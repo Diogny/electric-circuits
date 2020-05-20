@@ -1,0 +1,1058 @@
+[
+{
+	"type" : "gate",
+	"name" : "not",
+	"properties" : {
+		"description": "Logical NOT gate"
+	},
+	"meta" : {
+		"nodes": {
+			"length": 2,
+			"size": {
+				"width": 30,
+				"height": 0
+			},
+			"list" : [
+				{ "x": 0, "y": 30, "label": "Input A" },
+				{ "x": 117, "y": 30, "label": "Output Y" }
+			]
+		},
+		"logic" : {
+			"header": ["A", "Y"],
+			"table": [
+				[ 0, 1 ],
+				[ 1, 0 ]
+			]
+		}
+	},
+	"data" : "<path svg-type='body' d='M 15,0 L 75,30 L 15,60 Z'></path><circle svg-type='body'  r='12' cy='30' cx='90'/><path svg-type='node' node='0' d='M 0,30 H 15'></path><path svg-type='node' node='1' d='M 117,30 H 102'></path>"
+},
+{
+	"type" : "gate",
+	"name" : "buffer",
+	"properties" : {
+		"description": "Logical Buffer gate"
+	},
+	"meta" : {
+		"nodes": {
+			"length": 2,
+			"size": {
+				"width": 30,
+				"height": 0
+			},
+			"list" : [
+				{ "x": 0, "y": 30, "label": "Input A" },
+				{ "x": 86, "y": 30, "label": "Output Y" }
+			]
+		}
+	},
+	"data" : "<path svg-type='body' d='M 15,0 L 75,30 L 15,60 Z'></path><path svg-type='node' node='0' d='M 0,30 H 15'></path><path svg-type='node' node='1' d='M 86,30 H 71'></path>"
+},
+{
+	"type" : "gate",
+	"name" : "and",
+	"properties" : {
+		"description" : "Logical AND gate 2-inputs",
+		"comments" : "svg-type body moved to last, still hover shows the same but pin is hidden by node",
+		"example" : {
+			"editable" : true,
+			"label" : true,
+			"value" : "0.1mF"
+		},
+		"size" : {
+			"editable" : true,
+			"label" : true,
+			"combo": [ "1.5mm", "3mm", "5mm" ],
+			"value" : "3mm"
+		}
+	},
+	"meta" : {
+		"nodes": {
+			"length": 3,
+			"size": {
+				"width": 30,
+				"height": 0
+			},
+			"list" : [
+				{ "x": 0, "y": 15, "label": "Input A" },
+				{ "x": 0, "y": 45, "label": "Input B" },
+				{ "x": 100, "y": 30, "label": "Output Y" }
+			]
+		},
+		"logic" : {
+			"header": ["A", "B", "Y"],
+			"table": [
+				[ 0, 0, 0 ],
+				[ 0, 1, 0 ],
+				[ 1, 0, 0 ],
+				[ 1, 1, 1 ]
+			]
+		}
+	},
+	"data" : "<path svg-type='node' node='0' d='M 0,15 H 15'></path><path svg-type='node' node='1' d='M 0,45 H 15'></path><path svg-type='node' node='2' d='M 100,30 H 85'></path><path svg-type='body' d='M 15,0 H 45 C 98,0 98,60 45,60 H 15 Z'></path>"
+},
+{
+	"type" : "gate",
+	"name" : "nand",
+	"properties" : {
+		"description" : "Logicl NAND gate 2-inputs"
+	},
+	"meta" : {
+		"nodes": {
+			"length": 3,
+			"size": {
+				"width": 30,
+				"height": 0
+			},
+			"list" : [
+				{ "x": 0, "y": 15, "label": "Input A" },
+				{ "x": 0, "y": 45, "label": "Input B" },
+				{ "x": 122, "y": 30, "label": "Output Y" }
+			]
+		},
+		"logic" : {
+			"header": ["A", "B", "Y"],
+			"table": [
+				[ 0, 0, 1 ],
+				[ 0, 1, 1 ],
+				[ 1, 0, 1 ],
+				[ 1, 1, 0 ]
+			]
+		}
+	},
+	"data" : "<path svg-type='body' d='M 15,0 H 45 C 95,0 95,60 45,60 H 15 Z'></path><circle svg-type='body' r='12' cy='30' cx='95'></circle><path svg-type='node' node='0' d='M 0,15 H 15'></path><path svg-type='node' node='1' d='M 0,45 H 15'></path><path svg-type='node' node='2' d='M 122,30 H 107'></path>"
+},
+{
+	"type" : "gate",
+	"name" : "or",
+	"properties" : {
+		"description" : "Logicl OR gate 2-inputs"
+	},
+	"meta" : {
+		"nodes": {
+			"length": 3,
+			"size": {
+				"width": 30,
+				"height": 0
+			},
+			"list" : [
+				{ "x": 0, "y": 15, "label": "Input A" },
+				{ "x": 0, "y": 45, "label": "Input B" },
+				{ "x": 95, "y": 30, "label": "Output Y" }
+			]
+		},
+		"logic" : {
+			"header": ["A", "B", "Y"],
+			"table": [
+				[ 0, 0, 0 ],
+				[ 0, 1, 1 ],
+				[ 1, 0, 1 ],
+				[ 1, 1, 1 ]
+			]
+		}
+	},
+	"data" : "<path svg-type='body' d='M 12,0 Q 62,0 82,30 Q 62,60 12,60 Q 32,30 12,0 Z'></path><path svg-type='node' node='0' d='M 0,15 H 20'></path><path svg-type='node' node='1' d='M 0,45 H 20'></path><path svg-type='node' node='2' d='M 95,30 H 80'></path>"
+},
+{
+	"type" : "gate",
+	"name" : "nor",
+	"properties" : {
+		"description" : "Logicl NOR gate 2-inputs"
+	},
+	"meta" : {
+		"nodes": {
+			"length": 3,
+			"size": {
+				"width": 30,
+				"height": 0
+			},
+			"list" : [
+				{ "x": 0, "y": 15, "label": "Input A" },
+				{ "x": 0, "y": 45, "label": "Input B" },
+				{ "x": 125, "y": 30, "label": "Output Y" }
+			]
+		},
+		"logic" : {
+			"header": ["A", "B", "Y"],
+			"table": [
+				[ 0, 0, 1 ],
+				[ 0, 1, 0 ],
+				[ 1, 0, 0 ],
+				[ 1, 1, 0 ]
+			]
+		}
+	},
+	"data" : "<path svg-type='body' d='M 12,0 Q 62,0 82,30 Q 62,60 12,60 Q 32,30 12,0 Z'></path><circle svg-type='body' r='12' cy='30' cx='97'></circle><path svg-type='node' node='0' d='M 0,15 H 20'></path><path svg-type='node' node='1' d='M 0,45 H 20'></path><path svg-type='node' node='2' d='M 125,30 H 110'></path>"
+},
+{
+	"type" : "gate",
+	"name" : "xor",
+	"properties" : {
+		"description" : "Logicl XOR gate 2-inputs"
+	},
+	"meta" : {
+		"nodes": {
+			"length": 3,
+			"size": {
+				"width": 30,
+				"height": 0
+			},
+			"list" : [
+				{ "x": 0, "y": 15, "label": "Input A" },
+				{ "x": 0, "y": 45, "label": "Input B" },
+				{ "x": 114, "y": 30, "label": "Output Y" }
+			]
+		},
+		"logic" : {
+			"header": ["A", "B", "Y"],
+			"table": [
+				[ 0, 0, 0 ],
+				[ 0, 1, 1 ],
+				[ 1, 0, 1 ],
+				[ 1, 1, 0 ]
+			]
+		}
+	},
+	"data" : "<path svg-type='body' d='M 30,0 Q 80,0 100,30 Q 80,60 30,60 Q 50,30 30,0 Z'></path><path svg-type='body' class='thick no-fill' style='fill: none; ' d='M 12,60 Q 32,30 12,0'></path><path svg-type='node' node='0' d='M 0,15 H 22'></path><path svg-type='node' node='1' d='M 0,45 H 22'></path><path svg-type='node' node='2' d='M 114,30 H 98'></path>"
+},
+{
+	"type" : "gate",
+	"name" : "xnor",
+	"properties" : {
+		"description" : "Logicl XNOR gate 2-inputs"
+	},
+	"meta" : {
+		"nodes": {
+			"length": 3,
+			"size": {
+				"width": 30,
+				"height": 0
+			},
+			"list" : [
+				{ "x": 0, "y": 15, "label": "Input A" },
+				{ "x": 0, "y": 45, "label": "Input B" },
+				{ "x": 140, "y": 30, "label": "Output Y" }
+			]
+		},
+		"logic" : {
+			"header": ["A", "B", "Y"],
+			"table": [
+				[ 0, 0, 1 ],
+				[ 0, 1, 0 ],
+				[ 1, 0, 0 ],
+				[ 1, 1, 1 ]
+			]
+		}
+	},
+	"data" : "<path svg-type='body' d='M 30,0 Q 80,0 100,30 Q 80,60 30,60 Q 50,30 30,0 Z'></path><path svg-type='body' class='thick no-fill' style='fill: none; ' d='M 12,60 Q 32,30 12,0'></path><circle svg-type='body' r='12' cy='30' cx='115'></circle><path svg-type='node' node='0' d='M 0,15 H 22'></path><path svg-type='node' node='1' d='M 0,45 H 22'></path><path svg-type='node' node='2' d='M 140,30 H 126'></path>"
+},
+{
+	"type" : "power",
+	"name" : "gnd",
+	"properties" : {
+		"description" : "Ground terminal"
+	},
+	"meta" : {
+		"nodes": {
+			"length": 1,
+			"size": {
+				"width": 30,
+				"height": 0
+			},
+			"list" : [
+				{ "x": 60, "y": 0, "label": "GND" }
+			]
+		}
+	},
+	"data" : "<path svg-type='body' d='M 60,0 V 30'></path><path svg-type='body' d='M 120,30 H 0'></path><path svg-type='body' d='M 100,50 H 20'></path><path svg-type='body' d='M 80,70 H 40'></path><path svg-type='node' node='0' d='M 60,0 V 30'></path>"
+},
+{
+	"type" : "power",
+	"name" : "battery",
+	"properties" : {
+		"description" : "Generic battery"
+	},
+	"meta" : {
+		"nodes": {
+			"length": 2,
+			"size": {
+				"width": 30,
+				"height": 0
+			},
+			"list" : [
+				{ "x": 0, "y": 40, "label": "GND" },
+				{ "x": 70, "y": 40, "label": "VCC" }
+			]
+		}
+	},
+	"data" : "<rect svg-type='body' x='25' y='20' width='7' height='40'></rect><line x1='40' y1='0' x2='40' y2='80'></line><path class='vcc' style='fill: none; ' d='M 51,10 L 69,10 L 60,10 V 1 V 20 '></path><path svg-type='node' node='0' d='M 0,40 H 24'></path><path svg-type='node' node='1' d='M 70,40 H 41'></path>"
+},
+{
+	"type" : "power",
+	"name" : "battery-multi",
+	"properties" : {
+		"description" : "Generic multi-battery"
+	},
+	"meta" : {
+		"nodes": {
+			"length": 2,
+			"size": {
+				"width": 30,
+				"height": 0
+			},
+			"list" : [
+				{ "x": 0, "y": 40, "label": "GND" },
+				{ "x": 130, "y": 40, "label": "VCC" }
+			]
+		}
+	},
+	"data" : "<rect svg-type='body' x='25' y='20' width='7' height='40'></rect><line x1='40' y1='0' x2='40' y2='80'></line><rect svg-type='body' x='55' y='20' width='7' height='40'></rect><line svg-type='body' x1='75' y1='0' x2='75' y2='80'></line><rect svg-type='body' x='85' y='20' width='7' height='40'></rect><line svg-type='body' x1='105' y1='0' x2='105' y2='80'></line><path class='vcc' style='fill: none; ' d='M 111,10 L 129,10 L 120,10 V 1 V 20 '></path><path svg-type='node' node='0' d='M 0,40 H 25'></path><path svg-type='node' node='1' d='M 130,40 H 105'></path>"
+},
+{
+	"type" : "power",
+	"name" : "gen_power",
+	"properties" : {
+		"description": "3.3V Generic Power"
+	},
+	"meta" : {
+		"nodes": {
+			"length": 2,
+			"size": {
+				"width": 30,
+				"height": 0
+			},
+			"list" : [
+				{ "x": 0, "y": 40, "label": "GND" },
+				{ "x": 120, "y": 40, "label": "VCC" }
+			]
+		}
+	},
+	"data" : "<circle svg-type='body' r='40' cy='40' cx='60'></circle><text x='45' y='58' font-size='50'>V</text><path class='gnd' d='M 0,10 H 17'></path><path class='vcc' d='M 120,10 H 100'></path><path class='vcc' d='M 110,0 V 20'></path><path svg-type='node' node='0' d='M 0,40 H 20'></path><path svg-type='node' node='1' d='M 120,40 H 100'></path>"
+},
+{
+	"type" : "power",
+	"name" : "3v3",
+	"properties" : {
+		"description": "3.3V Generic Power",
+		"voltage" : {
+			"value" : "3.3V",
+			"label" : true
+		},
+		"current": "1500mA"
+	},
+	"tmpl" : {
+		"name" : "gen_power",
+		"labels" : ["GND", "3.3V VCC"]
+	}
+},
+{
+	"type" : "power",
+	"name" : "5v",
+	"properties" : {
+		"description": "5V Generic battery",
+		"voltage" : {
+			"value" : "5V",
+			"label" : true
+		},
+		"current": "2500mA"
+	},
+	"tmpl" : {
+		"name" : "gen_power",
+		"labels" : ["GND", "5V VCC"]
+	}
+},
+{
+	"type" : "diode",
+	"name" : "diode",
+	"properties" : {
+		"description" : "Generic diode"
+	},
+	"meta" : {
+		"nodes": {
+			"length": 2,
+			"size": {
+				"width": 30,
+				"height": 0
+			},
+			"list" : [
+				{ "x": 0, "y": 30, "label": "Anode (+)" },
+				{ "x": 100, "y": 30, "label": "Catode (-)" }
+			]
+		}
+	},
+	"data" : "<path svg-type='body' d='M 20,0 L 80,30 L 20,60 Z'></path><path svg-type='body' d='M 83,0 V 60 Z'></path><path svg-type='node' node='0' d='M 0,30 H 20'></path><path svg-type='node' node='1' d='M 100,30 H 83'></path>"
+},
+{
+	"type" : "diode",
+	"name" : "led",
+	"properties" : {
+		"description" : "Generic LED diode",
+		"notes": "color combo [green, blue, red, yellow, clear]. size combo [1.5mm, 3mm, 5mm]",
+		"size" : {
+			"editable" : true,
+			"label" : true,
+			"combo": [ "1.5", "3", "5" ],
+			"value" : "3mm"
+		}
+	},
+	"meta" : {
+		"nodes": {
+			"length": 2,
+			"size": {
+				"width": 30,
+				"height": 0
+			},
+			"list" : [
+				{ "x": 0, "y": 40, "label": "Anode (+)" },
+				{ "x": 100, "y": 40, "label": "Catode (-)" }
+			]
+		}
+	},
+	"data" : "<path svg-type='body' d='M 20,10 L 80,40 L 20,70 Z'></path><path svg-type='body' d='M 83,20 V 60 Z'></path><path svg-type='body' style='stroke-width: 2px; ' d='M 50,15 L 56.8,4.6 L 53,2 L 60,0 L 60,7.2 L 56.8,4.6'></path><path svg-type='body' style='stroke-width: 2px; ' d='M 63,23 L 69,13 L 65,10.2 L 72,8  L 72.9,15.5 L 69,13'></path><path svg-type='node' node='0' d='M 0,40 H 20'></path><path svg-type='node' node='1' d='M 100,40 H 83'></path>"
+},
+{
+	"type" : "diode",
+	"name" : "photodiode",
+	"properties" : {
+		"description" : "Generic photodiode"
+	},
+	"meta" : {
+		"nodes": {
+			"length": 2,
+			"size": {
+				"width": 30,
+				"height": 0
+			},
+			"list" : [
+				{ "x": 0, "y": 40, "label": "Anode (+)" },
+				{ "x": 100, "y": 40, "label": "Catode (-)" }
+			]
+		}
+	},
+	"data" : "<path svg-type='body' d='M 20,10 L 80,40 L 20,70 Z'></path><path svg-type='body' d='M 84,20 V 60 Z'></path><path svg-type='body' style='stroke-width: 2px;' d='M 60,0 L 53.3,10.1 L 49.4,7.6 L 50,15 L 57.4,12.8 L 53.3,10.1'></path><path svg-type='body' style='stroke-width: 2px;' d='M 72,8 L 65.4,18.1 L 61.6,15.6 L 62,23 L 69.5,20.9 L 65.4,18.1'></path><path svg-type='node' node='0' d='M 0,40 H 20'></path><path svg-type='node' node='1' d='M 100,40 H 85'></path>"
+},
+{
+	"type" : "diode",
+	"name" : "schottky",
+	"properties" : {
+		"description" : "Generic schottky diode"
+	},
+	"meta" : {
+		"nodes": {
+			"length": 2,
+			"size": {
+				"width": 30,
+				"height": 0
+			},
+			"list" : [
+				{ "x": 0, "y": 30, "label": "Anode (+)" },
+				{ "x": 100, "y": 30, "label": "Catode (-)" }
+			]
+		}
+	},
+	"data" : "<path svg-type='body' d='M 20,0 L 80,30 L 20,60 Z'></path><path svg-type='body' style='fill: none; ' d='M 68,47 L 68,60 L 83,60 L 83,0 L 98,0 L 98,13'></path><path svg-type='node' node='0' d='M 0,30 H 20'></path><path svg-type='node' node='1' d='M 100,30 H 83'></path>"
+},
+{
+	"type" : "diode",
+	"name" : "tunnel",
+	"properties" : {
+		"description" : "Generic tunnel diode"
+	},
+	"meta" : {
+		"nodes": {
+			"length": 2,
+			"size": {
+				"width": 30,
+				"height": 0
+			},
+			"list" : [
+				{ "x": 0, "y": 30, "label": "Anode (+)" },
+				{ "x": 100, "y": 30, "label": "Catode (-)" }
+			]
+		}
+	},
+	"data" : "<path svg-type='body' d='M 20,0 L 80,30 L 20,60 Z'></path><path svg-type='body' style='fill: none; ' d='M 73,60 L 83,60 L 83,0 L 73,0'></path><path svg-type='node' node='0' d='M 0,30 H 20'></path><path svg-type='node' node='1' d='M 100,30 H 83'></path>"
+},
+{
+	"type" : "diode",
+	"name" : "varicap",
+	"properties" : {
+		"description" : "Generic varicap diode"
+	},
+	"meta" : {
+		"nodes": {
+			"length": 2,
+			"size": {
+				"width": 30,
+				"height": 0
+			},
+			"list" : [
+				{ "x": 0, "y": 30, "label": "Anode (+)" },
+				{ "x": 115, "y": 30, "label": "Catode (-)" }
+			]
+		}
+	},
+	"data" : "<path svg-type='body' d='M 20,0 L 80,30 L 20,60 Z'></path><path svg-type='body' d='M 84,0 V 60 Z'></path><path svg-type='body' d='M 95,0 V 60 Z'></path><path svg-type='node' node='0' d='M 0,30 H 20'></path><path svg-type='node' node='1' d='M 115,30 H 95'></path>"
+},
+{
+	"type" : "diode",
+	"name" : "zener",
+	"properties" : {
+		"description" : "Generic Zener diode"
+	},
+	"meta" : {
+		"nodes": {
+			"length": 2,
+			"size": {
+				"width": 30,
+				"height": 0
+			},
+			"list" : [
+				{ "x": 0, "y": 30, "label": "Anode (+)" },
+				{ "x": 100, "y": 30, "label": "Catode (-)" }
+			]
+		}
+	},
+	"data" : "<path svg-type='body' style='fill: black; ' d='M 20,0 L 80,30 L 20,60 Z'></path><path svg-type='body' style='fill: none; ' d='M 73,60 L 83,60 L 83,0 L 93,0'></path><path svg-type='node' node='0' d='M 0,30 H 20'></path><path svg-type='node' node='1' d='M 100,30 H 83'></path>"
+},
+{
+	"type" : "transistor",
+	"name" : "npn",
+	"properties" : {
+		"description" : "BJT Bipolar NPN Transistor"
+	},
+	"meta" : {
+		"nodes": {
+			"length": 3,
+			"size": {
+				"width": 30,
+				"height": 0
+			},
+			"list" : [
+				{ "x": 0, "y": 60, "label": "Base" },
+				{ "x": 79, "y": 0, "label": "Collector" },
+				{ "x": 79, "y": 120, "label": "Emitter" }
+			]
+		}
+	},
+	"data" : "<circle svg-type='body' r='40' cy='60' cx='60'/><path svg-type='body' style='fill: none; stroke-width: 2px; ' d='M 80,25 L 50,45 V 30 V 60 H 20 H 50 V 90 V 75 L 80,95 L 64,92 L 80,95 L 75,80 '></path><path svg-type='node' node='0' d='M 0,60 H 20'></path><path svg-type='node' node='1' d='M 79,0 V 25'></path><path svg-type='node' node='2' d='M 79,120 V 95'></path>"
+},
+{
+	"type" : "transistor",
+	"name" : "pnp",
+	"properties" : {
+		"description" : "BJT Bipolar PNP Transistor"
+	},
+	"meta" : {
+		"nodes": {
+			"length": 3,
+			"size": {
+				"width": 30,
+				"height": 0
+			},
+			"list" : [
+				{ "x": 0, "y": 60, "label": "Base" },
+				{ "x": 79, "y": 0, "label": "Collector" },
+				{ "x": 79, "y": 120, "label": "Emitter" }
+			]
+		}
+	},
+	"data" : "<circle svg-type='body' r='40' cy='60' cx='60'/><path svg-type='body' style='fill: none; stroke-width: 2px; ' d='M 80,25 L 50,45 L 58,30 L 50,45 L 62,50 L 50,45 V 30 V 60 H 20 H 50 V 90 V 75 L 80,95 '></path><path svg-type='node' node='0' d='M 0,60 H 20'></path><path svg-type='node' node='1' d='M 79,0 V 25'></path><path svg-type='node' node='2' d='M 79,120 V 95'></path>"
+},
+{
+	"type" : "dip",
+	"name" : "dip4",
+	"properties" : {
+		"description" : "Generic DIP 4 pins"
+	},
+	"meta" : {
+		"nodes": {
+			"length": 4,
+			"size": {
+				"width": 0,
+				"height": 20
+			},
+			"list" : [
+				{ "x": 14, "y": 101, "label": "GND" },
+				{ "x": 42, "y": 101, "label": "Output 1" },
+				{ "x": 42, "y": 0, "label": "Data 0" },
+				{ "x": 14, "y": 0, "label": "VCC" }	
+			]
+		}
+	},
+	"data" :"<path svg-type='body' d='M 0,15 H 56 V 85 H 0 Z'></path><path svg-type='body' class='semi' d='m 1,37 a 8,10 0 1 1 0,25'></path><circle svg-type='body' cx='24' cy='69' r='4'></circle><text x='22' y='65' font-size='50' >4</text><path svg-type='node' node='0' d='M 14,101 V 86'></path><path svg-type='node' node='1' d='M 42,101 V 86'></path><path svg-type='node' node='2' d='M 42,0 V 15'></path><path svg-type='node' node='3' d='M 14,0 V 15'/>"
+},
+{
+	"type" : "dip",
+	"name" : "dip6",
+	"properties" : {
+		"description" : "Generic DIP 6 pins"
+	},
+	"meta" : {
+		"nodes": {
+			"length": 6,
+			"size": {
+				"width": 0,
+				"height": 20
+			},
+			"list" : [
+				{ "x": 14, "y": 101, "label": "GND" },
+				{ "x": 42, "y": 101, "label": "Output 1" },
+				{ "x": 70, "y": 101, "label": "Output 0" },
+				{ "x": 70, "y": 0, "label": "Data 1" },
+				{ "x": 42, "y": 0, "label": "Data 0" },
+				{ "x": 14, "y": 0, "label": "VCC" }	
+			]
+		}
+	},
+	"data" :"<path svg-type='body' d='M 0,15 H 84 V 85 H 0 Z'></path><path svg-type='body' class='semi' d='m 1,37 a 8,10 0 1 1 0,25'></path><circle svg-type='body' cx='26' cy='67' r='4'></circle><text x='38' y='67' font-size='50' >6</text><path svg-type='node' node='0' d='M 14,101 V 86'></path><path svg-type='node' node='1' d='M 42,101 V 86'></path><path svg-type='node' node='2' d='M 70,101 V 86'></path><path svg-type='node' node='3' d='M 70,0 V 15'></path><path svg-type='node' node='4' d='M 42,0 V 15'></path><path svg-type='node' node='5' d='M 14,0 V 15'></path>"
+},
+{
+	"type" : "dip",
+	"name" : "dip8",
+	"properties" : {
+		"description" : "Generic DIP 8 pins"
+	},
+	"meta" : {
+		"nodes": {
+			"length": 8,
+			"size": {
+				"width": 0,
+				"height": 20
+			},
+			"list" : [
+				{ "x": 14, "y": 101, "label": "GND" },
+				{ "x": 42, "y": 101, "label": "Output 1" },
+				{ "x": 70, "y": 101, "label": "Output 0" },
+				{ "x": 98, "y": 101, "label": "Data 3" },
+				{ "x": 98, "y": 0, "label": "Data 2" },
+				{ "x": 70, "y": 0, "label": "Data 1" },
+				{ "x": 42, "y": 0, "label": "Data 0" },
+				{ "x": 14, "y": 0, "label": "VCC" }
+			]
+		}
+	},
+	"data" : "<path svg-type='body' d='M 0,15 H 112 V 85 H 0 Z'></path><path svg-type='body' class='semi' d='m 1,37 a 8,10 0 1 1 0,25'></path><circle svg-type='body' cx='26' cy='67' r='4'></circle><text x='50' y='67' font-size='50'>8</text><path svg-type='node' node='0' d='M 14,101 V 86'></path><path svg-type='node' node='1' d='M 42,101 V 86'></path><path svg-type='node' node='2' d='M 70,101 V 86'></path><path svg-type='node' node='3' d='M 98,101 V 86'></path><path svg-type='node' node='4' d='M 98,0 V 15'></path><path svg-type='node' node='5' d='M 70,0 V 15'></path><path svg-type='node' node='6' d='M 42,0 V 15'></path><path svg-type='node' node='7' d='M 14,0 V 15'></path>"
+},
+{
+	"type" : "dip",
+	"name" : "dipn555",
+	"properties" : {
+		"description": "N555 Bipolar Timer",
+		"package": "bipolar",
+		"VCC": "4.5..15 V",
+		"temperature": "0..75 °C"
+	},
+	"tmpl" : {
+		"name" : "dip8",
+		"label" : {
+			"x" : 30,
+			"y" : 60,
+			"font": 32,
+			"text" : "N555"
+		},
+		"labels" : ["GND", "TRIG", "OUT", "RESET", "CONT", "THRES", "DISCH", "VCC"]
+	}
+},
+{
+	"type" : "dip",
+	"name" : "dip10",
+	"properties" : {
+		"description" : "Generic DIP 10 pins"
+	},
+	"meta": {
+		"nodes": {
+			"length": 10,
+			"size": {
+				"width": 0,
+				"height": 20
+			},
+			"list" : [
+				{ "x": 14,	"y": 112, "label": "GND" },
+				{ "x": 42,	"y": 112, "label": "Output 3" },
+				{ "x": 70,	"y": 112, "label": "Output 2" },
+				{ "x": 98,	"y": 112, "label": "Output 1" },
+				{ "x": 126, "y": 112, "label": "Output 0" },
+				{ "x": 126, "y": 0, "label": "Data 3" },
+				{ "x": 98,	"y": 0,	"label": "Data 2" },
+				{ "x": 70,	"y": 0,	"label": "Data 1" },
+				{ "x": 42,	"y": 0,	"label": "Data 0" },
+				{ "x": 14,	"y": 0,	"label": "VCC" }
+			]
+		}
+	},
+	"data": "<path svg-type='body' d='M 0,15 H 140 V 90 H 0 Z'></path><path svg-type='body' class='semi' d='m 1,42 a 8,10 0 1 1 0,25'></path><circle svg-type='body' cx='26' cy='72' r='4'></circle><text x='48' y='72' font-size='50' >10</text><path svg-type='node' node='0' d='M 14,112 V 91'></path><path svg-type='node' node='1' d='M 42,112 V 91'></path><path svg-type='node' node='2' d='M 70,112 V 91'></path><path svg-type='node' node='3' d='M 98,112 V 91'></path><path svg-type='node' node='4' d='M 126,112 V 91'></path><path svg-type='node' node='5' d='M 126,0 V 15'></path><path svg-type='node' node='6' d='M 98,0 V 15'></path><path svg-type='node' node='7' d='M 70,0 V 15'></path><path svg-type='node' node='8' d='M 42,0 V 15'></path><path svg-type='node' node='9' d='M 14,0 V 15'></path>"
+},
+{
+	"type" : "dip",
+	"name" : "dip12",
+	"properties" : {
+		"description" : "Generic DIP 12 pins"
+	},
+	"meta" : {
+		"nodes": {
+			"length": 12,
+			"size": {
+				"width": 0,
+				"height": 20
+			},
+			"list" : [
+				{ "x": 14, "y": 112, "label": "GND" },
+				{ "x": 42, "y": 112, "label": "Output 4" },
+				{ "x": 70, "y": 112, "label": "Output 3" },
+				{ "x": 98, "y": 112, "label": "Output 2" },
+				{ "x": 126, "y": 112, "label": "Output 1" },
+				{ "x": 154, "y": 112, "label": "Output 0" },
+				{ "x": 154, "y": 0, "label": "Data 4" },
+				{ "x": 126, "y": 0, "label": "Data 3" },
+				{ "x": 98, "y": 0, "label": "Data 2" },
+				{ "x": 70, "y": 0, "label": "Data 1" },
+				{ "x": 42, "y": 0, "label": "Data 0" },
+				{ "x": 14, "y": 0, "label": "VCC" }
+			]
+		}
+	},
+	"data" : "<path svg-type='body' d='M 0,20 H 168 V 90 H 0 Z'></path><path svg-type='body' class='semi' d='m 1,42 a 8,10 0 1 1 0,25'></path><circle svg-type='body' cx='26' cy='72' r='4'></circle><text x='58' y='72' font-size='50'>12</text><path svg-type='node' node='0' d='M 14,112 V 91'></path><path svg-type='node' node='1' d='M 42,112 V 91'></path><path svg-type='node' node='2' d='M 70,112 V 91'></path><path svg-type='node' node='3' d='M 98,112 V 91'></path><path svg-type='node' node='4' d='M 126,112 V 91'></path><path svg-type='node' node='5' d='M 154,112 V 91'></path><path svg-type='node' node='6' d='M 154,0 V 20'></path><path svg-type='node' node='7' d='M 126,0 V 20'></path><path svg-type='node' node='8' d='M 98,0 V 20'></path><path svg-type='node' node='9' d='M 70,0 V 20'></path><path svg-type='node' node='10' d='M 42,0 V 20'></path><path svg-type='node' node='11' d='M 14,0 V 20'></path>"
+},
+{
+	"type" : "dip",
+	"name" : "dip14",
+	"properties" : {
+		"description" : "Generic DIP 14 pins"
+	},
+	"meta" : {
+		"nodes": {
+			"length": 14,
+			"size": {
+				"width": 0,
+				"height": 20
+			},
+			"list" : [
+				{ "x": 14, "y": 112, "label": "GND" },
+				{ "x": 42, "y": 112, "label": "Output 5" },
+				{ "x": 70, "y": 112, "label": "Output 4" },
+				{ "x": 98, "y": 112, "label": "Output 3" },
+				{ "x": 126, "y": 112, "label": "Output 2" },
+				{ "x": 154, "y": 112, "label": "Output 1" },
+				{ "x": 182, "y": 112, "label": "Output 0" },
+				{ "x": 182, "y": 0, "label": "Data 5" },
+				{ "x": 154, "y": 0, "label": "Data 4" },
+				{ "x": 126, "y": 0, "label": "Data 3" },
+				{ "x": 98, "y": 0, "label": "Data 2" },
+				{ "x": 70, "y": 0, "label": "Data 1" },
+				{ "x": 42, "y": 0, "label": "Data 0" },
+				{ "x": 14, "y": 0, "label": "VCC" }
+			]
+		}
+	},
+	"data" : "<path svg-type='body' d='M 0,20 H 196 V 90 H 0 Z'></path><path svg-type='body' class='semi' d='m 1,42 a 8,10 0 1 1 0,25'></path><circle svg-type='body' cx='26' cy='72' r='4'></circle><text x='70' y='72' font-size='50'>14</text><path svg-type='node' node='0' d='M 14,112 V 91'></path><path svg-type='node' node='1' d='M 42,112 V 91'></path><path svg-type='node' node='2' d='M 70,112 V 91'></path><path svg-type='node' node='3' d='M 98,112 V 91'></path><path svg-type='node' node='4' d='M 126,112 V 91'></path><path svg-type='node' node='5' d='M 154,112 V 91'></path><path svg-type='node' node='6' d='M 182,112 V 91'></path><path svg-type='node' node='7' d='M 182,0 V 20'></path><path svg-type='node' node='8' d='M 154,0 V 20'></path><path svg-type='node' node='9' d='M 126,0 V 20'></path><path svg-type='node' node='10' d='M 98,0 V 20'></path><path svg-type='node' node='11' d='M 70,0 V 20'></path><path svg-type='node' node='12' d='M 42,0 V 20'></path><path svg-type='node' node='13' d='M 14,0 V 20'></path>"
+},
+{
+	"type" : "ic",
+	"name" : "7408",
+	"properties" : {
+		"description" : "Logic IC with four two-input AND Gates",
+		"package": "bipolar",
+		"VCC": "4.5..5.25 V",
+		"temperature": "0..70 °C"
+	},
+	"tmpl" : {
+		"name" : "dip14",
+		"label" : {
+			"x" : 60,
+			"y" : 70,
+			"font": 45,
+			"text" : "7408"
+		},
+		"labels" : ["Input 1-1", "Input 1-2", "Output 1", 
+				  "Input 2-1", "Input 2-2", "Output 2", "GND",
+				  "Output 3", "Input 3-2", "Input 3-1",
+				  "Output 4", "Input 4-2", "Input 4-1", "VCC"]
+	}
+},
+{
+	"type" : "dip",
+	"name" : "dip16",
+	"properties" : {
+		"description" : "Generic DIP 16 pins"
+	},
+	"meta" : {
+		"nodes": {
+			"length": 16,
+			"size": {
+				"width": 0,
+				"height": 20
+			},
+			"list" : [
+				{ "x": 14, "y": 112, "label": "GND" },
+				{ "x": 42, "y": 112, "label": "Output 6" },
+				{ "x": 70, "y": 112, "label": "Output 5" },
+				{ "x": 98, "y": 112, "label": "Output 4" },
+				{ "x": 126, "y": 112, "label": "Output 3" },
+				{ "x": 154, "y": 112, "label": "Output 2" },
+				{ "x": 182, "y": 112, "label": "Output 1" },
+				{ "x": 210, "y": 112, "label": "Output 0" },
+				{ "x": 210, "y": 0, "label": "Data 6" },
+				{ "x": 182, "y": 0, "label": "Data 5" },
+				{ "x": 154, "y": 0, "label": "Data 4" },
+				{ "x": 126, "y": 0, "label": "Data 3" },
+				{ "x": 98, "y": 0, "label": "Data 2" },
+				{ "x": 70, "y": 0, "label": "Data 1" },
+				{ "x": 42, "y": 0, "label": "Data 0" },
+				{ "x": 14, "y": 0, "label": "VCC" }
+			]
+		}
+	},
+	"data" : "<path svg-type='body' d='M 0,20 H 224 V 90 H 0 Z'></path><path svg-type='body' class='semi' d='m 1,42 a 8,10 0 1 1 0,25'></path><circle svg-type='body' cx='26' cy='72' r='4'></circle><text x='78' y='72' font-size='50'>16</text><path svg-type='node' node='0' d='M 14,112 V 91'></path><path svg-type='node' node='1' d='M 42,112 V 91'></path><path svg-type='node' node='2' d='M 70,112 V 91'></path><path svg-type='node' node='3' d='M 98,112 V 91'></path><path svg-type='node' node='4' d='M 126,112 V 91'></path><path svg-type='node' node='5' d='M 154,112 V 91'></path><path svg-type='node' node='6' d='M 182,112 V 91'></path><path svg-type='node' node='7' d='M 210,112 V 91'></path><path svg-type='node' node='8' d='M 210,0 V 20'></path><path svg-type='node' node='9' d='M 182,0 V 20'></path><path svg-type='node' node='10' d='M 154,0 V 20'></path><path svg-type='node' node='11' d='M 126,0 V 20'></path><path svg-type='node' node='12' d='M 98,0 V 20'></path><path svg-type='node' node='13' d='M 70,0 V 20'></path><path svg-type='node' node='14' d='M 42,0 V 20'></path><path svg-type='node' node='15' d='M 14,0 V 20'></path>"
+},
+{
+	"type": "dip",
+	"name": "dip28",
+	"properties" : {
+		"description" : "Generic DIP 28 pins"
+	},
+	"meta": {
+		"nodes": {
+			"length": 28,
+			"size": {
+				"width": 0,
+				"height": 20
+			},
+			"list": [
+				{ "x": 14, "y": 112, "label": "PC6 PCINT14/RESET" },
+				{ "x": 42, "y": 112, "label": "PD0 PCINT16/RXD" },
+				{ "x": 70, "y": 112, "label": "PD1 PCINT17/TXD" },
+				{ "x": 98, "y": 112, "label": "PD2 PCINT18/INTO" },
+				{ "x": 126, "y": 112, "label": "PD3 PCINT19/OC2B/INT1 PWM" },
+				{ "x": 154, "y": 112, "label": "PD4 PCINT20/XCK/T0" },
+				{ "x": 182, "y": 112, "label": "VCC" },
+				{ "x": 210, "y": 112, "label": "GND" },
+				{ "x": 238, "y": 112, "label": "PB6 PCINT6/XTAL1/TOSC1" },
+				{ "x": 266, "y": 112, "label": "PB7 PCINT7/XTAL2/TOSC2" },
+				{ "x": 294, "y": 112, "label": "PD5 PCINT21/OC0B/T1 PWM" },
+				{ "x": 322, "y": 112, "label": "PD6 PCINT22/OC0A/AIN0 PWM" },
+				{ "x": 350, "y": 112, "label": "PD7 PCINT23/AIN1" },
+				{ "x": 378, "y": 112, "label": "PB8 PCINT0/CLK0/ICP1" },
+				{ "x": 378, "y": 0, "label": "PB1 OC1A/PCINT1 PWM" },
+				{ "x": 350, "y": 0, "label": "PB2 SS/OC1B/PCINT2 PWM" },
+				{ "x": 322, "y": 0, "label": "PB3 MOSI/OC2A/PCINT3 PWM" },
+				{ "x": 294, "y": 0, "label": "PB4 MISO/PCINT4" },
+				{ "x": 266, "y": 0, "label": "PB5 SCK/PCINT5" },
+				{ "x": 238, "y": 0, "label": "AVCC" },
+				{	"x": 210, "y": 0, "label": "AREF" },
+				{ "x": 182, "y": 0, "label": "GND" },
+				{ "x": 154, "y": 0, "label": "PC0 ADC0/PCINT8" },
+				{ "x": 126, "y": 0, "label": "PC1 ADC1/PCINT9" },
+				{ "x": 98, "y": 0, "label": "PC2 ADC2/PCINT10" },
+				{ "x": 70, "y": 0, "label": "PC3 ADC3/PCINT11" },
+				{ "x": 42, "y": 0, "label": "PC4 ADC4/PCINT12" },
+				{ "x": 14, "y": 0, "label": "PC5 ADC5/PCINT13" }
+			]
+		}
+	},
+	"data": "<path svg-type='body' d='M 0,20 H 392 V 90 H 0 Z'></path><path svg-type='body' class='semi' d='m 1,42 a 8,10 0 1 1 0,25'></path><circle svg-type='body' cx='26' cy='72' r='4'></circle><text x='70' y='70' font-size='45' >Atmega168</text><path svg-type='node' node='0' d='M 14,112 V 91'></path><path svg-type='node' node='1' d='M 42,112 V 91'></path><path svg-type='node' node='2' d='M 70,112 V 91'></path><path svg-type='node' node='3' d='M 98,112 V 91'></path><path svg-type='node' node='4' d='M 126,112 V 91'></path><path svg-type='node' node='5' d='M 154,112 V 91'></path><path svg-type='node' node='6' d='M 182,112 V 91'></path><path svg-type='node' node='7' d='M 210,112 V 91'></path><path svg-type='node' node='8' d='M 238,112 V 91'></path><path svg-type='node' node='9' d='M 266,112 V 91'></path><path svg-type='node' node='10' d='M 294,112 V 91'></path><path svg-type='node' node='11' d='M 322,112 V 91'></path><path svg-type='node' node='12' d='M 350,112 V 91'></path><path svg-type='node' node='13' d='M 378,112 V 91'></path><path svg-type='node' node='14' d='M 378,0 V 20'></path><path svg-type='node' node='15' d='M 350,0 V 20'></path><path svg-type='node' node='16' d='M 322,0 V 20'></path><path svg-type='node' node='17' d='M 294,0 V 20'></path><path svg-type='node' node='18' d='M 266,0 V 20'></path><path svg-type='node' node='19' d='M 238,0 V 20'></path><path svg-type='node' node='20' d='M 210,0 V 20'></path><path svg-type='node' node='21' d='M 182,0 V 20'></path><path svg-type='node' node='22' d='M 154,0 V 20'></path><path svg-type='node' node='23' d='M 126,0 V 20'></path><path svg-type='node' node='24' d='M 98,0 V 20'></path><path svg-type='node' node='25' d='M 70,0 V 20'></path><path svg-type='node' node='26' d='M 42,0 V 20'></path><path svg-type='node' node='27' d='M 14,0 V 20'></path>"
+},
+{
+	"type" : "passive",
+	"name" : "capacitor",
+	"properties" : {
+		"capacitance" : {
+			"editable" : true,
+			"label" : true,
+			"value" : "0.1mF"
+		},
+		"voltage": "50V",
+		"tolerance": "2%",
+		"description": "Generic capacitor"
+	},
+	"meta" : {
+		"nodes": {
+			"length": 2,
+			"size": {
+				"width": 30,
+				"height": 0
+			},
+			"list" : [
+				{ "x": 0, "y": 30, "label": "pin 0" },
+				{ "x": 68, "y": 30, "label": "pin 1" }
+			]
+		}
+	},
+	"data" : "<rect svg-type='body' x='20' y='0' width='7' height='60'></rect><rect svg-type='body' x='40' y='0' width='7' height='60'></rect><path svg-type='node' node='0' d='M 0,30 H 19'></path><path svg-type='node' node='1' d='M 68,30 H 48'></path>"
+},
+{
+	"type" : "passive",
+	"name" : "capacitor-polarized",
+	"properties" : {
+		"description" : "Generic polarized capacitor"
+	},
+	"meta" : {
+		"nodes": {
+			"length": 2,
+			"size": {
+				"width": 30,
+				"height": 0
+			},
+			"list" : [
+				{ "x": 0, "y": 30, "label": "pin (-)" },
+				{ "x": 70, "y": 30, "label": "pin (+)" }
+			]
+		}
+	},
+	"data" : "<path svg-type='body' style='fill: none; ' d='M 20,60 Q 40,30 20,0'></path><path svg-type='body' style='fill: none; ' d='M 51,10 L 69,10 L 60,10 V 1 V 20 '></path><rect svg-type='body' x='40' y='0' width='5' height='60'></rect><path svg-type='node' node='0' d='M 0,30 H 30'></path><path svg-type='node' node='1' d='M 70,30 H 45'></path>"
+},
+{
+	"type" : "passive",
+	"name" : "capacitor-variable",
+	"properties" : {
+		"description" : "Generic variable capacitor"
+	},
+	"meta" : {
+		"nodes": {
+			"length": 2,
+			"size": {
+				"width": 30,
+				"height": 0
+			},
+			"list" : [
+				{ "x": 0, "y": 30, "label": "pin 0" },
+				{ "x": 68, "y": 30, "label": "pin 1" }
+			]
+		}
+	},
+	"data" : "<rect svg-type='body' x='20' y='0' width='7' height='60'></rect><rect svg-type='body' x='42' y='0' width='7' height='60'></rect><path svg-type='body' style='stroke-width: 2px;' d='M 5,60 L 59,6 L 54,1 L 65,0 L 64,10.3 L 59,6'></path><path svg-type='node' node='0' d='M 0,30 H 20'></path><path svg-type='node' node='1' d='M 68,30 H 48'></path>"
+},
+{
+	"type" : "motor",
+	"name" : "dc-motor",
+	"properties" : {
+		"description" : "Generic DC Motor"
+	},
+	"meta" : {
+		"nodes": {
+			"length": 2,
+			"size": {
+				"width": 30,
+				"height": 0
+			},
+			"list" : [
+				{ "x": 30, "y": 0, "label": "Pin (-)" },
+				{ "x": 30, "y": 100, "label": "Pin (+)" }
+			]
+		}
+	},
+	"data" : "<circle svg-type='body' r='30' cy='50' cx='30'></circle><text x='12' y='62' font-size='40'>M</text><path svg-type='node' node='0' d='M 30,0 V 20'></path><path svg-type='node' node='1' d='M 30,100 V 80'></path>"
+},
+{
+	"type" : "passive",
+	"name" : "resistor",
+	"properties" : {
+		"description": "Generic resistor",
+		"resistance" : {
+			"editable" : true,
+			"label" : true,
+			"value" : "5kΩ"
+		},
+		"tolerance": "2%"
+	},
+	"meta" : {
+		"nodes": {
+			"length": 2,
+			"size": {
+				"width": 30,
+				"height": 0
+			},
+			"list" : [
+				{ "x": 0, "y": 10, "label": "Pin 0" },
+				{ "x": 80, "y": 10, "label": "Pin 1" }
+			]
+		}
+	},
+	"data" : "<rect svg-type='body' x='20' y='0' width='40' height='20'></rect><path svg-type='node' node='0' d='M 0,10 H 19'></path><path svg-type='node' node='1' d='M 80,10 H 61'></path>"
+},
+{
+	"type" : "passive",
+	"name" : "push-button",
+	"properties" : {
+		"description" : "Generic Push Button"
+	},
+	"meta" : {
+		"nodes": {
+			"length": 2,
+			"size": {
+				"width": 30,
+				"height": 0
+			},
+			"list" : [
+				{ "x": 0, "y": 40, "label": "pin 0" },
+				{ "x": 80, "y": 40, "label": "pin 1" }
+			]
+		}
+	},
+	"data" : "<line x1='25' y1='0' x2='55' y2='0'></line><line x1='40' y1='1' x2='40' y2='14'></line><rect svg-type='body' x='20' y='15' width='40' height='10'></rect><circle svg-type='body' r='5' cx='25' cy='40'></circle><circle svg-type='body' r='5' cx='55' cy='40'></circle><path svg-type='node' node='0' d='M 0,40 H 20'></path><path svg-type='node' node='1' d='M 80,40 H 60'></path>"
+},
+{
+	"type" : "passive",
+	"name" : "switch",
+	"properties" : {
+		"description" : "Generic Switch"
+	},
+	"meta" : {
+		"nodes": {
+			"length": 2,
+			"size": {
+				"width": 30,
+				"height": 0
+			},
+			"list" : [
+				{ "x": 0, "y": 20, "label": "pin 0" },
+				{ "x": 90, "y": 20, "label": "pin 1" }
+			]
+		}
+	},
+	"data" : "<line x1='28' y1='17' x2='60' y2='0' style='stroke-width: 7px;'></line><circle svg-type='body' r='7' cx='25' cy='20'></circle><circle svg-type='body' r='7' cx='65' cy='20'></circle><path svg-type='node' node='0' d='M 0,20 H 19'></path><path svg-type='node' node='1' d='M 90,20 H 71'></path>"
+},
+{
+	"type" : "passive",
+	"name" : "switch-sdpt",
+	"properties" : {
+		"description": "Generic SDPT Switch"
+	},
+	"meta" : {
+		"nodes": {
+			"length": 3,
+			"size": {
+				"width": 30,
+				"height": 0
+			},
+			"list" : [
+				{ "x": 0, "y": 20, "label": "pin 0" },
+				{ "x": 90, "y": 7, "label": "pin 1" },
+				{ "x": 90, "y": 37, "label": "pin 2" }
+			]
+		}
+	},
+	"data" : "<line x1='28' y1='20' x2='60' y2='7' style='stroke-width: 7px;'></line><circle svg-type='body' r='7' cx='25' cy='20'></circle><circle svg-type='body' r='7' cx='65' cy='7'></circle><circle svg-type='body' r='7' cx='65' cy='37'></circle><path svg-type='node' node='0' d='M 0,20 H 19'></path><path svg-type='node' node='1' d='M 90,7 H 71'></path><path svg-type='node' node='2' d='M 90,37 H 71'></path>"
+},
+{
+	"type" : "passive",
+	"name" : "inductor",
+	"properties" : {
+		"description" : "Generic inductor"
+	},
+	"meta" : {
+		"nodes": {
+			"length": 2,
+			"size": {
+				"width": 30,
+				"height": 0
+			},
+			"list" : [
+				{ "x": 0, "y": 34, "label": "pin 0" },
+				{ "x": 134, "y": 34, "label": "pin 1" }
+			]
+		}
+	},
+	"data" : "<path svg-type='body' d='M 23,31 Q 38,0 53,26 Q 68,0 83,26 Q 98,0 113,31 V 36 H 108 Q 98,10 86,36 H 80 Q 68,10 56,36 H 50 Q 38,10 28,36 H 23 Z'></path><path svg-type='node' node='0' d='M 0,34 H 22'></path><path svg-type='node' node='1' d='M 134,34 H 114'></path>"
+}
+]

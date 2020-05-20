@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8" />
+	<title>Electronic Circuits</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="author" content="Diogny">
+	<meta name="base" content="path">
+	<link rel="shortcut icon" href="favicon.ico">
+	<link rel="stylesheet" href="dist/css/purecss.min.css">
+	<link rel="stylesheet" href="dist/css/styles.css">
+	<link rel="stylesheet" href="dist/css/styles-tests-circuits.css">
+</head>
+
+<body>
+	<main id="maincontent">
+		<div class="container">
+			<div id="top-bar" class="pure-g" style="background: cadetblue; color: white; padding: 4px 10px;">
+				<div class="pure-u-2-3">&nbsp; </div>
+				<div class="pure-u-1-3">&nbsp;</div>
+			</div>
+			<div class="bar pure-g no-select">
+				<div class="bar-group">
+					<div class="bar-item pure-u" data-scale="8"><span class="link"> 1/8X </span></div>
+					<div class="bar-item pure-u" data-scale="4"><span class="link"> &#188;X </span></div>
+					<div class="bar-item pure-u" data-scale="2"><span class="link"> &#189;X </span></div>
+					<div class="bar-item pure-u" data-scale="1"><span class="link"> 1X </span></div>
+					<div class="bar-item pure-u" data-scale="0.75"><span class="link" rate="3/4"> 1&#189;X </span></div>
+					<div class="bar-item pure-u selected" data-scale="0.5"><span class="link" rate="1/2"> 2X </span>
+					</div>
+					<div class="bar-item pure-u" data-scale="0.33"><span class="link" rate="1/3"> 3X </span></div>
+					<div class="bar-item pure-u" data-scale="0.25"><span class="link" rate="1/4"> 4X </span></div>
+					<div class="bar-item pure-u" data-scale="0.166"><span class="link" rate="1/6"> 6X </span></div>
+					<div class="bar-item pure-u" data-scale="0.125"><span class="link" rate="1/8"> 8X </span></div>
+				</div>
+				<div class="bar-group">
+					<div class="bar-item pure-u select-css">
+						<!-- <span class="">Component</span> -->
+						<select id="comp-option" class="pure-input-1-2">
+							<option value="and">AND</option>
+							<option value="nand">NAND</option>
+							<option value="or">OR</option>
+							<option value="nor">NOR</option>
+							<option value="xor">XOR</option>
+							<option value="xnor">XNOR</option>
+							<option value="not">NOT</option>
+							<option value="dip4">DIP4</option>
+							<option value="dip6">DIP6</option>
+							<option value="dip8">DIP8</option>
+							<option value="dipn555">555</option>
+							<option value="dip10">DIP10</option>
+							<option value="dip12">DIP12</option>
+							<option value="dip14">DIP14</option>
+							<option value="7408">7408</option>
+							<option value="dip16">DIP16</option>
+							<option value="dip28">DIP28</option>
+							<option value="5v">5V</option>
+							<option value="3v3">3.3v</option>
+							<option value="gnd">GND</option>
+							<option value="buffer">BUFFER</option>
+							<option value="diode">DIODE</option>
+							<option value="led">LED</option>
+							<option value="photodiode">PHOTODIODE</option>
+							<option value="schottky">SCHOTTKY</option>
+							<option value="tunnel">TUNNEL</option>
+							<option value="varicap">VARICAP</option>
+							<option value="zener">ZENER</option>
+							<option value="npn">NPN</option>
+							<option value="pnp">PNP</option>
+							<option value="capacitor">CAPACITOR</option>
+							<option value="capacitor-polarized">POLARIZED CAPACITOR</option>
+							<option value="capacitor-variable">VARIABLE CAPACITOR</option>
+							<option value="battery">BATTERY</option>
+							<option value="battery-multi">MULTI BATTERY</option>
+							<option value="dc-motor">DC MOTOR</option>
+							<option value="resistor">RESISTOR</option>
+							<option value="push-button">PUSH BUTTON</option>
+							<option value="switch">SWITCH</option>
+							<option value="switch-sdpt">SDPT SWITCH</option>
+							<option value="inductor">INDUCTOR</option>
+						</select>
+					</div>
+					<div class="bar-item pure-u">
+						<!-- <span class="">Pos</span> -->
+						<input id="comp-pos" type="text" value="50, 10" style="line-height: 26px;">
+					</div>
+					<div class="bar-item pure-u select-css">
+						<!-- <span class="">Color</span> -->
+						<select id="comp-color" class="pure-input-1-2">
+							<option value="white">white</option>
+							<option value="black">black</option>
+							<option value="green" selected>green</option>
+							<option value="red">red</option>
+							<option value="blue">blue</option>
+							<option value="yellow">yellow</option>
+							<option value="orange">orange</option>
+							<option value="purple">purple</option>
+							<option value="brown">brown</option>
+							<option value="aqua">aqua</option>
+							<option value="bisque">bisque</option>
+							<option value="navy">navy</option>
+							<option value="teal">teal</option>
+							<option value="violet">violet</option>
+						</select>
+					</div>
+				</div>
+				<div class="bar-group">
+					<div class="bar-item pure-u" rot-dir="left">
+						<img src="img/rot-left16x16.png" class="link" title="Rotate left">
+					</div>
+					<div class="bar-item pure-u">
+						<span id="rot-lbl" style="border: 1px solid #5d98d4;">0°</span>
+					</div>
+					<div class="bar-item pure-u" rot-dir="right">
+						<img src="img/rot-right16x16.png" class="link" title="Rotate right">
+					</div>
+				</div>
+				<div class="bar-group">
+					<div class="bar-item pure-u" tool="wire-edit">
+						<img src="img/wire-edit16x16.png" title="Wire edit is OFF">
+					</div>
+					<div class="bar-item pure-u" tool="ec-props">
+						<img src="img/list16x16.png" title="Properties">
+					</div>
+				</div>
+			</div>
+			<div id="board" class="grid60x60" svg-comp="board">
+				<svg xmlns="http://www.w3.org/2000/svg" svg-type="board" viewBox="0 0 4000 2700" width="100%"
+					height="500px" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1"
+					preserveAspectRatio="xMinYMin meet">
+				</svg>
+			</div>
+		</div>
+	</main>
+	<footer>
+		<h3>Specs</h3>
+		We are using Node.js <span id="node-version"></span>,
+		Chromium <span id="chrome-version"></span>,
+		and Electron <span id="electron-version"></span>.
+	</footer>
+
+
+	<!-- -->
+	<!-- later define it in the PHP controller -->
+	<script type="text/html" id="viewBox01">
+		<div class="expandable hide">
+			<span>(</span>
+			<span class="var"><i>x: </i>{x}</span><span>,</span>
+			<span class="var"><i>y: </i>{y}</span><span>,</span>
+			<span class="var"><i>w: </i>{width}</span><span>,</span>
+			<span class="var"><i>h: </i>{height}</span>
+			<span>)</span>
+		</div>
+	</script>
+	<script type="text/html" id="propWin01">
+		<div svg-type="win" id="{id}" class="{class}">
+			<header class="no-select">
+				<div>Properties</div>
+				<div>
+					<img width="16px" height="16px"><img width="16px" height="16px">
+				</div>
+			</header>
+			<main class="scroll-rgt">
+			</main>
+			<footer class="no-select">
+				<span></span>
+				<div>
+					<img width="16px" height="16px">
+				</div>
+			</footer>
+		</div>
+	</script>
+	<!-- You can also require other files to run in this process -->
+	<script>var exports = {};</script>
+	<script src="renderer.js"></script>
+</body>
+
+</html>
