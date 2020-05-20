@@ -5,13 +5,13 @@
 	"description": "Creates an electric circuits app",
 	"license": "ISC",
 	"main": "./dist/index.js",
-	"homepage": "https://github.com/Diogny/electric-units",
+	"homepage": "https://github.com/Diogny/electric-circuits",
 	"bugs": {
-		"url": "https://github.com/Diogny/electric-units/issues"
+		"url": "https://github.com/Diogny/electric-circuits/issues"
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/Diogny/electric-units.git"
+		"url": "https://github.com/Diogny/electric-circuits.git"
 	},
 	"keywords": [
 		"Electron",

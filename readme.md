@@ -23,9 +23,10 @@ pnpm install --save-dev tsconfig-paths-webpack-plugin
 
 ### git
 	git init
-		Initialized empty Git repository in C:/Users/diogn/OneDrive/Projects/npm/electric-units/.git/
+		Initialized empty Git repository in C:/Users/diogn/OneDrive/Projects/npm/electric-circuits/.git/
 
 ### git add files
+	git add .
 	git add package.json
 	git add tsconfig.json
 	git add dist/
@@ -35,7 +36,7 @@ pnpm install --save-dev tsconfig-paths-webpack-plugin
 
 ### git first commit
 	git commit -m "first commit"
-	git remote add origin https://github.com/Diogny/electric-units.git
+	git remote add origin https://github.com/Diogny/electric-circuits.git
 	git push -u origin master
 
 ### git update
