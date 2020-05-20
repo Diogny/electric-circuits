@@ -17,7 +17,7 @@ var BoardCircle = /** @class */ (function () {
         var tagAttrs = this.getObjectSettings();
         //set svg-type and nodeName value for 'node'
         tagAttrs["svg-type"] = this.nodeName;
-        tagAttrs[this.nodeName] = this.nodeValue; //node;
+        tagAttrs[this.nodeName] = this.nodeValue;
         //create SVG
         this.settings.g = utils_1.tag("circle", "", tagAttrs);
     }
@@ -47,8 +47,7 @@ var BoardCircle = /** @class */ (function () {
         configurable: true
     });
     Object.defineProperty(BoardCircle.prototype, "g", {
-        get: function () { return this.settings.g; } // this.g.cx.animVal.value
-        ,
+        get: function () { return this.settings.g; },
         enumerable: false,
         configurable: true
     });

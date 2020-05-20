@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var units_1 = require("./units");
 var utils_1 = require("./utils");
+//...still in progress ...
 var EcProp = /** @class */ (function () {
     function EcProp(ec, name, addTitle, onChange) {
         this.ec = ec;

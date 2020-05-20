@@ -1,3 +1,6 @@
+//Point class is adapted from:
+//https://github.com/Microsoft/TypeScriptSamples/blob/master/raytracer/raytracer.ts
+
 import { IPoint, ISize } from './interfaces';
 import { round } from './dab';
 

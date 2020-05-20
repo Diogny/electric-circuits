@@ -21,7 +21,6 @@ export default class Comp {
 		]); // all base components with metadata
 
 	private static boardItems: Map<string, ItemBoard> = new Map(); //all ecs, wires in the board
-	//private static alwaysTrue = () => !0;
 	protected settings: IComponentOptions;
 
 	get name(): string { return this.settings.name }

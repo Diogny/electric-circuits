@@ -31,7 +31,7 @@ var Bond = /** @class */ (function () {
         configurable: true
     });
     Object.defineProperty(Bond.prototype, "count", {
-        //amount of connections to this pin/node
+        //amount of connections to this node
         get: function () { return this.to.length; },
         enumerable: false,
         configurable: true

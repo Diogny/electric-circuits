@@ -2,6 +2,8 @@
 //numbers.ts
 Object.defineProperty(exports, "__esModule", { value: true });
 var dab_1 = require("./dab");
+//... in progress ...
+//npm https://www.npmjs.com/package/@dabberio/electric-units
 var Unit = /** @class */ (function () {
     function Unit(n) {
         var _this = this;

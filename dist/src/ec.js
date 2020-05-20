@@ -31,7 +31,7 @@ var EC = /** @class */ (function (_super) {
         options.highlightNodeName = "node";
         _this = _super.call(this, options) || this;
         //this ensures all path, rect, circles are inserted before the highlight circle node
-        //_.svg is used because _.html dowsn't work for SVG
+        //_.svg is used because _.html doesn't work for SVG
         [].slice.call(utils_1.svg("<g>" + _this.base.data + "</g>").children).forEach(function (n) {
             _this.g.insertBefore(n, _this.highlight.g);
         });
@@ -82,11 +82,11 @@ var EC = /** @class */ (function (_super) {
         var attrs = {
             dragx: this.x,
             dragy: this.y,
-            transform: "translate(" + this.x + " " + this.y + ")" // "translate(" + this.x + " " + this.y + ")"
+            transform: "translate(" + this.x + " " + this.y + ")"
         };
         if (this.rotation) {
             var center = this.origin;
-            attrs.transform += " rotate(" + this.rotation + " " + center.x + " " + center.y + ")"; // " rotate(" + this.rotation + " " + center.x + " " + center.y + ")"
+            attrs.transform += " rotate(" + this.rotation + " " + center.x + " " + center.y + ")";
         }
         //update SVG DOM attributes
         dab_1.attr(this.g, attrs);

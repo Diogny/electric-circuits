@@ -2,6 +2,8 @@
 
 import { isStr } from "./dab";
 
+//... in progress ...
+//npm https://www.npmjs.com/package/@dabberio/electric-units
 export default class Unit {
 
 	protected settings: { unit: number, prefix: number, value: number };

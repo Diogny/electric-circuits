@@ -11,7 +11,7 @@ export default class Bond implements TypedClass {
 	
 	get type(): Type { return Type.BOND }
 
-	//amount of connections to this pin/node
+	//amount of connections to this node
 	get count(): number { return this.to.length }
 
 	// [0>#id-0(Y), -1>#id-1(12)]
@@ -24,7 +24,7 @@ export default class Bond implements TypedClass {
 	 * @param {number} node node
 	 * @param {any} pin pin
 	 */
-	constructor(from: ItemBoard, to: ItemBoard, node: number, pin: number) {//
+	constructor(from: ItemBoard, to: ItemBoard, node: number, pin: number) {
 		if (!from || !to)
 			throw 'empty bond';
 		this.from = this.create(from, pin);

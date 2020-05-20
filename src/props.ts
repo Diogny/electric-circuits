@@ -4,6 +4,7 @@ import { attr, isFn, dP, typeOf, isInt, splat, isElement, isStr, isNumeric } fro
 import { IPropertyOptions, IPropertySettings, IPropertyCallback, IProperty } from './interfaces';
 import { qS } from './utils';
 
+//... in progress...
 export default class Prop implements IProperty {
 
 	protected settings: IPropertySettings;

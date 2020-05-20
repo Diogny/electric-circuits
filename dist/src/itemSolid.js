@@ -24,6 +24,7 @@ var ItemSolid = /** @class */ (function (_super) {
     function ItemSolid(options) {
         var _this = _super.call(this, options) || this;
         //I've to set new properties always, because super just copy defaults()
+        //later override method propertyDefaults()
         _this.settings.rotation = _this.validateRotation(options.rotation);
         return _this;
     }

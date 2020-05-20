@@ -173,9 +173,8 @@ export default class Wire extends ItemBoard {
 
 	public nodeHighlightable(node: number): boolean {
 		//any Wire node and that it is not a start|end bonded node
-		return this.valid(node) //this.editMode			&& 
-			&& !(node == 0 && this.nodeBonds(node))
-			&& !(node == this.last && this.nodeBonds(node))
+		return this.valid(node) //&& this.editMode
+			&& (!(this.nodeBonds(node) && (node == 0 || node == this.last)))
 	}
 
 	public setPoints(points: IPoint[]): Wire {
@@ -199,8 +198,8 @@ export default class Wire extends ItemBoard {
 			isLine = (ln: number) => ln && (ln <= lineCount),
 			isAround = (p: IPoint, x: number, y: number) =>
 				(x >= p.x - this.settings.pad) &&
-				(x <= p.x + this.settings.pad) && 
-				(y >= p.y - this.settings.pad) && 
+				(x <= p.x + this.settings.pad) &&
+				(y >= p.y - this.settings.pad) &&
 				(y <= p.y + this.settings.pad);
 
 		//if not in editMode, then ln will be 0, so reset to 1, and last point is the last

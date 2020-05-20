@@ -33,6 +33,7 @@ pnpm install --save-dev tsconfig-paths-webpack-plugin
 	git add test/
 	git add readme.md
 	git add .gitignore
+	
 
 ### git first commit
 	git commit -m "first commit"
@@ -43,6 +44,7 @@ pnpm install --save-dev tsconfig-paths-webpack-plugin
 	git status
 
 	git add <file> ...	git add .
+	git add -u					stage the modified and deleted files
 	git commit -m "update message"
 	git tag v1.0.2
 	git push origin master --tags

@@ -2,7 +2,7 @@ import ItemBoard from "./itemsBoard";
 import Unit from "./units";
 import { html } from "./utils";
 
-
+//...still in progress ...
 export default class EcProp {
 
 	prop: { value: string, label?: boolean, editable?: boolean, combo?: string[] } | string;

@@ -46,7 +46,7 @@ var ItemBoard = /** @class */ (function (_super) {
         //initialize Bonds array
         _this.settings.bonds = [];
         return _this;
-        //this still doesn't work to get all overridable properties
+        //this still doesn't work to get all overridable properties ¿?
         //properties still cannot access super value
         //(<any>this.settings).__selected = dab.propDescriptor(this, "selected");
     }

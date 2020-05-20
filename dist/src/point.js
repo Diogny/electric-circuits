@@ -1,4 +1,6 @@
 "use strict";
+//Point class is adapted from:
+//https://github.com/Microsoft/TypeScriptSamples/blob/master/raytracer/raytracer.ts
 Object.defineProperty(exports, "__esModule", { value: true });
 var dab_1 = require("./dab");
 var Point = /** @class */ (function () {

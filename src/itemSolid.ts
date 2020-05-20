@@ -14,6 +14,7 @@ export default abstract class ItemSolid extends ItemBoard {
 	constructor(options: IItemSolidOptions) {
 		super(options);
 		//I've to set new properties always, because super just copy defaults()
+		//later override method propertyDefaults()
 		this.settings.rotation = this.validateRotation(options.rotation);
 	}
 

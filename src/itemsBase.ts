@@ -1,5 +1,4 @@
-//boardItem.ts
-//import { __extends } from './extends';
+
 import { obj, addClass, removeClass, isStr } from './dab';
 import { tag } from './utils';
 import { Color, Colors } from './colors';

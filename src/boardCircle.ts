@@ -13,7 +13,7 @@ export default class BoardCircle implements IHighlightable {
 	get nodeName(): string { return this.settings.nodeName }
 	get nodeValue(): number { return this.settings.nodeValue }
 	get radius(): number { return this.settings.radius }
-	get g(): SVGCircleElement { return this.settings.g }	// this.g.cx.animVal.value
+	get g(): SVGCircleElement { return this.settings.g }
 
 	constructor(nodeName: string) {
 		//set initial default values
@@ -29,7 +29,7 @@ export default class BoardCircle implements IHighlightable {
 			tagAttrs: any = this.getObjectSettings();
 		//set svg-type and nodeName value for 'node'
 		tagAttrs["svg-type"] = this.nodeName;
-		tagAttrs[this.nodeName] = this.nodeValue; //node;
+		tagAttrs[this.nodeName] = this.nodeValue;
 		//create SVG
 		this.settings.g = <SVGCircleElement>tag("circle", "", tagAttrs);
 	}

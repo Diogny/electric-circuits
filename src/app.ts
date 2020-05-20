@@ -2,7 +2,6 @@
 import { IApplication, IApplicationOptions, IApplicationSettings, IProperty, IPropertyOptions } from "./interfaces";
 import Prop from "./props";
 import { dP, extend } from "./dab";
-import { ready } from "./utils";
 
 export class Application implements IApplication {
 

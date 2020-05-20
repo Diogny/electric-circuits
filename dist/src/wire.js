@@ -187,8 +187,9 @@ var Wire = /** @class */ (function (_super) {
     Wire.prototype.nodeHighlightable = function (node) {
         //any Wire node and that it is not a start|end bonded node
         return this.valid(node) //this.editMode			&& 
-            && !(node == 0 && this.nodeBonds(node))
-            && !(node == this.last && this.nodeBonds(node));
+            && (!(this.nodeBonds(node) && (node == 0 || node == this.last)));
+        //&& !(node == 0 && this.nodeBonds(node))
+        //&& !(node == this.last && this.nodeBonds(node))
     };
     Wire.prototype.setPoints = function (points) {
         if (!dab_1.isArr(points)

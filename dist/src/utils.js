@@ -1,5 +1,5 @@
 "use strict";
-//still in progress...
+//... still in progress ...
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.basePath = exports.gEId = exports.qSA = exports.qS = exports.ready = exports.prop = exports.filterArray = exports.filter = exports.map = exports.each = exports.html = exports.svg = exports.tag = exports.pad = exports.exec = exports.templatesDOM = exports.templatesUrl = void 0;
 var ajaxp_1 = require("./ajaxp");

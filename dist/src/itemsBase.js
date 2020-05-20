@@ -13,8 +13,6 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-//boardItem.ts
-//import { __extends } from './extends';
 var dab_1 = require("./dab");
 var utils_1 = require("./utils");
 var colors_1 = require("./colors");

@@ -45,7 +45,7 @@ export default abstract class ItemBoard extends ItemBase {
 		//initialize Bonds array
 		this.settings.bonds = [];
 
-		//this still doesn't work to get all overridable properties
+		//this still doesn't work to get all overridable properties ¿?
 		//properties still cannot access super value
 		//(<any>this.settings).__selected = dab.propDescriptor(this, "selected");
 	}

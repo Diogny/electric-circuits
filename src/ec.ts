@@ -24,7 +24,7 @@ export default class EC extends ItemSolid {
 		options.highlightNodeName = "node";
 		super(options);
 		//this ensures all path, rect, circles are inserted before the highlight circle node
-		//_.svg is used because _.html dowsn't work for SVG
+		//_.svg is used because _.html doesn't work for SVG
 		[].slice.call(svg(`<g>${this.base.data}</g>`).children).forEach(
 			(n: any) => {
 				this.g.insertBefore(n, this.highlight.g);
@@ -66,12 +66,12 @@ export default class EC extends ItemSolid {
 			attrs = {
 				dragx: this.x,
 				dragy: this.y,
-				transform: `translate(${this.x} ${this.y})` // "translate(" + this.x + " " + this.y + ")"
+				transform: `translate(${this.x} ${this.y})`
 			};
 		if (this.rotation) {
 			let
 				center = this.origin;
-			attrs.transform += ` rotate(${this.rotation} ${center.x} ${center.y})` // " rotate(" + this.rotation + " " + center.x + " " + center.y + ")"
+			attrs.transform += ` rotate(${this.rotation} ${center.x} ${center.y})`
 		}
 		//update SVG DOM attributes
 		attr(this.g, attrs);
