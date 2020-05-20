@@ -6,15 +6,13 @@ Used in my testing website [Electric Circuits](http://diogny.com/tests/circuits.
 ### Issues
 	have to use "@types/node": "12.12.21" because of a bug
 
-pnpm install --save-dev tsconfig-paths-webpack-plugin
+![working example](img/img01.png)
 
 ### Last compilation:
 	We are using Node.js 12.14.1, Chromium 83.0.4103.64, and Electron 9.0.0.
 
 ### install development packajes
-
-	pnpm i mocha -D
-	pnpm i chai -D
+	pnpm install --save-dev tsconfig-paths-webpack-plugin
 
 ### build/run
 	pnpm run build-dev		builds all
