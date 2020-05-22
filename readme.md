@@ -6,7 +6,7 @@ Used in my testing website [Electric Circuits](http://diogny.com/tests/circuits.
 ### Issues
 	have to use "@types/node": "12.12.21" because of a bug
 
-![working example](img/img01.png)
+![working example](dist/img/img01.png)
 
 ### Last compilation:
 	We are using Node.js 12.14.1, Chromium 83.0.4103.64, and Electron 9.0.0.
