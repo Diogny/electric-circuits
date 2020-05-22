@@ -23,7 +23,8 @@ const ts = (t: any) => ({}).toString.call(t);
 export { ts }
 
 //it can be extended later to array [] and object {}
-export const empty = (s: any): boolean => typeof s == void 0 || !s || (isStr(s) && s.match(/^ *$/) !== null);
+const empty = (s: any): boolean => typeof s == void 0 || !s || (isStr(s) && s.match(/^ *$/) !== null);
+export { empty }
 
 //returned values: array, date,	function, number, object, regexp, string, undefined  	global,	JSON, null
 export const typeOf = (o: any) => ts(o).slice(8, -1).toLowerCase();
@@ -181,6 +182,7 @@ export const aCld = (parent: any, child: any) => parent.appendChild(child);
 
 export const hasClass = (el: Element, className: string) => el.classList.contains(className);
 
+//className cannot contain spaces
 const addClass = (el: Element, className: string) => el.classList.add(className);
 export { addClass }
 
@@ -196,3 +198,32 @@ export const condClass = (el: any, className: string, b: boolean) => (b && (addC
 
 //https://plainjs.com/javascript/traversing/match-element-selector-52/
 //https://plainjs.com/javascript/traversing/get-siblings-of-an-element-40/
+
+
+export const getParentAttr = function (p: HTMLElement, attr: string) {
+	while (p && !p.hasAttribute(attr))
+		p = <HTMLElement>p.parentElement;
+	return p;
+}
+
+//Sets
+const unique = (x: any[]): any[] => x.filter((elem, index) => x.indexOf(elem) === index);
+export { unique }
+
+const union = (x: any[], y: any[]): any[] => unique(x.concat(y));
+export { union }
+
+export const addClassX = (el: Element, className: string): Element => {
+	el.classList.add(...(className || "").split(' ').filter((v: string) => !empty(v)))
+	return el
+}
+
+//this.win.classList.add(...(this.settings.class || "").split(' '));
+
+export const createClass = (baseClass: string, newClass: string): string => {
+	let
+		split = (s: string) => s.split(' '),
+		baseArr = split(baseClass || ""),
+		newArr = split(newClass || "");
+	return union(baseArr, newArr).join(' ')
+}

@@ -5,12 +5,19 @@ import Store from "./src/store";
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
-// First instantiate the class
+const args = process.argv.slice(1);
+let
+	serve = args.some(val => val === '--serve');
+if (serve) {
+	require('electron-reload')(__dirname, {});
+}
+
+
 const store = new Store({
-	// We'll call our data file 'user-preferences'
+	// data file
 	configName: 'user-preferences',
 	defaults: {
-		// 800x600 is the default size of our window
+		// default size of our main window
 		windowBounds: { width: 1120, height: 800 }
 	}
 });
@@ -23,15 +30,16 @@ const store = new Store({
 let mainWindow: Electron.BrowserWindow;
 
 function createMainWindow(opt: any) {
-	// Create the browser window.
+
 	const window = new BrowserWindow({
+		width: opt.width || 1120,
 		height: opt.height || 800,
+		useContentSize: true,
 		webPreferences: {
 			nodeIntegration: true,
 			enableRemoteModule: false,
 			//preload: path.join(app.getAppPath(), "preload.js")
 		},
-		width: opt.width || 1120,
 		show: false,
 	});
 
@@ -40,31 +48,14 @@ function createMainWindow(opt: any) {
 		window.focus()
 	});
 
-	/*
-	window.readConfig = function () {
-		const data = readFileSync('./config.json')
-		return data
-	}*/
-
-	// and load the index.html of the app.
+	// load the index.html of the app.
 	let url = path.join(app.getAppPath(), "index.html");
 	console.log('main index.html', url);
 	window.loadFile(url);
-	/*if (isDevelopment) {
-		window.loadURL(`http://localhost:${process.env.ELECTRON_WEBPACK_WDS_PORT}`)
-	}
-	else {
-		window.loadURL(formatUrl({
-			pathname: path.join(__dirname, 'index.html'),
-			protocol: 'file',
-			slashes: true
-		}));
-	}
-	//window.loadURL(`file://${__dirname}/index.html`)
-*/
 
 	if (isDevelopment) {
-		window.webContents.openDevTools()
+		//window.webContents.openDevTools()
+		//it's in the menu now, but for release it'd be removed and use this.
 	}
 
 	// Emitted when the window is closed.
@@ -88,6 +79,7 @@ function createMainWindow(opt: any) {
 }
 
 function createMenu() {
+	//this's just an start ...
 	const template: Electron.MenuItemConstructorOptions[] = [{
 		label: 'Edit',
 		submenu: [
@@ -105,7 +97,7 @@ function createMenu() {
 		submenu: [
 			{ role: 'reload' },
 			{ type: 'separator' },
-			{ type: 'separator' },
+			{ role: 'toggleDevTools' },
 			{ role: 'togglefullscreen' }
 		]
 	},
@@ -121,7 +113,8 @@ function createMenu() {
 	}
 	];
 
-	let menu = Menu.buildFromTemplate(template);
+	let
+		menu = Menu.buildFromTemplate(template);
 	Menu.setApplicationMenu(menu);
 }
 
@@ -129,19 +122,22 @@ function createMenu() {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on("ready", () => {
-	// First we'll get our height and width. This will be the defaults if there wasn't anything saved
+	// defaults if there wasn't anything saved
 	let { width, height } = store.get('windowBounds');
 
 	mainWindow = createMainWindow({ width, height });
+	//sendMainWindowSize(width, height);
 
 	// The BrowserWindow class extends the node.js core EventEmitter class, so we use that API
 	// to listen to events on the BrowserWindow. The resize event is emitted when the window size changes.
 	mainWindow.on('resize', () => {
 		// The event doesn't pass us the window size, so we call the `getBounds` method which returns an object with
 		// the height, width, and x and y coordinates.
-		let { width, height } = mainWindow.getBounds();
-		// Now that we have them, save them using the `set` method.
+		let { width, height } = mainWindow.getContentBounds(); //.getBounds();
+		// save them
 		store.set('windowBounds', { width, height });
+		//send
+		sendMainWindowSize(width, height);
 	});
 
 });
@@ -177,6 +173,7 @@ Object.defineProperty(global, 'shared', {
 })
 
 //https://medium.com/@nornagon/electrons-remote-module-considered-harmful-70d69500f31
+//this's the recommended new way to communicate between main process and ui renderer
 ipcMain.handle('shared', async (event, arg: string) => {
 	let
 		prop = global["shared"][arg];
@@ -185,6 +182,25 @@ ipcMain.handle('shared', async (event, arg: string) => {
 
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.
+
+function sendMainWindowSize(width: number, height: number) {
+	//send
+	mainWindow.webContents.send("win-resize", { width, height });
+}
+
+ipcMain.on('get-win-size', (event, arg) => {
+	let
+		data = mainWindow.getContentBounds() as any;
+	//extra
+	data.minSize = mainWindow.getMinimumSize();
+	data.maxSize = mainWindow.getMaximumSize();
+	data.contentSize = mainWindow.getContentSize();
+	data.contentBounds = mainWindow.getContentBounds();
+	//
+	event.returnValue = data //.getBounds();
+})
+
+//this will contain the communication section...
 ipcMain.on('asynchronous-message', (event, arg) => {
 	console.log(arg) // prints "ping"
 	event.reply('asynchronous-reply', 'pong')

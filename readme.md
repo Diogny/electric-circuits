@@ -13,6 +13,7 @@ Used in my testing website [Electric Circuits](http://diogny.com/tests/circuits.
 
 ### install development packajes
 	pnpm install --save-dev tsconfig-paths-webpack-plugin
+	pnpm install electron-reload --save-dev
 
 ### build/run
 	pnpm run build-dev		builds all
@@ -43,7 +44,8 @@ Used in my testing website [Electric Circuits](http://diogny.com/tests/circuits.
 
 	git add <file> ...	git add .
 	git add -u					stage the modified and deleted files
+	git add -A
 	git commit -m "update message"
-	git tag v1.0.2
+	git tag v1.0.3
 	git push origin master --tags
 

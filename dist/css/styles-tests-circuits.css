@@ -491,7 +491,7 @@ select:disabled {
   text-align: center;
 }
 
-/********************   WINDOW ********************/
+/********************  BASE WINDOW ********************/
 
 div.win {
   /*min-width: 100px;
@@ -500,17 +500,22 @@ div.win {
   border: 1px solid #d6d3d3;
   display: flex;
   flex-direction: column;
-}
-
-div.win.collapsed {
-  height: 20px !important;
+  background-color: #f1f1f1;
+  color: black;
 }
 
 div.win.hide {
   display: none;
 }
+
+/********************  APP WINDOW ********************/
+
+div.win.props.collapsed {
+  height: 20px !important;
+}
+
 /* HEADER */
-div.win > header {
+div.win.props > header {
   background-color: #3988ce;
   color: white;
   padding: 2px 6px;
@@ -518,60 +523,58 @@ div.win > header {
   line-height: 18px;
 }
 
-div.win.selected > header {
+div.win.props.selected > header {
   background-color: #17609f;
 }
 
-div.win.collapsed > main,
-div.win.collapsed > footer {
+div.win.props.collapsed > main,
+div.win.props.collapsed > footer {
   display: none;
 }
 
-div.win > header.dragging {
+div.win.props > header.dragging {
   cursor: move;
 }
 
 /* HEADER Title */
-div.win > header > div:nth-of-type(1) {
+div.win.props > header > div:nth-of-type(1) {
   font-size: 14px;
 }
 
 /* HEADER buttons */
-div.win > header > div:nth-of-type(2) {
+div.win.props > header > div:nth-of-type(2) {
   position: absolute;
   top: 2px;
   right: 2px;
 }
 
-div.win > header > div > img,
-div.win > footer > div > img {
+div.win.props > header > div > img,
+div.win.props > footer > div > img {
   /* float: right;*/
   cursor: pointer;
 }
 
-div.win > header > div:nth-of-type(2) > img:nth-of-type(1) {
+div.win.props > header > div:nth-of-type(2) > img:nth-of-type(1) {
   /*content: url(../img/arrow-up-16x16.png); not fully supported yet Firefox*/
-  background-image: url(../../img/arrow-up-16x16.png);
+  background-image: url(../img/arrow-up-16x16.png);
 }
 
-div.win.collapsed > header > div:nth-of-type(2) > img:nth-of-type(1) {
+div.win.props.collapsed > header > div:nth-of-type(2) > img:nth-of-type(1) {
   /*content: url(../img/arrow-down-16x16.png); not fully supported yet Firefox*/
-  background-image: url(../../img/arrow-down-16x16.png);
+  background-image: url(../img/arrow-down-16x16.png);
 }
 
-div.win > header > div:nth-of-type(2) > img:nth-of-type(2) {
+div.win.props > header > div:nth-of-type(2) > img:nth-of-type(2) {
   /*content: url(../img/close-p3-16x16.png); not fully supported yet Firefox*/
-  background-image: url(../../img/close-p3-16x16.png);
+  background-image: url(../img/close-p3-16x16.png);
 }
 
-div.win > header > div:nth-of-type(2) > img:hover {
+div.win.props > header > div:nth-of-type(2) > img:hover {
   background-color: red;
 }
 
 /* MAIN */
-div.win > main {
-  background-color: #f1f1f1;
-  color: black;
+div.win.props > main {
   height: 100%;
   /*width: 100%;*/
   flex: 1;
@@ -579,11 +582,11 @@ div.win > main {
   padding: 4px;
 }
 
-div.win > main.hide {
+div.win.props > main.hide {
   display: none;
 }
 
-div.win > main input {
+div.win.props > main input {
   width: 80px;
   height: 16px;
 }
@@ -604,9 +607,8 @@ div.ec-wrap {
 }
 
 /* FOOTER */
-div.win > footer {
+div.win.props > footer {
   background-color: white;
-  color: black;
   margin: 0;
   font-size: 12px;
   padding: 2px 6px;
@@ -614,29 +616,49 @@ div.win > footer {
   position: relative;
 }
 
-div.win > footer.hide {
+div.win.props > footer.hide {
   display: none;
 }
 
 /* HEADER Title */
-div.win > footer > span {
+div.win.props > footer > span {
   font-size: 14px;
 }
 
 /* HEADER buttons */
-div.win > footer > div {
+div.win.props > footer > div {
   position: absolute;
   top: 2px;
   right: 2px;
 }
 
-div.win > footer > div > img:nth-of-type(1) {
+div.win.props > footer > div > img:nth-of-type(1) {
   /*content: url(../img/arrow-up-16x16.png); not fully supported yet Firefox*/
-  background-image: url(../../img/garbage-blk-p3.png);
+  background-image: url(../img/garbage-blk-p3.png);
 }
 
-div.win > footer > div > img:hover {
+div.win.props > footer > div > img:hover {
   background-color: #d0cfcf;
+}
+
+/**/
+div.win.ctx > div {
+  padding: 10px 8px;
+  font-size: 16px;
+}
+
+div.win.ctx > div:hover {
+  background-color: #bdbdbf;
+  color: white;
+  cursor: pointer;
+}
+
+div.win.ctx > div > span {
+  color: #4b5661;
+}
+
+div.win.ctx > div > span.right {
+  float: right;
 }
 
 /*   */

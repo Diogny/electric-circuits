@@ -1,7 +1,7 @@
 {
 	"name": "electric-circuits",
 	"author": "Diogny A. B. <diognyab@outlook.com>",
-	"version": "1.0.2",
+	"version": "1.0.3",
 	"description": "Creates an electric circuits app",
 	"license": "ISC",
 	"main": "./dist/index.js",
@@ -30,14 +30,16 @@
 		"eslint": "eslint \"./src/*.ts\" \"./src/**/*.ts\" --report-unused-disable-directives",
 		"build-dev": "pnpm run build-ts && webpack --config webpack.dev.js",
 		"start": "pnpm run build-dev && pnpm run app",
-		"app": "electron ./index.js"
+		"app": "electron ./dist/index.js",
+		"webpack-watch": "webpack --watch",
+		"serve": "npm run build:main && electron ./dist/index.js --serve",
+		"build:main": "tsc && webpack --config webpack.dev.js"
 	},
 	"files": [],
-	"dependencies": {
-		"electron": "^9.0.0"
-	},
 	"devDependencies": {
+		"electron": "^9.0.0",
 		"@types/node": "12.12.21",
+		"electron-reload": "^1.5.0",
 		"eslint": "^7.0.0",
 		"html-webpack-plugin": "^4.3.0",
 		"ts-loader": "^7.0.4",

@@ -1,7 +1,7 @@
 "use strict";
 //still in progress...
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.condClass = exports.toggleClass = exports.removeClass = exports.addClass = exports.hasClass = exports.aCld = exports.dP = exports.rEL = exports.aEL = exports.propDescriptor = exports.attr = exports.css = exports.defEnum = exports.obj = exports.pojo = exports.isElement = exports.inherit = exports.copy = exports.extend = exports.nano = exports.splat = exports.round = exports.clamp = exports.pInt = exports.isInt = exports.isNumeric = exports.isNum = exports.isArr = exports.isObj = exports.isStr = exports.dfnd = exports.isFn = exports.typeOf = exports.empty = exports.ts = exports.consts = void 0;
+exports.createClass = exports.addClassX = exports.union = exports.unique = exports.getParentAttr = exports.condClass = exports.toggleClass = exports.removeClass = exports.addClass = exports.hasClass = exports.aCld = exports.dP = exports.rEL = exports.aEL = exports.propDescriptor = exports.attr = exports.css = exports.defEnum = exports.obj = exports.pojo = exports.isElement = exports.inherit = exports.copy = exports.extend = exports.nano = exports.splat = exports.round = exports.clamp = exports.pInt = exports.isInt = exports.isNumeric = exports.isNum = exports.isArr = exports.isObj = exports.isStr = exports.dfnd = exports.isFn = exports.typeOf = exports.empty = exports.ts = exports.consts = void 0;
 var c = {
     s: "string",
     o: "object",
@@ -22,7 +22,8 @@ exports.consts = c;
 var ts = function (t) { return ({}).toString.call(t); };
 exports.ts = ts;
 //it can be extended later to array [] and object {}
-exports.empty = function (s) { return typeof s == void 0 || !s || (isStr(s) && s.match(/^ *$/) !== null); };
+var empty = function (s) { return typeof s == void 0 || !s || (isStr(s) && s.match(/^ *$/) !== null); };
+exports.empty = empty;
 //returned values: array, date,	function, number, object, regexp, string, undefined  	global,	JSON, null
 exports.typeOf = function (o) { return ts(o).slice(8, -1).toLowerCase(); };
 //nullOrWhiteSpace(s) {
@@ -151,6 +152,7 @@ exports.rEL = function (el, eventName, fn) { return el.removeEventListener(event
 exports.dP = function (obj, propName, attrs) { return Object.defineProperty(obj, propName, attrs); };
 exports.aCld = function (parent, child) { return parent.appendChild(child); };
 exports.hasClass = function (el, className) { return el.classList.contains(className); };
+//className cannot contain spaces
 var addClass = function (el, className) { return el.classList.add(className); };
 exports.addClass = addClass;
 var removeClass = function (el, className) { return el.classList.remove(className); };
@@ -162,4 +164,24 @@ exports.toggleClass = function (el, className) { return el.classList.toggle(clas
 exports.condClass = function (el, className, b) { return (b && (addClass(el, className), 1)) || removeClass(el, className); };
 //https://plainjs.com/javascript/traversing/match-element-selector-52/
 //https://plainjs.com/javascript/traversing/get-siblings-of-an-element-40/
+exports.getParentAttr = function (p, attr) {
+    while (p && !p.hasAttribute(attr))
+        p = p.parentElement;
+    return p;
+};
+//Sets
+var unique = function (x) { return x.filter(function (elem, index) { return x.indexOf(elem) === index; }); };
+exports.unique = unique;
+var union = function (x, y) { return unique(x.concat(y)); };
+exports.union = union;
+exports.addClassX = function (el, className) {
+    var _a;
+    (_a = el.classList).add.apply(_a, (className || "").split(' ').filter(function (v) { return !empty(v); }));
+    return el;
+};
+//this.win.classList.add(...(this.settings.class || "").split(' '));
+exports.createClass = function (baseClass, newClass) {
+    var split = function (s) { return s.split(' '); }, baseArr = split(baseClass || ""), newArr = split(newClass || "");
+    return union(baseArr, newArr).join(' ');
+};
 //# sourceMappingURL=dab.js.map

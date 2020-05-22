@@ -3,11 +3,11 @@ import { templatesDOM, qSA, qS } from "./src/utils"
 import * as fs from 'fs';
 import {
 	IComponentOptions, IApplicationOptions, IItemSolidOptions, IItemWireOptions, IPoint,
-	StateType as State, ActionType as Action, IMachineState, IMouseState, IItemNode
+	StateType as State, ActionType as Action, IMachineState, IMouseState, IItemNode, IBaseWindowOptions, IContextMenuOptions
 } from "./src/interfaces";
 import Comp from "./src/components";
 import { MyApp } from "./src/myapp";
-import { isNumeric, attr, aEL, removeClass, toggleClass, addClass } from "./src/dab";
+import { isNumeric, attr, aEL, removeClass, toggleClass, addClass, getParentAttr } from "./src/dab";
 import Point from "./src/point";
 import ItemSolid from "./src/itemSolid";
 import EcProp from "./src/ecprop";
@@ -16,6 +16,8 @@ import Wire from "./src/wire";
 import StateMachine from "./src/stateMachine";
 import { Type } from "./src/types";
 import ItemBoard from "./src/itemsBoard";
+import ContextWindow from "src/context-window";
+import Size from "src/size";
 
 let
 	app: MyApp = <any>void 0;
@@ -88,17 +90,11 @@ function enableDisableTools() {
 }
 
 function hookEvents() {
-	let
-		getParent = function (p: HTMLElement, attr: string) {
-			while (p && !p.hasAttribute(attr))
-				p = <HTMLElement>p.parentElement;
-			return p;
-		}
 	//ZOOM controls
 	qSA('.bar-item[data-scale]').forEach((item: any) => {
 		aEL(item, "click", (e: MouseEvent) => {
 			let
-				scaleTarget = getParent(<HTMLElement>e.target, "data-scale"),
+				scaleTarget = getParentAttr(<HTMLElement>e.target, "data-scale"),
 				o = attr(scaleTarget, "data-scale"),
 				m = parseFloat(o);
 			if (app.multiplier == m)
@@ -129,7 +125,7 @@ function hookEvents() {
 			wire: Wire = app.wire,
 			transition: Action,
 			fn = (b: any) => b ? "ON" : "OFF",
-			toolTarget = getParent(<HTMLElement>e.target, "tool");
+			toolTarget = getParentAttr(<HTMLElement>e.target, "tool");
 		if (!wire)
 			return;
 		if (wire.editMode = !wire.editMode) {
@@ -147,7 +143,7 @@ function hookEvents() {
 	}, false);
 	//HtmlWindow
 	aEL(qS('.bar-item[tool="ec-props"]'), "click", (e: MouseEvent) => {
-		app.winProps.visible = !app.winProps.visible;
+		app.winProps.setVisible(!app.winProps.visible);
 	}, false);
 }
 
@@ -186,6 +182,10 @@ function createStateMachine() {
 			MOVE: function (newCtx: IMouseState) {
 			},
 			OUT: actionOutOfTool,
+			DOWN: function (newCtx: IMouseState) {
+				//save new context
+				app.rightClick.setVisible(false);
+			},
 			//transitions
 			START: function (newCtx: IMouseState) {
 				//uses machine current state
@@ -383,6 +383,8 @@ function createStateMachine() {
 			UP: function (newCtx: IMouseState) {
 				//save new context, before show be a DOWN event
 				(this as StateMachine).ctx = newCtx;
+				//save new context
+				app.rightClick.setVisible(false);
 				//check Ctrl-Click
 				if ((this as StateMachine).ctx.ctrlKey) {
 					//console.log(`Ctrl+Click on Wire line`);
@@ -578,21 +580,28 @@ function createStateMachine() {
 	});
 }
 
+function readJson(path: string): any {
+	//load default circuit library
+	var data = fs.readFileSync(path);
+	//console.log(data);
+	let
+		json = JSON.parse(data.toString());
+	return json
+}
+
 // It has the same sandbox as a Chrome extension.
 window.addEventListener("DOMContentLoaded", () => {
 
 	//load DOM script HTML templates
-	templatesDOM("viewBox01|propWin01")
+	templatesDOM("viewBox01|size01|point01|baseWin01|ctxWin01|ctxItem01|propWin01")
 		.then(async (templates: Object) => {
 
 			const d = await ipcRenderer.invoke('shared', 'app');
 			console.log("global.app =", d)
 
 			//load default circuit library
-			var data = fs.readFileSync('./dist/data/library-circuits.v2.json');
-			//console.log(data);
 			let
-				json = JSON.parse(data.toString());
+				json = readJson('./dist/data/library-circuits.v2.json');
 			//register components
 			json.forEach((element: IComponentOptions) => {
 				Comp.register(element);
@@ -638,17 +647,33 @@ window.addEventListener("DOMContentLoaded", () => {
 							updateCompLocation();
 						}
 					}
-				},
-				onDomLoaded: function () {
-
 				}
 			});
 
+			//context menu
+			json = readJson('./dist/data/context-menu.json');
+			app.rightClick = new ContextWindow(<IContextMenuOptions><unknown>{
+				app: app,
+				id: "win-rc",
+				x: 50,
+				y: 50,
+				size: {
+					width: 200,
+					height: 250
+				},
+				class: "no-select",
+				list: json
+			});
+
 			//set SVG viewBox values
-			app.setViewBox(<any>undefined);
+			//app.setViewBox(<any>undefined);
+			updateViewBox(ipcRenderer.sendSync('get-win-size', ''));
 
 			//add HtmlWindow to board
 			app.board.appendChild(app.winProps.win);
+			//add right-click window
+			app.board.appendChild(app.rightClick.win);
+			(<any>window).rc = app.rightClick;
 
 			//this's the top SVG element and all other are inserted before, so it's always ON TOP z-index max
 			//add text tooltip to SVG DOM
@@ -717,10 +742,32 @@ window.addEventListener("DOMContentLoaded", () => {
 		});
 });
 
+//this's a proof of concept of how to communicate with main process, the recommended new way...
+
+function updateViewBox(arg: any) {
+	//set body height
+	qS("body").style.height = arg.height + "px";
+	//expand main content height
+	let
+		mainHeight = qS("body").offsetHeight - qS("body>header").offsetHeight - qS("body>footer").offsetHeight;
+	qS("body>main").style.height = mainHeight + "px";
+	//update svg board height
+	app.svgBoard.style.height = mainHeight + "px";
+	//set app reference size
+	app.size = new Size(arg.width, arg.height);
+	//set SVG viewBox values
+	app.setViewBox(<any>undefined);
+	console.log(event, arg)
+}
+
+ipcRenderer.on("win-resize", (event, arg) => {
+	updateViewBox(arg)
+});
+
 console.log(ipcRenderer.sendSync('synchronous-message', 'ping')) // prints "pong"
 
 ipcRenderer.on('asynchronous-reply', (event, arg) => {
 	console.log(arg) // prints "pong"
 })
 ipcRenderer.send('asynchronous-message', 'ping')
-//remote.getGlobal('sharedObj')
+//remote.getGlobal('sharedObj')	will be deprecated soon

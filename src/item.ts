@@ -42,6 +42,10 @@ export default abstract class Item extends TypedClass {
 		return this;
 	}
 
+	public movePoint(p: Point): Item {
+		return this.move(p.x, p.y)
+	}
+
 	public translate(dx: number, dy: number): Item {
 		//for object chaining
 		return this.move(this.x + (dx | 0), this.y + (dy | 0));

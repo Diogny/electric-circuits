@@ -1,16 +1,20 @@
 import { Application } from "./app";
-import { IApplicationOptions, IMyApp, ITooltipText, IWindowOptions, IStateMachineOptions, StateType, ActionType, IMouseState } from "./interfaces";
+import {
+	IApplicationOptions, IMyApp, ITooltipText, IAppWindowOptions, IStateMachineOptions,
+	StateType, ActionType, IMouseState
+} from "./interfaces";
 import { basePath, qS } from "./utils";
 import Rect from "./rect";
 import Size from "./size";
 import Point from './point';
 import Tooltip from "./tooltip";
 import { attr, aEL, nano } from "./dab";
-import HtmlWindow from "./window";
+import AppWindow from "./app-window";
 import ItemSolid from "./itemSolid";
 import Wire from "./wire";
 import StateMachine from "./stateMachine";
 import Comp from "./components";
+import ContextWindow from "./context-window";
 
 export class MyApp extends Application implements IMyApp {
 	rootDir: string;
@@ -26,8 +30,11 @@ export class MyApp extends Application implements IMyApp {
 	tooltip: Tooltip;
 	topBarLeft: HTMLElement;
 	topBarRight: HTMLElement;
-	winProps: HtmlWindow;
+	winProps: AppWindow;
 	state: StateMachine;
+
+	size: Size;
+	rightClick: ContextWindow;
 
 	//temporary properties
 	ec: ItemSolid;
@@ -58,18 +65,17 @@ export class MyApp extends Application implements IMyApp {
 		this.topBarRight = qS("#top-bar>div:nth-of-type(2)");
 
 		//this'll hold the properties of the current selected component
-		this.winProps = new HtmlWindow(<IWindowOptions>{
+		this.winProps = new AppWindow(<IAppWindowOptions>{
 			app: this as Application,
 			id: "win-props",
 			x: 800,
 			y: 0,
-			title: "Properties",
-			bar: "...",
 			size: {
 				width: 250,
 				height: 300
 			},
-			visible: false,
+			title: "Properties",
+			bar: "...",
 			content: "Aaaaa...!  kjsdhj sjh sj d sj sd sdjs djsdj kkisaujn ak asd asdn askd askd aksdn aksd  ia hsdoia oa sdoas "
 		});
 
@@ -124,26 +130,28 @@ export class MyApp extends Application implements IMyApp {
 		});
 		//register machine events
 		let
+			//HTML
+			getClientXY = (evt: MouseEvent) =>
+				new Point(evt.clientX - that.board.offsetLeft, evt.clientY - that.board.offsetTop),
+			//SVG
+			getOffset = (clientXY: Point, evt: MouseEvent) =>
+				Point.times(clientXY, that.ratioX, that.ratioY).round(),
 			handleMouseEvent = function (evt: MouseEvent): IMouseState {
 				//this is MyApp
 				evt.preventDefault();
 				evt.stopPropagation();
 				let
 					arr = [],
-					target: SVGElement = <any>evt.target,
-					parent: Element = <any>target.parentNode,
-					type = attr(parent, "svg-comp"),
-					//HTML
-					clientXY = new Point(evt.clientX - that.board.offsetLeft, evt.clientY - that.board.offsetTop),
-					//SVG
-					clientXYScaled = Point.times(clientXY, that.ratioX, that.ratioY).round(),
+					target = <any>evt.target as SVGElement,
+					parent = <any>target.parentNode as Element,
+					clientXY = getClientXY(evt),
 					state: IMouseState = <IMouseState>{
 						id: '#' + parent.id,
-						type: type,
+						type: attr(parent, "svg-comp"),
 						button: evt.button,	//https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
 						//parent: parent,
 						client: clientXY,
-						offset: clientXYScaled,
+						offset: getOffset(clientXY, evt),
 						event: evt.type.replace('mouse', ''),
 						timeStamp: evt.timeStamp,
 						over: {
@@ -170,7 +178,7 @@ export class MyApp extends Application implements IMyApp {
 				arr.push(`multiplier: ${that.multiplier}`);
 				arr.push(`state: ${StateType[that.state.value]}`);
 				arr.push(state.offset.toString()); //`x: ${round(state.offset.x, 1)} y: ${round(state.offset.y, 1)}`
-				//arr.push(`Client: x: ${clientXY.x} y: ${clientXY.y}`);
+				arr.push(`client ${clientXY.toString()}`);
 				//arr.push(`scaled: x: ${clientXYScaled.x} y: ${clientXYScaled.y}`);
 				//render
 				that.topBarLeft.innerText = arr.join(", ");
@@ -193,6 +201,25 @@ export class MyApp extends Application implements IMyApp {
 		aEL(<any>this.svgBoard, "mouseup", function (evt: MouseEvent) {
 			that.state.enabled && that.state.send(ActionType.UP, handleMouseEvent.call(that, evt));
 		}, false);
+		//right click o board
+		aEL(<any>this.svgBoard, "contextmenu", function (evt: MouseEvent) {
+			evt.stopPropagation();
+			let
+				target = evt.target as Element,
+				type = attr(target, "svg-type"),
+				key = that.rightClick.setTrigger(
+					attr(target.parentNode, "id"),
+					attr(target.parentNode, "svg-comp"),
+					type,
+					attr(target, type));
+			if (key) {
+				that.rightClick
+					.build(key)
+					.movePoint(getClientXY(evt))
+					.setVisible(true);
+			}
+		}, false);
+
 	}
 
 	public insideBoard(p: Point): boolean {
@@ -222,7 +249,13 @@ export class MyApp extends Application implements IMyApp {
 		this.ratioX = this.viewBox.width / this.svgBoard.clientWidth;
 		this.ratioY = this.viewBox.height / this.svgBoard.clientHeight;
 		//
-		this.topBarRight.innerHTML = nano(this.templates.viewBox01, this.viewBox); // `${this.viewBox.x} ${this.viewBox.y} ${this.viewBox.width} ${this.viewBox.height}`;
+		this.refreshTopBarRight();
+	}
+
+	public refreshTopBarRight() {
+		this.topBarRight.innerHTML = nano(this.templates.viewBox01, this.viewBox) + "&nbsp; " +
+			nano(this.templates.size01, this.size);
+		// `${this.viewBox.x} ${this.viewBox.y} ${this.viewBox.width} ${this.viewBox.height}`;
 	}
 
 	public getAspectRatio(width: number, height: number) {

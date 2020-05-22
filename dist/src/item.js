@@ -78,6 +78,9 @@ var Item = /** @class */ (function (_super) {
         //for object chaining
         return this;
     };
+    Item.prototype.movePoint = function (p) {
+        return this.move(p.x, p.y);
+    };
     Item.prototype.translate = function (dx, dy) {
         //for object chaining
         return this.move(this.x + (dx | 0), this.y + (dy | 0));

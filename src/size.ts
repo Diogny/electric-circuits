@@ -1,5 +1,6 @@
 
 import { ISize } from './interfaces';
+import { round } from './dab';
 
 export default class Size implements ISize {
 	public width: number;
@@ -22,5 +23,12 @@ export default class Size implements ISize {
 
 	static create(size: ISize): Size {
 		return new Size(size.width, size.height)
+	}
+
+	public toString(options?: number): string {
+		let
+			noVars: boolean = ((options = <any>options | 0) & 4) != 0,
+			noPars: boolean = (options & 2) != 0;
+		return `${noPars ? "" : "("}${noVars ? "" : "w: "}${round(this.width, 1)}, ${noVars ? "" : "h: "}${round(this.height, 1)}${noPars ? "" : ")"}`
 	}
 }

@@ -6,7 +6,7 @@ import Prop from "./props";
 import Rect from "./rect";
 import Size from "./size";
 import Tooltip from "./tooltip";
-import HtmlWindow from "./window";
+import HtmlWindow from "./app-window";
 import StateMachine from "./stateMachine";
 import ItemBoard from "./itemsBoard";
 import { Application } from "./app";
@@ -282,29 +282,53 @@ export interface IBondItem {
 	ndx: number;
 }
 
-//***************************************** HtmlWindow ************************************//
+//***************************************** BaseWindow ************************************//
 
-export interface IWindowOptions extends IItemBaseOptions {
+export interface IBaseWindowOptions extends IItemBaseOptions {
 	app: Application;
-	selected: boolean;
 	size: ISize;
 	title: string;
+	templateName: string;
+	ignoreHeight: boolean;
+}
+
+export interface IBaseWindowSettings extends IBaseWindowOptions {
+	win: HTMLElement;
+}
+
+//***************************************** AppWindow ************************************//
+
+export interface IAppWindowOptions extends IBaseWindowOptions {
+	selected: boolean;
 	content: string;
 	bar: string;
 }
 
-export interface IWindowProperties extends IWindowOptions {
+export interface IAppWindowProperties extends IAppWindowOptions, IBaseWindowSettings {
 	//
-	app: Application;
+	titleDOM: HTMLElement;
+	main: HTMLElement;
+	footer: HTMLElement;
 	//
 	dragging: boolean;
 	offset: Point;
-	//
+}
+
+//***************************************** ContextWindow ************************************//
+
+export interface IContextMenuItem {
+	text: string;
+	action: number;
+	shortcut: string;
+}
+
+export interface IContextMenuOptions extends IBaseWindowOptions {
+	list: Map<string, IContextMenuItem[]>;
+}
+
+export interface IContextMenuSettings extends IContextMenuOptions {
 	win: HTMLElement;
-	//
-	header: HTMLElement;
-	main: HTMLElement;
-	footer: HTMLElement;
+	current: string;
 }
 
 //***************************************** State Machine ************************************//

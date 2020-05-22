@@ -22,7 +22,7 @@ var size_1 = require("./size");
 var point_1 = require("./point");
 var tooltip_1 = require("./tooltip");
 var dab_1 = require("./dab");
-var window_1 = require("./window");
+var app_window_1 = require("./app-window");
 var stateMachine_1 = require("./stateMachine");
 var components_1 = require("./components");
 var MyApp = /** @class */ (function (_super) {
@@ -50,18 +50,17 @@ var MyApp = /** @class */ (function (_super) {
         _this.topBarLeft = utils_1.qS("#top-bar>div:nth-of-type(1)");
         _this.topBarRight = utils_1.qS("#top-bar>div:nth-of-type(2)");
         //this'll hold the properties of the current selected component
-        _this.winProps = new window_1.default({
+        _this.winProps = new app_window_1.default({
             app: _this,
             id: "win-props",
             x: 800,
             y: 0,
-            title: "Properties",
-            bar: "...",
             size: {
                 width: 250,
                 height: 300
             },
-            visible: false,
+            title: "Properties",
+            bar: "...",
             content: "Aaaaa...!  kjsdhj sjh sj d sj sd sdjs djsdj kkisaujn ak asd asdn askd askd aksdn aksd  ia hsdoia oa sdoas "
         });
         var that = _this;
@@ -108,21 +107,25 @@ var MyApp = /** @class */ (function (_super) {
             }
         });
         //register machine events
-        var handleMouseEvent = function (evt) {
+        var 
+        //HTML
+        getClientXY = function (evt) {
+            return new point_1.default(evt.clientX - that.board.offsetLeft, evt.clientY - that.board.offsetTop);
+        }, 
+        //SVG
+        getOffset = function (clientXY, evt) {
+            return point_1.default.times(clientXY, that.ratioX, that.ratioY).round();
+        }, handleMouseEvent = function (evt) {
             //this is MyApp
             evt.preventDefault();
             evt.stopPropagation();
-            var arr = [], target = evt.target, parent = target.parentNode, type = dab_1.attr(parent, "svg-comp"), 
-            //HTML
-            clientXY = new point_1.default(evt.clientX - that.board.offsetLeft, evt.clientY - that.board.offsetTop), 
-            //SVG
-            clientXYScaled = point_1.default.times(clientXY, that.ratioX, that.ratioY).round(), state = {
+            var arr = [], target = evt.target, parent = target.parentNode, clientXY = getClientXY(evt), state = {
                 id: '#' + parent.id,
-                type: type,
+                type: dab_1.attr(parent, "svg-comp"),
                 button: evt.button,
                 //parent: parent,
                 client: clientXY,
-                offset: clientXYScaled,
+                offset: getOffset(clientXY, evt),
                 event: evt.type.replace('mouse', ''),
                 timeStamp: evt.timeStamp,
                 over: {
@@ -149,7 +152,7 @@ var MyApp = /** @class */ (function (_super) {
             arr.push("multiplier: " + that.multiplier);
             arr.push("state: " + interfaces_1.StateType[that.state.value]);
             arr.push(state.offset.toString()); //`x: ${round(state.offset.x, 1)} y: ${round(state.offset.y, 1)}`
-            //arr.push(`Client: x: ${clientXY.x} y: ${clientXY.y}`);
+            arr.push("client " + clientXY.toString());
             //arr.push(`scaled: x: ${clientXYScaled.x} y: ${clientXYScaled.y}`);
             //render
             that.topBarLeft.innerText = arr.join(", ");
@@ -171,6 +174,17 @@ var MyApp = /** @class */ (function (_super) {
         }, false);
         dab_1.aEL(_this.svgBoard, "mouseup", function (evt) {
             that.state.enabled && that.state.send(interfaces_1.ActionType.UP, handleMouseEvent.call(that, evt));
+        }, false);
+        //right click o board
+        dab_1.aEL(_this.svgBoard, "contextmenu", function (evt) {
+            evt.stopPropagation();
+            var target = evt.target, type = dab_1.attr(target, "svg-type"), key = that.rightClick.setTrigger(dab_1.attr(target.parentNode, "id"), dab_1.attr(target.parentNode, "svg-comp"), type, dab_1.attr(target, type));
+            if (key) {
+                that.rightClick
+                    .build(key)
+                    .movePoint(getClientXY(evt))
+                    .setVisible(true);
+            }
         }, false);
         return _this;
     }
@@ -196,7 +210,12 @@ var MyApp = /** @class */ (function (_super) {
         this.ratioX = this.viewBox.width / this.svgBoard.clientWidth;
         this.ratioY = this.viewBox.height / this.svgBoard.clientHeight;
         //
-        this.topBarRight.innerHTML = dab_1.nano(this.templates.viewBox01, this.viewBox); // `${this.viewBox.x} ${this.viewBox.y} ${this.viewBox.width} ${this.viewBox.height}`;
+        this.refreshTopBarRight();
+    };
+    MyApp.prototype.refreshTopBarRight = function () {
+        this.topBarRight.innerHTML = dab_1.nano(this.templates.viewBox01, this.viewBox) + "&nbsp; " +
+            dab_1.nano(this.templates.size01, this.size);
+        // `${this.viewBox.x} ${this.viewBox.y} ${this.viewBox.width} ${this.viewBox.height}`;
     };
     MyApp.prototype.getAspectRatio = function (width, height) {
         var ratio = width / height;

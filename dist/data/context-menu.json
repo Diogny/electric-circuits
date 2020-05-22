@@ -1,0 +1,107 @@
+{
+	"board": [
+		{
+			"text": "Remove All",
+			"action": 0
+		},
+		{
+			"text": "Select All",
+			"action": 9,
+			"shortcut": "Ctrl+A"
+		},
+		{
+			"text": "Deselect All",
+			"action": 19,
+			"shortcut": "Ctrl+B"
+		}
+	],
+	"ec-body": [
+		{
+			"text": "Delete",
+			"action": 0,
+			"shortcut": "Del"
+		},
+		{
+			"text": "Properties",
+			"action": 0,
+			"shortcut": "Ctrl+P"
+		},
+		{
+			"text": "Rotate 45 clockwise",
+			"action": 110
+		},
+		{
+			"text": "Rotate 45 counter clockwise",
+			"action": 111
+		},
+		{
+			"text": "Rotate 90 clockwise",
+			"action": 112
+		},
+		{
+			"text": "Rotate 90 counter clockwise",
+			"action": 113
+		},
+		{
+			"text": "Select",
+			"action": 0
+		},
+		{
+			"text": "Bring to Front",
+			"action": 0
+		}
+	],
+	"ec-node": [
+		{
+			"text": "Unbond",
+			"action": 0,
+			"shortcut": "Ctrl-U"
+		},
+		{
+			"text": "Connections",
+			"action": 0,
+			"shortcut": "Ctrl+P"
+		},
+		{
+			"text": "Select",
+			"action": 0
+		}
+	],
+	"wire-line": [
+		{
+			"text": "Properties",
+			"action": 0,
+			"shortcut": "Ctrl+P"
+		},
+		{
+			"text": "Delete",
+			"action": 0,
+			"shortcut": "Del"
+		},
+		{
+			"text": "Connections",
+			"action": 0,
+			"shortcut": "Ctrl+P"
+		},
+		{
+			"text": "Select",
+			"action": 0
+		}
+	],
+	"wire-node": [
+		{
+			"text": "Delete",
+			"action": 0,
+			"shortcut": "Del"
+		},
+		{
+			"text": "Connections",
+			"action": 0,
+			"shortcut": "Ctrl+P"
+		},
+		{
+			"text": "Select",
+			"action": 0
+		}
+	]
+}
