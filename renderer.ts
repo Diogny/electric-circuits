@@ -35,7 +35,6 @@ function createComponent(name: string | null): ItemSolid {
 			name: name,
 			x: app.pos.x,
 			y: app.pos.y,
-			color: app.prop("comp_color").value,
 			onProp: function (e: any) {
 				//this happens when this component is created
 			}
@@ -585,7 +584,7 @@ function readJson(path: string): any {
 	var data = fs.readFileSync(path);
 	//console.log(data);
 	let
-		json = JSON.parse(data.toString());
+		json = JSON.parse(data.toString().replace(/[\t\r\n]*/g, ""));
 	return json
 }
 
@@ -606,6 +605,8 @@ window.addEventListener("DOMContentLoaded", () => {
 			json.forEach((element: IComponentOptions) => {
 				Comp.register(element);
 			});
+			//read context menu data
+			json = readJson('./dist/data/context-menu.json');
 
 			app = new MyApp(<IApplicationOptions>{
 				templates: templates,
@@ -613,14 +614,6 @@ window.addEventListener("DOMContentLoaded", () => {
 				props: {
 					rot_lbl: {
 						tag: "#rot-lbl"
-					},
-					comp_color: {
-						tag: "#comp-color",
-						onChange: function (value: number | string | string[], where: number) {
-							if (where != 1)		// 1 == "ui"
-								return;
-							app.ec && (app.ec.setColor(<string>value));
-						}
 					},
 					comp_option: {
 						tag: "#comp-option",
@@ -647,26 +640,11 @@ window.addEventListener("DOMContentLoaded", () => {
 							updateCompLocation();
 						}
 					}
-				}
-			});
-
-			//context menu
-			json = readJson('./dist/data/context-menu.json');
-			app.rightClick = new ContextWindow(<IContextMenuOptions><unknown>{
-				app: app,
-				id: "win-rc",
-				x: 50,
-				y: 50,
-				size: {
-					width: 200,
-					height: 250
 				},
-				class: "no-select",
 				list: json
 			});
 
 			//set SVG viewBox values
-			//app.setViewBox(<any>undefined);
 			updateViewBox(ipcRenderer.sendSync('get-win-size', ''));
 
 			//add HtmlWindow to board
@@ -757,7 +735,7 @@ function updateViewBox(arg: any) {
 	app.size = new Size(arg.width, arg.height);
 	//set SVG viewBox values
 	app.setViewBox(<any>undefined);
-	console.log(event, arg)
+	//console.log(event, arg)
 }
 
 ipcRenderer.on("win-resize", (event, arg) => {

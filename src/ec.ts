@@ -15,7 +15,7 @@ export default class EC extends ItemSolid {
 	get type(): Type { return Type.EC }
 
 	get count(): number {
-		return this.base.nodes.length
+		return this.base.meta.nodes.length
 	}
 
 	constructor(options: IItemSolidOptions) {
@@ -98,7 +98,7 @@ export default class EC extends ItemSolid {
 	//this returns (x, y) relative to the EC location
 	public getNode(pinNode: number): IItemNode {
 		let
-			pin: IItemNode = <IItemNode>this.base.nodes.list[pinNode],
+			pin: IItemNode = <IItemNode>this.base.meta.nodes.list[pinNode],
 			rotate = (obj: Point, rotation: number, center: Point): Point => {
 				if (!rotation)
 					return obj;

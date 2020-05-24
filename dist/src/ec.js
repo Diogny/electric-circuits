@@ -62,7 +62,7 @@ var EC = /** @class */ (function (_super) {
     });
     Object.defineProperty(EC.prototype, "count", {
         get: function () {
-            return this.base.nodes.length;
+            return this.base.meta.nodes.length;
         },
         enumerable: false,
         configurable: true
@@ -108,7 +108,7 @@ var EC = /** @class */ (function (_super) {
     //this returns (x, y) relative to the EC location
     EC.prototype.getNode = function (pinNode) {
         var _this = this;
-        var pin = this.base.nodes.list[pinNode], rotate = function (obj, rotation, center) {
+        var pin = this.base.meta.nodes.list[pinNode], rotate = function (obj, rotation, center) {
             if (!rotation)
                 return obj;
             var rot = _this.rotateBy(center.x, center.y, obj.x, obj.y, -rotation);

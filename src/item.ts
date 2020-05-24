@@ -57,7 +57,7 @@ export default abstract class Item extends TypedClass {
 			name: "",									//have to be here so it's copied
 			x: 0,
 			y: 0,
-			color: Color.getcolor("", Colors.green),	//have to be here so it's copied
+			color: Color.getcolor("", Colors.white),	//have to be here so it's copied
 			class: "",									//have to be here so it's copied
 			visible: true,		//defaults is visible
 		}

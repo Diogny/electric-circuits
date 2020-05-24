@@ -21,7 +21,7 @@ export default class BoardCircle implements IHighlightable {
 			nodeName: nodeName || "node",
 			nodeValue: -1,
 			visible: false,
-			radius: 10,
+			radius: 5,
 			p: Point.origin
 		}
 		//create SVG DOM Element
@@ -44,22 +44,22 @@ export default class BoardCircle implements IHighlightable {
 	}
 
 	public setRadius(value: number): BoardCircle {
-		this.settings.radius = value <= 0 ? 10 : value;
-		return this.refresh();		//for object chaining
+		this.settings.radius = value <= 0 ? 5 : value;
+		return this.refresh();
 	}
 
 	public hide(): BoardCircle {
 		this.settings.visible = false;
-		this.settings.p = Point.origin;	//clean attributes
+		this.settings.p = Point.origin;
 		this.settings.nodeValue = -1;
-		return this.refresh();	//for object chaining
+		return this.refresh();
 	}
 
 	public show(nodeValue: number): BoardCircle {
 		this.settings.visible = true;
 		// this.p  moved first
 		this.settings.nodeValue = nodeValue;
-		return this.refresh();	//for object chaining
+		return this.refresh();
 	}
 
 	private getObjectSettings(): any {

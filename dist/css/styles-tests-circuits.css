@@ -62,27 +62,31 @@ line[class="dash"] {
 }
 
 /************************ EC ************************/
+
 .ec {
   fill: none;
   stroke-opacity: 0.9;
-  stroke-width: 3px;
+  stroke-width: 1px;
   stroke-linecap: butt;
   fill-rule: evenodd;
+}
+
+g[svg-comp] > path[svg-type="node"] {
+  stroke-width: 1px;
+  fill: darkgray;
+}
+g[svg-comp]:hover {
+  stroke: red;
+  stroke-width: 1px !important;
 }
 
 .ec.white {
   stroke: black;
   fill: black;
 }
+
 g[svg-comp].white > [svg-type="body"] {
-  fill: #f1efef;
-}
-g[svg-comp].white.selected > text[svg-type="body"],
-g[svg-comp].yellow.selected > text[svg-type="body"],
-g[svg-comp].aqua.selected > text[svg-type="body"] {
-  stroke: #251d1d;
-  fill: #251d1d;
-  stroke-width: 1px;
+  fill: white;
 }
 
 .ec.black {
@@ -91,150 +95,55 @@ g[svg-comp].aqua.selected > text[svg-type="body"] {
 }
 
 g[svg-comp].black > [svg-type="body"] {
-  fill: #252323;
+  fill: #636060;
 }
 
-g[svg-comp].black > path[svg-type="body"].semi,
-g[svg-comp].black > text,
-g[svg-comp].green > path[svg-type="body"].semi,
-g[svg-comp].green > text,
-g[svg-comp].red > path[svg-type="body"].semi,
-g[svg-comp].red > text,
-g[svg-comp].blue > path[svg-type="body"].semi,
-g[svg-comp].blue > text,
-g[svg-comp].purple > path[svg-type="body"].semi,
-g[svg-comp].purple > text,
-g[svg-comp].brown > path[svg-type="body"].semi,
-g[svg-comp].brown > text,
-g[svg-comp].navy > path[svg-type="body"].semi,
-g[svg-comp].navy > text,
-g[svg-comp].teal > path[svg-type="body"].semi,
-g[svg-comp].teal > text {
-  stroke: white;
+g[svg-comp].black > text {
   fill: white;
+  stroke: white;
 }
 
 .ec.green {
   stroke: #0d7537;
   fill: #0d7537;
 }
+
 g[svg-comp].green > [svg-type="body"] {
   fill: #88dc88;
 }
 
-g[svg-comp].red > [svg-type="body"] {
-  fill: red;
-}
-
-.ec.blue {
-  stroke: #0f12c5;
-  fill: #0f12c5;
-}
-g[svg-comp].blue > [svg-type="body"] {
-  fill: #3f8aec;
-}
-
-.ec.yellow,
-.ec.orange,
-.ec.purple,
-.ec.brown,
-.ec.aqua,
-.ec.bisque,
-.ec.navy,
-.ec.teal,
-.ec.violet,
-.ec.red {
-  stroke: #464540;
-  fill: #464540;
-}
-g[svg-comp].yellow > [svg-type="body"] {
-  fill: #ffff00;
-}
-
-g[svg-comp].orange > [svg-type="body"] {
-  fill: #ffae00;
-}
-
-g[svg-comp].purple > [svg-type="body"] {
-  fill: #80008094;
-}
-
-g[svg-comp].brown > [svg-type="body"] {
-  fill: #a52a2a8a;
-}
-
-g[svg-comp].aqua > [svg-type="body"] {
-  fill: aqua;
-}
-
-g[svg-comp].bisque > [svg-type="body"] {
-  fill: bisque;
-}
-
-g[svg-comp].navy > [svg-type="body"] {
-  fill: #1717b9;
-}
-
-g[svg-comp].teal > [svg-type="body"] {
-  fill: #008080db;
-}
-
-g[svg-comp].violet > [svg-type="body"] {
-  fill: #ee82eeab;
-}
-
-.ec.selected {
-  stroke: black !important;
-  fill: black !important;
-}
-
-/* [class="svg_body"] */
-.ec.selected > [svg-type="body"] {
-  stroke: black;
-  stroke-width: 10px;
-}
-
-.ec.selected > text[svg-type="body"] {
-  stroke: white;
-  fill: white;
-}
-
-g[svg-comp]:hover {
-  stroke-width: 10px;
-}
-
-/* ex .pins*/
-g[svg-comp] > path[svg-type="node"] {
-  /*fill-opacity: 0.75;*/
-  stroke-width: 7px;
-}
-
-/* .cirPoint */
-g[svg-comp] > circle[svg-type="node"],
-circle[svg-type="bond"] {
-  /*display: inline; was moving text out of place*/
-  fill: #bcdcfb;
-  stroke-width: 4px;
-  stroke: red;
-  /*#327c76;*/
-}
-
-/* .cirPoint:hover */
-g[svg-comp] > circle[svg-type="node"]:hover {
-  stroke: red;
-}
-
 g[svg-comp] > path[svg-type="body"].thick {
-  stroke-width: 7px;
+  stroke-width: 2px;
 }
 
-g[svg-comp] > path[svg-type="body"].no-fill {
+g[svg-comp] > path[svg-type="body"].no-fill,
+g[svg-comp].selected > [svg-type="body"].no-fill {
   fill: none;
 }
 
-/* .dip-text */
-g[svg-comp] > text {
-  stroke-width: 1px;
+.ec.selected > [svg-type="body"].no-fill {
+  fill: none;
+}
+
+g[svg-comp] text {
+  fill: black;
+  stroke: black;
+  stroke-width: 0.5px;
+  font-family: monospace;
+  font-size: 10px;
+}
+g[svg-comp] text.title {
+  font-size: 18px;
+}
+
+g[svg-comp] text.big {
+  font-size: 50px;
+}
+
+g[svg-comp] > circle[svg-type="node"] {
+  fill: #bcdcfb;
+  stroke-width: 2px;
+  stroke: red;
 }
 
 .vcc {
@@ -247,7 +156,7 @@ g[svg-comp] > text {
 
 .vcc,
 .gnd {
-  stroke-width: 3px;
+  stroke-width: 1px;
 }
 
 .dragging {
@@ -258,6 +167,7 @@ g[svg-comp] > text {
   cursor: crosshair;
 }
 
+/*tooltip*/
 g.label > rect {
   /*#31e8e5;*/
   fill: #9de8e7;
@@ -271,13 +181,33 @@ g.label > rect {
 g.label > text {
   fill: #656262;
   /*color: black;
-	fill-opacity: 1;
-	stroke-opacity: 1;*/
+		fill-opacity: 1;
+		stroke-opacity: 1;*/
 }
 
 .hide {
   display: none;
 }
+
+/*selected*/
+
+.ec.selected > [svg-type="body"] {
+  stroke-width: 3px;
+}
+
+.ec.white.selected > [svg-type="body"] {
+  fill: #f1efef;
+}
+
+.ec.green.selected > [svg-type="body"] {
+  fill: #f1efef;
+}
+
+.ec.black.selected > [svg-type="body"] {
+  fill: black;
+}
+
+/*missing*/
 
 /************************ WIRE   ************************/
 

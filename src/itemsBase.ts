@@ -48,8 +48,7 @@ export default abstract class ItemBase extends Item {
 		this.settings.g = tag("g", this.settings.id, {
 			class: (this.settings.class = classArr.join(' '))
 		});
-		this.settings.color = Color.getcolor(options.color, Colors.green);
-		addClass(this.g, this.color);
+		addClass(this.g, this.settings.color = Color.getcolor(options.color, Colors.white));
 	}
 
 	//ec.setColor("red").rotate(45).select(true).highlight.setRadius(15).highlight.show(5)

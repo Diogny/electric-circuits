@@ -25,89 +25,13 @@ var dab_1 = require("./dab");
 var app_window_1 = require("./app-window");
 var stateMachine_1 = require("./stateMachine");
 var components_1 = require("./components");
+var context_window_1 = require("./context-window");
 var MyApp = /** @class */ (function (_super) {
     __extends(MyApp, _super);
     function MyApp(options) {
         var _this = _super.call(this, options) || this;
         _this.tooltipFontSize = function () { return Math.max(10, 35 * _this.multiplier); };
-        //location is panning, size is for scaling
-        _this.viewBox = new rect_1.default(point_1.default.origin, size_1.default.empty);
-        //scaling multipler
-        _this.multiplier = 0.5; // 2X UI default
-        _this.ratioX = 1;
-        _this.ratioY = 1;
-        _this.pos = new point_1.default(50, 10);
-        //main SVG insertion point
-        _this.tooltip = new tooltip_1.default({ id: "tooltip", borderRadius: 4 });
-        _this.rootDir = utils_1.basePath();
-        _this.board = utils_1.qS("#board");
-        _this.svgBoard = _this.board.children[0];
-        //
-        _this.ratio = window.screen.width / window.screen.height;
-        //base_vb_width: board.clientWidth * ratio | 0,
-        //base_vb_height: board.clientHeight * ratio | 0
-        _this.baseViewBox = new size_1.default(_this.board.clientWidth * _this.ratio | 0, _this.board.clientHeight * _this.ratio | 0);
-        _this.topBarLeft = utils_1.qS("#top-bar>div:nth-of-type(1)");
-        _this.topBarRight = utils_1.qS("#top-bar>div:nth-of-type(2)");
-        //this'll hold the properties of the current selected component
-        _this.winProps = new app_window_1.default({
-            app: _this,
-            id: "win-props",
-            x: 800,
-            y: 0,
-            size: {
-                width: 250,
-                height: 300
-            },
-            title: "Properties",
-            bar: "...",
-            content: "Aaaaa...!  kjsdhj sjh sj d sj sd sdjs djsdj kkisaujn ak asd asdn askd askd aksdn aksd  ia hsdoia oa sdoas "
-        });
-        var that = _this;
-        //create state machine
-        _this.state = new stateMachine_1.default({
-            id: "state-machine-01",
-            initial: interfaces_1.StateType.IDLE,
-            states: {},
-            ctx: {},
-            commonActions: {
-                HIDE_NODE: function (newContext) {
-                    newContext.it && newContext.it.hideNode();
-                    //hide tooltip
-                    that.tooltip.setVisible(false);
-                },
-                SHOW_BODY_TOOLTIP: function (newContext) {
-                    var _a;
-                    var p = point_1.default.translateBy(newContext.offset, 20);
-                    that.tooltip.setVisible(true)
-                        .move(p.x, p.y)
-                        .setFontSize(that.tooltipFontSize())
-                        .setText((_a = newContext.it) === null || _a === void 0 ? void 0 : _a.id);
-                },
-                SHOW_NODE_TOOLTIP: function (newContext) {
-                    var _a, _b, _c;
-                    //data has current state
-                    if (!((_a = newContext.it) === null || _a === void 0 ? void 0 : _a.highlighted)) {
-                        (_b = newContext.it) === null || _b === void 0 ? void 0 : _b.showNode(newContext.over.nodeNumber);
-                        //show tooltip
-                        var p = point_1.default.translateBy(newContext.offset, 20);
-                        that.tooltip.setVisible(true)
-                            .move(p.x, p.y)
-                            .setFontSize(that.tooltipFontSize())
-                            .setText(newContext.over.nodeNumber + " -" + ((_c = newContext.over.node) === null || _c === void 0 ? void 0 : _c.label));
-                    }
-                },
-                FORWARD_OVER: function (newContext) {
-                    //accepts transitions to new state on mouse OVER
-                    var prefix = !newContext.it ? "" : newContext.it.type == 1 ? "EC_" : "WIRE_", stateName = (prefix + newContext.over.type).toUpperCase(), state = interfaces_1.StateType[stateName];
-                    //EC_NODE		WIRE_NODE
-                    that.state.transition(state, interfaces_1.ActionType.START, newContext);
-                    //console.log(`transition: ${transition}.${action}`)
-                }
-            }
-        });
-        //register machine events
-        var 
+        var that = _this, 
         //HTML
         getClientXY = function (evt) {
             return new point_1.default(evt.clientX - that.board.offsetLeft, evt.clientY - that.board.offsetTop);
@@ -158,16 +82,101 @@ var MyApp = /** @class */ (function (_super) {
             that.topBarLeft.innerText = arr.join(", ");
             return state;
         };
-        //
+        ;
+        //location is panning, size is for scaling
+        _this.viewBox = new rect_1.default(point_1.default.origin, size_1.default.empty);
+        //scaling multipler
+        _this.multiplier = 0.5; // 2X UI default
+        //this's a const value
+        _this.ratio = window.screen.width / window.screen.height;
+        _this.ratioX = 1;
+        _this.ratioY = 1;
+        _this.pos = new point_1.default(50, 10);
+        //main SVG insertion point
+        _this.tooltip = new tooltip_1.default({ id: "tooltip", borderRadius: 4 });
+        _this.rootDir = utils_1.basePath(); //not used in electron
+        _this.board = utils_1.qS("#board");
+        _this.svgBoard = _this.board.children[0];
+        _this.topBarLeft = utils_1.qS("#top-bar>div:nth-of-type(1)");
+        _this.topBarRight = utils_1.qS("#top-bar>div:nth-of-type(2)");
+        //this'll hold the properties of the current selected component
+        _this.winProps = new app_window_1.default({
+            app: _this,
+            id: "win-props",
+            x: 800,
+            y: 0,
+            size: {
+                width: 250,
+                height: 300
+            },
+            title: "Properties",
+            bar: "...",
+            content: "Aaaaa...!  kjsdhj sjh sj d sj sd sdjs djsdj kkisaujn ak asd asdn askd askd aksdn aksd  ia hsdoia oa sdoas "
+        });
+        //create state machine
+        _this.state = new stateMachine_1.default({
+            id: "state-machine-01",
+            initial: interfaces_1.StateType.IDLE,
+            states: {},
+            ctx: {},
+            commonActions: {
+                HIDE_NODE: function (newContext) {
+                    newContext.it && newContext.it.hideNode();
+                    //hide tooltip
+                    that.tooltip.setVisible(false);
+                },
+                SHOW_BODY_TOOLTIP: function (newContext) {
+                    var _a;
+                    var p = point_1.default.translateBy(newContext.offset, 20);
+                    that.tooltip.setVisible(true)
+                        .move(p.x, p.y)
+                        .setFontSize(that.tooltipFontSize())
+                        .setText((_a = newContext.it) === null || _a === void 0 ? void 0 : _a.id);
+                },
+                SHOW_NODE_TOOLTIP: function (newContext) {
+                    var _a, _b, _c;
+                    //data has current state
+                    if (!((_a = newContext.it) === null || _a === void 0 ? void 0 : _a.highlighted)) {
+                        (_b = newContext.it) === null || _b === void 0 ? void 0 : _b.showNode(newContext.over.nodeNumber);
+                        //show tooltip
+                        var p = point_1.default.translateBy(newContext.offset, 20);
+                        that.tooltip.setVisible(true)
+                            .move(p.x, p.y)
+                            .setFontSize(that.tooltipFontSize())
+                            .setText(newContext.over.nodeNumber + " -" + ((_c = newContext.over.node) === null || _c === void 0 ? void 0 : _c.label));
+                    }
+                },
+                FORWARD_OVER: function (newContext) {
+                    //accepts transitions to new state on mouse OVER
+                    var prefix = !newContext.it ? "" : newContext.it.type == 1 ? "EC_" : "WIRE_", stateName = (prefix + newContext.over.type).toUpperCase(), state = interfaces_1.StateType[stateName];
+                    //EC_NODE		WIRE_NODE
+                    that.state.transition(state, interfaces_1.ActionType.START, newContext);
+                    //console.log(`transition: ${transition}.${action}`)
+                }
+            }
+        });
+        //context menu
+        _this.rightClick = new context_window_1.default({
+            app: _this,
+            id: "win-rc",
+            x: 50,
+            y: 50,
+            size: {
+                width: 200,
+                height: 250
+            },
+            class: "no-select",
+            list: options.list
+        });
         dab_1.aEL(_this.svgBoard, "mouseover", function (evt) {
             that.state.enabled && that.state.send(interfaces_1.ActionType.OVER, handleMouseEvent.call(that, evt));
-        }, false); //enter a component
+        }, false);
         dab_1.aEL(_this.svgBoard, "mousemove", function (evt) {
             that.state.enabled && that.state.send(interfaces_1.ActionType.MOVE, handleMouseEvent.call(that, evt));
         }, false);
         dab_1.aEL(_this.svgBoard, "mouseout", function (evt) {
             that.state.enabled && that.state.send(interfaces_1.ActionType.OUT, handleMouseEvent.call(that, evt));
-        }, false); //exists a component
+        }, false);
         //
         dab_1.aEL(_this.svgBoard, "mousedown", function (evt) {
             that.state.enabled && that.state.send(interfaces_1.ActionType.DOWN, handleMouseEvent.call(that, evt));
@@ -199,6 +208,9 @@ var MyApp = /** @class */ (function (_super) {
             m = parseFloat(o);
         }
         this.multiplier = m;
+        //base_vb_width: board.clientWidth * ratio | 0,
+        //base_vb_height: board.clientHeight * ratio | 0
+        this.baseViewBox = new size_1.default(this.board.clientWidth * this.ratio | 0, this.board.clientHeight * this.ratio | 0);
         //calculate size
         this.viewBox.size = new size_1.default(this.baseViewBox.width * this.multiplier | 0, this.baseViewBox.height * this.multiplier | 0);
         //app.vb_width = app.base_vb_width * this.multiplier | 0;

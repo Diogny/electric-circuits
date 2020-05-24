@@ -1,7 +1,7 @@
 import { Application } from "./app";
 import {
 	IApplicationOptions, IMyApp, ITooltipText, IAppWindowOptions, IStateMachineOptions,
-	StateType, ActionType, IMouseState
+	StateType, ActionType, IMouseState, IContextMenuOptions
 } from "./interfaces";
 import { basePath, qS } from "./utils";
 import Rect from "./rect";
@@ -17,24 +17,25 @@ import Comp from "./components";
 import ContextWindow from "./context-window";
 
 export class MyApp extends Application implements IMyApp {
-	rootDir: string;
-	board: HTMLElement;
-	ratio: number;
-	svgBoard: SVGElement;
+
+	readonly rootDir: string;
+	readonly board: HTMLElement;
+	readonly ratio: number;
+	readonly svgBoard: SVGElement;
+	readonly tooltip: Tooltip;
+	readonly topBarLeft: HTMLElement;
+	readonly topBarRight: HTMLElement;
+	readonly winProps: AppWindow;
+	readonly state: StateMachine;
+	readonly rightClick: ContextWindow;
+
 	viewBox: Rect;			//vb_x: 0, vb_y: 0,	vb_width: 0, vb_height: 0
 	baseViewBox: Size;		//base_vb_width, base_vb_height
 	multiplier: number;
 	ratioX: number;
 	ratioY: number;
 	pos: Point;
-	tooltip: Tooltip;
-	topBarLeft: HTMLElement;
-	topBarRight: HTMLElement;
-	winProps: AppWindow;
-	state: StateMachine;
-
 	size: Size;
-	rightClick: ContextWindow;
 
 	//temporary properties
 	ec: ItemSolid;
@@ -42,94 +43,8 @@ export class MyApp extends Application implements IMyApp {
 
 	constructor(options: IApplicationOptions) {
 		super(options);
-		//location is panning, size is for scaling
-		this.viewBox = new Rect(Point.origin, Size.empty);
-		//scaling multipler
-		this.multiplier = 0.5;  // 2X UI default
-		this.ratioX = 1;
-		this.ratioY = 1;
-		this.pos = new Point(50, 10);
-		//main SVG insertion point
-		this.tooltip = new Tooltip(<ITooltipText>{ id: "tooltip", borderRadius: 4 });
-
-		this.rootDir = <string>basePath();
-		this.board = (<HTMLElement>qS("#board"));
-		this.svgBoard = (<SVGElement>this.board.children[0]);
-		//
-		this.ratio = window.screen.width / window.screen.height;
-		//base_vb_width: board.clientWidth * ratio | 0,
-		//base_vb_height: board.clientHeight * ratio | 0
-		this.baseViewBox = new Size(this.board.clientWidth * this.ratio | 0, this.board.clientHeight * this.ratio | 0);
-
-		this.topBarLeft = qS("#top-bar>div:nth-of-type(1)");
-		this.topBarRight = qS("#top-bar>div:nth-of-type(2)");
-
-		//this'll hold the properties of the current selected component
-		this.winProps = new AppWindow(<IAppWindowOptions>{
-			app: this as Application,
-			id: "win-props",
-			x: 800,
-			y: 0,
-			size: {
-				width: 250,
-				height: 300
-			},
-			title: "Properties",
-			bar: "...",
-			content: "Aaaaa...!  kjsdhj sjh sj d sj sd sdjs djsdj kkisaujn ak asd asdn askd askd aksdn aksd  ia hsdoia oa sdoas "
-		});
-
 		let
-			that: MyApp = this;
-
-		//create state machine
-		this.state = new StateMachine(<IStateMachineOptions>{
-			id: "state-machine-01",
-			initial: StateType.IDLE, // 'IDLE',
-			states: {},
-			ctx: <IMouseState>{},
-			commonActions: {
-				HIDE_NODE: function (newContext: IMouseState) {
-					newContext.it && newContext.it.hideNode();
-					//hide tooltip
-					that.tooltip.setVisible(false);
-				},
-				SHOW_BODY_TOOLTIP: function (newContext: IMouseState) {
-					let
-						p = Point.translateBy(newContext.offset, 20);
-					that.tooltip.setVisible(true)
-						.move(p.x, p.y)
-						.setFontSize(that.tooltipFontSize())
-						.setText(<string>newContext.it?.id);
-				},
-				SHOW_NODE_TOOLTIP: function (newContext: IMouseState) {
-					//data has current state
-					if (!newContext.it?.highlighted) {
-						newContext.it?.showNode(<number>newContext.over.nodeNumber);
-						//show tooltip
-						let
-							p = Point.translateBy(newContext.offset, 20);
-
-						that.tooltip.setVisible(true)
-							.move(p.x, p.y)
-							.setFontSize(that.tooltipFontSize())
-							.setText(`${newContext.over.nodeNumber} -${newContext.over.node?.label}`);
-					}
-				},
-				FORWARD_OVER: function (newContext: IMouseState) {
-					//accepts transitions to new state on mouse OVER
-					let
-						prefix = !newContext.it ? "" : newContext.it.type == 1 ? "EC_" : "WIRE_",
-						stateName = (prefix + newContext.over.type).toUpperCase(),
-						state = <StateType><unknown>StateType[<any>stateName];
-					//EC_NODE		WIRE_NODE
-					that.state.transition(state, ActionType.START, newContext);
-					//console.log(`transition: ${transition}.${action}`)
-				}
-			}
-		});
-		//register machine events
-		let
+			that: MyApp = this,
 			//HTML
 			getClientXY = (evt: MouseEvent) =>
 				new Point(evt.clientX - that.board.offsetLeft, evt.clientY - that.board.offsetTop),
@@ -183,17 +98,108 @@ export class MyApp extends Application implements IMyApp {
 				//render
 				that.topBarLeft.innerText = arr.join(", ");
 				return state;
-			};
-		//
+			};;
+
+		//location is panning, size is for scaling
+		this.viewBox = new Rect(Point.origin, Size.empty);
+		//scaling multipler
+		this.multiplier = 0.5;  // 2X UI default
+		//this's a const value
+		this.ratio = window.screen.width / window.screen.height;
+		this.ratioX = 1;
+		this.ratioY = 1;
+		this.pos = new Point(50, 10);
+		//main SVG insertion point
+		this.tooltip = new Tooltip(<ITooltipText>{ id: "tooltip", borderRadius: 4 });
+		this.rootDir = <string>basePath();			//not used in electron
+		this.board = (<HTMLElement>qS("#board"));
+		this.svgBoard = (<SVGElement>this.board.children[0]);
+		this.topBarLeft = qS("#top-bar>div:nth-of-type(1)");
+		this.topBarRight = qS("#top-bar>div:nth-of-type(2)");
+
+		//this'll hold the properties of the current selected component
+		this.winProps = new AppWindow(<IAppWindowOptions>{
+			app: this as Application,
+			id: "win-props",
+			x: 800,
+			y: 0,
+			size: {
+				width: 250,
+				height: 300
+			},
+			title: "Properties",
+			bar: "...",
+			content: "Aaaaa...!  kjsdhj sjh sj d sj sd sdjs djsdj kkisaujn ak asd asdn askd askd aksdn aksd  ia hsdoia oa sdoas "
+		});
+		//create state machine
+		this.state = new StateMachine(<IStateMachineOptions>{
+			id: "state-machine-01",
+			initial: StateType.IDLE, // 'IDLE',
+			states: {},
+			ctx: <IMouseState>{},
+			commonActions: {
+				HIDE_NODE: function (newContext: IMouseState) {
+					newContext.it && newContext.it.hideNode();
+					//hide tooltip
+					that.tooltip.setVisible(false);
+				},
+				SHOW_BODY_TOOLTIP: function (newContext: IMouseState) {
+					let
+						p = Point.translateBy(newContext.offset, 20);
+					that.tooltip.setVisible(true)
+						.move(p.x, p.y)
+						.setFontSize(that.tooltipFontSize())
+						.setText(<string>newContext.it?.id);
+				},
+				SHOW_NODE_TOOLTIP: function (newContext: IMouseState) {
+					//data has current state
+					if (!newContext.it?.highlighted) {
+						newContext.it?.showNode(<number>newContext.over.nodeNumber);
+						//show tooltip
+						let
+							p = Point.translateBy(newContext.offset, 20);
+
+						that.tooltip.setVisible(true)
+							.move(p.x, p.y)
+							.setFontSize(that.tooltipFontSize())
+							.setText(`${newContext.over.nodeNumber} -${newContext.over.node?.label}`);
+					}
+				},
+				FORWARD_OVER: function (newContext: IMouseState) {
+					//accepts transitions to new state on mouse OVER
+					let
+						prefix = !newContext.it ? "" : newContext.it.type == 1 ? "EC_" : "WIRE_",
+						stateName = (prefix + newContext.over.type).toUpperCase(),
+						state = <StateType><unknown>StateType[<any>stateName];
+					//EC_NODE		WIRE_NODE
+					that.state.transition(state, ActionType.START, newContext);
+					//console.log(`transition: ${transition}.${action}`)
+				}
+			}
+		});
+		//context menu
+		this.rightClick = new ContextWindow(<IContextMenuOptions><unknown>{
+			app: this,
+			id: "win-rc",
+			x: 50,
+			y: 50,
+			size: {
+				width: 200,
+				height: 250
+			},
+			class: "no-select",
+			list: options.list
+		});
+
 		aEL(<any>this.svgBoard, "mouseover", function (evt: MouseEvent) {
 			that.state.enabled && that.state.send(ActionType.OVER, handleMouseEvent.call(that, evt));
-		}, false);		//enter a component
+		}, false);
 		aEL(<any>this.svgBoard, "mousemove", function (evt: MouseEvent) {
 			that.state.enabled && that.state.send(ActionType.MOVE, handleMouseEvent.call(that, evt));
 		}, false);
 		aEL(<any>this.svgBoard, "mouseout", function (evt: MouseEvent) {
 			that.state.enabled && that.state.send(ActionType.OUT, handleMouseEvent.call(that, evt));
-		}, false);		//exists a component
+		}, false);
 		//
 		aEL(<any>this.svgBoard, "mousedown", function (evt: MouseEvent) {
 			that.state.enabled && that.state.send(ActionType.DOWN, handleMouseEvent.call(that, evt));
@@ -219,7 +225,6 @@ export class MyApp extends Application implements IMyApp {
 					.setVisible(true);
 			}
 		}, false);
-
 	}
 
 	public insideBoard(p: Point): boolean {
@@ -235,6 +240,9 @@ export class MyApp extends Application implements IMyApp {
 			m = parseFloat(o);
 		}
 		this.multiplier = m;
+		//base_vb_width: board.clientWidth * ratio | 0,
+		//base_vb_height: board.clientHeight * ratio | 0
+		this.baseViewBox = new Size(this.board.clientWidth * this.ratio | 0, this.board.clientHeight * this.ratio | 0);
 		//calculate size
 		this.viewBox.size = new Size(
 			this.baseViewBox.width * this.multiplier | 0,

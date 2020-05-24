@@ -34,17 +34,43 @@ var ItemBoard = /** @class */ (function (_super) {
         _this.settings.id = _this.base.name + "-" + base.count++;
         //deep copy component properties
         _this.settings.props = dab_1.obj(base.obj.props);
-        //create main component container
+        //add properties to DOM
         dab_1.attr(_this.g, {
             id: _this.id,
             "svg-comp": _this.base.type,
         });
+        //check for custom class
+        _this.base.meta.class && dab_1.addClassX(_this.g, _this.base.meta.class);
         //create the highligh object
         _this.highlight = new boardCircle_1.default(options.highlightNodeName);
         //add it to component, this's the insertion point (insertBefore) for all inherited objects
         dab_1.aCld(_this.g, _this.highlight.g);
         //initialize Bonds array
         _this.settings.bonds = [];
+        //add component label if available
+        var createText = function (attr, text) {
+            var svgText = utils_1.tag("text", "", attr);
+            return svgText.innerHTML = text, svgText;
+        };
+        if (base.obj.meta.label) {
+            dab_1.aCld(_this.g, createText({
+                x: base.obj.meta.label.x,
+                y: base.obj.meta.label.y,
+                "class": base.obj.meta.label.class
+            }, base.obj.meta.label.text));
+        }
+        //add node labels
+        if (base.obj.meta.nodeLabel) {
+            var i = 0, factor = 20, x = 7, pins = _this.count / 2;
+            for (var y = 60; y > 0; y -= 44, x += (factor = -factor)) {
+                for (var col = 0; col < pins; col++, i++, x += factor) {
+                    dab_1.aCld(_this.g, createText({
+                        x: x,
+                        y: y
+                    }, i + ""));
+                }
+            }
+        }
         return _this;
         //this still doesn't work to get all overridable properties ¿?
         //properties still cannot access super value

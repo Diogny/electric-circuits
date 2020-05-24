@@ -10,7 +10,7 @@ var BoardCircle = /** @class */ (function () {
             nodeName: nodeName || "node",
             nodeValue: -1,
             visible: false,
-            radius: 10,
+            radius: 5,
             p: point_1.default.origin
         };
         //create SVG DOM Element
@@ -59,20 +59,20 @@ var BoardCircle = /** @class */ (function () {
         return this;
     };
     BoardCircle.prototype.setRadius = function (value) {
-        this.settings.radius = value <= 0 ? 10 : value;
-        return this.refresh(); //for object chaining
+        this.settings.radius = value <= 0 ? 5 : value;
+        return this.refresh();
     };
     BoardCircle.prototype.hide = function () {
         this.settings.visible = false;
-        this.settings.p = point_1.default.origin; //clean attributes
+        this.settings.p = point_1.default.origin;
         this.settings.nodeValue = -1;
-        return this.refresh(); //for object chaining
+        return this.refresh();
     };
     BoardCircle.prototype.show = function (nodeValue) {
         this.settings.visible = true;
         // this.p  moved first
         this.settings.nodeValue = nodeValue;
-        return this.refresh(); //for object chaining
+        return this.refresh();
     };
     BoardCircle.prototype.getObjectSettings = function () {
         var o = {

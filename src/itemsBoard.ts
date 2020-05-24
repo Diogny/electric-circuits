@@ -1,11 +1,12 @@
 
-import { aCld, condClass, obj, attr, extend, isFn } from './dab';
+import { aCld, condClass, obj, attr, extend, isFn, addClassX } from './dab';
 import Bond from './bonds';
 import ItemBase from './itemsBase';
 import Comp from './components';
 import { IHighlightable, IPoint, IItemNode, IItemBoardOptions, IBondItem, IItemBoardProperties } from './interfaces';
 import BoardCircle from './boardCircle';
-import { map } from './utils';
+import { map, tag } from './utils';
+import EC from './ec';
 
 //ItemBoard->Wire
 export default abstract class ItemBoard extends ItemBase {
@@ -17,7 +18,7 @@ export default abstract class ItemBoard extends ItemBase {
 	get onProp(): Function { return this.settings.onProp }
 	get selected(): boolean { return this.settings.selected }
 	get bonds(): Bond[] { return this.settings.bonds }
-
+	
 	abstract get count(): number;	// EC is node count, Wire is node count
 
 	constructor(options: IItemBoardOptions) {
@@ -33,17 +34,49 @@ export default abstract class ItemBoard extends ItemBase {
 		this.settings.id = this.base.name + "-" + base.count++;
 		//deep copy component properties
 		this.settings.props = obj(base.obj.props);
-		//create main component container
+		//add properties to DOM
 		attr(this.g, {
 			id: this.id,
 			"svg-comp": this.base.type,
 		});
+		//check for custom class
+		this.base.meta.class && addClassX(this.g, this.base.meta.class);
 		//create the highligh object
 		this.highlight = new BoardCircle(options.highlightNodeName);
 		//add it to component, this's the insertion point (insertBefore) for all inherited objects
 		aCld(this.g, this.highlight.g);
 		//initialize Bonds array
 		this.settings.bonds = [];
+		//add component label if available
+		let
+			createText = (attr: any, text: string) => {
+				let
+					svgText = tag("text", "", attr);
+				return svgText.innerHTML = text, svgText
+			}
+		if (base.obj.meta.label) {
+			aCld(this.g, createText({
+				x: base.obj.meta.label.x,
+				y: base.obj.meta.label.y,
+				"class": base.obj.meta.label.class
+			}, base.obj.meta.label.text))
+		}
+		//add node labels
+		if (base.obj.meta.nodeLabel) {
+			let
+				i = 0,
+				factor = 20,
+				x = 7,
+				pins = (this as unknown as EC).count / 2;
+			for (let y = 60; y > 0; y -= 44, x += (factor = -factor)) {
+				for (let col = 0; col < pins; col++, i++, x += factor) {
+					aCld(this.g, createText({
+						x: x,
+						y: y
+					}, i + ""))
+				}
+			}
+		}
 
 		//this still doesn't work to get all overridable properties ¿?
 		//properties still cannot access super value

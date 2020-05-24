@@ -3,26 +3,23 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var dab_1 = require("./dab");
 var Comp = /** @class */ (function () {
     function Comp(options) {
-        var _this = this;
+        var that = this, template = options.tmpl;
+        //delete
+        delete options.tmpl;
         //copy making a dupplicate
         this.settings = dab_1.obj(options);
         //check to see if this component derivates from a template
-        if (this.settings.tmpl) {
-            var tmp = Comp.find(this.settings.tmpl.name, true);
+        if (template) {
+            var comp = Comp.find(template.name, true);
             //copy SVG data
-            this.settings.data = tmp.obj.data;
-            //deep copy meta
-            this.settings.meta = dab_1.obj({
-                "nodes": tmp.obj.nodes,
-                "logic": tmp.obj.logic
-            });
-            //update svg text tag if provided
-            var lbl = this.settings.tmpl.label;
-            lbl && (this.settings.data = this.settings.data
-                .replace(/\<text[^\>]*\>(.*)\<\/text\>/gm, "<text x='" + lbl.x + "' y='" + lbl.y + "' font-size='" + lbl.font + "'>" + lbl.text + "</text>"));
+            this.settings.data = comp.obj.data;
+            //deep copy meta, it has simple object and values
+            this.settings.meta = JSON.parse(JSON.stringify(comp.obj.meta));
+            //copy label if any
+            template.label && (this.settings.meta.label = dab_1.obj(template.label));
             //update node labels
-            this.settings.tmpl.labels.forEach(function (lbl, ndx) {
-                _this.settings.meta.nodes.list[ndx].label = lbl;
+            template.labels.forEach(function (lbl, ndx) {
+                that.settings.meta.nodes.list[ndx].label = lbl;
             });
         }
         if (!Comp.store(this.settings.name, this))
@@ -48,13 +45,10 @@ var Comp = /** @class */ (function () {
         enumerable: false,
         configurable: true
     });
-    Object.defineProperty(Comp.prototype, "nodes", {
-        get: function () { return this.settings.meta.nodes; },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Comp.prototype, "logic", {
-        get: function () { return this.settings.meta.logic; },
+    Object.defineProperty(Comp.prototype, "meta", {
+        get: function () {
+            return this.settings.meta;
+        },
         enumerable: false,
         configurable: true
     });
@@ -80,20 +74,22 @@ var Comp = /** @class */ (function () {
         });
         return set;
     };
+    // all base components with metadata
     Comp.baseComps = Comp.initializeComponents([{
             name: "label",
             obj: {
-                name: "label", type: "label"
+                name: "label", type: "label", meta: {}
             }
         },
         {
             name: "wire",
             obj: {
-                name: "wire", type: "wire"
+                name: "wire", type: "wire", meta: {}
             }
         }
-    ]); // all base components with metadata
-    Comp.boardItems = new Map(); //all ecs, wires in the board
+    ]);
+    //all ecs, wires in the board
+    Comp.boardItems = new Map();
     ////////////////////////////// STATIC ////////////////////////////////
     Comp.each = function (callbackfn) { return Comp.boardItems.forEach(callbackfn); };
     //it can be sent #id

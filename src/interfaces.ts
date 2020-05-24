@@ -51,6 +51,7 @@ export interface IApplicationOptions {
 	templates: any;
 	includePropsInThis: boolean;
 	props: { [x: string]: IPropertyOptions };
+	list: Map<string, IContextMenuItem[]>
 }
 
 export interface IApplicationSettings {
@@ -143,8 +144,11 @@ export interface IComponentOptions {
 
 //meta
 export interface IComponentMetadata {
+	class: string;
 	nodes: IMetadataNodes;
 	logic: IMetadataLogic;
+	label: IComponentTemplateLabel;
+	nodeLabel: boolean;
 }
 
 export interface IMetadataNodes {
@@ -176,7 +180,7 @@ export interface IComponentTemplate {
 export interface IComponentTemplateLabel {
 	x: number;
 	y: number;
-	font: string;
+	class: string;
 	text: string;
 }
 

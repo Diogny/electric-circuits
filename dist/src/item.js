@@ -91,7 +91,7 @@ var Item = /** @class */ (function (_super) {
             name: "",
             x: 0,
             y: 0,
-            color: colors_1.Color.getcolor("", colors_1.Colors.green),
+            color: colors_1.Color.getcolor("", colors_1.Colors.white),
             class: "",
             visible: true,
         };

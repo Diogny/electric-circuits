@@ -6,6 +6,7 @@
 		"description": "Logical NOT gate"
 	},
 	"meta" : {
+		"class": "next",
 		"nodes": {
 			"length": 2,
 			"size": {
@@ -14,7 +15,7 @@
 			},
 			"list" : [
 				{ "x": 0, "y": 30, "label": "Input A" },
-				{ "x": 117, "y": 30, "label": "Output Y" }
+				{ "x": 90, "y": 30, "label": "Output Y" }
 			]
 		},
 		"logic" : {
@@ -25,7 +26,10 @@
 			]
 		}
 	},
-	"data" : "<path svg-type='body' d='M 15,0 L 75,30 L 15,60 Z'></path><circle svg-type='body'  r='12' cy='30' cx='90'/><path svg-type='node' node='0' d='M 0,30 H 15'></path><path svg-type='node' node='1' d='M 117,30 H 102'></path>"
+	"data" : "<path svg-type='node' node='0' d='M 0,25 V35 H5 V25 Z'/>
+<path svg-type='node' node='1' d='M 85,25 H90 V35 H85 Z'/>
+<circle svg-type='body' cx='76' cy='30' r='10'/>
+<path svg-type='body' d='M 5,0 L 65,30 L 5,60 Z'//>"
 },
 {
 	"type" : "gate",
@@ -34,6 +38,7 @@
 		"description": "Logical Buffer gate"
 	},
 	"meta" : {
+		"class": "next",
 		"nodes": {
 			"length": 2,
 			"size": {
@@ -42,11 +47,13 @@
 			},
 			"list" : [
 				{ "x": 0, "y": 30, "label": "Input A" },
-				{ "x": 86, "y": 30, "label": "Output Y" }
+				{ "x": 70, "y": 30, "label": "Output Y" }
 			]
 		}
 	},
-	"data" : "<path svg-type='body' d='M 15,0 L 75,30 L 15,60 Z'></path><path svg-type='node' node='0' d='M 0,30 H 15'></path><path svg-type='node' node='1' d='M 86,30 H 71'></path>"
+	"data" : "<path svg-type='node' node='0' d='M 0,25 V35 H5 V25 Z'></path>
+<path svg-type='node' node='1' d='M 55,28 H70 V32 H55 Z'></path>
+<path svg-type='body' d='M 5,0 L 65,30 L 5,60 Z'></path>"
 },
 {
 	"type" : "gate",
@@ -67,6 +74,7 @@
 		}
 	},
 	"meta" : {
+		"class": "next",
 		"nodes": {
 			"length": 3,
 			"size": {
@@ -76,7 +84,7 @@
 			"list" : [
 				{ "x": 0, "y": 15, "label": "Input A" },
 				{ "x": 0, "y": 45, "label": "Input B" },
-				{ "x": 100, "y": 30, "label": "Output Y" }
+				{ "x": 74, "y": 30, "label": "Output Y" }
 			]
 		},
 		"logic" : {
@@ -89,7 +97,10 @@
 			]
 		}
 	},
-	"data" : "<path svg-type='node' node='0' d='M 0,15 H 15'></path><path svg-type='node' node='1' d='M 0,45 H 15'></path><path svg-type='node' node='2' d='M 100,30 H 85'></path><path svg-type='body' d='M 15,0 H 45 C 98,0 98,60 45,60 H 15 Z'></path>"
+	"data" : "<path svg-type='node' node='0' d='M 0,10 H5 V20 H0 Z'/>
+<path svg-type='node' node='1' d='M 0,40 H5 V50 H0 Z'/>
+<path svg-type='node' node='2' d='M 68,25 H73 V35 H68 Z'/>
+<path svg-type='body' d='M 5,0 H 35 C 80,0 80,60 35,60 H 5 Z'/>"
 },
 {
 	"type" : "gate",
@@ -98,6 +109,7 @@
 		"description" : "Logicl NAND gate 2-inputs"
 	},
 	"meta" : {
+		"class": "next",
 		"nodes": {
 			"length": 3,
 			"size": {
@@ -107,7 +119,7 @@
 			"list" : [
 				{ "x": 0, "y": 15, "label": "Input A" },
 				{ "x": 0, "y": 45, "label": "Input B" },
-				{ "x": 122, "y": 30, "label": "Output Y" }
+				{ "x": 93, "y": 30, "label": "Output Y" }
 			]
 		},
 		"logic" : {
@@ -120,7 +132,11 @@
 			]
 		}
 	},
-	"data" : "<path svg-type='body' d='M 15,0 H 45 C 95,0 95,60 45,60 H 15 Z'></path><circle svg-type='body' r='12' cy='30' cx='95'></circle><path svg-type='node' node='0' d='M 0,15 H 15'></path><path svg-type='node' node='1' d='M 0,45 H 15'></path><path svg-type='node' node='2' d='M 122,30 H 107'></path>"
+	"data" : "<path svg-type='node' node='0' d='M 0,10 H5 V20 H0 Z'/>
+<path svg-type='node' node='1' d='M 0,40 H5 V50 H0 Z'/>
+<path svg-type='node' node='2' d='M 88,25 H93 V35 H88 Z'/>
+<circle svg-type='body' cx='79' cy='30' r='10'/>
+<path svg-type='body' d='M 5,0 H 35 C 80,0 80,60 35,60 H 5 Z'/>"
 },
 {
 	"type" : "gate",
@@ -129,6 +145,7 @@
 		"description" : "Logicl OR gate 2-inputs"
 	},
 	"meta" : {
+		"class": "next",
 		"nodes": {
 			"length": 3,
 			"size": {
@@ -136,9 +153,9 @@
 				"height": 0
 			},
 			"list" : [
-				{ "x": 0, "y": 15, "label": "Input A" },
-				{ "x": 0, "y": 45, "label": "Input B" },
-				{ "x": 95, "y": 30, "label": "Output Y" }
+				{ "x": 2, "y": 15, "label": "Input A" },
+				{ "x": 2, "y": 45, "label": "Input B" },
+				{ "x": 75, "y": 30, "label": "Output Y" }
 			]
 		},
 		"logic" : {
@@ -151,7 +168,10 @@
 			]
 		}
 	},
-	"data" : "<path svg-type='body' d='M 12,0 Q 62,0 82,30 Q 62,60 12,60 Q 32,30 12,0 Z'></path><path svg-type='node' node='0' d='M 0,15 H 20'></path><path svg-type='node' node='1' d='M 0,45 H 20'></path><path svg-type='node' node='2' d='M 95,30 H 80'></path>"
+	"data" : "<path svg-type='node' node='0' d='M 2,10 V20 H10 V10 Z'/>
+<path svg-type='node' node='1' d='M 2,40 V50 H10 V40 Z'/>
+<path svg-type='node' node='2' d='M 65,25 H75 V35 H65 Z'/>
+<path svg-type='body' d='M 0,0 Q 50,0 70,30 Q 50,60 0,60 Q 20,30 0,0 Z'/>"
 },
 {
 	"type" : "gate",
@@ -160,6 +180,7 @@
 		"description" : "Logicl NOR gate 2-inputs"
 	},
 	"meta" : {
+		"class": "next",
 		"nodes": {
 			"length": 3,
 			"size": {
@@ -167,9 +188,9 @@
 				"height": 0
 			},
 			"list" : [
-				{ "x": 0, "y": 15, "label": "Input A" },
-				{ "x": 0, "y": 45, "label": "Input B" },
-				{ "x": 125, "y": 30, "label": "Output Y" }
+				{ "x": 2, "y": 15, "label": "Input A" },
+				{ "x": 2, "y": 45, "label": "Input B" },
+				{ "x": 95, "y": 30, "label": "Output Y" }
 			]
 		},
 		"logic" : {
@@ -182,7 +203,11 @@
 			]
 		}
 	},
-	"data" : "<path svg-type='body' d='M 12,0 Q 62,0 82,30 Q 62,60 12,60 Q 32,30 12,0 Z'></path><circle svg-type='body' r='12' cy='30' cx='97'></circle><path svg-type='node' node='0' d='M 0,15 H 20'></path><path svg-type='node' node='1' d='M 0,45 H 20'></path><path svg-type='node' node='2' d='M 125,30 H 110'></path>"
+	"data" : "<path svg-type='node' node='0' d='M 2,10 V20 H10 V10 Z'/>
+<path svg-type='node' node='1' d='M 2,40 V50 H10 V40 Z'/>
+<path svg-type='node' node='2' d='M 88,25 H95 V35 H88 Z'/>
+<circle svg-type='body' cx='80' cy='30' r='10'/>
+<path svg-type='body' d='M 0,0 Q 50,0 70,30 Q 50,60 0,60 Q 20,30 0,0 Z'/>"
 },
 {
 	"type" : "gate",
@@ -191,6 +216,7 @@
 		"description" : "Logicl XOR gate 2-inputs"
 	},
 	"meta" : {
+		"class": "next",
 		"nodes": {
 			"length": 3,
 			"size": {
@@ -198,9 +224,9 @@
 				"height": 0
 			},
 			"list" : [
-				{ "x": 0, "y": 15, "label": "Input A" },
-				{ "x": 0, "y": 45, "label": "Input B" },
-				{ "x": 114, "y": 30, "label": "Output Y" }
+				{ "x": 2, "y": 15, "label": "Input A" },
+				{ "x": 2, "y": 45, "label": "Input B" },
+				{ "x": 85, "y": 30, "label": "Output Y" }
 			]
 		},
 		"logic" : {
@@ -213,7 +239,11 @@
 			]
 		}
 	},
-	"data" : "<path svg-type='body' d='M 30,0 Q 80,0 100,30 Q 80,60 30,60 Q 50,30 30,0 Z'></path><path svg-type='body' class='thick no-fill' style='fill: none; ' d='M 12,60 Q 32,30 12,0'></path><path svg-type='node' node='0' d='M 0,15 H 22'></path><path svg-type='node' node='1' d='M 0,45 H 22'></path><path svg-type='node' node='2' d='M 114,30 H 98'></path>"
+	"data" : "<path svg-type='node' node='0' d='M 2,10 V20 H9 L 5,10 Z'/>
+<path svg-type='node' node='1' d='M 2,40 V50 H5 L 9,40 Z'/>
+<path svg-type='node' node='2' d='M 75,25 H85 V35 H75 Z'/>
+<path svg-type='body' class='thick no-fill' d='M 0,60 Q 20,30 0,0'/>
+<path svg-type='body' d='M 10,0 Q 60,0 80,30 Q 60,60 10,60 Q 30,30 10,0 Z'/>"
 },
 {
 	"type" : "gate",
@@ -222,6 +252,7 @@
 		"description" : "Logicl XNOR gate 2-inputs"
 	},
 	"meta" : {
+		"class": "next",
 		"nodes": {
 			"length": 3,
 			"size": {
@@ -229,9 +260,9 @@
 				"height": 0
 			},
 			"list" : [
-				{ "x": 0, "y": 15, "label": "Input A" },
-				{ "x": 0, "y": 45, "label": "Input B" },
-				{ "x": 140, "y": 30, "label": "Output Y" }
+				{ "x": 2, "y": 15, "label": "Input A" },
+				{ "x": 2, "y": 45, "label": "Input B" },
+				{ "x": 105, "y": 30, "label": "Output Y" }
 			]
 		},
 		"logic" : {
@@ -244,7 +275,12 @@
 			]
 		}
 	},
-	"data" : "<path svg-type='body' d='M 30,0 Q 80,0 100,30 Q 80,60 30,60 Q 50,30 30,0 Z'></path><path svg-type='body' class='thick no-fill' style='fill: none; ' d='M 12,60 Q 32,30 12,0'></path><circle svg-type='body' r='12' cy='30' cx='115'></circle><path svg-type='node' node='0' d='M 0,15 H 22'></path><path svg-type='node' node='1' d='M 0,45 H 22'></path><path svg-type='node' node='2' d='M 140,30 H 126'></path>"
+	"data" : "<path svg-type='node' node='0' d='M 2,10 V20 H9 L 5,10 Z'/>
+<path svg-type='node' node='1' d='M 2,40 V50 H5 L 9,40 Z'/>
+<path svg-type='node' node='2' d='M 95,25 H105 V35 H95 Z'/>
+<circle svg-type='body' cx='90' cy='30' r='10'/>
+<path svg-type='body' class='thick no-fill' d='M 0,60 Q 20,30 0,0'/>
+<path svg-type='body' d='M 10,0 Q 60,0 80,30 Q 60,60 10,60 Q 30,30 10,0 Z'/>"
 },
 {
 	"type" : "power",
@@ -253,6 +289,7 @@
 		"description" : "Ground terminal"
 	},
 	"meta" : {
+		"class": "next",
 		"nodes": {
 			"length": 1,
 			"size": {
@@ -260,11 +297,14 @@
 				"height": 0
 			},
 			"list" : [
-				{ "x": 60, "y": 0, "label": "GND" }
+				{ "x": 40, "y": 0, "label": "GND" }
 			]
 		}
 	},
-	"data" : "<path svg-type='body' d='M 60,0 V 30'></path><path svg-type='body' d='M 120,30 H 0'></path><path svg-type='body' d='M 100,50 H 20'></path><path svg-type='body' d='M 80,70 H 40'></path><path svg-type='node' node='0' d='M 60,0 V 30'></path>"
+	"data" : "<path svg-type='body' d='M 80,5 H0 V10 H80 Z'></path>
+<path svg-type='body' d='M 65,20 H15 V25 H65 Z'></path>
+<path svg-type='body' d='M 35,35 H45 V40 H35 Z'></path>
+<path svg-type='node' node='0' d='M 35,0 H45 V5 H35 Z'></path>"
 },
 {
 	"type" : "power",
@@ -273,6 +313,63 @@
 		"description" : "Generic battery"
 	},
 	"meta" : {
+		"class": "next",
+		"nodes": {
+			"length": 2,
+			"size": {
+				"width": 30,
+				"height": 0
+			},
+			"list" : [
+				{ "x": 0, "y": 40, "label": "GND" },
+				{ "x": 25, "y": 40, "label": "VCC" }
+			]
+		}
+	},
+	"data" : "<rect svg-type='body' x='5' y='20' width='7' height='40'/>
+<line x1='20' y1='0' x2='20' y2='80'/>
+<path class='vcc' style='fill: none; ' d='M 25,20 L 35,20 L 30,20 V 15 V 25'/>
+<path svg-type='node' node='0' d='M 0,35 V45 H5 V35 Z'/>
+<path svg-type='node' node='1' d='M 20,35 V45 H25 V35 Z'/>"
+},
+{
+	"type" : "power",
+	"name" : "battery-multi",
+	"properties" : {
+		"description" : "Generic multi-battery"
+	},
+	"meta" : {
+		"class": "next",
+		"nodes": {
+			"length": 2,
+			"size": {
+				"width": 30,
+				"height": 0
+			},
+			"list" : [
+				{ "x": 0, "y": 40, "label": "GND" },
+				{ "x": 73, "y": 40, "label": "VCC" }
+			]
+		}
+	},
+	"data" : "<rect svg-type='body' x='5' y='20' width='7' height='40'/>
+<line x1='20' y1='0' x2='20' y2='80'/>
+<rect svg-type='body' x='29' y='20' width='7' height='40'/>
+<line svg-type='body' x1='44.5' y1='0' x2='44.5' y2='80'/>
+<rect svg-type='body' x='53' y='20' width='7' height='40'/>
+<line svg-type='body' x1='68' y1='0' x2='68' y2='80'/>
+<path class='vcc' style='fill: none; ' d='M 75,20 L 85,20 L 80,20 V 15 V 25'/>
+<path svg-type='node' node='0' d='M 0,35 V45 H5 V35 Z'/>
+<path svg-type='node' node='1' d='M 68,35 V45 H73 V35 Z'/>"
+},
+{
+	"type" : "power",
+	"name" : "gen_power",
+	"properties" : {
+		"description": "Generic Power"
+	},
+	"meta" : {
+		"class": "next",
 		"nodes": {
 			"length": 2,
 			"size": {
@@ -285,49 +382,13 @@
 			]
 		}
 	},
-	"data" : "<rect svg-type='body' x='25' y='20' width='7' height='40'></rect><line x1='40' y1='0' x2='40' y2='80'></line><path class='vcc' style='fill: none; ' d='M 51,10 L 69,10 L 60,10 V 1 V 20 '></path><path svg-type='node' node='0' d='M 0,40 H 24'></path><path svg-type='node' node='1' d='M 70,40 H 41'></path>"
-},
-{
-	"type" : "power",
-	"name" : "battery-multi",
-	"properties" : {
-		"description" : "Generic multi-battery"
-	},
-	"meta" : {
-		"nodes": {
-			"length": 2,
-			"size": {
-				"width": 30,
-				"height": 0
-			},
-			"list" : [
-				{ "x": 0, "y": 40, "label": "GND" },
-				{ "x": 130, "y": 40, "label": "VCC" }
-			]
-		}
-	},
-	"data" : "<rect svg-type='body' x='25' y='20' width='7' height='40'></rect><line x1='40' y1='0' x2='40' y2='80'></line><rect svg-type='body' x='55' y='20' width='7' height='40'></rect><line svg-type='body' x1='75' y1='0' x2='75' y2='80'></line><rect svg-type='body' x='85' y='20' width='7' height='40'></rect><line svg-type='body' x1='105' y1='0' x2='105' y2='80'></line><path class='vcc' style='fill: none; ' d='M 111,10 L 129,10 L 120,10 V 1 V 20 '></path><path svg-type='node' node='0' d='M 0,40 H 25'></path><path svg-type='node' node='1' d='M 130,40 H 105'></path>"
-},
-{
-	"type" : "power",
-	"name" : "gen_power",
-	"properties" : {
-		"description": "3.3V Generic Power"
-	},
-	"meta" : {
-		"nodes": {
-			"length": 2,
-			"size": {
-				"width": 30,
-				"height": 0
-			},
-			"list" : [
-				{ "x": 0, "y": 40, "label": "GND" },
-				{ "x": 120, "y": 40, "label": "VCC" }
-			]
-		}
-	},
-	"data" : "<circle svg-type='body' r='40' cy='40' cx='60'></circle><text x='45' y='58' font-size='50'>V</text><path class='gnd' d='M 0,10 H 17'></path><path class='vcc' d='M 120,10 H 100'></path><path class='vcc' d='M 110,0 V 20'></path><path svg-type='node' node='0' d='M 0,40 H 20'></path><path svg-type='node' node='1' d='M 120,40 H 100'></path>"
+	"data" : "<circle svg-type='body' cx='35' cy='40' r='30'/>
+<text x='20' y='58' class='big'>V</text>
+<path class='gnd' d='M 0,10 H 10'/>
+<path class='vcc' d='M 70,10 H 60'/>
+<path class='vcc' d='M 65,5 V 15'/>
+<path svg-type='node' node='0' d='M 0,35 V45 H5 V35 Z'/>
+<path svg-type='node' node='1' d='M 65,35 V45 H70 V35 Z'/>"
 },
 {
 	"type" : "power",
@@ -368,6 +429,7 @@
 		"description" : "Generic diode"
 	},
 	"meta" : {
+		"class": "next",
 		"nodes": {
 			"length": 2,
 			"size": {
@@ -376,11 +438,14 @@
 			},
 			"list" : [
 				{ "x": 0, "y": 30, "label": "Anode (+)" },
-				{ "x": 100, "y": 30, "label": "Catode (-)" }
+				{ "x": 73, "y": 30, "label": "Catode (-)" }
 			]
 		}
 	},
-	"data" : "<path svg-type='body' d='M 20,0 L 80,30 L 20,60 Z'></path><path svg-type='body' d='M 83,0 V 60 Z'></path><path svg-type='node' node='0' d='M 0,30 H 20'></path><path svg-type='node' node='1' d='M 100,30 H 83'></path>"
+	"data" : "<path svg-type='node' node='0' d='M 0,25 V35 H5 V25 Z'/>
+<path svg-type='node' node='1' d='M 68,25 V35 H73 V25 Z'/>
+<path svg-type='body' d='M 5,0 L 65,30 L 5,60 Z'/>
+<path svg-type='body' d='M 65,0 H68 V60 H65 Z'/>"
 },
 {
 	"type" : "diode",
@@ -396,6 +461,7 @@
 		}
 	},
 	"meta" : {
+		"class": "next",
 		"nodes": {
 			"length": 2,
 			"size": {
@@ -404,11 +470,16 @@
 			},
 			"list" : [
 				{ "x": 0, "y": 40, "label": "Anode (+)" },
-				{ "x": 100, "y": 40, "label": "Catode (-)" }
+				{ "x": 73, "y": 40, "label": "Catode (-)" }
 			]
 		}
 	},
-	"data" : "<path svg-type='body' d='M 20,10 L 80,40 L 20,70 Z'></path><path svg-type='body' d='M 83,20 V 60 Z'></path><path svg-type='body' style='stroke-width: 2px; ' d='M 50,15 L 56.8,4.6 L 53,2 L 60,0 L 60,7.2 L 56.8,4.6'></path><path svg-type='body' style='stroke-width: 2px; ' d='M 63,23 L 69,13 L 65,10.2 L 72,8  L 72.9,15.5 L 69,13'></path><path svg-type='node' node='0' d='M 0,40 H 20'></path><path svg-type='node' node='1' d='M 100,40 H 83'></path>"
+	"data" : "<path svg-type='body' d='M 5,10 L 65,40 L 5,70 Z'/>
+<path svg-type='body' d='M 65,10 H68 V70 H65 Z'/>
+<path svg-type='body' d='M 30,15 L 36.8,4.6 L 33,2 L 40,0 L 40,7.2 L 36.8,4.6'/>
+<path svg-type='body' d='M 43,23 L 49,13 L 45,10.2 L 52,8  L 52.9,15.5 L 49,13'/>
+<path svg-type='node' node='0' d='M 0,35 V45 H5 V35 Z'/>
+<path svg-type='node' node='1' d='M 68,35 V45 H73 V35 Z'/>"
 },
 {
 	"type" : "diode",
@@ -417,6 +488,7 @@
 		"description" : "Generic photodiode"
 	},
 	"meta" : {
+		"class": "next",
 		"nodes": {
 			"length": 2,
 			"size": {
@@ -425,11 +497,16 @@
 			},
 			"list" : [
 				{ "x": 0, "y": 40, "label": "Anode (+)" },
-				{ "x": 100, "y": 40, "label": "Catode (-)" }
+				{ "x": 73, "y": 40, "label": "Catode (-)" }
 			]
 		}
 	},
-	"data" : "<path svg-type='body' d='M 20,10 L 80,40 L 20,70 Z'></path><path svg-type='body' d='M 84,20 V 60 Z'></path><path svg-type='body' style='stroke-width: 2px;' d='M 60,0 L 53.3,10.1 L 49.4,7.6 L 50,15 L 57.4,12.8 L 53.3,10.1'></path><path svg-type='body' style='stroke-width: 2px;' d='M 72,8 L 65.4,18.1 L 61.6,15.6 L 62,23 L 69.5,20.9 L 65.4,18.1'></path><path svg-type='node' node='0' d='M 0,40 H 20'></path><path svg-type='node' node='1' d='M 100,40 H 85'></path>"
+	"data" : "<path svg-type='body' d='M 5,10 L 65,40 L 5,70 Z'/>
+<path svg-type='body' d='M 65,10 H68 V70 H65 Z'/>
+<path svg-type='body' d='M 40,0 L 33.3,10.1 L 29.4,7.6 L 30,15 L 37.4,12.8 L 33.3,10.1'/>
+<path svg-type='body' d='M 52,8 L 45.4,18.1 L 41.6,15.6 L 42,23 L 49.5,20.9 L 45.4,18.1'/>
+<path svg-type='node' node='0' d='M 0,35 V45 H5 V35 Z'/>
+<path svg-type='node' node='1' d='M 68,35 V45 H73 V35 Z'/>"
 },
 {
 	"type" : "diode",
@@ -438,6 +515,7 @@
 		"description" : "Generic schottky diode"
 	},
 	"meta" : {
+		"class": "next",
 		"nodes": {
 			"length": 2,
 			"size": {
@@ -446,11 +524,14 @@
 			},
 			"list" : [
 				{ "x": 0, "y": 30, "label": "Anode (+)" },
-				{ "x": 100, "y": 30, "label": "Catode (-)" }
+				{ "x": 71, "y": 30, "label": "Catode (-)" }
 			]
 		}
 	},
-	"data" : "<path svg-type='body' d='M 20,0 L 80,30 L 20,60 Z'></path><path svg-type='body' style='fill: none; ' d='M 68,47 L 68,60 L 83,60 L 83,0 L 98,0 L 98,13'></path><path svg-type='node' node='0' d='M 0,30 H 20'></path><path svg-type='node' node='1' d='M 100,30 H 83'></path>"
+	"data" : "<path svg-type='body' d='M 5,0 L 65,30 L 5,60 Z'/>
+<path svg-type='body' style='fill: none; ' d='M 51,47 L 51,60 L 66,60 L 66,0 L 81,0 L 81,13'/>
+<path svg-type='node' node='0' d='M 0,25 V35 H5 V25 Z'/>
+<path svg-type='node' node='1' d='M 66,25 V35 H71 V25 Z'/>"
 },
 {
 	"type" : "diode",
@@ -459,6 +540,7 @@
 		"description" : "Generic tunnel diode"
 	},
 	"meta" : {
+		"class": "next",
 		"nodes": {
 			"length": 2,
 			"size": {
@@ -467,11 +549,14 @@
 			},
 			"list" : [
 				{ "x": 0, "y": 30, "label": "Anode (+)" },
-				{ "x": 100, "y": 30, "label": "Catode (-)" }
+				{ "x": 71, "y": 30, "label": "Catode (-)" }
 			]
 		}
 	},
-	"data" : "<path svg-type='body' d='M 20,0 L 80,30 L 20,60 Z'></path><path svg-type='body' style='fill: none; ' d='M 73,60 L 83,60 L 83,0 L 73,0'></path><path svg-type='node' node='0' d='M 0,30 H 20'></path><path svg-type='node' node='1' d='M 100,30 H 83'></path>"
+	"data" : "<path svg-type='body' d='M 5,0 L 65,30 L 5,60 Z'/>
+<path svg-type='body' style='fill: none; ' d='M 56,60 L 66,60 L 66,0 L 56,0'/>
+<path svg-type='node' node='0' d='M 0,25 V35 H5 V25 Z'/>
+<path svg-type='node' node='1' d='M 66,25 V35 H71 V25 Z'/>"
 },
 {
 	"type" : "diode",
@@ -480,6 +565,7 @@
 		"description" : "Generic varicap diode"
 	},
 	"meta" : {
+		"class": "next",
 		"nodes": {
 			"length": 2,
 			"size": {
@@ -488,11 +574,15 @@
 			},
 			"list" : [
 				{ "x": 0, "y": 30, "label": "Anode (+)" },
-				{ "x": 115, "y": 30, "label": "Catode (-)" }
+				{ "x": 80, "y": 30, "label": "Catode (-)" }
 			]
 		}
 	},
-	"data" : "<path svg-type='body' d='M 20,0 L 80,30 L 20,60 Z'></path><path svg-type='body' d='M 84,0 V 60 Z'></path><path svg-type='body' d='M 95,0 V 60 Z'></path><path svg-type='node' node='0' d='M 0,30 H 20'></path><path svg-type='node' node='1' d='M 115,30 H 95'></path>"
+	"data" : "<path svg-type='body' d='M 5,0 L 65,30 L 5,60 Z'/>
+<path svg-type='body' d='M 66,0 V 60 Z'/>
+<path svg-type='body' d='M 75,0 V 60 Z'/>
+<path svg-type='node' node='0' d='M 0,25 V35 H5 V25 Z'/>
+<path svg-type='node' node='1' d='M 75,25 V35 H80 V25 Z'/>"
 },
 {
 	"type" : "diode",
@@ -501,6 +591,7 @@
 		"description" : "Generic Zener diode"
 	},
 	"meta" : {
+		"class": "next",
 		"nodes": {
 			"length": 2,
 			"size": {
@@ -509,11 +600,14 @@
 			},
 			"list" : [
 				{ "x": 0, "y": 30, "label": "Anode (+)" },
-				{ "x": 100, "y": 30, "label": "Catode (-)" }
+				{ "x": 71, "y": 30, "label": "Catode (-)" }
 			]
 		}
 	},
-	"data" : "<path svg-type='body' style='fill: black; ' d='M 20,0 L 80,30 L 20,60 Z'></path><path svg-type='body' style='fill: none; ' d='M 73,60 L 83,60 L 83,0 L 93,0'></path><path svg-type='node' node='0' d='M 0,30 H 20'></path><path svg-type='node' node='1' d='M 100,30 H 83'></path>"
+	"data" : "<path svg-type='body' d='M 5,0 L 65,30 L 5,60 Z'/>
+<path svg-type='body' style='fill: none; ' d='M 56,60 L 66,60 L 66,0 L 76,0'/>
+<path svg-type='node' node='0' d='M 0,25 V35 H5 V25 Z'/>
+<path svg-type='node' node='1' d='M 66,25 V35 H71 V25 Z'/>"
 },
 {
 	"type" : "transistor",
@@ -522,6 +616,7 @@
 		"description" : "BJT Bipolar NPN Transistor"
 	},
 	"meta" : {
+		"class": "next",
 		"nodes": {
 			"length": 3,
 			"size": {
@@ -529,13 +624,17 @@
 				"height": 0
 			},
 			"list" : [
-				{ "x": 0, "y": 60, "label": "Base" },
-				{ "x": 79, "y": 0, "label": "Collector" },
-				{ "x": 79, "y": 120, "label": "Emitter" }
+				{ "x": 0, "y": 30, "label": "Base" },
+				{ "x": 58, "y": 4, "label": "Collector" },
+				{ "x": 58, "y": 56, "label": "Emitter" }
 			]
 		}
 	},
-	"data" : "<circle svg-type='body' r='40' cy='60' cx='60'/><path svg-type='body' style='fill: none; stroke-width: 2px; ' d='M 80,25 L 50,45 V 30 V 60 H 20 H 50 V 90 V 75 L 80,95 L 64,92 L 80,95 L 75,80 '></path><path svg-type='node' node='0' d='M 0,60 H 20'></path><path svg-type='node' node='1' d='M 79,0 V 25'></path><path svg-type='node' node='2' d='M 79,120 V 95'></path>"
+	"data" : "<path svg-type='node' node='0' d='M 0,25 V35 H5 V25 Z'/>
+<path svg-type='node' node='1' d='M 51,4.5 L 55,0.5 L 61.5,6.8 L 58,11 Z'/>
+<path svg-type='node' node='2' d='M 58,49 61.5,53.2 L 55,59.5 L51,55.5'/>
+<circle svg-type='body' cx='35' cy='30' r='30'/>
+<path svg-type='body' style='fill: none; stroke-width: 2px; ' d='M 5,30 H28 V10 V20 L 55,8 M 28,30 V50 M 28,40 L 55,52 L 45,52 M 55,52 L 48,44.5'/>"
 },
 {
 	"type" : "transistor",
@@ -544,6 +643,7 @@
 		"description" : "BJT Bipolar PNP Transistor"
 	},
 	"meta" : {
+		"class": "next",
 		"nodes": {
 			"length": 3,
 			"size": {
@@ -551,13 +651,17 @@
 				"height": 0
 			},
 			"list" : [
-				{ "x": 0, "y": 60, "label": "Base" },
-				{ "x": 79, "y": 0, "label": "Collector" },
-				{ "x": 79, "y": 120, "label": "Emitter" }
+				{ "x": 0, "y": 30, "label": "Base" },
+				{ "x": 58, "y": 4, "label": "Collector" },
+				{ "x": 58, "y": 56, "label": "Emitter" }
 			]
 		}
 	},
-	"data" : "<circle svg-type='body' r='40' cy='60' cx='60'/><path svg-type='body' style='fill: none; stroke-width: 2px; ' d='M 80,25 L 50,45 L 58,30 L 50,45 L 62,50 L 50,45 V 30 V 60 H 20 H 50 V 90 V 75 L 80,95 '></path><path svg-type='node' node='0' d='M 0,60 H 20'></path><path svg-type='node' node='1' d='M 79,0 V 25'></path><path svg-type='node' node='2' d='M 79,120 V 95'></path>"
+	"data" : "<path svg-type='node' node='0' d='M 0,25 V35 H5 V25 Z'/>
+<path svg-type='node' node='1' d='M 51,4.5 L 55,0.5 L 61.5,6.8 L 58,11 Z'/>
+<path svg-type='node' node='2' d='M 58,49 61.5,53.2 L 55,59.5 L51,55.5'/>
+<circle svg-type='body' cx='35' cy='30' r='30'/>
+<path svg-type='body' style='fill: none; stroke-width: 2px; ' d='M 5,30 H28 V10 V20 L 55,8 L 45,8 M 55,8 L 48,15.5 M 28,30 V50 M 28,40 L 55,52'/>"
 },
 {
 	"type" : "dip",
@@ -566,21 +670,28 @@
 		"description" : "Generic DIP 4 pins"
 	},
 	"meta" : {
+		"class": "next",
+		"nodeLabel": true,
 		"nodes": {
 			"length": 4,
 			"size": {
 				"width": 0,
-				"height": 20
+				"height": 5
 			},
 			"list" : [
-				{ "x": 14, "y": 101, "label": "GND" },
-				{ "x": 42, "y": 101, "label": "Output 1" },
-				{ "x": 42, "y": 0, "label": "Data 0" },
-				{ "x": 14, "y": 0, "label": "VCC" }	
+				{ "x": 10, "y": 70, "label": "GND" },
+				{ "x": 30, "y": 70, "label": "Output 1" },
+				{ "x": 30, "y": 0, "label": "Data 0" },
+				{ "x": 10, "y": 0, "label": "VCC" }	
 			]
 		}
 	},
-	"data" :"<path svg-type='body' d='M 0,15 H 56 V 85 H 0 Z'></path><path svg-type='body' class='semi' d='m 1,37 a 8,10 0 1 1 0,25'></path><circle svg-type='body' cx='24' cy='69' r='4'></circle><text x='22' y='65' font-size='50' >4</text><path svg-type='node' node='0' d='M 14,101 V 86'></path><path svg-type='node' node='1' d='M 42,101 V 86'></path><path svg-type='node' node='2' d='M 42,0 V 15'></path><path svg-type='node' node='3' d='M 14,0 V 15'/>"
+	"data" :"<path svg-type='body' d='M 0,5 H40 V65 H0 Z'></path>
+<path svg-type='body' class='no-fill' d='M 0,25 H5 V45 H0'></path>
+<path svg-type='node' node='0' d='M 5,65 V70 H15 V65 Z'/>
+<path svg-type='node' node='1' d='M 25,65 V70 H35 V65 Z'/>
+<path svg-type='node' node='2' d='M 25,0 V5 H35 V0 Z'/>
+<path svg-type='node' node='3' d='M 5,0 V5 H15 V0 Z'/>"
 },
 {
 	"type" : "dip",
@@ -589,6 +700,8 @@
 		"description" : "Generic DIP 6 pins"
 	},
 	"meta" : {
+		"class": "next",
+		"nodeLabel": true,
 		"nodes": {
 			"length": 6,
 			"size": {
@@ -596,16 +709,23 @@
 				"height": 20
 			},
 			"list" : [
-				{ "x": 14, "y": 101, "label": "GND" },
-				{ "x": 42, "y": 101, "label": "Output 1" },
-				{ "x": 70, "y": 101, "label": "Output 0" },
-				{ "x": 70, "y": 0, "label": "Data 1" },
-				{ "x": 42, "y": 0, "label": "Data 0" },
-				{ "x": 14, "y": 0, "label": "VCC" }	
+				{ "x": 10, "y": 70, "label": "GND" },
+				{ "x": 30, "y": 70, "label": "Output 1" },
+				{ "x": 50, "y": 70, "label": "Output 0" },
+				{ "x": 50, "y": 0, "label": "Data 1" },
+				{ "x": 30, "y": 0, "label": "Data 0" },
+				{ "x": 10, "y": 0, "label": "VCC" }	
 			]
 		}
 	},
-	"data" :"<path svg-type='body' d='M 0,15 H 84 V 85 H 0 Z'></path><path svg-type='body' class='semi' d='m 1,37 a 8,10 0 1 1 0,25'></path><circle svg-type='body' cx='26' cy='67' r='4'></circle><text x='38' y='67' font-size='50' >6</text><path svg-type='node' node='0' d='M 14,101 V 86'></path><path svg-type='node' node='1' d='M 42,101 V 86'></path><path svg-type='node' node='2' d='M 70,101 V 86'></path><path svg-type='node' node='3' d='M 70,0 V 15'></path><path svg-type='node' node='4' d='M 42,0 V 15'></path><path svg-type='node' node='5' d='M 14,0 V 15'></path>"
+	"data" :"<path svg-type='body' d='M 0,5 H60 V65 H0 Z'/>
+<path svg-type='body' class='no-fill' d='M 0,25 H5 V45 H0'/>
+<path svg-type='node' node='0' d='M 5,65 V70 H15 V65 Z'/>
+<path svg-type='node' node='1' d='M 25,65 V70 H35 V65 Z'/>
+<path svg-type='node' node='2' d='M 45,65 V70 H55 V65 Z'/>
+<path svg-type='node' node='3' d='M 45,0 V5 H55 V0 Z'/>
+<path svg-type='node' node='4' d='M 25,0 V5 H35 V0 Z'/>
+<path svg-type='node' node='5' d='M 5,0 V5 H15 V0 Z'/>"
 },
 {
 	"type" : "dip",
@@ -614,6 +734,8 @@
 		"description" : "Generic DIP 8 pins"
 	},
 	"meta" : {
+		"class": "next",
+		"nodeLabel": true,
 		"nodes": {
 			"length": 8,
 			"size": {
@@ -621,18 +743,27 @@
 				"height": 20
 			},
 			"list" : [
-				{ "x": 14, "y": 101, "label": "GND" },
-				{ "x": 42, "y": 101, "label": "Output 1" },
-				{ "x": 70, "y": 101, "label": "Output 0" },
-				{ "x": 98, "y": 101, "label": "Data 3" },
-				{ "x": 98, "y": 0, "label": "Data 2" },
-				{ "x": 70, "y": 0, "label": "Data 1" },
-				{ "x": 42, "y": 0, "label": "Data 0" },
-				{ "x": 14, "y": 0, "label": "VCC" }
+				{ "x": 10, "y": 70, "label": "GND" },
+				{ "x": 30, "y": 70, "label": "Output 1" },
+				{ "x": 50, "y": 70, "label": "Output 0" },
+				{ "x": 70, "y": 70, "label": "Data 3" },
+				{ "x": 70, "y": 0, "label": "Data 2" },
+				{ "x": 50, "y": 0, "label": "Data 1" },
+				{ "x": 30, "y": 0, "label": "Data 0" },
+				{ "x": 10, "y": 0, "label": "VCC" }
 			]
 		}
 	},
-	"data" : "<path svg-type='body' d='M 0,15 H 112 V 85 H 0 Z'></path><path svg-type='body' class='semi' d='m 1,37 a 8,10 0 1 1 0,25'></path><circle svg-type='body' cx='26' cy='67' r='4'></circle><text x='50' y='67' font-size='50'>8</text><path svg-type='node' node='0' d='M 14,101 V 86'></path><path svg-type='node' node='1' d='M 42,101 V 86'></path><path svg-type='node' node='2' d='M 70,101 V 86'></path><path svg-type='node' node='3' d='M 98,101 V 86'></path><path svg-type='node' node='4' d='M 98,0 V 15'></path><path svg-type='node' node='5' d='M 70,0 V 15'></path><path svg-type='node' node='6' d='M 42,0 V 15'></path><path svg-type='node' node='7' d='M 14,0 V 15'></path>"
+	"data" : "<path svg-type='body' d='M 0,5 H80 V65 H0 Z'></path>
+<path svg-type='body' class='no-fill' d='M 0,25 H5 V45 H0'></path>
+<path svg-type='node' node='0' d='M 5,65 V70 H15 V65 Z'/>
+<path svg-type='node' node='1' d='M 25,65 V70 H35 V65 Z'/>
+<path svg-type='node' node='2' d='M 45,65 V70 H55 V65 Z'/>
+<path svg-type='node' node='3' d='M 65,65 V70 H75 V65 Z'/>
+<path svg-type='node' node='4' d='M 65,0 V5 H75 V0 Z'/>
+<path svg-type='node' node='5' d='M 45,0 V5 H55 V0 Z'/>
+<path svg-type='node' node='6' d='M 25,0 V5 H35 V0 Z'/>
+<path svg-type='node' node='7' d='M 5,0 V5 H15 V0 Z'/>"
 },
 {
 	"type" : "dip",
@@ -646,9 +777,9 @@
 	"tmpl" : {
 		"name" : "dip8",
 		"label" : {
-			"x" : 30,
-			"y" : 60,
-			"font": 32,
+			"x" : 15,
+			"y" : 40,
+			"class" : "title",
 			"text" : "N555"
 		},
 		"labels" : ["GND", "TRIG", "OUT", "RESET", "CONT", "THRES", "DISCH", "VCC"]
@@ -661,6 +792,8 @@
 		"description" : "Generic DIP 10 pins"
 	},
 	"meta": {
+		"class": "next",
+		"nodeLabel": true,
 		"nodes": {
 			"length": 10,
 			"size": {
@@ -668,20 +801,31 @@
 				"height": 20
 			},
 			"list" : [
-				{ "x": 14,	"y": 112, "label": "GND" },
-				{ "x": 42,	"y": 112, "label": "Output 3" },
-				{ "x": 70,	"y": 112, "label": "Output 2" },
-				{ "x": 98,	"y": 112, "label": "Output 1" },
-				{ "x": 126, "y": 112, "label": "Output 0" },
-				{ "x": 126, "y": 0, "label": "Data 3" },
-				{ "x": 98,	"y": 0,	"label": "Data 2" },
-				{ "x": 70,	"y": 0,	"label": "Data 1" },
-				{ "x": 42,	"y": 0,	"label": "Data 0" },
-				{ "x": 14,	"y": 0,	"label": "VCC" }
+				{ "x": 10,	"y": 70, "label": "GND" },
+				{ "x": 30,	"y": 70, "label": "Output 3" },
+				{ "x": 50,	"y": 70, "label": "Output 2" },
+				{ "x": 70,	"y": 70, "label": "Output 1" },
+				{ "x": 90, "y": 70, "label": "Output 0" },
+				{ "x": 90, "y": 0, "label": "Data 3" },
+				{ "x": 70,	"y": 0,	"label": "Data 2" },
+				{ "x": 50,	"y": 0,	"label": "Data 1" },
+				{ "x": 30,	"y": 0,	"label": "Data 0" },
+				{ "x": 10,	"y": 0,	"label": "VCC" }
 			]
 		}
 	},
-	"data": "<path svg-type='body' d='M 0,15 H 140 V 90 H 0 Z'></path><path svg-type='body' class='semi' d='m 1,42 a 8,10 0 1 1 0,25'></path><circle svg-type='body' cx='26' cy='72' r='4'></circle><text x='48' y='72' font-size='50' >10</text><path svg-type='node' node='0' d='M 14,112 V 91'></path><path svg-type='node' node='1' d='M 42,112 V 91'></path><path svg-type='node' node='2' d='M 70,112 V 91'></path><path svg-type='node' node='3' d='M 98,112 V 91'></path><path svg-type='node' node='4' d='M 126,112 V 91'></path><path svg-type='node' node='5' d='M 126,0 V 15'></path><path svg-type='node' node='6' d='M 98,0 V 15'></path><path svg-type='node' node='7' d='M 70,0 V 15'></path><path svg-type='node' node='8' d='M 42,0 V 15'></path><path svg-type='node' node='9' d='M 14,0 V 15'></path>"
+	"data": "<path svg-type='body' d='M 0,5 H100 V65 H0 Z'></path>
+<path svg-type='body' class='no-fill' d='M 0,25 H5 V45 H0'></path>
+<path svg-type='node' node='0' d='M 5,65 V70 H15 V65 Z'/>
+<path svg-type='node' node='1' d='M 25,65 V70 H35 V65 Z'/>
+<path svg-type='node' node='2' d='M 45,65 V70 H55 V65 Z'/>
+<path svg-type='node' node='3' d='M 65,65 V70 H75 V65 Z'/>
+<path svg-type='node' node='4' d='M 85,65 V70 H95 V65 Z'/>
+<path svg-type='node' node='5' d='M 85,0 V5 H95 V0 Z'/>
+<path svg-type='node' node='6' d='M 65,0 V5 H75 V0 Z'/>
+<path svg-type='node' node='7' d='M 45,0 V5 H55 V0 Z'/>
+<path svg-type='node' node='8' d='M 25,0 V5 H35 V0 Z'/>
+<path svg-type='node' node='9' d='M 5,0 V5 H15 V0 Z'/>"
 },
 {
 	"type" : "dip",
@@ -690,6 +834,8 @@
 		"description" : "Generic DIP 12 pins"
 	},
 	"meta" : {
+		"class": "next",
+		"nodeLabel": true,
 		"nodes": {
 			"length": 12,
 			"size": {
@@ -697,22 +843,35 @@
 				"height": 20
 			},
 			"list" : [
-				{ "x": 14, "y": 112, "label": "GND" },
-				{ "x": 42, "y": 112, "label": "Output 4" },
-				{ "x": 70, "y": 112, "label": "Output 3" },
-				{ "x": 98, "y": 112, "label": "Output 2" },
-				{ "x": 126, "y": 112, "label": "Output 1" },
-				{ "x": 154, "y": 112, "label": "Output 0" },
-				{ "x": 154, "y": 0, "label": "Data 4" },
-				{ "x": 126, "y": 0, "label": "Data 3" },
-				{ "x": 98, "y": 0, "label": "Data 2" },
-				{ "x": 70, "y": 0, "label": "Data 1" },
-				{ "x": 42, "y": 0, "label": "Data 0" },
-				{ "x": 14, "y": 0, "label": "VCC" }
+				{ "x": 10, "y": 70, "label": "GND" },
+				{ "x": 30, "y": 70, "label": "Output 4" },
+				{ "x": 50, "y": 70, "label": "Output 3" },
+				{ "x": 70, "y": 70, "label": "Output 2" },
+				{ "x": 90, "y": 70, "label": "Output 1" },
+				{ "x": 110, "y": 70, "label": "Output 0" },
+				{ "x": 110, "y": 0, "label": "Data 4" },
+				{ "x": 90, "y": 0, "label": "Data 3" },
+				{ "x": 70, "y": 0, "label": "Data 2" },
+				{ "x": 50, "y": 0, "label": "Data 1" },
+				{ "x": 30, "y": 0, "label": "Data 0" },
+				{ "x": 10, "y": 0, "label": "VCC" }
 			]
 		}
 	},
-	"data" : "<path svg-type='body' d='M 0,20 H 168 V 90 H 0 Z'></path><path svg-type='body' class='semi' d='m 1,42 a 8,10 0 1 1 0,25'></path><circle svg-type='body' cx='26' cy='72' r='4'></circle><text x='58' y='72' font-size='50'>12</text><path svg-type='node' node='0' d='M 14,112 V 91'></path><path svg-type='node' node='1' d='M 42,112 V 91'></path><path svg-type='node' node='2' d='M 70,112 V 91'></path><path svg-type='node' node='3' d='M 98,112 V 91'></path><path svg-type='node' node='4' d='M 126,112 V 91'></path><path svg-type='node' node='5' d='M 154,112 V 91'></path><path svg-type='node' node='6' d='M 154,0 V 20'></path><path svg-type='node' node='7' d='M 126,0 V 20'></path><path svg-type='node' node='8' d='M 98,0 V 20'></path><path svg-type='node' node='9' d='M 70,0 V 20'></path><path svg-type='node' node='10' d='M 42,0 V 20'></path><path svg-type='node' node='11' d='M 14,0 V 20'></path>"
+	"data" : "<path svg-type='body' d='M 0,5 H120 V65 H0 Z'></path>
+<path svg-type='body' class='no-fill' d='M 0,25 H5 V45 H0'></path>
+<path svg-type='node' node='0' d='M 5,65 V70 H15 V65 Z'/>
+<path svg-type='node' node='1' d='M 25,65 V70 H35 V65 Z'/>
+<path svg-type='node' node='2' d='M 45,65 V70 H55 V65 Z'/>
+<path svg-type='node' node='3' d='M 65,65 V70 H75 V65 Z'/>
+<path svg-type='node' node='4' d='M 85,65 V70 H95 V65 Z'/>
+<path svg-type='node' node='5' d='M 105,65 V70 H115 V65 Z'/>
+<path svg-type='node' node='6' d='M 105,0 V5 H115 V0 Z'/>
+<path svg-type='node' node='7' d='M 85,0 V5 H95 V0 Z'/>
+<path svg-type='node' node='8' d='M 65,0 V5 H75 V0 Z'/>
+<path svg-type='node' node='9' d='M 45,0 V5 H55 V0 Z'/>
+<path svg-type='node' node='10' d='M 25,0 V5 H35 V0 Z'/>
+<path svg-type='node' node='11' d='M 5,0 V5 H15 V0 Z'/>"
 },
 {
 	"type" : "dip",
@@ -721,6 +880,8 @@
 		"description" : "Generic DIP 14 pins"
 	},
 	"meta" : {
+		"class": "next",
+		"nodeLabel": true,
 		"nodes": {
 			"length": 14,
 			"size": {
@@ -728,24 +889,39 @@
 				"height": 20
 			},
 			"list" : [
-				{ "x": 14, "y": 112, "label": "GND" },
-				{ "x": 42, "y": 112, "label": "Output 5" },
-				{ "x": 70, "y": 112, "label": "Output 4" },
-				{ "x": 98, "y": 112, "label": "Output 3" },
-				{ "x": 126, "y": 112, "label": "Output 2" },
-				{ "x": 154, "y": 112, "label": "Output 1" },
-				{ "x": 182, "y": 112, "label": "Output 0" },
-				{ "x": 182, "y": 0, "label": "Data 5" },
-				{ "x": 154, "y": 0, "label": "Data 4" },
-				{ "x": 126, "y": 0, "label": "Data 3" },
-				{ "x": 98, "y": 0, "label": "Data 2" },
-				{ "x": 70, "y": 0, "label": "Data 1" },
-				{ "x": 42, "y": 0, "label": "Data 0" },
-				{ "x": 14, "y": 0, "label": "VCC" }
+				{ "x": 10, "y": 70, "label": "GND" },
+				{ "x": 30, "y": 70, "label": "Output 5" },
+				{ "x": 50, "y": 70, "label": "Output 4" },
+				{ "x": 70, "y": 70, "label": "Output 3" },
+				{ "x": 90, "y": 70, "label": "Output 2" },
+				{ "x": 110, "y": 70, "label": "Output 1" },
+				{ "x": 130, "y": 70, "label": "Output 0" },
+				{ "x": 130, "y": 0, "label": "Data 5" },
+				{ "x": 110, "y": 0, "label": "Data 4" },
+				{ "x": 90, "y": 0, "label": "Data 3" },
+				{ "x": 70, "y": 0, "label": "Data 2" },
+				{ "x": 50, "y": 0, "label": "Data 1" },
+				{ "x": 30, "y": 0, "label": "Data 0" },
+				{ "x": 10, "y": 0, "label": "VCC" }
 			]
 		}
 	},
-	"data" : "<path svg-type='body' d='M 0,20 H 196 V 90 H 0 Z'></path><path svg-type='body' class='semi' d='m 1,42 a 8,10 0 1 1 0,25'></path><circle svg-type='body' cx='26' cy='72' r='4'></circle><text x='70' y='72' font-size='50'>14</text><path svg-type='node' node='0' d='M 14,112 V 91'></path><path svg-type='node' node='1' d='M 42,112 V 91'></path><path svg-type='node' node='2' d='M 70,112 V 91'></path><path svg-type='node' node='3' d='M 98,112 V 91'></path><path svg-type='node' node='4' d='M 126,112 V 91'></path><path svg-type='node' node='5' d='M 154,112 V 91'></path><path svg-type='node' node='6' d='M 182,112 V 91'></path><path svg-type='node' node='7' d='M 182,0 V 20'></path><path svg-type='node' node='8' d='M 154,0 V 20'></path><path svg-type='node' node='9' d='M 126,0 V 20'></path><path svg-type='node' node='10' d='M 98,0 V 20'></path><path svg-type='node' node='11' d='M 70,0 V 20'></path><path svg-type='node' node='12' d='M 42,0 V 20'></path><path svg-type='node' node='13' d='M 14,0 V 20'></path>"
+	"data" : "<path svg-type='body' d='M 0,5 H140 V65 H0 Z'></path>
+<path svg-type='body' class='no-fill' d='M 0,25 H5 V45 H0'></path>
+<path svg-type='node' node='0' d='M 5,65 V70 H15 V65 Z'/>
+<path svg-type='node' node='1' d='M 25,65 V70 H35 V65 Z'/>
+<path svg-type='node' node='2' d='M 45,65 V70 H55 V65 Z'/>
+<path svg-type='node' node='3' d='M 65,65 V70 H75 V65 Z'/>
+<path svg-type='node' node='4' d='M 85,65 V70 H95 V65 Z'/>
+<path svg-type='node' node='5' d='M 105,65 V70 H115 V65 Z'/>
+<path svg-type='node' node='6' d='M 125,65 V70 H135 V65 Z'/>
+<path svg-type='node' node='7' d='M 125,0 V5 H135 V0 Z'/>
+<path svg-type='node' node='8' d='M 105,0 V5 H115 V0 Z'/>
+<path svg-type='node' node='9' d='M 85,0 V5 H95 V0 Z'/>
+<path svg-type='node' node='10' d='M 65,0 V5 H75 V0 Z'/>
+<path svg-type='node' node='11' d='M 45,0 V5 H55 V0 Z'/>
+<path svg-type='node' node='12' d='M 25,0 V5 H35 V0 Z'/>
+<path svg-type='node' node='13' d='M 5,0 V5 H15 V0 Z'/>"
 },
 {
 	"type" : "ic",
@@ -759,9 +935,9 @@
 	"tmpl" : {
 		"name" : "dip14",
 		"label" : {
-			"x" : 60,
-			"y" : 70,
-			"font": 45,
+			"x" : 15,
+			"y" : 40,
+			"class" : "title",
 			"text" : "7408"
 		},
 		"labels" : ["Input 1-1", "Input 1-2", "Output 1", 
@@ -777,6 +953,8 @@
 		"description" : "Generic DIP 16 pins"
 	},
 	"meta" : {
+		"class": "next",
+		"nodeLabel": true,
 		"nodes": {
 			"length": 16,
 			"size": {
@@ -784,26 +962,43 @@
 				"height": 20
 			},
 			"list" : [
-				{ "x": 14, "y": 112, "label": "GND" },
-				{ "x": 42, "y": 112, "label": "Output 6" },
-				{ "x": 70, "y": 112, "label": "Output 5" },
-				{ "x": 98, "y": 112, "label": "Output 4" },
-				{ "x": 126, "y": 112, "label": "Output 3" },
-				{ "x": 154, "y": 112, "label": "Output 2" },
-				{ "x": 182, "y": 112, "label": "Output 1" },
-				{ "x": 210, "y": 112, "label": "Output 0" },
-				{ "x": 210, "y": 0, "label": "Data 6" },
-				{ "x": 182, "y": 0, "label": "Data 5" },
-				{ "x": 154, "y": 0, "label": "Data 4" },
-				{ "x": 126, "y": 0, "label": "Data 3" },
-				{ "x": 98, "y": 0, "label": "Data 2" },
-				{ "x": 70, "y": 0, "label": "Data 1" },
-				{ "x": 42, "y": 0, "label": "Data 0" },
-				{ "x": 14, "y": 0, "label": "VCC" }
+				{ "x": 10, "y": 70, "label": "GND" },
+				{ "x": 30, "y": 70, "label": "Output 6" },
+				{ "x": 50, "y": 70, "label": "Output 5" },
+				{ "x": 70, "y": 70, "label": "Output 4" },
+				{ "x": 90, "y": 70, "label": "Output 3" },
+				{ "x": 110, "y": 70, "label": "Output 2" },
+				{ "x": 130, "y": 70, "label": "Output 1" },
+				{ "x": 150, "y": 70, "label": "Output 0" },
+				{ "x": 150, "y": 0, "label": "Data 6" },
+				{ "x": 130, "y": 0, "label": "Data 5" },
+				{ "x": 110, "y": 0, "label": "Data 4" },
+				{ "x": 90, "y": 0, "label": "Data 3" },
+				{ "x": 70, "y": 0, "label": "Data 2" },
+				{ "x": 50, "y": 0, "label": "Data 1" },
+				{ "x": 30, "y": 0, "label": "Data 0" },
+				{ "x": 10, "y": 0, "label": "VCC" }
 			]
 		}
 	},
-	"data" : "<path svg-type='body' d='M 0,20 H 224 V 90 H 0 Z'></path><path svg-type='body' class='semi' d='m 1,42 a 8,10 0 1 1 0,25'></path><circle svg-type='body' cx='26' cy='72' r='4'></circle><text x='78' y='72' font-size='50'>16</text><path svg-type='node' node='0' d='M 14,112 V 91'></path><path svg-type='node' node='1' d='M 42,112 V 91'></path><path svg-type='node' node='2' d='M 70,112 V 91'></path><path svg-type='node' node='3' d='M 98,112 V 91'></path><path svg-type='node' node='4' d='M 126,112 V 91'></path><path svg-type='node' node='5' d='M 154,112 V 91'></path><path svg-type='node' node='6' d='M 182,112 V 91'></path><path svg-type='node' node='7' d='M 210,112 V 91'></path><path svg-type='node' node='8' d='M 210,0 V 20'></path><path svg-type='node' node='9' d='M 182,0 V 20'></path><path svg-type='node' node='10' d='M 154,0 V 20'></path><path svg-type='node' node='11' d='M 126,0 V 20'></path><path svg-type='node' node='12' d='M 98,0 V 20'></path><path svg-type='node' node='13' d='M 70,0 V 20'></path><path svg-type='node' node='14' d='M 42,0 V 20'></path><path svg-type='node' node='15' d='M 14,0 V 20'></path>"
+	"data" : "<path svg-type='body' d='M 0,5 H160 V65 H0 Z'></path>
+<path svg-type='body' class='no-fill' d='M 0,25 H5 V45 H0'></path>
+<path svg-type='node' node='0' d='M 5,65 V70 H15 V65 Z'/>
+<path svg-type='node' node='1' d='M 25,65 V70 H35 V65 Z'/>
+<path svg-type='node' node='2' d='M 45,65 V70 H55 V65 Z'/>
+<path svg-type='node' node='3' d='M 65,65 V70 H75 V65 Z'/>
+<path svg-type='node' node='4' d='M 85,65 V70 H95 V65 Z'/>
+<path svg-type='node' node='5' d='M 105,65 V70 H115 V65 Z'/>
+<path svg-type='node' node='6' d='M 125,65 V70 H135 V65 Z'/>
+<path svg-type='node' node='7' d='M 145,65 V70 H155 V65 Z'/>
+<path svg-type='node' node='8' d='M 145,0 V5 H155 V0 Z'/>
+<path svg-type='node' node='9' d='M 125,0 V5 H135 V0 Z'/>
+<path svg-type='node' node='10' d='M 105,0 V5 H115 V0 Z'/>
+<path svg-type='node' node='11' d='M 85,0 V5 H95 V0 Z'/>
+<path svg-type='node' node='12' d='M 65,0 V5 H75 V0 Z'/>
+<path svg-type='node' node='13' d='M 45,0 V5 H55 V0 Z'/>
+<path svg-type='node' node='14' d='M 25,0 V5 H35 V0 Z'/>
+<path svg-type='node' node='15' d='M 5,0 V5 H15 V0 Z'/>"
 },
 {
 	"type": "dip",
@@ -812,6 +1007,14 @@
 		"description" : "Generic DIP 28 pins"
 	},
 	"meta": {
+		"class": "next",
+		"nodeLabel": true,
+		"label" : {
+			"x" : 15,
+			"y" : 40,
+			"class" : "title",
+			"text" : "Atmega168"
+		},
 		"nodes": {
 			"length": 28,
 			"size": {
@@ -819,38 +1022,67 @@
 				"height": 20
 			},
 			"list": [
-				{ "x": 14, "y": 112, "label": "PC6 PCINT14/RESET" },
-				{ "x": 42, "y": 112, "label": "PD0 PCINT16/RXD" },
-				{ "x": 70, "y": 112, "label": "PD1 PCINT17/TXD" },
-				{ "x": 98, "y": 112, "label": "PD2 PCINT18/INTO" },
-				{ "x": 126, "y": 112, "label": "PD3 PCINT19/OC2B/INT1 PWM" },
-				{ "x": 154, "y": 112, "label": "PD4 PCINT20/XCK/T0" },
-				{ "x": 182, "y": 112, "label": "VCC" },
-				{ "x": 210, "y": 112, "label": "GND" },
-				{ "x": 238, "y": 112, "label": "PB6 PCINT6/XTAL1/TOSC1" },
-				{ "x": 266, "y": 112, "label": "PB7 PCINT7/XTAL2/TOSC2" },
-				{ "x": 294, "y": 112, "label": "PD5 PCINT21/OC0B/T1 PWM" },
-				{ "x": 322, "y": 112, "label": "PD6 PCINT22/OC0A/AIN0 PWM" },
-				{ "x": 350, "y": 112, "label": "PD7 PCINT23/AIN1" },
-				{ "x": 378, "y": 112, "label": "PB8 PCINT0/CLK0/ICP1" },
-				{ "x": 378, "y": 0, "label": "PB1 OC1A/PCINT1 PWM" },
-				{ "x": 350, "y": 0, "label": "PB2 SS/OC1B/PCINT2 PWM" },
-				{ "x": 322, "y": 0, "label": "PB3 MOSI/OC2A/PCINT3 PWM" },
-				{ "x": 294, "y": 0, "label": "PB4 MISO/PCINT4" },
-				{ "x": 266, "y": 0, "label": "PB5 SCK/PCINT5" },
-				{ "x": 238, "y": 0, "label": "AVCC" },
-				{	"x": 210, "y": 0, "label": "AREF" },
-				{ "x": 182, "y": 0, "label": "GND" },
-				{ "x": 154, "y": 0, "label": "PC0 ADC0/PCINT8" },
-				{ "x": 126, "y": 0, "label": "PC1 ADC1/PCINT9" },
-				{ "x": 98, "y": 0, "label": "PC2 ADC2/PCINT10" },
-				{ "x": 70, "y": 0, "label": "PC3 ADC3/PCINT11" },
-				{ "x": 42, "y": 0, "label": "PC4 ADC4/PCINT12" },
-				{ "x": 14, "y": 0, "label": "PC5 ADC5/PCINT13" }
+				{ "x": 10, "y": 70, "label": "PC6 PCINT14/RESET" },
+				{ "x": 30, "y": 70, "label": "PD0 PCINT16/RXD" },
+				{ "x": 50, "y": 70, "label": "PD1 PCINT17/TXD" },
+				{ "x": 70, "y": 70, "label": "PD2 PCINT18/INTO" },
+				{ "x": 90, "y": 70, "label": "PD3 PCINT19/OC2B/INT1 PWM" },
+				{ "x": 110, "y": 70, "label": "PD4 PCINT20/XCK/T0" },
+				{ "x": 130, "y": 70, "label": "VCC" },
+				{ "x": 150, "y": 70, "label": "GND" },
+				{ "x": 170, "y": 70, "label": "PB6 PCINT6/XTAL1/TOSC1" },
+				{ "x": 190, "y": 70, "label": "PB7 PCINT7/XTAL2/TOSC2" },
+				{ "x": 210, "y": 70, "label": "PD5 PCINT21/OC0B/T1 PWM" },
+				{ "x": 230, "y": 70, "label": "PD6 PCINT22/OC0A/AIN0 PWM" },
+				{ "x": 250, "y": 70, "label": "PD7 PCINT23/AIN1" },
+				{ "x": 270, "y": 70, "label": "PB8 PCINT0/CLK0/ICP1" },
+				{ "x": 270, "y": 0, "label": "PB1 OC1A/PCINT1 PWM" },
+				{ "x": 250, "y": 0, "label": "PB2 SS/OC1B/PCINT2 PWM" },
+				{ "x": 230, "y": 0, "label": "PB3 MOSI/OC2A/PCINT3 PWM" },
+				{ "x": 210, "y": 0, "label": "PB4 MISO/PCINT4" },
+				{ "x": 190, "y": 0, "label": "PB5 SCK/PCINT5" },
+				{ "x": 170, "y": 0, "label": "AVCC" },
+				{ "x": 150, "y": 0, "label": "AREF" },
+				{ "x": 130, "y": 0, "label": "GND" },
+				{ "x": 110, "y": 0, "label": "PC0 ADC0/PCINT8" },
+				{ "x": 90, "y": 0, "label": "PC1 ADC1/PCINT9" },
+				{ "x": 70, "y": 0, "label": "PC2 ADC2/PCINT10" },
+				{ "x": 50, "y": 0, "label": "PC3 ADC3/PCINT11" },
+				{ "x": 30, "y": 0, "label": "PC4 ADC4/PCINT12" },
+				{ "x": 10, "y": 0, "label": "PC5 ADC5/PCINT13" }
 			]
 		}
 	},
-	"data": "<path svg-type='body' d='M 0,20 H 392 V 90 H 0 Z'></path><path svg-type='body' class='semi' d='m 1,42 a 8,10 0 1 1 0,25'></path><circle svg-type='body' cx='26' cy='72' r='4'></circle><text x='70' y='70' font-size='45' >Atmega168</text><path svg-type='node' node='0' d='M 14,112 V 91'></path><path svg-type='node' node='1' d='M 42,112 V 91'></path><path svg-type='node' node='2' d='M 70,112 V 91'></path><path svg-type='node' node='3' d='M 98,112 V 91'></path><path svg-type='node' node='4' d='M 126,112 V 91'></path><path svg-type='node' node='5' d='M 154,112 V 91'></path><path svg-type='node' node='6' d='M 182,112 V 91'></path><path svg-type='node' node='7' d='M 210,112 V 91'></path><path svg-type='node' node='8' d='M 238,112 V 91'></path><path svg-type='node' node='9' d='M 266,112 V 91'></path><path svg-type='node' node='10' d='M 294,112 V 91'></path><path svg-type='node' node='11' d='M 322,112 V 91'></path><path svg-type='node' node='12' d='M 350,112 V 91'></path><path svg-type='node' node='13' d='M 378,112 V 91'></path><path svg-type='node' node='14' d='M 378,0 V 20'></path><path svg-type='node' node='15' d='M 350,0 V 20'></path><path svg-type='node' node='16' d='M 322,0 V 20'></path><path svg-type='node' node='17' d='M 294,0 V 20'></path><path svg-type='node' node='18' d='M 266,0 V 20'></path><path svg-type='node' node='19' d='M 238,0 V 20'></path><path svg-type='node' node='20' d='M 210,0 V 20'></path><path svg-type='node' node='21' d='M 182,0 V 20'></path><path svg-type='node' node='22' d='M 154,0 V 20'></path><path svg-type='node' node='23' d='M 126,0 V 20'></path><path svg-type='node' node='24' d='M 98,0 V 20'></path><path svg-type='node' node='25' d='M 70,0 V 20'></path><path svg-type='node' node='26' d='M 42,0 V 20'></path><path svg-type='node' node='27' d='M 14,0 V 20'></path>"
+	"data": "<path svg-type='body' d='M 0,5 H280 V65 H0 Z'></path>
+<path svg-type='body' class='no-fill' d='M 0,25 H5 V45 H0'></path>
+<path svg-type='node' node='0' d='M 5,65 V70 H15 V65 Z'/>
+<path svg-type='node' node='1' d='M 25,65 V70 H35 V65 Z'/>
+<path svg-type='node' node='2' d='M 45,65 V70 H55 V65 Z'/>
+<path svg-type='node' node='3' d='M 65,65 V70 H75 V65 Z'/>
+<path svg-type='node' node='4' d='M 85,65 V70 H95 V65 Z'/>
+<path svg-type='node' node='5' d='M 105,65 V70 H115 V65 Z'/>
+<path svg-type='node' node='6' d='M 125,65 V70 H135 V65 Z'/>
+<path svg-type='node' node='7' d='M 145,65 V70 H155 V65 Z'/>
+<path svg-type='node' node='8' d='M 165,65 V70 H175 V65 Z'/>
+<path svg-type='node' node='9' d='M 185,65 V70 H195 V65 Z'/>
+<path svg-type='node' node='10' d='M 205,65 V70 H215 V65 Z'/>
+<path svg-type='node' node='11' d='M 225,65 V70 H235 V65 Z'/>
+<path svg-type='node' node='12' d='M 245,65 V70 H255 V65 Z'/>
+<path svg-type='node' node='13' d='M 265,65 V70 H275 V65 Z'/>
+<path svg-type='node' node='14' d='M 265,0 V5 H275 V0 Z'/>
+<path svg-type='node' node='15' d='M 245,0 V5 H255 V0 Z'/>
+<path svg-type='node' node='16' d='M 225,0 V5 H235 V0 Z'/>
+<path svg-type='node' node='17' d='M 205,0 V5 H215 V0 Z'/>
+<path svg-type='node' node='18' d='M 185,0 V5 H195 V0 Z'/>
+<path svg-type='node' node='19' d='M 165,0 V5 H175 V0 Z'/>
+<path svg-type='node' node='20' d='M 145,0 V5 H155 V0 Z'/>
+<path svg-type='node' node='21' d='M 125,0 V5 H135 V0 Z'/>
+<path svg-type='node' node='22' d='M 105,0 V5 H115 V0 Z'/>
+<path svg-type='node' node='23' d='M 85,0 V5 H95 V0 Z'/>
+<path svg-type='node' node='24' d='M 65,0 V5 H75 V0 Z'/>
+<path svg-type='node' node='25' d='M 45,0 V5 H55 V0 Z'/>
+<path svg-type='node' node='26' d='M 25,0 V5 H35 V0 Z'/>
+<path svg-type='node' node='27' d='M 5,0 V5 H15 V0 Z'/>"
 },
 {
 	"type" : "passive",
@@ -866,6 +1098,7 @@
 		"description": "Generic capacitor"
 	},
 	"meta" : {
+		"class": "next",
 		"nodes": {
 			"length": 2,
 			"size": {
@@ -873,12 +1106,15 @@
 				"height": 0
 			},
 			"list" : [
-				{ "x": 0, "y": 30, "label": "pin 0" },
-				{ "x": 68, "y": 30, "label": "pin 1" }
+				{ "x": 0, "y": 30, "label": "node 0" },
+				{ "x": 35, "y": 30, "label": "node 1" }
 			]
 		}
 	},
-	"data" : "<rect svg-type='body' x='20' y='0' width='7' height='60'></rect><rect svg-type='body' x='40' y='0' width='7' height='60'></rect><path svg-type='node' node='0' d='M 0,30 H 19'></path><path svg-type='node' node='1' d='M 68,30 H 48'></path>"
+	"data" : "<rect svg-type='body' x='5' y='0' width='7' height='60'/>
+<rect svg-type='body' x='20' y='0' width='7' height='60'/>
+<path svg-type='node' node='0' d='M 0,25 V35 H5 V25 Z'/>
+<path svg-type='node' node='1' d='M 27,25 V35 H33 V25 Z'/>"
 },
 {
 	"type" : "passive",
@@ -887,6 +1123,7 @@
 		"description" : "Generic polarized capacitor"
 	},
 	"meta" : {
+		"class": "next",
 		"nodes": {
 			"length": 2,
 			"size": {
@@ -894,12 +1131,16 @@
 				"height": 0
 			},
 			"list" : [
-				{ "x": 0, "y": 30, "label": "pin (-)" },
-				{ "x": 70, "y": 30, "label": "pin (+)" }
+				{ "x": 5, "y": 30, "label": "node (-)" },
+				{ "x": 30, "y": 30, "label": "node (+)" }
 			]
 		}
 	},
-	"data" : "<path svg-type='body' style='fill: none; ' d='M 20,60 Q 40,30 20,0'></path><path svg-type='body' style='fill: none; ' d='M 51,10 L 69,10 L 60,10 V 1 V 20 '></path><rect svg-type='body' x='40' y='0' width='5' height='60'></rect><path svg-type='node' node='0' d='M 0,30 H 30'></path><path svg-type='node' node='1' d='M 70,30 H 45'></path>"
+	"data" : "<path svg-type='body' style='fill: none; ' d='M 0,60 Q 20,30 0,0'/>
+<path svg-type='body' style='fill: none; ' d='M 28,12 L 42,12 L 35,12 V 5 V 20 '/>
+<rect svg-type='body' x='20' y='0' width='5' height='60'/>
+<path svg-type='node' node='0' d='M 5,25 V35 H9.5 V25 Z'/>
+<path svg-type='node' node='1' d='M 25,25 V35 H30 V25 Z'/>"
 },
 {
 	"type" : "passive",
@@ -908,6 +1149,7 @@
 		"description" : "Generic variable capacitor"
 	},
 	"meta" : {
+		"class": "next",
 		"nodes": {
 			"length": 2,
 			"size": {
@@ -915,12 +1157,16 @@
 				"height": 0
 			},
 			"list" : [
-				{ "x": 0, "y": 30, "label": "pin 0" },
-				{ "x": 68, "y": 30, "label": "pin 1" }
+				{ "x": 15, "y": 30, "label": "node 0" },
+				{ "x": 54, "y": 30, "label": "node 1" }
 			]
 		}
 	},
-	"data" : "<rect svg-type='body' x='20' y='0' width='7' height='60'></rect><rect svg-type='body' x='42' y='0' width='7' height='60'></rect><path svg-type='body' style='stroke-width: 2px;' d='M 5,60 L 59,6 L 54,1 L 65,0 L 64,10.3 L 59,6'></path><path svg-type='node' node='0' d='M 0,30 H 20'></path><path svg-type='node' node='1' d='M 68,30 H 48'></path>"
+	"data" : "<rect svg-type='body' x='20' y='0' width='7' height='60'/>
+<rect svg-type='body' x='42' y='0' width='7' height='60'/>
+<path svg-type='body' style='stroke-width: 2px;' d='M 5,60 L 59,6 L 54,1 L 65,0 L 64,10.3 L 59,6'/>
+<path svg-type='node' node='0' d='M 15,25 V35 H20 V25 Z'/>
+<path svg-type='node' node='1' d='M 49,25 V35 H54 V25 Z'/>"
 },
 {
 	"type" : "motor",
@@ -929,6 +1175,7 @@
 		"description" : "Generic DC Motor"
 	},
 	"meta" : {
+		"class": "next",
 		"nodes": {
 			"length": 2,
 			"size": {
@@ -936,12 +1183,15 @@
 				"height": 0
 			},
 			"list" : [
-				{ "x": 30, "y": 0, "label": "Pin (-)" },
-				{ "x": 30, "y": 100, "label": "Pin (+)" }
+				{ "x": 30, "y": 0, "label": "node (-)" },
+				{ "x": 30, "y": 70, "label": "node (+)" }
 			]
 		}
 	},
-	"data" : "<circle svg-type='body' r='30' cy='50' cx='30'></circle><text x='12' y='62' font-size='40'>M</text><path svg-type='node' node='0' d='M 30,0 V 20'></path><path svg-type='node' node='1' d='M 30,100 V 80'></path>"
+	"data" : "<circle svg-type='body' cx='30' cy='35' r='30'/>
+<text x='15' y='50' class='big'>M</text>
+<path svg-type='node' node='0' d='M 25,0 H35 V5 H25 Z'/>
+<path svg-type='node' node='1' d='M 25,70 H35 V65 H25 Z'/>"
 },
 {
 	"type" : "passive",
@@ -956,6 +1206,7 @@
 		"tolerance": "2%"
 	},
 	"meta" : {
+		"class": "next",
 		"nodes": {
 			"length": 2,
 			"size": {
@@ -963,12 +1214,14 @@
 				"height": 0
 			},
 			"list" : [
-				{ "x": 0, "y": 10, "label": "Pin 0" },
-				{ "x": 80, "y": 10, "label": "Pin 1" }
+				{ "x": 0, "y": 10, "label": "node 0" },
+				{ "x": 50, "y": 10, "label": "node 1" }
 			]
 		}
 	},
-	"data" : "<rect svg-type='body' x='20' y='0' width='40' height='20'></rect><path svg-type='node' node='0' d='M 0,10 H 19'></path><path svg-type='node' node='1' d='M 80,10 H 61'></path>"
+	"data" : "<rect svg-type='body' x='5' y='0' width='40' height='20'/>
+<path svg-type='node' node='0' d='M 0,5 V15 H5 V5 Z'/>
+<path svg-type='node' node='1' d='M 45,5 V15 H50 V5 Z'/>"
 },
 {
 	"type" : "passive",
@@ -977,6 +1230,7 @@
 		"description" : "Generic Push Button"
 	},
 	"meta" : {
+		"class": "next",
 		"nodes": {
 			"length": 2,
 			"size": {
@@ -984,12 +1238,18 @@
 				"height": 0
 			},
 			"list" : [
-				{ "x": 0, "y": 40, "label": "pin 0" },
-				{ "x": 80, "y": 40, "label": "pin 1" }
+				{ "x": 0, "y": 40, "label": "node 0" },
+				{ "x": 80, "y": 40, "label": "node 1" }
 			]
 		}
 	},
-	"data" : "<line x1='25' y1='0' x2='55' y2='0'></line><line x1='40' y1='1' x2='40' y2='14'></line><rect svg-type='body' x='20' y='15' width='40' height='10'></rect><circle svg-type='body' r='5' cx='25' cy='40'></circle><circle svg-type='body' r='5' cx='55' cy='40'></circle><path svg-type='node' node='0' d='M 0,40 H 20'></path><path svg-type='node' node='1' d='M 80,40 H 60'></path>"
+	"data" : "<rect svg-type='body' x='25' y='0' width='20' height='4'/>
+<rect svg-type='body' x='33' y='4' width='4' height='11'/>
+<rect svg-type='body' x='10' y='15' width='50' height='10'/>
+<path svg-type='node' node='0' d='M 0,35 V 45 H11 V35 Z'/>
+<path svg-type='node' node='1' d='M 60,35 V45 H71 V35 Z'/>
+<circle svg-type='body' cx='16' cy='40' r='7'/>
+<circle svg-type='body' cx='55' cy='40' r='7'/>"
 },
 {
 	"type" : "passive",
@@ -998,6 +1258,7 @@
 		"description" : "Generic Switch"
 	},
 	"meta" : {
+		"class": "next",
 		"nodes": {
 			"length": 2,
 			"size": {
@@ -1005,12 +1266,16 @@
 				"height": 0
 			},
 			"list" : [
-				{ "x": 0, "y": 20, "label": "pin 0" },
-				{ "x": 90, "y": 20, "label": "pin 1" }
+				{ "x": 0, "y": 20, "label": "node 0" },
+				{ "x": 90, "y": 20, "label": "node 1" }
 			]
 		}
 	},
-	"data" : "<line x1='28' y1='17' x2='60' y2='0' style='stroke-width: 7px;'></line><circle svg-type='body' r='7' cx='25' cy='20'></circle><circle svg-type='body' r='7' cx='65' cy='20'></circle><path svg-type='node' node='0' d='M 0,20 H 19'></path><path svg-type='node' node='1' d='M 90,20 H 71'></path>"
+	"data" : "<path svg-type='body' d='M 21,19 L 54,2 L57,8 L 23,25 Z'/>
+<path svg-type='node' node='0' d='M 0,20 V30 H11 V20 Z'/>
+<path svg-type='node' node='1' d='M 60,20 V30 H71 V20 Z'/>
+<circle svg-type='body' r='7' cx='16' cy='25'/>
+<circle svg-type='body' r='7' cx='55' cy='25'/>"
 },
 {
 	"type" : "passive",
@@ -1019,6 +1284,7 @@
 		"description": "Generic SDPT Switch"
 	},
 	"meta" : {
+		"class": "next",
 		"nodes": {
 			"length": 3,
 			"size": {
@@ -1026,13 +1292,16 @@
 				"height": 0
 			},
 			"list" : [
-				{ "x": 0, "y": 20, "label": "pin 0" },
-				{ "x": 90, "y": 7, "label": "pin 1" },
-				{ "x": 90, "y": 37, "label": "pin 2" }
+				{ "x": 7, "y": 25, "label": "node 0" },
+				{ "x": 58, "y": 7, "label": "node 1" },
+				{ "x": 58, "y": 43, "label": "node 2" }
 			]
 		}
 	},
-	"data" : "<line x1='28' y1='20' x2='60' y2='7' style='stroke-width: 7px;'></line><circle svg-type='body' r='7' cx='25' cy='20'></circle><circle svg-type='body' r='7' cx='65' cy='7'></circle><circle svg-type='body' r='7' cx='65' cy='37'></circle><path svg-type='node' node='0' d='M 0,20 H 19'></path><path svg-type='node' node='1' d='M 90,7 H 71'></path><path svg-type='node' node='2' d='M 90,37 H 71'></path>"
+	"data" : "<path svg-type='body' d='M 13,19 L 49,6 L52,14 L 16,27 Z'/>
+<circle svg-type='node' node='0' r='7' cx='7' cy='25'/>
+<circle svg-type='node' node='1' r='7' cx='58' cy='7'/>
+<circle svg-type='node' node='2' r='7' cx='58' cy='43'/>"
 },
 {
 	"type" : "passive",
@@ -1041,6 +1310,7 @@
 		"description" : "Generic inductor"
 	},
 	"meta" : {
+		"class": "next",
 		"nodes": {
 			"length": 2,
 			"size": {
@@ -1048,11 +1318,13 @@
 				"height": 0
 			},
 			"list" : [
-				{ "x": 0, "y": 34, "label": "pin 0" },
-				{ "x": 134, "y": 34, "label": "pin 1" }
+				{ "x": 0, "y": 25, "label": "node 0" },
+				{ "x": 100, "y": 25, "label": "node 1" }
 			]
 		}
 	},
-	"data" : "<path svg-type='body' d='M 23,31 Q 38,0 53,26 Q 68,0 83,26 Q 98,0 113,31 V 36 H 108 Q 98,10 86,36 H 80 Q 68,10 56,36 H 50 Q 38,10 28,36 H 23 Z'></path><path svg-type='node' node='0' d='M 0,34 H 22'></path><path svg-type='node' node='1' d='M 134,34 H 114'></path>"
+	"data" : "<path svg-type='body' d='M 5,20 Q 20,0 35,26 Q 50,0 65,26 Q 80,0 95,20 V36 H90 Q 85,5 68,36 H62 Q 50,7 38,36 H32 Q 16,6 10,36 H5 Z'/>
+<path svg-type='node' node='0' d='M 0,20 V30 H5 V20 Z'/>
+<path svg-type='node' node='1' d='M 95,20 V30 H100 V20 Z'/>"
 }
 ]

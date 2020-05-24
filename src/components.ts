@@ -2,60 +2,59 @@
 import { obj } from './dab';
 import ItemBoard from './itemsBoard';
 import {
-	IBaseComponent, IComponentOptions, IMetadataNodes, IMetadataLogic, IBaseStoreComponent
+	IBaseComponent, IComponentOptions, IBaseStoreComponent, IComponentMetadata
 } from './interfaces';
 
 export default class Comp {
 
+	// all base components with metadata
 	private static baseComps: Map<string, IBaseComponent> =
 		Comp.initializeComponents([{
 			name: "label", obj: <Comp>{
-				name: "label", type: "label"
+				name: "label", type: "label", meta: {}
 			}
 		},
 		{
 			name: "wire", obj: <Comp>{
-				name: "wire", type: "wire"
+				name: "wire", type: "wire", meta: {}
 			}
 		}
-		]); // all base components with metadata
+		]);
 
-	private static boardItems: Map<string, ItemBoard> = new Map(); //all ecs, wires in the board
+	//all ecs, wires in the board
+	private static boardItems: Map<string, ItemBoard> = new Map();
 	protected settings: IComponentOptions;
 
 	get name(): string { return this.settings.name }
 	get type(): string { return this.settings.type }
 	get data(): string { return this.settings.data }
 	get props(): any { return this.settings.properties }
-
-	get nodes(): IMetadataNodes { return this.settings.meta.nodes }
-	get logic(): IMetadataLogic { return this.settings.meta.logic }
+	get meta(): IComponentMetadata {
+		return this.settings.meta
+	}
 
 	constructor(options: IComponentOptions) {
+		let
+			that = this,
+			template = options.tmpl;
+		//delete
+		delete options.tmpl;
 		//copy making a dupplicate
 		this.settings = obj(options);
 
 		//check to see if this component derivates from a template
-		if (this.settings.tmpl) {
+		if (template) {
 			let
-				tmp = Comp.find(this.settings.tmpl.name, true);
+				comp = Comp.find(template.name, true);
 			//copy SVG data
-			this.settings.data = tmp.obj.data;
-			//deep copy meta
-			this.settings.meta = obj({
-				"nodes": tmp.obj.nodes,
-				"logic": tmp.obj.logic
-			});
-			//update svg text tag if provided
-			let
-				lbl = this.settings.tmpl.label;
-			lbl && (this.settings.data = this.settings.data
-				.replace(/\<text[^\>]*\>(.*)\<\/text\>/gm,
-					`<text x='${lbl.x}' y='${lbl.y}' font-size='${lbl.font}'>${lbl.text}</text>`)
-			);
+			this.settings.data = comp.obj.data;
+			//deep copy meta, it has simple object and values
+			this.settings.meta = JSON.parse(JSON.stringify(comp.obj.meta));
+			//copy label if any
+			template.label && (this.settings.meta.label = obj(template.label));
 			//update node labels
-			this.settings.tmpl.labels.forEach((lbl, ndx) => {
-				this.settings.meta.nodes.list[ndx].label = lbl;
+			template.labels.forEach((lbl, ndx) => {
+				that.settings.meta.nodes.list[ndx].label = lbl;
 			})
 		}
 		if (!Comp.store(this.settings.name, this))

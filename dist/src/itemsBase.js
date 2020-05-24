@@ -31,8 +31,7 @@ var ItemBase = /** @class */ (function (_super) {
         _this.settings.g = utils_1.tag("g", _this.settings.id, {
             class: (_this.settings.class = classArr.join(' '))
         });
-        _this.settings.color = colors_1.Color.getcolor(options.color, colors_1.Colors.green);
-        dab_1.addClass(_this.g, _this.color);
+        dab_1.addClass(_this.g, _this.settings.color = colors_1.Color.getcolor(options.color, colors_1.Colors.white));
         return _this;
     }
     Object.defineProperty(ItemBase.prototype, "g", {

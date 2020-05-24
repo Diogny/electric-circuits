@@ -2,11 +2,11 @@ devDependencies:
   '@types/node': 12.12.21
   electron: 9.0.0
   electron-reload: 1.5.0
-  eslint: 7.0.0
+  eslint: 7.1.0
   html-webpack-plugin: 4.3.0_webpack@4.43.0
-  ts-loader: 7.0.4_typescript@3.9.2
+  ts-loader: 7.0.5_typescript@3.9.3
   tsconfig-paths-webpack-plugin: 3.2.0
-  typescript: 3.9.2
+  typescript: 3.9.3
   webpack: 4.43.0_webpack@4.43.0
   webpack-bundle-analyzer: 3.8.0
   webpack-cli: 3.3.11_webpack@4.43.0
@@ -1480,7 +1480,7 @@ packages:
       node: '>=4'
     resolution:
       integrity: sha512-8y9YjtM1JBJU/A9Kc+SbaOV4y29sSWckBwMHa+FGtVj5gN/sbnKDf6xJUl+8g7FAij9LVaP8C24DUiH/f/2Z9A==
-  /eslint/7.0.0:
+  /eslint/7.1.0:
     dependencies:
       '@babel/code-frame': 7.8.3
       ajv: 6.12.2
@@ -1523,7 +1523,7 @@ packages:
       node: ^10.12.0 || >=12.0.0
     hasBin: true
     resolution:
-      integrity: sha512-qY1cwdOxMONHJfGqw52UOpZDeqXy8xmD0u8CT6jIstil72jkhURC704W8CFyTPDPllz4z4lu0Ql1+07PG/XdIg==
+      integrity: sha512-DfS3b8iHMK5z/YLSme8K5cge168I8j8o1uiVmFCgnnjxZQbCGyraF8bMl7Ju4yfBmCuxD7shOF7eqGkcuIHfsA==
   /espree/7.0.0:
     dependencies:
       acorn: 7.2.0
@@ -4387,21 +4387,21 @@ packages:
     dev: true
     resolution:
       integrity: sha512-c3zayb8/kWWpycWYg87P71E1S1ZL6b6IJxfb5fvsUgsf0S2MVGaDhDXXjDMpdCpfWXqptc+4mXwmiy1ypXqRAA==
-  /ts-loader/7.0.4_typescript@3.9.2:
+  /ts-loader/7.0.5_typescript@3.9.3:
     dependencies:
       chalk: 2.4.2
       enhanced-resolve: 4.1.1
       loader-utils: 1.4.0
       micromatch: 4.0.2
       semver: 6.3.0
-      typescript: 3.9.2
+      typescript: 3.9.3
     dev: true
     engines:
       node: '>=10.0.0'
     peerDependencies:
       typescript: '*'
     resolution:
-      integrity: sha512-5du6OQHl+4ZjO4crEyoYUyWSrmmo7bAO+inkaILZ68mvahqrfoa4nn0DRmpQ4ruT4l+cuJCgF0xD7SBIyLeeow==
+      integrity: sha512-zXypEIT6k3oTc+OZNx/cqElrsbBtYqDknf48OZos0NQ3RTt045fBIU8RRSu+suObBzYB355aIPGOe/3kj9h7Ig==
   /tsconfig-paths-webpack-plugin/3.2.0:
     dependencies:
       chalk: 2.4.2
@@ -4467,13 +4467,13 @@ packages:
     dev: true
     resolution:
       integrity: sha1-hnrHTjhkGHsdPUfZlqeOxciDB3c=
-  /typescript/3.9.2:
+  /typescript/3.9.3:
     dev: true
     engines:
       node: '>=4.2.0'
     hasBin: true
     resolution:
-      integrity: sha512-q2ktq4n/uLuNNShyayit+DTobV2ApPEo/6so68JaD5ojvc/6GClBipedB9zNWYxRSAlZXAe405Rlijzl6qDiSw==
+      integrity: sha512-D/wqnB2xzNFIcoBG9FG8cXRDjiqSTbG2wd8DMZeQyJlP1vfTkIxH4GKveWaEBYySKIg+USu+E+EDIR47SqnaMQ==
   /union-value/1.0.1:
     dependencies:
       arr-union: 3.1.0
@@ -4822,11 +4822,11 @@ specifiers:
   '@types/node': 12.12.21
   electron: ^9.0.0
   electron-reload: ^1.5.0
-  eslint: ^7.0.0
+  eslint: ^7.1.0
   html-webpack-plugin: ^4.3.0
-  ts-loader: ^7.0.4
+  ts-loader: ^7.0.5
   tsconfig-paths-webpack-plugin: ^3.2.0
-  typescript: ^3.9.2
+  typescript: ^3.9.3
   webpack: ^4.43.0
   webpack-bundle-analyzer: ^3.8.0
   webpack-cli: ^3.3.11
