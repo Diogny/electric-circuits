@@ -70,6 +70,11 @@ var MyApp = /** @class */ (function (_super) {
                 case "line":
                     state.over.line = dab_1.attr(state.over.svg, state.over.type) | 0;
                     break;
+                default:
+                    //if we got here, it's a hit on a component without svg-type
+                    //state.type != ["board", "wire"] then it's "body"
+                    (state.it && state.type != "wire") && (state.over.type = "body");
+                    break;
             }
             //UI logs
             arr.push(" " + state.event + " " + state.id + " " + state.type + "^" + state.over.type);

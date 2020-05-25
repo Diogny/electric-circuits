@@ -87,6 +87,11 @@ export class MyApp extends Application implements IMyApp {
 					case "line":
 						state.over.line = attr(state.over.svg, state.over.type) | 0;
 						break;
+					default:
+						//if we got here, it's a hit on a component without svg-type
+						//state.type != ["board", "wire"] then it's "body"
+						(state.it && state.type != "wire") && (state.over.type = "body");
+						break;
 				}
 				//UI logs
 				arr.push(` ${state.event} ${state.id} ${state.type}^${state.over.type}`);
@@ -240,18 +245,12 @@ export class MyApp extends Application implements IMyApp {
 			m = parseFloat(o);
 		}
 		this.multiplier = m;
-		//base_vb_width: board.clientWidth * ratio | 0,
-		//base_vb_height: board.clientHeight * ratio | 0
 		this.baseViewBox = new Size(this.board.clientWidth * this.ratio | 0, this.board.clientHeight * this.ratio | 0);
 		//calculate size
 		this.viewBox.size = new Size(
 			this.baseViewBox.width * this.multiplier | 0,
 			this.baseViewBox.height * this.multiplier | 0);
-		//app.vb_width = app.base_vb_width * this.multiplier | 0;
-		//app.vb_height = app.base_vb_height * this.multiplier | 0;
-
 		//set SVG DOM viewBox attribute
-		//attr(this.svgBoard, { "viewBox": `${app.vb_x} ${app.vb_y} ${app.vb_width} ${app.vb_height}` });
 		attr(this.svgBoard, { "viewBox": `${this.viewBox.x} ${this.viewBox.y} ${this.viewBox.width} ${this.viewBox.height}` });
 		//calculate ratio
 		this.ratioX = this.viewBox.width / this.svgBoard.clientWidth;
@@ -263,7 +262,6 @@ export class MyApp extends Application implements IMyApp {
 	public refreshTopBarRight() {
 		this.topBarRight.innerHTML = nano(this.templates.viewBox01, this.viewBox) + "&nbsp; " +
 			nano(this.templates.size01, this.size);
-		// `${this.viewBox.x} ${this.viewBox.y} ${this.viewBox.width} ${this.viewBox.height}`;
 	}
 
 	public getAspectRatio(width: number, height: number) {

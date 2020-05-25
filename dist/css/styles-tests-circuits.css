@@ -85,7 +85,8 @@ g[svg-comp]:hover {
   fill: black;
 }
 
-g[svg-comp].white > [svg-type="body"] {
+g[svg-comp].white > [svg-type="body"],
+.white {
   fill: white;
 }
 
@@ -94,7 +95,8 @@ g[svg-comp].white > [svg-type="body"] {
   fill: #807b7b;
 }
 
-g[svg-comp].black > [svg-type="body"] {
+g[svg-comp].black > [svg-type="body"],
+.black {
   fill: #636060;
 }
 
@@ -108,20 +110,21 @@ g[svg-comp].black > text {
   fill: #0d7537;
 }
 
-g[svg-comp].green > [svg-type="body"] {
+g[svg-comp].green > [svg-type="body"],
+.green {
   fill: #88dc88;
 }
 
-g[svg-comp] > path[svg-type="body"].thick {
+g[svg-comp] > .thick {
   stroke-width: 2px;
 }
 
-g[svg-comp] > path[svg-type="body"].no-fill,
-g[svg-comp].selected > [svg-type="body"].no-fill {
-  fill: none;
+g[svg-comp] > .thick3 {
+  stroke-width: 3px;
 }
 
-.ec.selected > [svg-type="body"].no-fill {
+g[svg-comp] > .no-fill,
+g[svg-comp].selected > .no-fill {
   fill: none;
 }
 
@@ -152,11 +155,6 @@ g[svg-comp] > circle[svg-type="node"] {
 
 .gnd {
   stroke: black;
-}
-
-.vcc,
-.gnd {
-  stroke-width: 1px;
 }
 
 .dragging {

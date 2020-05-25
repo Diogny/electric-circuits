@@ -242,7 +242,7 @@
 	"data" : "<path svg-type='node' node='0' d='M 2,10 V20 H9 L 5,10 Z'/>
 <path svg-type='node' node='1' d='M 2,40 V50 H5 L 9,40 Z'/>
 <path svg-type='node' node='2' d='M 75,25 H85 V35 H75 Z'/>
-<path svg-type='body' class='thick no-fill' d='M 0,60 Q 20,30 0,0'/>
+<path class='thick no-fill' d='M 0,60 Q 20,30 0,0'/>
 <path svg-type='body' d='M 10,0 Q 60,0 80,30 Q 60,60 10,60 Q 30,30 10,0 Z'/>"
 },
 {
@@ -279,7 +279,7 @@
 <path svg-type='node' node='1' d='M 2,40 V50 H5 L 9,40 Z'/>
 <path svg-type='node' node='2' d='M 95,25 H105 V35 H95 Z'/>
 <circle svg-type='body' cx='90' cy='30' r='10'/>
-<path svg-type='body' class='thick no-fill' d='M 0,60 Q 20,30 0,0'/>
+<path class='thick no-fill' d='M 0,60 Q 20,30 0,0'/>
 <path svg-type='body' d='M 10,0 Q 60,0 80,30 Q 60,60 10,60 Q 30,30 10,0 Z'/>"
 },
 {
@@ -328,7 +328,7 @@
 	},
 	"data" : "<rect svg-type='body' x='5' y='20' width='7' height='40'/>
 <line x1='20' y1='0' x2='20' y2='80'/>
-<path class='vcc' style='fill: none; ' d='M 25,20 L 35,20 L 30,20 V 15 V 25'/>
+<path class='vcc no-fill' d='M 25,20 L 35,20 L 30,20 V 15 V 25'/>
 <path svg-type='node' node='0' d='M 0,35 V45 H5 V35 Z'/>
 <path svg-type='node' node='1' d='M 20,35 V45 H25 V35 Z'/>"
 },
@@ -358,7 +358,7 @@
 <line svg-type='body' x1='44.5' y1='0' x2='44.5' y2='80'/>
 <rect svg-type='body' x='53' y='20' width='7' height='40'/>
 <line svg-type='body' x1='68' y1='0' x2='68' y2='80'/>
-<path class='vcc' style='fill: none; ' d='M 75,20 L 85,20 L 80,20 V 15 V 25'/>
+<path class='vcc no-fill' d='M 75,20 L 85,20 L 80,20 V 15 V 25'/>
 <path svg-type='node' node='0' d='M 0,35 V45 H5 V35 Z'/>
 <path svg-type='node' node='1' d='M 68,35 V45 H73 V35 Z'/>"
 },
@@ -529,7 +529,7 @@
 		}
 	},
 	"data" : "<path svg-type='body' d='M 5,0 L 65,30 L 5,60 Z'/>
-<path svg-type='body' style='fill: none; ' d='M 51,47 L 51,60 L 66,60 L 66,0 L 81,0 L 81,13'/>
+<path class='no-fill' d='M 51,47 L 51,60 L 66,60 L 66,0 L 81,0 L 81,13'/>
 <path svg-type='node' node='0' d='M 0,25 V35 H5 V25 Z'/>
 <path svg-type='node' node='1' d='M 66,25 V35 H71 V25 Z'/>"
 },
@@ -554,7 +554,7 @@
 		}
 	},
 	"data" : "<path svg-type='body' d='M 5,0 L 65,30 L 5,60 Z'/>
-<path svg-type='body' style='fill: none; ' d='M 56,60 L 66,60 L 66,0 L 56,0'/>
+<path class='no-fill' d='M 56,60 L 66,60 L 66,0 L 56,0'/>
 <path svg-type='node' node='0' d='M 0,25 V35 H5 V25 Z'/>
 <path svg-type='node' node='1' d='M 66,25 V35 H71 V25 Z'/>"
 },
@@ -605,7 +605,7 @@
 		}
 	},
 	"data" : "<path svg-type='body' d='M 5,0 L 65,30 L 5,60 Z'/>
-<path svg-type='body' style='fill: none; ' d='M 56,60 L 66,60 L 66,0 L 76,0'/>
+<path class='no-fill' d='M 56,60 L 66,60 L 66,0 L 76,0'/>
 <path svg-type='node' node='0' d='M 0,25 V35 H5 V25 Z'/>
 <path svg-type='node' node='1' d='M 66,25 V35 H71 V25 Z'/>"
 },
@@ -634,7 +634,7 @@
 <path svg-type='node' node='1' d='M 51,4.5 L 55,0.5 L 61.5,6.8 L 58,11 Z'/>
 <path svg-type='node' node='2' d='M 58,49 61.5,53.2 L 55,59.5 L51,55.5'/>
 <circle svg-type='body' cx='35' cy='30' r='30'/>
-<path svg-type='body' style='fill: none; stroke-width: 2px; ' d='M 5,30 H28 V10 V20 L 55,8 M 28,30 V50 M 28,40 L 55,52 L 45,52 M 55,52 L 48,44.5'/>"
+<path class='thick no-fill' d='M 5,30 H28 V10 V20 L 55,8 M 28,30 V50 M 28,40 L 55,52 L 45,52 M 55,52 L 48,44.5'/>"
 },
 {
 	"type" : "transistor",
@@ -661,7 +661,7 @@
 <path svg-type='node' node='1' d='M 51,4.5 L 55,0.5 L 61.5,6.8 L 58,11 Z'/>
 <path svg-type='node' node='2' d='M 58,49 61.5,53.2 L 55,59.5 L51,55.5'/>
 <circle svg-type='body' cx='35' cy='30' r='30'/>
-<path svg-type='body' style='fill: none; stroke-width: 2px; ' d='M 5,30 H28 V10 V20 L 55,8 L 45,8 M 55,8 L 48,15.5 M 28,30 V50 M 28,40 L 55,52'/>"
+<path class='thick no-fill' d='M 5,30 H28 V10 V20 L 55,8 L 45,8 M 55,8 L 48,15.5 M 28,30 V50 M 28,40 L 55,52'/>"
 },
 {
 	"type" : "dip",
@@ -687,7 +687,7 @@
 		}
 	},
 	"data" :"<path svg-type='body' d='M 0,5 H40 V65 H0 Z'></path>
-<path svg-type='body' class='no-fill' d='M 0,25 H5 V45 H0'></path>
+<path class='no-fill' d='M 0,25 H5 V45 H0'></path>
 <path svg-type='node' node='0' d='M 5,65 V70 H15 V65 Z'/>
 <path svg-type='node' node='1' d='M 25,65 V70 H35 V65 Z'/>
 <path svg-type='node' node='2' d='M 25,0 V5 H35 V0 Z'/>
@@ -719,7 +719,7 @@
 		}
 	},
 	"data" :"<path svg-type='body' d='M 0,5 H60 V65 H0 Z'/>
-<path svg-type='body' class='no-fill' d='M 0,25 H5 V45 H0'/>
+<path class='no-fill' d='M 0,25 H5 V45 H0'/>
 <path svg-type='node' node='0' d='M 5,65 V70 H15 V65 Z'/>
 <path svg-type='node' node='1' d='M 25,65 V70 H35 V65 Z'/>
 <path svg-type='node' node='2' d='M 45,65 V70 H55 V65 Z'/>
@@ -755,7 +755,7 @@
 		}
 	},
 	"data" : "<path svg-type='body' d='M 0,5 H80 V65 H0 Z'></path>
-<path svg-type='body' class='no-fill' d='M 0,25 H5 V45 H0'></path>
+<path class='no-fill' d='M 0,25 H5 V45 H0'></path>
 <path svg-type='node' node='0' d='M 5,65 V70 H15 V65 Z'/>
 <path svg-type='node' node='1' d='M 25,65 V70 H35 V65 Z'/>
 <path svg-type='node' node='2' d='M 45,65 V70 H55 V65 Z'/>
@@ -815,7 +815,7 @@
 		}
 	},
 	"data": "<path svg-type='body' d='M 0,5 H100 V65 H0 Z'></path>
-<path svg-type='body' class='no-fill' d='M 0,25 H5 V45 H0'></path>
+<path class='no-fill' d='M 0,25 H5 V45 H0'></path>
 <path svg-type='node' node='0' d='M 5,65 V70 H15 V65 Z'/>
 <path svg-type='node' node='1' d='M 25,65 V70 H35 V65 Z'/>
 <path svg-type='node' node='2' d='M 45,65 V70 H55 V65 Z'/>
@@ -859,7 +859,7 @@
 		}
 	},
 	"data" : "<path svg-type='body' d='M 0,5 H120 V65 H0 Z'></path>
-<path svg-type='body' class='no-fill' d='M 0,25 H5 V45 H0'></path>
+<path class='no-fill' d='M 0,25 H5 V45 H0'></path>
 <path svg-type='node' node='0' d='M 5,65 V70 H15 V65 Z'/>
 <path svg-type='node' node='1' d='M 25,65 V70 H35 V65 Z'/>
 <path svg-type='node' node='2' d='M 45,65 V70 H55 V65 Z'/>
@@ -907,7 +907,7 @@
 		}
 	},
 	"data" : "<path svg-type='body' d='M 0,5 H140 V65 H0 Z'></path>
-<path svg-type='body' class='no-fill' d='M 0,25 H5 V45 H0'></path>
+<path class='no-fill' d='M 0,25 H5 V45 H0'></path>
 <path svg-type='node' node='0' d='M 5,65 V70 H15 V65 Z'/>
 <path svg-type='node' node='1' d='M 25,65 V70 H35 V65 Z'/>
 <path svg-type='node' node='2' d='M 45,65 V70 H55 V65 Z'/>
@@ -982,7 +982,7 @@
 		}
 	},
 	"data" : "<path svg-type='body' d='M 0,5 H160 V65 H0 Z'></path>
-<path svg-type='body' class='no-fill' d='M 0,25 H5 V45 H0'></path>
+<path class='no-fill' d='M 0,25 H5 V45 H0'></path>
 <path svg-type='node' node='0' d='M 5,65 V70 H15 V65 Z'/>
 <path svg-type='node' node='1' d='M 25,65 V70 H35 V65 Z'/>
 <path svg-type='node' node='2' d='M 45,65 V70 H55 V65 Z'/>
@@ -1054,7 +1054,7 @@
 		}
 	},
 	"data": "<path svg-type='body' d='M 0,5 H280 V65 H0 Z'></path>
-<path svg-type='body' class='no-fill' d='M 0,25 H5 V45 H0'></path>
+<path class='no-fill' d='M 0,25 H5 V45 H0'></path>
 <path svg-type='node' node='0' d='M 5,65 V70 H15 V65 Z'/>
 <path svg-type='node' node='1' d='M 25,65 V70 H35 V65 Z'/>
 <path svg-type='node' node='2' d='M 45,65 V70 H55 V65 Z'/>
@@ -1136,8 +1136,8 @@
 			]
 		}
 	},
-	"data" : "<path svg-type='body' style='fill: none; ' d='M 0,60 Q 20,30 0,0'/>
-<path svg-type='body' style='fill: none; ' d='M 28,12 L 42,12 L 35,12 V 5 V 20 '/>
+	"data" : "<path class='no-fill' d='M 0,60 Q 20,30 0,0'/>
+<path class='no-fill' d='M 28,12 L 42,12 L 35,12 V 5 V 20 '/>
 <rect svg-type='body' x='20' y='0' width='5' height='60'/>
 <path svg-type='node' node='0' d='M 5,25 V35 H9.5 V25 Z'/>
 <path svg-type='node' node='1' d='M 25,25 V35 H30 V25 Z'/>"
@@ -1239,7 +1239,7 @@
 			},
 			"list" : [
 				{ "x": 0, "y": 40, "label": "node 0" },
-				{ "x": 80, "y": 40, "label": "node 1" }
+				{ "x": 71, "y": 40, "label": "node 1" }
 			]
 		}
 	},
@@ -1266,8 +1266,8 @@
 				"height": 0
 			},
 			"list" : [
-				{ "x": 0, "y": 20, "label": "node 0" },
-				{ "x": 90, "y": 20, "label": "node 1" }
+				{ "x": 0, "y": 25, "label": "node 0" },
+				{ "x": 71, "y": 25, "label": "node 1" }
 			]
 		}
 	},
@@ -1326,5 +1326,43 @@
 	"data" : "<path svg-type='body' d='M 5,20 Q 20,0 35,26 Q 50,0 65,26 Q 80,0 95,20 V36 H90 Q 85,5 68,36 H62 Q 50,7 38,36 H32 Q 16,6 10,36 H5 Z'/>
 <path svg-type='node' node='0' d='M 0,20 V30 H5 V20 Z'/>
 <path svg-type='node' node='1' d='M 95,20 V30 H100 V20 Z'/>"
+},
+{
+	"type" : "relay",
+	"name" : "relay-9v",
+	"properties" : {
+		"description" : "9V relay"
+	},
+	"meta" : {
+		"class": "next",
+		"nodes": {
+			"length": 5,
+			"size": {
+				"width": 30,
+				"height": 0
+			},
+			"list" : [
+				{ "x": 0, "y": 15, "label": "Coil 0" },
+				{ "x": 0, "y": 75, "label": "Coil 1" },
+				{ "x": 80, "y": 45, "label": "Common" },
+				{ "x": 50, "y": 0, "label": "N/C" },
+				{ "x": 50, "y": 90, "label": "N/O" }
+			]
+		}
+	},
+	"data" : "<rect svg-type='body' x='5' y='5' width='70' height='80'/>
+<path class='thick3 no-fill' d='M 75,45 H65 L 50,20'/>
+<line class='thick3' x1='50' y1='5' x2='50' y2='15'/>
+<circle class='white' cx='50' cy='20' r='5'/>
+<line class='thick3' x1='50' y1='75' x2='50' y2='85'/>
+<circle class='white' cx='50' cy='70' r='5'/>
+<path class='thick3 no-fill' d='M 5,15 H15 V20 Q 25,25 15,30 Q 25,35 15,40 Q 25,45 15,50 Q 25,55 15,60 Q 25,65 15,70 V75 H5'/>
+<line class='thick' x1='25' y1='15' x2='25' y2='75'/>
+<line class='thick' x1='30' y1='15' x2='30' y2='75'/>
+<path svg-type='node' node='0' d='M 0,10 V20 H5 V10 Z'/>
+<path svg-type='node' node='1' d='M 0,70 V80 H5 V70 Z'/>
+<path svg-type='node' node='2' d='M 75,40 V50 H80 V40 Z'/>
+<path svg-type='node' node='3' d='M 45,0 H55 V5 H45 Z'/>
+<path svg-type='node' node='4' d='M 45,90 H55 V85 H45 Z'/>"
 }
 ]
