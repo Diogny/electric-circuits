@@ -86,6 +86,7 @@ var ItemBase = /** @class */ (function (_super) {
         var _a;
         (_a = this.g.parentNode) === null || _a === void 0 ? void 0 : _a.removeChild(this.g);
     };
+    ItemBase.prototype.afterDOMinserted = function () { };
     return ItemBase;
 }(item_1.default));
 exports.default = ItemBase;

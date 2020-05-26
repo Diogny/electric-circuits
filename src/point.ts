@@ -35,6 +35,26 @@ export default class Point implements IPoint {
 	}
 	//get positive(): boolean { return this.x >= 0 && this.y >= 0 }
 
+	/**
+	 * @description rotate (x,y) through center (x,y) by an angle
+	 * @param {number} cx center x
+	 * @param {number} cy center y
+	 * @param {number} angle angle to rotate
+	 */
+	public rotateBy(cx: number, cy: number, angle: number): Point {
+		var radians = (Math.PI / 180) * angle,
+			cos = Math.cos(radians),
+			sin = Math.sin(radians),
+			nx = (cos * (this.x - cx)) + (sin * (this.y - cy)) + cx,
+			ny = (cos * (this.y - cy)) - (sin * (this.x - cx)) + cy;
+		return new Point(round(nx, 3), round(ny, 3))
+	}
+
+	//static
+	static validateRotation(val: number): number {
+		return (val = (val | 0) % 360, (val < 0) && (val += 360), val);
+	}
+
 	static origin = new Point(0, 0);
 
 	static create(p: IPoint) {

@@ -9,10 +9,6 @@
 		"class": "next",
 		"nodes": {
 			"length": 2,
-			"size": {
-				"width": 30,
-				"height": 0
-			},
 			"list" : [
 				{ "x": 0, "y": 30, "label": "Input A" },
 				{ "x": 90, "y": 30, "label": "Output Y" }
@@ -41,10 +37,6 @@
 		"class": "next",
 		"nodes": {
 			"length": 2,
-			"size": {
-				"width": 30,
-				"height": 0
-			},
 			"list" : [
 				{ "x": 0, "y": 30, "label": "Input A" },
 				{ "x": 70, "y": 30, "label": "Output Y" }
@@ -60,27 +52,12 @@
 	"name" : "and",
 	"properties" : {
 		"description" : "Logical AND gate 2-inputs",
-		"comments" : "svg-type body moved to last, still hover shows the same but pin is hidden by node",
-		"example" : {
-			"editable" : true,
-			"label" : true,
-			"value" : "0.1mF"
-		},
-		"size" : {
-			"editable" : true,
-			"label" : true,
-			"combo": [ "1.5mm", "3mm", "5mm" ],
-			"value" : "3mm"
-		}
+		"comments" : "svg-type body moved to last, still hover shows the same but pin is hidden by node"
 	},
 	"meta" : {
 		"class": "next",
 		"nodes": {
 			"length": 3,
-			"size": {
-				"width": 30,
-				"height": 0
-			},
 			"list" : [
 				{ "x": 0, "y": 15, "label": "Input A" },
 				{ "x": 0, "y": 45, "label": "Input B" },
@@ -112,10 +89,6 @@
 		"class": "next",
 		"nodes": {
 			"length": 3,
-			"size": {
-				"width": 30,
-				"height": 0
-			},
 			"list" : [
 				{ "x": 0, "y": 15, "label": "Input A" },
 				{ "x": 0, "y": 45, "label": "Input B" },
@@ -148,10 +121,6 @@
 		"class": "next",
 		"nodes": {
 			"length": 3,
-			"size": {
-				"width": 30,
-				"height": 0
-			},
 			"list" : [
 				{ "x": 2, "y": 15, "label": "Input A" },
 				{ "x": 2, "y": 45, "label": "Input B" },
@@ -183,10 +152,6 @@
 		"class": "next",
 		"nodes": {
 			"length": 3,
-			"size": {
-				"width": 30,
-				"height": 0
-			},
 			"list" : [
 				{ "x": 2, "y": 15, "label": "Input A" },
 				{ "x": 2, "y": 45, "label": "Input B" },
@@ -219,10 +184,6 @@
 		"class": "next",
 		"nodes": {
 			"length": 3,
-			"size": {
-				"width": 30,
-				"height": 0
-			},
 			"list" : [
 				{ "x": 2, "y": 15, "label": "Input A" },
 				{ "x": 2, "y": 45, "label": "Input B" },
@@ -255,10 +216,6 @@
 		"class": "next",
 		"nodes": {
 			"length": 3,
-			"size": {
-				"width": 30,
-				"height": 0
-			},
 			"list" : [
 				{ "x": 2, "y": 15, "label": "Input A" },
 				{ "x": 2, "y": 45, "label": "Input B" },
@@ -292,10 +249,6 @@
 		"class": "next",
 		"nodes": {
 			"length": 1,
-			"size": {
-				"width": 30,
-				"height": 0
-			},
 			"list" : [
 				{ "x": 40, "y": 0, "label": "GND" }
 			]
@@ -316,10 +269,6 @@
 		"class": "next",
 		"nodes": {
 			"length": 2,
-			"size": {
-				"width": 30,
-				"height": 0
-			},
 			"list" : [
 				{ "x": 0, "y": 40, "label": "GND" },
 				{ "x": 25, "y": 40, "label": "VCC" }
@@ -342,10 +291,6 @@
 		"class": "next",
 		"nodes": {
 			"length": 2,
-			"size": {
-				"width": 30,
-				"height": 0
-			},
 			"list" : [
 				{ "x": 0, "y": 40, "label": "GND" },
 				{ "x": 73, "y": 40, "label": "VCC" }
@@ -372,10 +317,6 @@
 		"class": "next",
 		"nodes": {
 			"length": 2,
-			"size": {
-				"width": 30,
-				"height": 0
-			},
 			"list" : [
 				{ "x": 0, "y": 40, "label": "GND" },
 				{ "x": 70, "y": 40, "label": "VCC" }
@@ -395,10 +336,7 @@
 	"name" : "3v3",
 	"properties" : {
 		"description": "3.3V Generic Power",
-		"voltage" : {
-			"value" : "3.3V",
-			"label" : true
-		},
+		"voltage" : "3.3V",
 		"current": "1500mA"
 	},
 	"tmpl" : {
@@ -411,10 +349,7 @@
 	"name" : "5v",
 	"properties" : {
 		"description": "5V Generic battery",
-		"voltage" : {
-			"value" : "5V",
-			"label" : true
-		},
+		"voltage" : "5V",
 		"current": "2500mA"
 	},
 	"tmpl" : {
@@ -432,54 +367,49 @@
 		"class": "next",
 		"nodes": {
 			"length": 2,
-			"size": {
-				"width": 30,
-				"height": 0
-			},
 			"list" : [
 				{ "x": 0, "y": 30, "label": "Anode (+)" },
-				{ "x": 73, "y": 30, "label": "Catode (-)" }
+				{ "x": 71, "y": 30, "label": "Catode (-)" }
 			]
 		}
 	},
 	"data" : "<path svg-type='node' node='0' d='M 0,25 V35 H5 V25 Z'/>
-<path svg-type='node' node='1' d='M 68,25 V35 H73 V25 Z'/>
+<path svg-type='node' node='1' d='M 66,25 V35 H71 V25 Z'/>
 <path svg-type='body' d='M 5,0 L 65,30 L 5,60 Z'/>
-<path svg-type='body' d='M 65,0 H68 V60 H65 Z'/>"
+<line x1='66' y1='0' x2='66' y2='60'/>"
 },
 {
 	"type" : "diode",
 	"name" : "led",
 	"properties" : {
 		"description" : "Generic LED diode",
-		"notes": "color combo [green, blue, red, yellow, clear]. size combo [1.5mm, 3mm, 5mm]",
+		"notes": "write here notes...",
 		"size" : {
-			"editable" : true,
-			"label" : true,
-			"combo": [ "1.5", "3", "5" ],
-			"value" : "3mm"
+			"combo": [ "1.5mm", "3mm", "5mm" ],
+			"value" : "3mm",
+			"type": "unit"
+		},
+		"color" : {
+			"combo": [ "red", "green", "blue", "yellow", "white" ],
+			"value" : "red"
 		}
 	},
 	"meta" : {
 		"class": "next",
 		"nodes": {
 			"length": 2,
-			"size": {
-				"width": 30,
-				"height": 0
-			},
 			"list" : [
 				{ "x": 0, "y": 40, "label": "Anode (+)" },
-				{ "x": 73, "y": 40, "label": "Catode (-)" }
+				{ "x": 71, "y": 40, "label": "Catode (-)" }
 			]
 		}
 	},
 	"data" : "<path svg-type='body' d='M 5,10 L 65,40 L 5,70 Z'/>
-<path svg-type='body' d='M 65,10 H68 V70 H65 Z'/>
+<line x1='66' y1='10' x2='66' y2='65'/>
 <path svg-type='body' d='M 30,15 L 36.8,4.6 L 33,2 L 40,0 L 40,7.2 L 36.8,4.6'/>
 <path svg-type='body' d='M 43,23 L 49,13 L 45,10.2 L 52,8  L 52.9,15.5 L 49,13'/>
 <path svg-type='node' node='0' d='M 0,35 V45 H5 V35 Z'/>
-<path svg-type='node' node='1' d='M 68,35 V45 H73 V35 Z'/>"
+<path svg-type='node' node='1' d='M 66,35 V45 H71 V35 Z'/>"
 },
 {
 	"type" : "diode",
@@ -491,22 +421,18 @@
 		"class": "next",
 		"nodes": {
 			"length": 2,
-			"size": {
-				"width": 30,
-				"height": 0
-			},
 			"list" : [
 				{ "x": 0, "y": 40, "label": "Anode (+)" },
-				{ "x": 73, "y": 40, "label": "Catode (-)" }
+				{ "x": 71, "y": 40, "label": "Catode (-)" }
 			]
 		}
 	},
 	"data" : "<path svg-type='body' d='M 5,10 L 65,40 L 5,70 Z'/>
-<path svg-type='body' d='M 65,10 H68 V70 H65 Z'/>
+<line x1='66' y1='10' x2='66' y2='65'/>
 <path svg-type='body' d='M 40,0 L 33.3,10.1 L 29.4,7.6 L 30,15 L 37.4,12.8 L 33.3,10.1'/>
 <path svg-type='body' d='M 52,8 L 45.4,18.1 L 41.6,15.6 L 42,23 L 49.5,20.9 L 45.4,18.1'/>
 <path svg-type='node' node='0' d='M 0,35 V45 H5 V35 Z'/>
-<path svg-type='node' node='1' d='M 68,35 V45 H73 V35 Z'/>"
+<path svg-type='node' node='1' d='M 66,35 V45 H71 V35 Z'/>"
 },
 {
 	"type" : "diode",
@@ -518,10 +444,6 @@
 		"class": "next",
 		"nodes": {
 			"length": 2,
-			"size": {
-				"width": 30,
-				"height": 0
-			},
 			"list" : [
 				{ "x": 0, "y": 30, "label": "Anode (+)" },
 				{ "x": 71, "y": 30, "label": "Catode (-)" }
@@ -543,10 +465,6 @@
 		"class": "next",
 		"nodes": {
 			"length": 2,
-			"size": {
-				"width": 30,
-				"height": 0
-			},
 			"list" : [
 				{ "x": 0, "y": 30, "label": "Anode (+)" },
 				{ "x": 71, "y": 30, "label": "Catode (-)" }
@@ -568,10 +486,6 @@
 		"class": "next",
 		"nodes": {
 			"length": 2,
-			"size": {
-				"width": 30,
-				"height": 0
-			},
 			"list" : [
 				{ "x": 0, "y": 30, "label": "Anode (+)" },
 				{ "x": 80, "y": 30, "label": "Catode (-)" }
@@ -594,10 +508,6 @@
 		"class": "next",
 		"nodes": {
 			"length": 2,
-			"size": {
-				"width": 30,
-				"height": 0
-			},
 			"list" : [
 				{ "x": 0, "y": 30, "label": "Anode (+)" },
 				{ "x": 71, "y": 30, "label": "Catode (-)" }
@@ -619,10 +529,6 @@
 		"class": "next",
 		"nodes": {
 			"length": 3,
-			"size": {
-				"width": 30,
-				"height": 0
-			},
 			"list" : [
 				{ "x": 0, "y": 30, "label": "Base" },
 				{ "x": 58, "y": 4, "label": "Collector" },
@@ -646,10 +552,6 @@
 		"class": "next",
 		"nodes": {
 			"length": 3,
-			"size": {
-				"width": 30,
-				"height": 0
-			},
 			"list" : [
 				{ "x": 0, "y": 30, "label": "Base" },
 				{ "x": 58, "y": 4, "label": "Collector" },
@@ -674,10 +576,6 @@
 		"nodeLabel": true,
 		"nodes": {
 			"length": 4,
-			"size": {
-				"width": 0,
-				"height": 5
-			},
 			"list" : [
 				{ "x": 10, "y": 70, "label": "GND" },
 				{ "x": 30, "y": 70, "label": "Output 1" },
@@ -704,10 +602,6 @@
 		"nodeLabel": true,
 		"nodes": {
 			"length": 6,
-			"size": {
-				"width": 0,
-				"height": 20
-			},
 			"list" : [
 				{ "x": 10, "y": 70, "label": "GND" },
 				{ "x": 30, "y": 70, "label": "Output 1" },
@@ -738,10 +632,6 @@
 		"nodeLabel": true,
 		"nodes": {
 			"length": 8,
-			"size": {
-				"width": 0,
-				"height": 20
-			},
 			"list" : [
 				{ "x": 10, "y": 70, "label": "GND" },
 				{ "x": 30, "y": 70, "label": "Output 1" },
@@ -796,21 +686,17 @@
 		"nodeLabel": true,
 		"nodes": {
 			"length": 10,
-			"size": {
-				"width": 0,
-				"height": 20
-			},
 			"list" : [
-				{ "x": 10,	"y": 70, "label": "GND" },
-				{ "x": 30,	"y": 70, "label": "Output 3" },
-				{ "x": 50,	"y": 70, "label": "Output 2" },
-				{ "x": 70,	"y": 70, "label": "Output 1" },
+				{ "x": 10, "y": 70, "label": "GND" },
+				{ "x": 30, "y": 70, "label": "Output 3" },
+				{ "x": 50, "y": 70, "label": "Output 2" },
+				{ "x": 70, "y": 70, "label": "Output 1" },
 				{ "x": 90, "y": 70, "label": "Output 0" },
 				{ "x": 90, "y": 0, "label": "Data 3" },
-				{ "x": 70,	"y": 0,	"label": "Data 2" },
-				{ "x": 50,	"y": 0,	"label": "Data 1" },
-				{ "x": 30,	"y": 0,	"label": "Data 0" },
-				{ "x": 10,	"y": 0,	"label": "VCC" }
+				{ "x": 70, "y": 0, "label": "Data 2" },
+				{ "x": 50, "y": 0, "label": "Data 1" },
+				{ "x": 30, "y": 0, "label": "Data 0" },
+				{ "x": 10, "y": 0, "label": "VCC" }
 			]
 		}
 	},
@@ -838,10 +724,6 @@
 		"nodeLabel": true,
 		"nodes": {
 			"length": 12,
-			"size": {
-				"width": 0,
-				"height": 20
-			},
 			"list" : [
 				{ "x": 10, "y": 70, "label": "GND" },
 				{ "x": 30, "y": 70, "label": "Output 4" },
@@ -884,10 +766,6 @@
 		"nodeLabel": true,
 		"nodes": {
 			"length": 14,
-			"size": {
-				"width": 0,
-				"height": 20
-			},
 			"list" : [
 				{ "x": 10, "y": 70, "label": "GND" },
 				{ "x": 30, "y": 70, "label": "Output 5" },
@@ -957,10 +835,6 @@
 		"nodeLabel": true,
 		"nodes": {
 			"length": 16,
-			"size": {
-				"width": 0,
-				"height": 20
-			},
 			"list" : [
 				{ "x": 10, "y": 70, "label": "GND" },
 				{ "x": 30, "y": 70, "label": "Output 6" },
@@ -1017,10 +891,6 @@
 		},
 		"nodes": {
 			"length": 28,
-			"size": {
-				"width": 0,
-				"height": 20
-			},
 			"list": [
 				{ "x": 10, "y": 70, "label": "PC6 PCINT14/RESET" },
 				{ "x": 30, "y": 70, "label": "PD0 PCINT16/RXD" },
@@ -1089,9 +959,8 @@
 	"name" : "capacitor",
 	"properties" : {
 		"capacitance" : {
-			"editable" : true,
-			"label" : true,
-			"value" : "0.1mF"
+			"value" : "0.1mF",
+			"type": "unit"
 		},
 		"voltage": "50V",
 		"tolerance": "2%",
@@ -1099,12 +968,14 @@
 	},
 	"meta" : {
 		"class": "next",
+		"countStart": 1,
+		"nameTmpl": "C{count}",
+		"labelId": {
+			"x": 5,
+			"y": -5
+		},
 		"nodes": {
 			"length": 2,
-			"size": {
-				"width": 30,
-				"height": 0
-			},
 			"list" : [
 				{ "x": 0, "y": 30, "label": "node 0" },
 				{ "x": 35, "y": 30, "label": "node 1" }
@@ -1124,12 +995,14 @@
 	},
 	"meta" : {
 		"class": "next",
+		"countStart": 1,
+		"nameTmpl": "C{count}",
+		"labelId": {
+			"x": 10,
+			"y": -5
+		},
 		"nodes": {
 			"length": 2,
-			"size": {
-				"width": 30,
-				"height": 0
-			},
 			"list" : [
 				{ "x": 5, "y": 30, "label": "node (-)" },
 				{ "x": 30, "y": 30, "label": "node (+)" }
@@ -1150,12 +1023,14 @@
 	},
 	"meta" : {
 		"class": "next",
+		"countStart": 1,
+		"nameTmpl": "C{count}",
+		"labelId": {
+			"x": 25,
+			"y": -5
+		},
 		"nodes": {
 			"length": 2,
-			"size": {
-				"width": 30,
-				"height": 0
-			},
 			"list" : [
 				{ "x": 15, "y": 30, "label": "node 0" },
 				{ "x": 54, "y": 30, "label": "node 1" }
@@ -1178,10 +1053,6 @@
 		"class": "next",
 		"nodes": {
 			"length": 2,
-			"size": {
-				"width": 30,
-				"height": 0
-			},
 			"list" : [
 				{ "x": 30, "y": 0, "label": "node (-)" },
 				{ "x": 30, "y": 70, "label": "node (+)" }
@@ -1199,20 +1070,21 @@
 	"properties" : {
 		"description": "Generic resistor",
 		"resistance" : {
-			"editable" : true,
-			"label" : true,
-			"value" : "5kΩ"
+			"value" : "5kΩ",
+			"type": "unit"
 		},
 		"tolerance": "2%"
 	},
 	"meta" : {
 		"class": "next",
+		"countStart": 1,
+		"nameTmpl": "R{count}",
+		"labelId": {
+			"x": 15,
+			"y": -5
+		},
 		"nodes": {
 			"length": 2,
-			"size": {
-				"width": 30,
-				"height": 0
-			},
 			"list" : [
 				{ "x": 0, "y": 10, "label": "node 0" },
 				{ "x": 50, "y": 10, "label": "node 1" }
@@ -1233,10 +1105,6 @@
 		"class": "next",
 		"nodes": {
 			"length": 2,
-			"size": {
-				"width": 30,
-				"height": 0
-			},
 			"list" : [
 				{ "x": 0, "y": 40, "label": "node 0" },
 				{ "x": 71, "y": 40, "label": "node 1" }
@@ -1261,10 +1129,6 @@
 		"class": "next",
 		"nodes": {
 			"length": 2,
-			"size": {
-				"width": 30,
-				"height": 0
-			},
 			"list" : [
 				{ "x": 0, "y": 25, "label": "node 0" },
 				{ "x": 71, "y": 25, "label": "node 1" }
@@ -1287,10 +1151,6 @@
 		"class": "next",
 		"nodes": {
 			"length": 3,
-			"size": {
-				"width": 30,
-				"height": 0
-			},
 			"list" : [
 				{ "x": 7, "y": 25, "label": "node 0" },
 				{ "x": 58, "y": 7, "label": "node 1" },
@@ -1313,10 +1173,6 @@
 		"class": "next",
 		"nodes": {
 			"length": 2,
-			"size": {
-				"width": 30,
-				"height": 0
-			},
 			"list" : [
 				{ "x": 0, "y": 25, "label": "node 0" },
 				{ "x": 100, "y": 25, "label": "node 1" }
@@ -1337,10 +1193,6 @@
 		"class": "next",
 		"nodes": {
 			"length": 5,
-			"size": {
-				"width": 30,
-				"height": 0
-			},
 			"list" : [
 				{ "x": 0, "y": 15, "label": "Coil 0" },
 				{ "x": 0, "y": 75, "label": "Coil 1" },

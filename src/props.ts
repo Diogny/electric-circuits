@@ -1,13 +1,13 @@
 //props.ts
 
 import { attr, isFn, dP, typeOf, isInt, splat, isElement, isStr, isNumeric } from './dab';
-import { IPropertyOptions, IPropertySettings, IPropertyCallback, IProperty } from './interfaces';
+import { IUIPropertyOptions, IUIPropertySettings, IUIPropertyCallback, IUIProperty } from './interfaces';
 import { qS } from './utils';
 
 //... in progress...
-export default class Prop implements IProperty {
+export default class UIProp implements IUIProperty {
 
-	protected settings: IPropertySettings;
+	protected settings: IUIPropertySettings;
 
 	get id(): string { return this.settings.id }
 	get type(): string { return this.settings.type }
@@ -18,9 +18,9 @@ export default class Prop implements IProperty {
 
 	get nodeName(): string { return this.html.nodeName.toLowerCase() }
 
-	get onChange(): IPropertyCallback | undefined { return this.settings.onChange }
+	get onChange(): IUIPropertyCallback | undefined { return this.settings.onChange }
 
-	set onChange(fn: IPropertyCallback | undefined) {
+	set onChange(fn: IUIPropertyCallback | undefined) {
 		isFn(fn) && (this.settings.onChange = fn)
 	}
 
@@ -75,9 +75,9 @@ export default class Prop implements IProperty {
 		this.selectionUiChanged(null);
 	}
 
-	constructor(options: IPropertyOptions) {
+	constructor(options: IUIPropertyOptions) {
 		//set default values
-		this.settings = <IPropertySettings><unknown>{
+		this.settings = <IUIPropertySettings><unknown>{
 			type: "text",
 			selected: false,
 			editable: false,
@@ -99,7 +99,7 @@ export default class Prop implements IProperty {
 		//set properties
 		this.settings.tag = options.tag;
 		this.settings.name = <string>this.html.getAttribute("name");
-		this.settings.id = this.html.id || attr(this.html, "prop-id") || ('property' + Prop._propId++);
+		this.settings.id = this.html.id || attr(this.html, "prop-id") || ('property' + UIProp._propId++);
 
 		switch (this.nodeName) {
 			case 'input':
@@ -163,7 +163,7 @@ export default class Prop implements IProperty {
 
 				break;
 			default:
-				if (Prop.textOnly.indexOf(this.nodeName) >= 0) {
+				if (UIProp.textOnly.indexOf(this.nodeName) >= 0) {
 					this.settings.getter = 'innerText';
 				} else
 					throw `Unsupported HTML tag: ${this.nodeName}`;
@@ -180,7 +180,7 @@ export default class Prop implements IProperty {
 		//when comming from UI, this is the DOM Element
 		// 	otherwise it's the property
 		let
-			prop: Prop | null = this instanceof Prop ? this : (<any>this).dab;
+			prop: UIProp | null = this instanceof UIProp ? this : (<any>this).dab;
 		if (prop && prop.onChange)
 			prop.onChange(
 				prop.value,			//this cache current value

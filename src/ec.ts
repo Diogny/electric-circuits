@@ -9,8 +9,11 @@ import { IItemSolidOptions, IPoint, IItemNode } from './interfaces';
 import ItemSolid from './itemSolid';
 import Rect from './rect';
 import Size from './size';
+import { Label } from './label';
 
 export default class EC extends ItemSolid {
+
+	label: Label;
 
 	get type(): Type { return Type.EC }
 
@@ -29,6 +32,15 @@ export default class EC extends ItemSolid {
 			(n: any) => {
 				this.g.insertBefore(n, this.highlight.g);
 			});
+		//create label if defined
+		if (this.base.meta.labelId) {
+			this.label = new Label(<any>{
+				fontSize: 15,
+				x: this.base.meta.labelId.x,
+				y: this.base.meta.labelId.y
+			});
+			this.label.setText(this.id);
+		}
 		//this shows dragx, dragy, and rotate
 		this.refresh();
 		//signal component creation
@@ -63,14 +75,13 @@ export default class EC extends ItemSolid {
 
 	public refresh(): EC {
 		let
-			attrs = {
+			attrs: any = {
 				dragx: this.x,
 				dragy: this.y,
 				transform: `translate(${this.x} ${this.y})`
-			};
+			},
+			center = this.origin;
 		if (this.rotation) {
-			let
-				center = this.origin;
 			attrs.transform += ` rotate(${this.rotation} ${center.x} ${center.y})`
 		}
 		//update SVG DOM attributes
@@ -79,6 +90,19 @@ export default class EC extends ItemSolid {
 		each(this.bonds, (b: Bond, key: any) => {
 			this.nodeRefresh(key);
 		});
+		//update label if any
+		if (this.label) {
+			let
+				pos = Point.plus(this.p, this.label.p);
+			attrs = {
+				transform: `translate(${pos.x} ${pos.y})`
+			};
+			this.rotation && (
+				center = Point.minus(Point.plus(this.p, center), pos),
+				attrs.transform += ` rotate(${this.rotation} ${center.x} ${center.y})`
+			);
+			attr(this.label.g, attrs)
+		}
 		return this;
 	}
 
@@ -103,7 +127,7 @@ export default class EC extends ItemSolid {
 				if (!rotation)
 					return obj;
 				let
-					rot = this.rotateBy(center.x, center.y, obj.x, obj.y, -rotation);
+					rot = obj.rotateBy(center.x, center.y, -rotation);
 				return new Point(rot.x, rot.y)
 			};
 		if (!pin)
@@ -144,4 +168,19 @@ export default class EC extends ItemSolid {
 		return this.valid(name)	//for now all valid nodes are highlightables
 	}
 
+	public setVisible(value: boolean): EC {
+		super.setVisible(value);
+		this.label && this.label.setVisible(value);
+		return this;
+	}
+
+	public remove() {
+		//delete label if any first
+		this.label && this.g.parentNode?.removeChild(this.label.g);
+		super.remove();
+	}
+
+	public afterDOMinserted() {
+		this.label && (this.g.insertAdjacentElement("afterend", this.label.g), this.label.setVisible(true))
+	}
 }

@@ -23,6 +23,21 @@ var Point = /** @class */ (function () {
         var noVars = ((options = options | 0) & 4) != 0, noPars = (options & 2) != 0;
         return "" + (noPars ? "" : "(") + (noVars ? "" : "x: ") + dab_1.round(this.x, 1) + ", " + (noVars ? "" : "y: ") + dab_1.round(this.y, 1) + (noPars ? "" : ")");
     };
+    //get positive(): boolean { return this.x >= 0 && this.y >= 0 }
+    /**
+     * @description rotate (x,y) through center (x,y) by an angle
+     * @param {number} cx center x
+     * @param {number} cy center y
+     * @param {number} angle angle to rotate
+     */
+    Point.prototype.rotateBy = function (cx, cy, angle) {
+        var radians = (Math.PI / 180) * angle, cos = Math.cos(radians), sin = Math.sin(radians), nx = (cos * (this.x - cx)) + (sin * (this.y - cy)) + cx, ny = (cos * (this.y - cy)) - (sin * (this.x - cx)) + cy;
+        return new Point(dab_1.round(nx, 3), dab_1.round(ny, 3));
+    };
+    //static
+    Point.validateRotation = function (val) {
+        return (val = (val | 0) % 360, (val < 0) && (val += 360), val);
+    };
     Point.create = function (p) {
         return new Point(p.x, p.y);
     };
@@ -37,7 +52,6 @@ var Point = /** @class */ (function () {
     Point.plus = function (v1, v2) { return new Point(v1.x + v2.x, v1.y + v2.y); };
     //
     Point.inside = function (p, s) { return p.x >= 0 && p.x <= s.width && p.y >= 0 && p.y <= s.height; };
-    //get positive(): boolean { return this.x >= 0 && this.y >= 0 }
     Point.origin = new Point(0, 0);
     return Point;
 }());

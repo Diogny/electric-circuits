@@ -3,7 +3,7 @@ import { templatesDOM, qSA, qS } from "./src/utils"
 import * as fs from 'fs';
 import {
 	IComponentOptions, IApplicationOptions, IItemSolidOptions, IItemWireOptions, IPoint,
-	StateType as State, ActionType as Action, IMachineState, IMouseState, IItemNode, IBaseWindowOptions, IContextMenuOptions
+	StateType as State, ActionType as Action, IMachineState, IMouseState, IItemNode
 } from "./src/interfaces";
 import Comp from "./src/components";
 import { MyApp } from "./src/myapp";
@@ -16,11 +16,13 @@ import Wire from "./src/wire";
 import StateMachine from "./src/stateMachine";
 import { Type } from "./src/types";
 import ItemBoard from "./src/itemsBoard";
-import ContextWindow from "src/context-window";
 import Size from "src/size";
 
 let
-	app: MyApp = <any>void 0;
+	app: MyApp = <any>void 0,
+	//this will hold components created by key==name, to test set editable property and others...
+	//	only full refresh starts from scratch
+	list: Map<string, EC> = new Map();
 
 //https://www.electronjs.org/docs/tutorial/security
 
@@ -31,7 +33,12 @@ function onEcPropChange(value: any) {
 function createComponent(name: string | null): ItemSolid {
 	!name && (name = <string>app.prop("comp_option").value);
 	let
-		comp: EC = new EC(<IItemSolidOptions><unknown>{
+		comp: EC;
+
+	if (list.has(name)) {
+		comp = <EC>list.get(name);
+	} else {
+		comp = new EC(<IItemSolidOptions><unknown>{
 			name: name,
 			x: app.pos.x,
 			y: app.pos.y,
@@ -39,16 +46,21 @@ function createComponent(name: string | null): ItemSolid {
 				//this happens when this component is created
 			}
 		});
+		//uncomment only to test, because C1 is created for every capacitor, and R1
+		//list.set(name, comp);
+	}
+
+	//disconnects and remove component from DOM
 	app.ec && (app.ec.disconnect(), app.ec.remove());
+
 	//add it to SVG DOM
 	app.svgBoard.insertBefore(comp.g, app.tooltip.g);
-
+	//do after DOM inserted work
+	comp.afterDOMinserted();
+	
 	//create properties
 	app.winProps.clear();
 	comp.properties().forEach((name: string) => {
-
-		//still needs to assign value to select
-
 		app.winProps.appendPropChild(new EcProp(comp, name, true, onEcPropChange), true);
 	})
 	return comp;

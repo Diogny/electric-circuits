@@ -18,17 +18,17 @@ export interface IExec {
 
 //***************************************** UIProperty ************************************//
 
-export interface IPropertyCallback {
+export interface IUIPropertyCallback {
 	(value: number | string | string[], where: number, prop: Prop, e: any): void;
 }
 
-export interface IPropertyOptions {
+export interface IUIPropertyOptions {
 	tag: string | Element;
-	onChange?: IPropertyCallback | undefined;
+	onChange?: IUIPropertyCallback | undefined;
 	toStringFn?: () => string;
 }
 
-export interface IProperty extends IPropertyOptions {
+export interface IUIProperty extends IUIPropertyOptions {
 	id: string;
 	name: string;
 	type: string;
@@ -38,29 +38,41 @@ export interface IProperty extends IPropertyOptions {
 	value: number | string | string[];
 }
 
-export interface IPropertySettings extends IProperty {
+export interface IUIPropertySettings extends IUIProperty {
 	getter: string;
 	htmlSelect: boolean;
 	selectCount: number;
 	selectMultiple: boolean;
 }
 
+//***************************************** Component Property ************************************//
+
+export interface IComponentProperty {
+	value: string;
+	combo?: string[];
+	type?: string;
+	readonly?: boolean;
+}
+
+export type ComponentPropertyType = string | IComponentProperty;
+//string | { value: string, label?: boolean, editable?: boolean, combo?: string[]
+
 //***************************************** Application ************************************//
 
 export interface IApplicationOptions {
 	templates: any;
 	includePropsInThis: boolean;
-	props: { [x: string]: IPropertyOptions };
+	props: { [x: string]: IUIPropertyOptions };
 	list: Map<string, IContextMenuItem[]>
 }
 
 export interface IApplicationSettings {
-	props: Map<string, IProperty>;
+	props: Map<string, IUIProperty>;
 	templates: any;
 }
 
 export interface IApplication {
-	prop(id: string): IProperty;
+	prop(id: string): IUIProperty;
 }
 
 //***************************************** MyApp ************************************//
@@ -144,7 +156,10 @@ export interface IComponentOptions {
 
 //meta
 export interface IComponentMetadata {
+	countStart: number;
+	nameTmpl: string;
 	class: string;
+	labelId: IPoint;
 	nodes: IMetadataNodes;
 	logic: IMetadataLogic;
 	label: IComponentTemplateLabel;
@@ -153,7 +168,7 @@ export interface IComponentMetadata {
 
 export interface IMetadataNodes {
 	length: number;
-	size: ISize;
+	//size: ISize;
 	list: IMetadataNodeInfo[];
 }
 
@@ -218,8 +233,11 @@ export interface IItemWireOptions extends IItemBoardOptions {
 	points: IPoint[];
 }
 
-export interface ITooltipText extends IItemBaseOptions {
+export interface ILabelText extends IItemBaseOptions {
 	fontSize: number;
+}
+
+export interface ITooltipText extends ILabelText {
 	borderRadius: number;
 }
 

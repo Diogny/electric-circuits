@@ -1,29 +1,15 @@
-//label.ts
-import { attr, obj, removeClass, aCld, isStr, pojo, extend } from './dab';
+import { attr, obj, isStr, pojo, extend } from './dab';
 import { tag, map, filter } from './utils';
-import ItemBase from "./itemsBase";
 import { Type } from "./types";
 import { ITooltipText, ISize, ITooltipSettings } from "./interfaces";
+import { Label } from './label';
 
-export default class Tooltip extends ItemBase {
+export default class Tooltip extends Label {
 
 	protected settings: ITooltipSettings;
 	private svgRect: SVGRectElement;
-	private t: SVGTextElement;
 	private gap: number;
-	public text: string;
-
-	get type(): Type { return Type.LABEL }
-
-	get size(): ISize {
-		let b = this.t.getBBox();
-		return obj({
-			width: Math.round(b.width) + 10, //this.gap,
-			height: Math.round(b.height) + this.gap
-		})
-	}
-
-	get fontSize(): number { return this.settings.fontSize }
+	get type(): Type { return Type.TOOLTIP }
 
 	get borderRadius(): number { return this.settings.borderRadius }
 
@@ -34,34 +20,25 @@ export default class Tooltip extends ItemBase {
 	}
 	*/
 
+	get size(): ISize {
+		let b = this.t.getBBox();
+		return obj({
+			width: Math.round(b.width) + 10, //this.gap,
+			height: Math.round(b.height) + this.gap
+		})
+	}
+	
 	constructor(options: ITooltipText) {
-		//set defaults
-		options.name = "label";
-		options.class = "label";
-		options.visible = false;
 		super(options);
-		this.text = '';
-		//remove color class, not needed for a Tooltip text
-		removeClass(this.g, this.color);
-		//create Rect box
 		this.svgRect = <SVGRectElement>tag("rect", "", {
 			x: 0,
 			y: 0,
-			rx: this.borderRadius		// 4
+			rx: this.borderRadius
 		});
-		aCld(this.g, this.svgRect);
-		//create Label
-		this.t = <SVGTextElement>tag("text", "", {});
-		aCld(this.g, this.t);
+		this.g.insertBefore(this.svgRect, this.t);
 	}
 
-	public move(x: number, y: number): Tooltip {
-		super.move(x, y);
-		attr(this.g, { transform: "translate(" + this.x + " " + this.y + ")" });
-		return this;	//chaining
-	}
-
-	public setVisible(value: boolean): Tooltip {
+	public setVisible(value: boolean): Label {
 		super.setVisible(value);
 		//clear values
 		//because Firefox give DOM not loaded on g.getBox() because it's not visible yet
@@ -69,18 +46,13 @@ export default class Tooltip extends ItemBase {
 		this.text = this.t.innerHTML = '';
 		return this;
 	}
-
+	
 	public setBorderRadius(value: number): Tooltip {
 		this.settings.borderRadius = value | 0;
 		return this.build()
 	}
 
-	public setFontSize(value: number): Tooltip {
-		this.settings.fontSize = value;
-		return this.build()
-	}
-
-	private build(): Tooltip {
+	protected build(): Tooltip {
 		this.gap = Math.round(this.fontSize / 2) + 1;
 		attr(this.t, {
 			"font-size": this.fontSize,
@@ -125,7 +97,8 @@ export default class Tooltip extends ItemBase {
 
 	public propertyDefaults(): ITooltipText {
 		return extend(super.propertyDefaults(), {
-			fontSize: 50,
+			name: "tooltip",
+			class: "tooltip",
 			borderRadius: 4
 		})
 	}

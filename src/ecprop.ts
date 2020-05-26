@@ -1,74 +1,77 @@
 import ItemBoard from "./itemsBoard";
 import Unit from "./units";
 import { html } from "./utils";
+import { ComponentPropertyType, IComponentProperty } from "./interfaces";
 
 //...still in progress ...
 export default class EcProp {
 
-	prop: { value: string, label?: boolean, editable?: boolean, combo?: string[] } | string;
+	//holds value no matter if prop is an object or just an string
+	propValue: string;
+	//holds the unit value if it's a unit prop
 	unit?: Unit;
+
 	readonly editable: boolean;
+	//true if property is an object
 	readonly valueObject: boolean;
 	html: HTMLElement;
 	onChange: Function;
 
 	get value(): string {
-		return this.valueObject ? (this.editable ? <string>this.unit?.toString() : (<any>this.prop).value) : <string>this.prop
+		return this.unit ?
+			this.unit.toString() :
+			this.propValue
 	}
 
 	constructor(public ec: ItemBoard, public name: string, addTitle: boolean, onChange?: Function) {
-		if (!(this.prop = ec.prop(name)))
+		let
+			prop: ComponentPropertyType = ec.prop(name);
+
+		if (!prop)
 			throw `invalid ec: ${ec.id}, prop: ${name}`;
 
 		//valueObject is when not an string, and
-		//editable when it's a valueObject with editable property == true
-		if (this.editable = (this.valueObject = typeof this.prop != "string") && (<boolean>this.prop.editable == true)) {
-			this.unit = new Unit((<any>this.prop).value);
+		//editable when it's a valueObject with readonly property == false
+		if (this.editable = (this.valueObject = typeof prop != "string") && !(<boolean>prop.readonly)) {
+			//set Unit only if defined
+			((<IComponentProperty>prop).type == "unit")
+				&& (this.unit = new Unit((<IComponentProperty>prop).value));
 		}
 		let
 			htmlProp: HTMLElement;
 		//create html
 		if (this.editable) {
-			if ((<any>this.prop).combo) {
-				//combo
+			this.propValue = (<IComponentProperty>prop).value;
+			if ((<IComponentProperty>prop).combo) {
 				let
-					options = [].map.call((<any>this.prop).combo, (element: string) => {
-						return `<option value="${element}">${element}</option>`
+					options = [].map.call((<IComponentProperty>prop).combo, (element: string) => {
+						return `<option value="${element}"${(this.propValue == element ? " selected" : "")}>${element}</option>`
 					}).join('');
 				htmlProp = <HTMLElement>html(`<select class="ec-prop">${options}</select>`)
 			} else {
-				//input
 				htmlProp = <HTMLElement>html(`<input class="ec-prop" value="${this.value}">`)
 			}
 			//hook onchange event if editable
 			let
 				that = this as EcProp;
 			onChange && (this.onChange = onChange, htmlProp.addEventListener('change', function () {
-				//create new value
-				if (that.editable) {
-					if (htmlProp.nodeName == "INPUT") {
-						that.prop = (<HTMLInputElement>htmlProp).value
-					} else {
-						//SELECT
-						that.prop = (<HTMLSelectElement>htmlProp).selectedOptions[0].value
-					}
-					//create unit
-					that.unit = new Unit(that.prop);
+				//save new value
+				if (htmlProp.nodeName == "INPUT") {
+					that.propValue = (<HTMLInputElement>htmlProp).value
 				} else {
-					//check for valueObject here
-
-
-					
-					that.prop = htmlProp.innerText;
+					that.propValue = (<HTMLSelectElement>htmlProp).selectedOptions[0].value
 				}
+				//create unit if defined
+				that.unit && (that.unit = new Unit(that.propValue));
+				(<IComponentProperty>prop).value = that.propValue;
 				that.onChange.call(that, that.value);
 			}));
 		} else {
-			//span
-			htmlProp = <HTMLElement>html(`<span class="ec-prop">${this.value}</span>`)
+			this.propValue = this.valueObject ? (<IComponentProperty>prop).value : <string>prop;
+			htmlProp = <HTMLElement>html(`<span class="ec-prop">${this.propValue}</span>`)
 		}
-		//
 		if (addTitle) {
+			//wrap title
 			this.html = <HTMLSpanElement>html(`<span><label class="ec-prop-title">${name}</label></span>`);
 			this.html.appendChild(htmlProp);
 		} else {
@@ -77,30 +80,3 @@ export default class EcProp {
 	}
 
 }
-
-/*
-"properties" : {
-		"capacitance" : {
-			"editable" : true,
-			"label" : true,
-			"value" : "0.1mF"
-		},
-		"voltage": "50V",
-		"tolerance": "2%",
-		"description": "Generic capacitor",
-		"voltage" : {
-			"label" : true,
-			"value" : "5V"
-		},
-		"current": "2500mA",
-		"description" : "Generic LED diode",
-		"notes": "color combo [green, blue, red, yellow, clear]. size combo [1.5mm, 3mm, 5mm]",
-		"size" : {
-			"editable" : true,
-			"label" : true,
-			"combo": [ "1.5", "3", "5" ],
-			"value" : "3mm"
-		}
-},
-
-*/

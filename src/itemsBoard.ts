@@ -1,9 +1,9 @@
 
-import { aCld, condClass, obj, attr, extend, isFn, addClassX } from './dab';
+import { aCld, condClass, obj, attr, extend, isFn, addClassX, nano } from './dab';
 import Bond from './bonds';
 import ItemBase from './itemsBase';
 import Comp from './components';
-import { IHighlightable, IPoint, IItemNode, IItemBoardOptions, IBondItem, IItemBoardProperties } from './interfaces';
+import { IHighlightable, IPoint, IItemNode, IItemBoardOptions, IBondItem, IItemBoardProperties, ComponentPropertyType } from './interfaces';
 import BoardCircle from './boardCircle';
 import { map, tag } from './utils';
 import EC from './ec';
@@ -18,7 +18,7 @@ export default abstract class ItemBoard extends ItemBase {
 	get onProp(): Function { return this.settings.onProp }
 	get selected(): boolean { return this.settings.selected }
 	get bonds(): Bond[] { return this.settings.bonds }
-	
+
 	abstract get count(): number;	// EC is node count, Wire is node count
 
 	constructor(options: IItemBoardOptions) {
@@ -31,7 +31,11 @@ export default abstract class ItemBoard extends ItemBase {
 		//save base data
 		this.settings.base = base.obj;
 		//this overrides the id
-		this.settings.id = this.base.name + "-" + base.count++;
+		////this.base.name + "-" + base.count++;
+		this.settings.id = nano(base.obj.meta.nameTmpl, {
+			name: this.base.name,
+			count: base.count++
+		});
 		//deep copy component properties
 		this.settings.props = obj(base.obj.props);
 		//add properties to DOM
@@ -135,11 +139,11 @@ export default abstract class ItemBoard extends ItemBase {
 		return this;
 	}
 
-	public prop(propName: string): string | { value: string, label?: boolean, editable?: boolean, combo?: string[] } { return this.settings.props[propName] }
+	public prop(propName: string): ComponentPropertyType { return this.settings.props[propName] }
 
 	public properties(): string[] {
 		return map(this.settings.props,
-			(value: string | { label?: boolean, editable?: boolean, value: string, combo?: string[] }, key: string) => key)
+			(value: ComponentPropertyType, key: string) => key)
 	}
 
 	//poly.bond(0, ec, 1)

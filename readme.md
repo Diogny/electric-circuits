@@ -15,6 +15,10 @@ Used in my testing website [Electric Circuits](http://diogny.com/tests/circuits.
 	pnpm install --save-dev tsconfig-paths-webpack-plugin
 	pnpm install electron-reload --save-dev
 
+### testings
+	pnpm i mocha -D
+	pnpm i chai -D
+	
 ### build/run
 	pnpm run build-dev		builds all
 	pnpm run start			builds all & starts electron app
@@ -46,6 +50,6 @@ Used in my testing website [Electric Circuits](http://diogny.com/tests/circuits.
 	git add -u					stage the modified and deleted files
 	git add -A
 	git commit -m "update message"
-	git tag v1.0.5
+	git tag v1.0.6
 	git push origin master --tags
 

@@ -31,7 +31,11 @@ var ItemBoard = /** @class */ (function (_super) {
         //save base data
         _this.settings.base = base.obj;
         //this overrides the id
-        _this.settings.id = _this.base.name + "-" + base.count++;
+        ////this.base.name + "-" + base.count++;
+        _this.settings.id = dab_1.nano(base.obj.meta.nameTmpl, {
+            name: _this.base.name,
+            count: base.count++
+        });
         //deep copy component properties
         _this.settings.props = dab_1.obj(base.obj.props);
         //add properties to DOM

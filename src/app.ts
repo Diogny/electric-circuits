@@ -1,6 +1,6 @@
 
-import { IApplication, IApplicationOptions, IApplicationSettings, IProperty, IPropertyOptions } from "./interfaces";
-import Prop from "./props";
+import { IApplication, IApplicationOptions, IApplicationSettings, IUIProperty, IUIPropertyOptions } from "./interfaces";
+import UIProp from "./props";
 import { dP, extend } from "./dab";
 
 export class Application implements IApplication {
@@ -16,9 +16,9 @@ export class Application implements IApplication {
 
 	public has(key: string): boolean { return this.settings.props.has(key) }
 
-	public add(propOptions: IPropertyOptions, key?: string): boolean {
+	public add(propOptions: IUIPropertyOptions, key?: string): boolean {
 		let
-			p = new Prop(propOptions);
+			p = new UIProp(propOptions);
 		//if key is undefined, then we get it from property.id
 		!key && (key = p.id);
 		//see for duplicates
@@ -46,8 +46,8 @@ export class Application implements IApplication {
 		});
 	}
 
-	prop(id: string): IProperty {
-		return <IProperty>this.settings.props.get(id)
+	prop(id: string): IUIProperty {
+		return <IUIProperty>this.settings.props.get(id)
 	}
 
 }

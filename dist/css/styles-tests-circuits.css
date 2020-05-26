@@ -166,7 +166,7 @@ g[svg-comp] > circle[svg-type="node"] {
 }
 
 /*tooltip*/
-g.label > rect {
+g.tooltip > rect {
   /*#31e8e5;*/
   fill: #9de8e7;
   stroke: #3bab68;
@@ -176,7 +176,7 @@ g.label > rect {
   stroke-opacity: 0.9;
 }
 
-g.label > text {
+g.tooltip > text {
   fill: #656262;
   /*color: black;
 		fill-opacity: 1;

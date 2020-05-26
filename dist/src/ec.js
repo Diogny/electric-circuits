@@ -22,6 +22,7 @@ var point_1 = require("./point");
 var itemSolid_1 = require("./itemSolid");
 var rect_1 = require("./rect");
 var size_1 = require("./size");
+var label_1 = require("./label");
 var EC = /** @class */ (function (_super) {
     __extends(EC, _super);
     function EC(options) {
@@ -35,6 +36,15 @@ var EC = /** @class */ (function (_super) {
         [].slice.call(utils_1.svg("<g>" + _this.base.data + "</g>").children).forEach(function (n) {
             _this.g.insertBefore(n, _this.highlight.g);
         });
+        //create label if defined
+        if (_this.base.meta.labelId) {
+            _this.label = new label_1.Label({
+                fontSize: 15,
+                x: _this.base.meta.labelId.x,
+                y: _this.base.meta.labelId.y
+            });
+            _this.label.setText(_this.id);
+        }
         //this shows dragx, dragy, and rotate
         _this.refresh();
         //signal component creation
@@ -83,9 +93,8 @@ var EC = /** @class */ (function (_super) {
             dragx: this.x,
             dragy: this.y,
             transform: "translate(" + this.x + " " + this.y + ")"
-        };
+        }, center = this.origin;
         if (this.rotation) {
-            var center = this.origin;
             attrs.transform += " rotate(" + this.rotation + " " + center.x + " " + center.y + ")";
         }
         //update SVG DOM attributes
@@ -94,6 +103,16 @@ var EC = /** @class */ (function (_super) {
         utils_1.each(this.bonds, function (b, key) {
             _this.nodeRefresh(key);
         });
+        //update label if any
+        if (this.label) {
+            var pos = point_1.default.plus(this.p, this.label.p);
+            attrs = {
+                transform: "translate(" + pos.x + " " + pos.y + ")"
+            };
+            this.rotation && (center = point_1.default.minus(point_1.default.plus(this.p, center), pos),
+                attrs.transform += " rotate(" + this.rotation + " " + center.x + " " + center.y + ")");
+            dab_1.attr(this.label.g, attrs);
+        }
         return this;
     };
     EC.prototype.nodeRefresh = function (node) {
@@ -107,11 +126,10 @@ var EC = /** @class */ (function (_super) {
     };
     //this returns (x, y) relative to the EC location
     EC.prototype.getNode = function (pinNode) {
-        var _this = this;
         var pin = this.base.meta.nodes.list[pinNode], rotate = function (obj, rotation, center) {
             if (!rotation)
                 return obj;
-            var rot = _this.rotateBy(center.x, center.y, obj.x, obj.y, -rotation);
+            var rot = obj.rotateBy(center.x, center.y, -rotation);
             return new point_1.default(rot.x, rot.y);
         };
         if (!pin)
@@ -142,6 +160,20 @@ var EC = /** @class */ (function (_super) {
     };
     EC.prototype.nodeHighlightable = function (name) {
         return this.valid(name); //for now all valid nodes are highlightables
+    };
+    EC.prototype.setVisible = function (value) {
+        _super.prototype.setVisible.call(this, value);
+        this.label && this.label.setVisible(value);
+        return this;
+    };
+    EC.prototype.remove = function () {
+        var _a;
+        //delete label if any first
+        this.label && ((_a = this.g.parentNode) === null || _a === void 0 ? void 0 : _a.removeChild(this.label.g));
+        _super.prototype.remove.call(this);
+    };
+    EC.prototype.afterDOMinserted = function () {
+        this.label && (this.g.insertAdjacentElement("afterend", this.label.g), this.label.setVisible(true));
     };
     return EC;
 }(itemSolid_1.default));

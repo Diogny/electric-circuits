@@ -70,4 +70,5 @@ export default abstract class ItemBase extends Item {
 		this.g.parentNode?.removeChild(this.g);
 	}
 
+	public afterDOMinserted() { }
 }

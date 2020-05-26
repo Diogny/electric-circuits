@@ -213,15 +213,10 @@ var MyApp = /** @class */ (function (_super) {
             m = parseFloat(o);
         }
         this.multiplier = m;
-        //base_vb_width: board.clientWidth * ratio | 0,
-        //base_vb_height: board.clientHeight * ratio | 0
         this.baseViewBox = new size_1.default(this.board.clientWidth * this.ratio | 0, this.board.clientHeight * this.ratio | 0);
         //calculate size
         this.viewBox.size = new size_1.default(this.baseViewBox.width * this.multiplier | 0, this.baseViewBox.height * this.multiplier | 0);
-        //app.vb_width = app.base_vb_width * this.multiplier | 0;
-        //app.vb_height = app.base_vb_height * this.multiplier | 0;
         //set SVG DOM viewBox attribute
-        //attr(this.svgBoard, { "viewBox": `${app.vb_x} ${app.vb_y} ${app.vb_width} ${app.vb_height}` });
         dab_1.attr(this.svgBoard, { "viewBox": this.viewBox.x + " " + this.viewBox.y + " " + this.viewBox.width + " " + this.viewBox.height });
         //calculate ratio
         this.ratioX = this.viewBox.width / this.svgBoard.clientWidth;
@@ -232,7 +227,6 @@ var MyApp = /** @class */ (function (_super) {
     MyApp.prototype.refreshTopBarRight = function () {
         this.topBarRight.innerHTML = dab_1.nano(this.templates.viewBox01, this.viewBox) + "&nbsp; " +
             dab_1.nano(this.templates.size01, this.size);
-        // `${this.viewBox.x} ${this.viewBox.y} ${this.viewBox.width} ${this.viewBox.height}`;
     };
     MyApp.prototype.getAspectRatio = function (width, height) {
         var ratio = width / height;

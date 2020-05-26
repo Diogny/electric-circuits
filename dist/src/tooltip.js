@@ -13,47 +13,39 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-//label.ts
 var dab_1 = require("./dab");
 var utils_1 = require("./utils");
-var itemsBase_1 = require("./itemsBase");
 var types_1 = require("./types");
+var label_1 = require("./label");
 var Tooltip = /** @class */ (function (_super) {
     __extends(Tooltip, _super);
-    /*	DOESN'T WORK
-    set visible(value: boolean) {
-        //weird way to access an ancestor property  super.visible doesn't work
-        super["visible"] = value;
-    }
-    */
     function Tooltip(options) {
-        var _this = this;
-        //set defaults
-        options.name = "label";
-        options.class = "label";
-        options.visible = false;
-        _this = _super.call(this, options) || this;
-        _this.text = '';
-        //remove color class, not needed for a Tooltip text
-        dab_1.removeClass(_this.g, _this.color);
-        //create Rect box
+        var _this = _super.call(this, options) || this;
         _this.svgRect = utils_1.tag("rect", "", {
             x: 0,
             y: 0,
-            rx: _this.borderRadius // 4
+            rx: _this.borderRadius
         });
-        dab_1.aCld(_this.g, _this.svgRect);
-        //create Label
-        _this.t = utils_1.tag("text", "", {});
-        dab_1.aCld(_this.g, _this.t);
+        _this.g.insertBefore(_this.svgRect, _this.t);
         return _this;
     }
     Object.defineProperty(Tooltip.prototype, "type", {
-        get: function () { return types_1.Type.LABEL; },
+        get: function () { return types_1.Type.TOOLTIP; },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(Tooltip.prototype, "borderRadius", {
+        get: function () { return this.settings.borderRadius; },
         enumerable: false,
         configurable: true
     });
     Object.defineProperty(Tooltip.prototype, "size", {
+        /*	DOESN'T WORK
+        set visible(value: boolean) {
+            //weird way to access an ancestor property  super.visible doesn't work
+            super["visible"] = value;
+        }
+        */
         get: function () {
             var b = this.t.getBBox();
             return dab_1.obj({
@@ -64,21 +56,6 @@ var Tooltip = /** @class */ (function (_super) {
         enumerable: false,
         configurable: true
     });
-    Object.defineProperty(Tooltip.prototype, "fontSize", {
-        get: function () { return this.settings.fontSize; },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Tooltip.prototype, "borderRadius", {
-        get: function () { return this.settings.borderRadius; },
-        enumerable: false,
-        configurable: true
-    });
-    Tooltip.prototype.move = function (x, y) {
-        _super.prototype.move.call(this, x, y);
-        dab_1.attr(this.g, { transform: "translate(" + this.x + " " + this.y + ")" });
-        return this; //chaining
-    };
     Tooltip.prototype.setVisible = function (value) {
         _super.prototype.setVisible.call(this, value);
         //clear values
@@ -89,10 +66,6 @@ var Tooltip = /** @class */ (function (_super) {
     };
     Tooltip.prototype.setBorderRadius = function (value) {
         this.settings.borderRadius = value | 0;
-        return this.build();
-    };
-    Tooltip.prototype.setFontSize = function (value) {
-        this.settings.fontSize = value;
         return this.build();
     };
     Tooltip.prototype.build = function () {
@@ -132,12 +105,13 @@ var Tooltip = /** @class */ (function (_super) {
     };
     Tooltip.prototype.propertyDefaults = function () {
         return dab_1.extend(_super.prototype.propertyDefaults.call(this), {
-            fontSize: 50,
+            name: "tooltip",
+            class: "tooltip",
             borderRadius: 4
         });
     };
     return Tooltip;
-}(itemsBase_1.default));
+}(label_1.Label));
 exports.default = Tooltip;
 //tooltip.move(200,50).setText("One line").visible = true;
 //tooltip.move(200,50).setText("One line\r\nTwo lines and").visible = true;

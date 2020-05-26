@@ -4,8 +4,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var dab_1 = require("./dab");
 var utils_1 = require("./utils");
 //... in progress...
-var Prop = /** @class */ (function () {
-    function Prop(options) {
+var UIProp = /** @class */ (function () {
+    function UIProp(options) {
         var _this = this;
         //set default values
         this.settings = {
@@ -29,7 +29,7 @@ var Prop = /** @class */ (function () {
         //set properties
         this.settings.tag = options.tag;
         this.settings.name = this.html.getAttribute("name");
-        this.settings.id = this.html.id || dab_1.attr(this.html, "prop-id") || ('property' + Prop._propId++);
+        this.settings.id = this.html.id || dab_1.attr(this.html, "prop-id") || ('property' + UIProp._propId++);
         switch (this.nodeName) {
             case 'input':
                 this.settings.type = this.html.type.toLowerCase();
@@ -89,7 +89,7 @@ var Prop = /** @class */ (function () {
                 });
                 break;
             default:
-                if (Prop.textOnly.indexOf(this.nodeName) >= 0) {
+                if (UIProp.textOnly.indexOf(this.nodeName) >= 0) {
                     this.settings.getter = 'innerText';
                 }
                 else
@@ -99,42 +99,42 @@ var Prop = /** @class */ (function () {
         //later see how can I register change event only for editable properties
         this.html.addEventListener('change', this.selectionUiChanged);
     }
-    Object.defineProperty(Prop.prototype, "id", {
+    Object.defineProperty(UIProp.prototype, "id", {
         get: function () { return this.settings.id; },
         enumerable: false,
         configurable: true
     });
-    Object.defineProperty(Prop.prototype, "type", {
+    Object.defineProperty(UIProp.prototype, "type", {
         get: function () { return this.settings.type; },
         enumerable: false,
         configurable: true
     });
-    Object.defineProperty(Prop.prototype, "name", {
+    Object.defineProperty(UIProp.prototype, "name", {
         get: function () { return this.settings.name; },
         enumerable: false,
         configurable: true
     });
-    Object.defineProperty(Prop.prototype, "tag", {
+    Object.defineProperty(UIProp.prototype, "tag", {
         get: function () { return this.settings.tag; },
         enumerable: false,
         configurable: true
     });
-    Object.defineProperty(Prop.prototype, "html", {
+    Object.defineProperty(UIProp.prototype, "html", {
         get: function () { return this.settings.html; },
         enumerable: false,
         configurable: true
     });
-    Object.defineProperty(Prop.prototype, "editable", {
+    Object.defineProperty(UIProp.prototype, "editable", {
         get: function () { return this.settings.editable; },
         enumerable: false,
         configurable: true
     });
-    Object.defineProperty(Prop.prototype, "nodeName", {
+    Object.defineProperty(UIProp.prototype, "nodeName", {
         get: function () { return this.html.nodeName.toLowerCase(); },
         enumerable: false,
         configurable: true
     });
-    Object.defineProperty(Prop.prototype, "onChange", {
+    Object.defineProperty(UIProp.prototype, "onChange", {
         get: function () { return this.settings.onChange; },
         set: function (fn) {
             dab_1.isFn(fn) && (this.settings.onChange = fn);
@@ -142,7 +142,7 @@ var Prop = /** @class */ (function () {
         enumerable: false,
         configurable: true
     });
-    Object.defineProperty(Prop.prototype, "value", {
+    Object.defineProperty(UIProp.prototype, "value", {
         get: function () {
             var val = this.html[this.settings.getter]; //select.selectedOptions
             if (!this.settings.htmlSelect) {
@@ -190,13 +190,13 @@ var Prop = /** @class */ (function () {
         enumerable: false,
         configurable: true
     });
-    Prop.prototype.toString = function () {
+    UIProp.prototype.toString = function () {
         return this.settings.toStringFn ? this.settings.toStringFn() : this.id + ": " + this.value;
     };
-    Prop.prototype.selectionUiChanged = function (e) {
+    UIProp.prototype.selectionUiChanged = function (e) {
         //when comming from UI, this is the DOM Element
         // 	otherwise it's the property
-        var prop = this instanceof Prop ? this : this.dab;
+        var prop = this instanceof UIProp ? this : this.dab;
         if (prop && prop.onChange)
             prop.onChange(prop.value, //this cache current value
             (e) ? 1 : 2, // 1 == 'ui' : 2 == 'prop'
@@ -204,9 +204,9 @@ var Prop = /** @class */ (function () {
             e //event if UI triggered
             );
     };
-    Prop.textOnly = "a|abbr|acronym|b|bdo|big|cite|code|dfn|em|i|kbd|label|legend|li|q|samp|small|span|strong|sub|sup|td|th|tt|var".split('|');
-    Prop._propId = 1;
-    return Prop;
+    UIProp.textOnly = "a|abbr|acronym|b|bdo|big|cite|code|dfn|em|i|kbd|label|legend|li|q|samp|small|span|strong|sub|sup|td|th|tt|var".split('|');
+    UIProp._propId = 1;
+    return UIProp;
 }());
-exports.default = Prop;
+exports.default = UIProp;
 //# sourceMappingURL=props.js.map

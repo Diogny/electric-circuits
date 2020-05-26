@@ -1,6 +1,17 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var dab_1 = require("./dab");
+var defaultIdTemplate = "{name}-{count}";
+var defaultComponent = function (name) { return ({
+    name: name,
+    obj: {
+        name: name,
+        type: name,
+        meta: {
+            nameTmpl: defaultIdTemplate
+        }
+    }
+}); };
 var Comp = /** @class */ (function () {
     function Comp(options) {
         var that = this, template = options.tmpl;
@@ -22,6 +33,8 @@ var Comp = /** @class */ (function () {
                 that.settings.meta.nodes.list[ndx].label = lbl;
             });
         }
+        //set default id template if not defined
+        !this.settings.meta.nameTmpl && (this.settings.meta.nameTmpl = defaultIdTemplate);
         if (!Comp.store(this.settings.name, this))
             throw "duplicated: " + this.settings.name;
     }
@@ -60,7 +73,7 @@ var Comp = /** @class */ (function () {
     Comp.storeComponent = function (map, name, o) {
         return map.set(name, dab_1.obj({
             //interface IBaseComponent
-            count: 0,
+            count: o.meta.countStart | 0,
             obj: o
         }));
     };
@@ -75,19 +88,7 @@ var Comp = /** @class */ (function () {
         return set;
     };
     // all base components with metadata
-    Comp.baseComps = Comp.initializeComponents([{
-            name: "label",
-            obj: {
-                name: "label", type: "label", meta: {}
-            }
-        },
-        {
-            name: "wire",
-            obj: {
-                name: "wire", type: "wire", meta: {}
-            }
-        }
-    ]);
+    Comp.baseComps = Comp.initializeComponents([defaultComponent("tooltip"), defaultComponent("wire")]);
     //all ecs, wires in the board
     Comp.boardItems = new Map();
     ////////////////////////////// STATIC ////////////////////////////////

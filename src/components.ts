@@ -5,21 +5,23 @@ import {
 	IBaseComponent, IComponentOptions, IBaseStoreComponent, IComponentMetadata
 } from './interfaces';
 
+const defaultIdTemplate = "{name}-{count}";
+const defaultComponent = (name: string): IBaseStoreComponent => (<any>{
+	name: name,
+	obj: {
+		name: name,
+		type: name,
+		meta: {
+			nameTmpl: defaultIdTemplate
+		}
+	}
+});
+
 export default class Comp {
 
 	// all base components with metadata
 	private static baseComps: Map<string, IBaseComponent> =
-		Comp.initializeComponents([{
-			name: "label", obj: <Comp>{
-				name: "label", type: "label", meta: {}
-			}
-		},
-		{
-			name: "wire", obj: <Comp>{
-				name: "wire", type: "wire", meta: {}
-			}
-		}
-		]);
+		Comp.initializeComponents([defaultComponent("tooltip"), defaultComponent("wire")]);
 
 	//all ecs, wires in the board
 	private static boardItems: Map<string, ItemBoard> = new Map();
@@ -57,6 +59,8 @@ export default class Comp {
 				that.settings.meta.nodes.list[ndx].label = lbl;
 			})
 		}
+		//set default id template if not defined
+		!this.settings.meta.nameTmpl && (this.settings.meta.nameTmpl = defaultIdTemplate);
 		if (!Comp.store(this.settings.name, this))
 			throw `duplicated: ${this.settings.name}`;
 	}
@@ -84,7 +88,7 @@ export default class Comp {
 	private static storeComponent(map: Map<string, IBaseComponent>, name: string, o: Comp): Map<string, IBaseComponent> {
 		return map.set(name, obj({
 			//interface IBaseComponent
-			count: 0,
+			count: o.meta.countStart | 0,
 			obj: o
 		}))
 	}

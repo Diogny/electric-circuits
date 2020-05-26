@@ -9,6 +9,7 @@ var Type;
     Type[Type["BOND"] = 3] = "BOND";
     Type[Type["LABEL"] = 4] = "LABEL";
     Type[Type["WIN"] = 5] = "WIN";
+    Type[Type["TOOLTIP"] = 6] = "TOOLTIP";
 })(Type = exports.Type || (exports.Type = {}));
 ;
 var TypedClass = /** @class */ (function () {
