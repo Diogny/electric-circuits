@@ -1,11 +1,11 @@
 //ec.ts
-import { attr, obj } from './dab';
+import { attr, obj, extend } from './dab';
 import { svg, each } from './utils';
 import { Type } from './types';
 import Comp from './components';
 import Bond from './bonds';
 import Point from './point';
-import { IItemSolidOptions, IPoint, IItemNode } from './interfaces';
+import { IItemSolidOptions, IPoint, IItemNode, IItemBoardProperties } from './interfaces';
 import ItemSolid from './itemSolid';
 import Rect from './rect';
 import Size from './size';
@@ -22,9 +22,6 @@ export default class EC extends ItemSolid {
 	}
 
 	constructor(options: IItemSolidOptions) {
-		//set defaults
-		options.class = "ec";
-		options.highlightNodeName = "node";
 		super(options);
 		//this ensures all path, rect, circles are inserted before the highlight circle node
 		//_.svg is used because _.html doesn't work for SVG
@@ -76,8 +73,8 @@ export default class EC extends ItemSolid {
 	public refresh(): EC {
 		let
 			attrs: any = {
-				dragx: this.x,
-				dragy: this.y,
+				//dragx: this.x,
+				//dragy: this.y,
 				transform: `translate(${this.x} ${this.y})`
 			},
 			center = this.origin;
@@ -182,5 +179,12 @@ export default class EC extends ItemSolid {
 
 	public afterDOMinserted() {
 		this.label && (this.g.insertAdjacentElement("afterend", this.label.g), this.label.setVisible(true))
+	}
+
+	public propertyDefaults(): IItemBoardProperties {
+		return extend(super.propertyDefaults(), {
+			class: "ec",
+			highlightNodeName: "node"
+		})
 	}
 }

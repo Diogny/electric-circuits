@@ -22,10 +22,14 @@ var Item = /** @class */ (function (_super) {
     function Item(options) {
         var _this = _super.call(this) || this;
         //merge defaults and deep copy
+        //all default properties must be refrenced from this or this.settings
+        // options is for custom options only
         _this.settings = dab_1.obj(dab_1.copy(_this.propertyDefaults(), options));
-        //set default if not defined
+        //fix (x,y) coordiinates if wrongly initially provided
         _this.settings.x = _this.settings.x || 0;
         _this.settings.y = _this.settings.y || 0;
+        //fix color if wrongly provided, default is "white"
+        _this.settings.color = colors_1.Color.getcolor(_this.color, colors_1.Colors.white);
         return _this;
     }
     Object.defineProperty(Item.prototype, "name", {
@@ -75,14 +79,12 @@ var Item = /** @class */ (function (_super) {
     Item.prototype.move = function (x, y) {
         this.settings.x = x | 0;
         this.settings.y = y | 0;
-        //for object chaining
         return this;
     };
     Item.prototype.movePoint = function (p) {
         return this.move(p.x, p.y);
     };
     Item.prototype.translate = function (dx, dy) {
-        //for object chaining
         return this.move(this.x + (dx | 0), this.y + (dy | 0));
     };
     Item.prototype.propertyDefaults = function () {
@@ -91,7 +93,7 @@ var Item = /** @class */ (function (_super) {
             name: "",
             x: 0,
             y: 0,
-            color: colors_1.Color.getcolor("", colors_1.Colors.white),
+            color: "white",
             class: "",
             visible: true,
         };

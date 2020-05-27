@@ -16,6 +16,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var base_window_1 = require("./base-window");
 var utils_1 = require("./utils");
 var dab_1 = require("./dab");
+var components_1 = require("./components");
+var ecprop_1 = require("./ecprop");
 var ContextWindow = /** @class */ (function (_super) {
     __extends(ContextWindow, _super);
     function ContextWindow(options) {
@@ -35,11 +37,31 @@ var ContextWindow = /** @class */ (function (_super) {
         var that = _this;
         //register global click event
         dab_1.aEL(_this.win, "click", function (e) {
-            var self = dab_1.getParentAttr(e.target, "data-action"), action = dab_1.attr(self, "data-action"), trigger = dab_1.attr(self.parentElement, "data-trigger");
-            self && (console.log(self.nodeName, action, trigger), that.setVisible(false));
+            var self = dab_1.getParentAttr(e.target, "data-action"), action = dab_1.attr(self, "data-action") | 0, trigger = dab_1.attr(self.parentElement, "data-trigger");
+            self && (that.setVisible(false), _this.execute(action, trigger));
         }, false);
         return _this;
     }
+    ContextWindow.prototype.execute = function (action, trigger) {
+        var arr = trigger.split('::'), comp = components_1.default.item(arr.shift()), name = arr.shift(), type = arr.shift(), app = this.app;
+        if (comp) {
+            switch (action) {
+                case 11: //"Properties"
+                    app.winProps.clear();
+                    comp.properties().forEach(function (name) {
+                        app.winProps.appendPropChild(new ecprop_1.default(comp, name, true, function onEcPropChange(value) {
+                            console.log(this, value);
+                        }), true);
+                    });
+                    app.winProps.setVisible(true);
+                    break;
+            }
+            console.log("action: " + action + ", id: " + comp.id + ", name: " + name + ", type: " + type + ", trigger: " + trigger);
+        }
+        else {
+            console.log("invalid trigger: " + trigger);
+        }
+    };
     ContextWindow.prototype.setVisible = function (value) {
         //clear data trigger info
         return (!_super.prototype.setVisible.call(this, value).visible && this.win.setAttribute("data-trigger", "")), this;
@@ -50,11 +72,11 @@ var ContextWindow = /** @class */ (function (_super) {
      * @param type component child type
      * @returns {string} context key
      */
-    ContextWindow.prototype.setTrigger = function (id, comp, type, data) {
+    ContextWindow.prototype.setTrigger = function (id, name, type, data) {
         var ctx;
         switch (type) {
             case "node":
-                ctx = ((comp == "wire") ? "wire-" : "ec-") + type;
+                ctx = ((name == "wire") ? "wire-" : "ec-") + type;
                 break;
             case "board":
                 ctx = type;
@@ -66,10 +88,15 @@ var ContextWindow = /** @class */ (function (_super) {
                 ctx = "wire-" + type;
                 break;
             default:
-                return void 0;
+                //if id && comp has a value, then type is "body"
+                if (id && name) {
+                    ctx = "ec-" + (type = "body");
+                }
+                else
+                    return void 0;
         }
-        var a = [id, comp, type, data].filter(function (v) { return v != null; });
-        return this.win.setAttribute("data-trigger", "" + a.join(':')), ctx;
+        var a = [id, name, type, data].filter(function (v) { return v != null; });
+        return this.win.setAttribute("data-trigger", "" + a.join('::')), ctx;
     };
     ContextWindow.prototype.build = function (key) {
         var _this = this;

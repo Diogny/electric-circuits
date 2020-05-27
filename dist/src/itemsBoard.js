@@ -19,25 +19,73 @@ var itemsBase_1 = require("./itemsBase");
 var components_1 = require("./components");
 var boardCircle_1 = require("./boardCircle");
 var utils_1 = require("./utils");
+var point_1 = require("./point");
+var PropertyInjector = /** @class */ (function () {
+    function PropertyInjector(ec) {
+        this.ec = ec;
+    }
+    Object.defineProperty(PropertyInjector.prototype, "type", {
+        get: function () { return "property"; },
+        enumerable: false,
+        configurable: true
+    });
+    return PropertyInjector;
+}());
+var PointInjector = /** @class */ (function (_super) {
+    __extends(PointInjector, _super);
+    function PointInjector() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    Object.defineProperty(PointInjector.prototype, "title", {
+        //later can be atomized to different, now burned to this.p
+        get: function () { return "position"; },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(PointInjector.prototype, "value", {
+        get: function () { return this.ec.p.toString(0x06); } //no vars and no parenthesis
+        ,
+        enumerable: false,
+        configurable: true
+    });
+    PointInjector.prototype.setValue = function (val) {
+        var p = point_1.default.parse(val);
+        return p && (this.ec.move(p.x, p.y), true);
+    };
+    return PointInjector;
+}(PropertyInjector));
 //ItemBoard->Wire
 var ItemBoard = /** @class */ (function (_super) {
     __extends(ItemBoard, _super);
     function ItemBoard(options) {
         var _this = _super.call(this, options) || this;
         //I can use a MAC address for a board item in components.ts to access all base info of component
-        var base = components_1.default.find(options.name, true);
+        var base = components_1.default.find(_this.name, true), regex = /(?:{([^}]+?)})+/g, that = _this;
         if (!base)
-            throw "unknown component: " + options.name;
+            throw "unknown component: " + _this.name;
         //save base data
-        _this.settings.base = base.obj;
-        //this overrides the id
-        ////this.base.name + "-" + base.count++;
-        _this.settings.id = dab_1.nano(base.obj.meta.nameTmpl, {
-            name: _this.base.name,
-            count: base.count++
+        _this.settings.base = base.comp;
+        //use template to create id according to defined strategy
+        // nano(base.comp.meta.nameTmpl, { name: this.base.name, count: base.count++ });
+        _this.settings.id = base.comp.meta.nameTmpl.replace(regex, function (match, group) {
+            var arr = group.split('.'), getRoot = function (name) {
+                //valid entry points
+                switch (name) {
+                    case "this": return that;
+                    case "base": return base;
+                    case "Comp": return components_1.default;
+                }
+            }, rootRef = getRoot(arr.shift()), prop = arr.pop(), result;
+            while (rootRef && arr.length)
+                rootRef = rootRef[arr.shift()];
+            if (rootRef == undefined || (result = rootRef[prop]) == undefined)
+                throw "invalid id naming template";
+            //increment counter if any
+            dab_1.isNum(result) && (rootRef[prop] = result + 1);
+            return result;
         });
         //deep copy component properties
-        _this.settings.props = dab_1.obj(base.obj.props);
+        _this.settings.props = dab_1.obj(base.comp.props);
         //add properties to DOM
         dab_1.attr(_this.g, {
             id: _this.id,
@@ -46,34 +94,27 @@ var ItemBoard = /** @class */ (function (_super) {
         //check for custom class
         _this.base.meta.class && dab_1.addClassX(_this.g, _this.base.meta.class);
         //create the highligh object
-        _this.highlight = new boardCircle_1.default(options.highlightNodeName);
+        _this.highlight = new boardCircle_1.default(_this.settings.highlightNodeName);
         //add it to component, this's the insertion point (insertBefore) for all inherited objects
         dab_1.aCld(_this.g, _this.highlight.g);
-        //initialize Bonds array
-        _this.settings.bonds = [];
         //add component label if available
         var createText = function (attr, text) {
             var svgText = utils_1.tag("text", "", attr);
             return svgText.innerHTML = text, svgText;
         };
-        if (base.obj.meta.label) {
+        if (base.comp.meta.label) {
             dab_1.aCld(_this.g, createText({
-                x: base.obj.meta.label.x,
-                y: base.obj.meta.label.y,
-                "class": base.obj.meta.label.class
-            }, base.obj.meta.label.text));
+                x: base.comp.meta.label.x,
+                y: base.comp.meta.label.y,
+                "class": base.comp.meta.label.class
+            }, base.comp.meta.label.text));
         }
         //add node labels
-        if (base.obj.meta.nodeLabel) {
-            var i = 0, factor = 20, x = 7, pins = _this.count / 2;
-            for (var y = 60; y > 0; y -= 44, x += (factor = -factor)) {
-                for (var col = 0; col < pins; col++, i++, x += factor) {
-                    dab_1.aCld(_this.g, createText({
-                        x: x,
-                        y: y
-                    }, i + ""));
-                }
-            }
+        if (base.comp.meta.nodeLabel) {
+            var pins = _this.count / 2;
+            for (var y = 60, x = 7, i = 0, factor = 20; y > 0; y -= 44, x += (factor = -factor))
+                for (var col = 0; col < pins; col++, i++, x += factor)
+                    dab_1.aCld(_this.g, createText({ x: x, y: y }, i + ""));
         }
         return _this;
         //this still doesn't work to get all overridable properties ¿?
@@ -97,6 +138,12 @@ var ItemBoard = /** @class */ (function (_super) {
     });
     Object.defineProperty(ItemBoard.prototype, "bonds", {
         get: function () { return this.settings.bonds; },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(ItemBoard.prototype, "windowProperties", {
+        //properties available to show up in property window
+        get: function () { return ["p"]; },
         enumerable: false,
         configurable: true
     });
@@ -148,9 +195,16 @@ var ItemBoard = /** @class */ (function (_super) {
         //for object chaining
         return this;
     };
-    ItemBoard.prototype.prop = function (propName) { return this.settings.props[propName]; };
+    ItemBoard.prototype.prop = function (propName) {
+        //inject available properties if called
+        switch (propName) {
+            case "p":
+                return new PointInjector(this);
+        }
+        return this.settings.props[propName];
+    };
     ItemBoard.prototype.properties = function () {
-        return utils_1.map(this.settings.props, function (value, key) { return key; });
+        return this.windowProperties.concat(utils_1.map(this.settings.props, function (value, key) { return key; }));
     };
     //poly.bond(0, ec, 1)
     //poly.bond(poly.last, ec, 1)
@@ -230,7 +284,8 @@ var ItemBoard = /** @class */ (function (_super) {
     ItemBoard.prototype.propertyDefaults = function () {
         return dab_1.extend(_super.prototype.propertyDefaults.call(this), {
             selected: false,
-            onProp: void 0
+            onProp: void 0,
+            bonds: []
         });
     };
     return ItemBoard;

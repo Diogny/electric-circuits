@@ -1,9 +1,9 @@
 import { Application } from "./app";
 import {
 	IApplicationOptions, IMyApp, ITooltipText, IAppWindowOptions, IStateMachineOptions,
-	StateType, ActionType, IMouseState, IContextMenuOptions
+	StateType, ActionType, IMouseState, IContextMenuOptions, IItemSolidOptions
 } from "./interfaces";
-import { basePath, qS } from "./utils";
+import { basePath, qS, pad } from "./utils";
 import Rect from "./rect";
 import Size from "./size";
 import Point from './point';
@@ -15,6 +15,8 @@ import Wire from "./wire";
 import StateMachine from "./stateMachine";
 import Comp from "./components";
 import ContextWindow from "./context-window";
+import ItemBoard from "./itemsBoard";
+import EC from "./ec";
 
 export class MyApp extends Application implements IMyApp {
 
@@ -36,6 +38,7 @@ export class MyApp extends Application implements IMyApp {
 	ratioY: number;
 	pos: Point;
 	size: Size;
+	compList: Map<string, ItemBoard>;
 
 	//temporary properties
 	ec: ItemSolid;
@@ -94,17 +97,17 @@ export class MyApp extends Application implements IMyApp {
 						break;
 				}
 				//UI logs
-				arr.push(` ${state.event} ${state.id} ${state.type}^${state.over.type}`);
-				arr.push(`multiplier: ${that.multiplier}`);
+				arr.push(`${pad(state.event, 5, '&nbsp;')} ${state.id} ${state.type}^${state.over.type}`);
+				//arr.push(`multiplier: ${that.multiplier}`);
 				arr.push(`state: ${StateType[that.state.value]}`);
 				arr.push(state.offset.toString()); //`x: ${round(state.offset.x, 1)} y: ${round(state.offset.y, 1)}`
-				arr.push(`client ${clientXY.toString()}`);
+				//arr.push(`client ${clientXY.toString()}`);
 				//arr.push(`scaled: x: ${clientXYScaled.x} y: ${clientXYScaled.y}`);
 				//render
-				that.topBarLeft.innerText = arr.join(", ");
+				that.topBarLeft.innerHTML = arr.join(", ");
 				return state;
-			};;
-
+			};
+		this.compList = new Map();
 		//location is panning, size is for scaling
 		this.viewBox = new Rect(Point.origin, Size.empty);
 		//scaling multipler
@@ -139,13 +142,12 @@ export class MyApp extends Application implements IMyApp {
 		//create state machine
 		this.state = new StateMachine(<IStateMachineOptions>{
 			id: "state-machine-01",
-			initial: StateType.IDLE, // 'IDLE',
+			initial: StateType.IDLE,
 			states: {},
 			ctx: <IMouseState>{},
 			commonActions: {
 				HIDE_NODE: function (newContext: IMouseState) {
 					newContext.it && newContext.it.hideNode();
-					//hide tooltip
 					that.tooltip.setVisible(false);
 				},
 				SHOW_BODY_TOOLTIP: function (newContext: IMouseState) {
@@ -160,10 +162,8 @@ export class MyApp extends Application implements IMyApp {
 					//data has current state
 					if (!newContext.it?.highlighted) {
 						newContext.it?.showNode(<number>newContext.over.nodeNumber);
-						//show tooltip
 						let
 							p = Point.translateBy(newContext.offset, 20);
-
 						that.tooltip.setVisible(true)
 							.move(p.x, p.y)
 							.setFontSize(that.tooltipFontSize())
@@ -176,9 +176,7 @@ export class MyApp extends Application implements IMyApp {
 						prefix = !newContext.it ? "" : newContext.it.type == 1 ? "EC_" : "WIRE_",
 						stateName = (prefix + newContext.over.type).toUpperCase(),
 						state = <StateType><unknown>StateType[<any>stateName];
-					//EC_NODE		WIRE_NODE
-					that.state.transition(state, ActionType.START, newContext);
-					//console.log(`transition: ${transition}.${action}`)
+					that.state.transition(state, ActionType.START, newContext);	//EC_NODE		WIRE_NODE
 				}
 			}
 		});
@@ -222,7 +220,7 @@ export class MyApp extends Application implements IMyApp {
 					attr(target.parentNode, "id"),
 					attr(target.parentNode, "svg-comp"),
 					type,
-					attr(target, type));
+					type && attr(target, type));
 			if (key) {
 				that.rightClick
 					.build(key)
@@ -272,4 +270,34 @@ export class MyApp extends Application implements IMyApp {
 
 	public tooltipFontSize = () => Math.max(10, 35 * this.multiplier)
 
+	public hasComponent(id: string): boolean { return this.compList.has(id); }
+
+	public addComponent(name: string): ItemBoard {
+		let
+			comp: ItemBoard = <any>void 0;
+
+		if (name == "wire") {
+			//
+		} else {
+			comp = new EC(<IItemSolidOptions><unknown>{
+				name: name,
+				x: this.pos.x,
+				y: this.pos.y,
+				onProp: function (e: any) {
+					//this happens when this component is created
+				}
+			})
+		}
+		if (comp) {
+			if (this.hasComponent(comp.id))
+				throw `duplicated component ${comp.id}`;
+			this.compList.set(comp.id, comp);
+
+			//add it to SVG DOM
+			this.svgBoard.insertBefore(comp.g, this.tooltip.g);
+			//do after DOM inserted work
+			comp.afterDOMinserted();
+		}
+		return <ItemBoard>comp;
+	}
 }

@@ -176,6 +176,7 @@ export default class AppWindow extends BaseWindow {
 	public clear(): AppWindow {
 		//don't call base.clear because it clears all innerHTML
 		this.setTextHtml("");
+		this.settings.properties = [];
 		return this;
 	}
 
@@ -202,9 +203,14 @@ export default class AppWindow extends BaseWindow {
 			let
 				root = this.main;
 			wrap && (root = root.appendChild(document.createElement("div")), root.classList.add("ec-wrap"));
-			root.appendChild(el.html)
+			root.appendChild(el.html);
+			this.settings.properties.push(el);
 		}
 		return this
+	}
+
+	public property(name: string): EcProp | undefined {
+		return this.settings.properties.find(p => p.name == name)
 	}
 
 	//public propertyDefaults = (): IItemBaseProperties => {
@@ -214,7 +220,8 @@ export default class AppWindow extends BaseWindow {
 			content: "",
 			bar: "",
 			//dragging: false,
-			selected: false
+			selected: false,
+			properties: []
 		})
 	}
 

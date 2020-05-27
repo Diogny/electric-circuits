@@ -24,10 +24,14 @@ export default abstract class Item extends TypedClass {
 	constructor(options: IItemBaseOptions) {
 		super();
 		//merge defaults and deep copy
+		//all default properties must be refrenced from this or this.settings
+		// options is for custom options only
 		this.settings = obj(copy(this.propertyDefaults(), options));
-		//set default if not defined
+		//fix (x,y) coordiinates if wrongly initially provided
 		this.settings.x = this.settings.x || 0;
 		this.settings.y = this.settings.y || 0;
+		//fix color if wrongly provided, default is "white"
+		this.settings.color = Color.getcolor(this.color, Colors.white)
 	}
 
 	public setVisible(value: boolean): Item {
@@ -38,7 +42,6 @@ export default abstract class Item extends TypedClass {
 	public move(x: number, y: number): Item {
 		this.settings.x = x | 0;
 		this.settings.y = y | 0;
-		//for object chaining
 		return this;
 	}
 
@@ -47,18 +50,17 @@ export default abstract class Item extends TypedClass {
 	}
 
 	public translate(dx: number, dy: number): Item {
-		//for object chaining
 		return this.move(this.x + (dx | 0), this.y + (dy | 0));
 	}
 
 	public propertyDefaults(): IItemBaseOptions {
 		return <IItemBaseOptions>{
-			id: "",										//have to be here so it's copied
-			name: "",									//have to be here so it's copied
+			id: "",				//have to be here so it's copied
+			name: "",			//have to be here so it's copied
 			x: 0,
 			y: 0,
-			color: Color.getcolor("", Colors.white),	//have to be here so it's copied
-			class: "",									//have to be here so it's copied
+			color: "white",		//have to be here so it's copied
+			class: "",			//have to be here so it's copied
 			visible: true,		//defaults is visible
 		}
 	}

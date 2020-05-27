@@ -51,8 +51,7 @@
 	"type" : "gate",
 	"name" : "and",
 	"properties" : {
-		"description" : "Logical AND gate 2-inputs",
-		"comments" : "svg-type body moved to last, still hover shows the same but pin is hidden by node"
+		"description" : "Logical AND gate 2-inputs"
 	},
 	"meta" : {
 		"class": "next",
@@ -969,7 +968,7 @@
 	"meta" : {
 		"class": "next",
 		"countStart": 1,
-		"nameTmpl": "C{count}",
+		"nameTmpl": "C{Comp.capacitorCount}",
 		"labelId": {
 			"x": 5,
 			"y": -5
@@ -996,7 +995,7 @@
 	"meta" : {
 		"class": "next",
 		"countStart": 1,
-		"nameTmpl": "C{count}",
+		"nameTmpl": "C{Comp.capacitorCount}",
 		"labelId": {
 			"x": 10,
 			"y": -5
@@ -1024,7 +1023,7 @@
 	"meta" : {
 		"class": "next",
 		"countStart": 1,
-		"nameTmpl": "C{count}",
+		"nameTmpl": "C{Comp.capacitorCount}",
 		"labelId": {
 			"x": 25,
 			"y": -5
@@ -1078,7 +1077,7 @@
 	"meta" : {
 		"class": "next",
 		"countStart": 1,
-		"nameTmpl": "R{count}",
+		"nameTmpl": "R{Comp.resistorCount}",
 		"labelId": {
 			"x": 15,
 			"y": -5

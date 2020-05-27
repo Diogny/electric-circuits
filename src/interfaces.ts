@@ -10,6 +10,8 @@ import HtmlWindow from "./app-window";
 import StateMachine from "./stateMachine";
 import ItemBoard from "./itemsBoard";
 import { Application } from "./app";
+import EC from "./ec";
+import EcProp from "./ecprop";
 
 export interface IExec {
 	result: any;
@@ -52,6 +54,10 @@ export interface IComponentProperty {
 	combo?: string[];
 	type?: string;
 	readonly?: boolean;
+	title?: string;
+	//this's for EC properties like this.p show in property window
+	ec: ItemBoard;
+	setValue(val: string): boolean;
 }
 
 export type ComponentPropertyType = string | IComponentProperty;
@@ -156,9 +162,9 @@ export interface IComponentOptions {
 
 //meta
 export interface IComponentMetadata {
-	countStart: number;
-	nameTmpl: string;
 	class: string;
+	countStart: number;	//for non-global count
+	nameTmpl: string;
 	labelId: IPoint;
 	nodes: IMetadataNodes;
 	logic: IMetadataLogic;
@@ -202,12 +208,12 @@ export interface IComponentTemplateLabel {
 //
 export interface IBaseStoreComponent {
 	name: string,
-	obj: Comp;
+	comp: Comp;
 }
 
 export interface IBaseComponent {
 	count: number;
-	obj: Comp;
+	comp: Comp;
 }
 
 //***************************************** Item ************************************//
@@ -278,6 +284,7 @@ export interface IWireProperties extends IItemSolidProperties {
 	polyline: SVGElement;
 	lines: SVGElement[];		//used on edit-mode only
 	pad: number;
+	edit: boolean;
 }
 
 export interface IHighlightable {
@@ -334,6 +341,8 @@ export interface IAppWindowProperties extends IAppWindowOptions, IBaseWindowSett
 	//
 	dragging: boolean;
 	offset: Point;
+	//
+	properties: EcProp[];
 }
 
 //***************************************** ContextWindow ************************************//
@@ -427,6 +436,8 @@ export enum ActionType {
 	SHOW_NODE_TOOLTIP = 18,
 	SHOW_BODY_TOOLTIP = 19,
 	FORWARD_OVER = 20,
+	SELECT_ALL = 21,
+	UNSELECT_ALL = 22,
 	//check this one is used
-	AFTER_DRAG = 21
+	AFTER_DRAG = 51
 }

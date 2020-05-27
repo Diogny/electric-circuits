@@ -50,6 +50,6 @@ Used in my testing website [Electric Circuits](http://diogny.com/tests/circuits.
 	git add -u					stage the modified and deleted files
 	git add -A
 	git commit -m "update message"
-	git tag v1.0.6
+	git tag v1.0.7
 	git push origin master --tags
 

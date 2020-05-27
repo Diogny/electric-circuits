@@ -1,12 +1,40 @@
 
-import { aCld, condClass, obj, attr, extend, isFn, addClassX, nano } from './dab';
+import { aCld, condClass, obj, attr, extend, isFn, addClassX, isNum } from './dab';
 import Bond from './bonds';
 import ItemBase from './itemsBase';
 import Comp from './components';
-import { IHighlightable, IPoint, IItemNode, IItemBoardOptions, IBondItem, IItemBoardProperties, ComponentPropertyType } from './interfaces';
+import {
+	IHighlightable, IPoint, IItemNode, IItemBoardOptions, IBondItem, IItemBoardProperties,
+	ComponentPropertyType, IComponentProperty
+} from './interfaces';
 import BoardCircle from './boardCircle';
 import { map, tag } from './utils';
 import EC from './ec';
+import Point from './point';
+
+abstract class PropertyInjector implements IComponentProperty {
+	abstract value: string;
+
+	get type(): string { return "property" }
+
+	abstract setValue(val: string): boolean;
+
+	constructor(public ec: ItemBoard) { }
+}
+
+class PointInjector extends PropertyInjector {
+
+	//later can be atomized to different, now burned to this.p
+	get title(): string { return "position" }
+
+	get value(): string { return this.ec.p.toString(0x06) }	//no vars and no parenthesis
+
+	public setValue(val: string): boolean {
+		let
+			p = Point.parse(val);
+		return p && (this.ec.move(p.x, p.y), true);
+	}
+}
 
 //ItemBoard->Wire
 export default abstract class ItemBoard extends ItemBase {
@@ -19,25 +47,49 @@ export default abstract class ItemBoard extends ItemBase {
 	get selected(): boolean { return this.settings.selected }
 	get bonds(): Bond[] { return this.settings.bonds }
 
-	abstract get count(): number;	// EC is node count, Wire is node count
+	//properties available to show up in property window
+	get windowProperties(): string[] { return ["p"] }
+
+	abstract get count(): number;	// EC is node count, Wire is point count
 
 	constructor(options: IItemBoardOptions) {
 		super(options);
 		//I can use a MAC address for a board item in components.ts to access all base info of component
 		let
-			base = Comp.find(options.name, true);
+			base = Comp.find(this.name, true),
+			regex = /(?:{([^}]+?)})+/g,
+			that = this;
 		if (!base)
-			throw `unknown component: ${options.name}`;
+			throw `unknown component: ${this.name}`;
 		//save base data
-		this.settings.base = base.obj;
-		//this overrides the id
-		////this.base.name + "-" + base.count++;
-		this.settings.id = nano(base.obj.meta.nameTmpl, {
-			name: this.base.name,
-			count: base.count++
-		});
+		this.settings.base = base.comp;
+		//use template to create id according to defined strategy
+		// nano(base.comp.meta.nameTmpl, { name: this.base.name, count: base.count++ });
+		this.settings.id = base.comp.meta.nameTmpl.replace(regex,
+			function (match: string, group: string): string { //, offset: number, str: string
+				let
+					arr = group.split('.'),
+					getRoot = (name: string): any => {
+						//valid entry points
+						switch (name) {
+							case "this": return that;
+							case "base": return base;
+							case "Comp": return Comp;
+						}
+					},
+					rootRef = getRoot(<string>arr.shift()),
+					prop = arr.pop(),
+					result: any;
+				while (rootRef && arr.length)
+					rootRef = rootRef[<any>arr.shift()];
+				if (rootRef == undefined || (result = rootRef[<any>prop]) == undefined)
+					throw `invalid id naming template`;
+				//increment counter if any
+				isNum(result) && (rootRef[<any>prop] = result + 1)
+				return result;
+			});
 		//deep copy component properties
-		this.settings.props = obj(base.obj.props);
+		this.settings.props = obj(base.comp.props);
 		//add properties to DOM
 		attr(this.g, {
 			id: this.id,
@@ -46,11 +98,9 @@ export default abstract class ItemBoard extends ItemBase {
 		//check for custom class
 		this.base.meta.class && addClassX(this.g, this.base.meta.class);
 		//create the highligh object
-		this.highlight = new BoardCircle(options.highlightNodeName);
+		this.highlight = new BoardCircle(this.settings.highlightNodeName);
 		//add it to component, this's the insertion point (insertBefore) for all inherited objects
 		aCld(this.g, this.highlight.g);
-		//initialize Bonds array
-		this.settings.bonds = [];
 		//add component label if available
 		let
 			createText = (attr: any, text: string) => {
@@ -58,28 +108,20 @@ export default abstract class ItemBoard extends ItemBase {
 					svgText = tag("text", "", attr);
 				return svgText.innerHTML = text, svgText
 			}
-		if (base.obj.meta.label) {
+		if (base.comp.meta.label) {
 			aCld(this.g, createText({
-				x: base.obj.meta.label.x,
-				y: base.obj.meta.label.y,
-				"class": base.obj.meta.label.class
-			}, base.obj.meta.label.text))
+				x: base.comp.meta.label.x,
+				y: base.comp.meta.label.y,
+				"class": base.comp.meta.label.class
+			}, base.comp.meta.label.text))
 		}
 		//add node labels
-		if (base.obj.meta.nodeLabel) {
+		if (base.comp.meta.nodeLabel) {
 			let
-				i = 0,
-				factor = 20,
-				x = 7,
 				pins = (this as unknown as EC).count / 2;
-			for (let y = 60; y > 0; y -= 44, x += (factor = -factor)) {
-				for (let col = 0; col < pins; col++, i++, x += factor) {
-					aCld(this.g, createText({
-						x: x,
-						y: y
-					}, i + ""))
-				}
-			}
+			for (let y = 60, x = 7, i = 0, factor = 20; y > 0; y -= 44, x += (factor = -factor))
+				for (let col = 0; col < pins; col++, i++, x += factor)
+					aCld(this.g, createText({ x: x, y: y }, i + ""));
 		}
 
 		//this still doesn't work to get all overridable properties ¿?
@@ -139,11 +181,18 @@ export default abstract class ItemBoard extends ItemBase {
 		return this;
 	}
 
-	public prop(propName: string): ComponentPropertyType { return this.settings.props[propName] }
+	public prop(propName: string): ComponentPropertyType {
+		//inject available properties if called
+		switch (propName) {
+			case "p":
+				return new PointInjector(this)
+		}
+		return this.settings.props[propName]
+	}
 
 	public properties(): string[] {
-		return map(this.settings.props,
-			(value: ComponentPropertyType, key: string) => key)
+		return this.windowProperties.concat(map(this.settings.props,
+			(value: ComponentPropertyType, key: string) => key))
 	}
 
 	//poly.bond(0, ec, 1)
@@ -245,7 +294,8 @@ export default abstract class ItemBoard extends ItemBase {
 	public propertyDefaults(): IItemBoardProperties {
 		return extend(super.propertyDefaults(), {
 			selected: false,
-			onProp: void 0
+			onProp: void 0,
+			bonds: []
 		})
 	}
 }

@@ -1,7 +1,7 @@
 
 import { obj, addClass, removeClass, isStr } from './dab';
 import { tag } from './utils';
-import { Color, Colors } from './colors';
+import { Color } from './colors';
 import { IItemBaseProperties, IItemBaseOptions, ISize } from './interfaces';
 import Item from './item';
 import Rect from './rect';
@@ -48,7 +48,7 @@ export default abstract class ItemBase extends Item {
 		this.settings.g = tag("g", this.settings.id, {
 			class: (this.settings.class = classArr.join(' '))
 		});
-		addClass(this.g, this.settings.color = Color.getcolor(options.color, Colors.white));
+		addClass(this.g, this.color);
 	}
 
 	//ec.setColor("red").rotate(45).select(true).highlight.setRadius(15).highlight.show(5)

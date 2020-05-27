@@ -7,7 +7,7 @@ import {
 } from "./src/interfaces";
 import Comp from "./src/components";
 import { MyApp } from "./src/myapp";
-import { isNumeric, attr, aEL, removeClass, toggleClass, addClass, getParentAttr } from "./src/dab";
+import { attr, aEL, removeClass, toggleClass, addClass, getParentAttr } from "./src/dab";
 import Point from "./src/point";
 import ItemSolid from "./src/itemSolid";
 import EcProp from "./src/ecprop";
@@ -47,7 +47,7 @@ function createComponent(name: string | null): ItemSolid {
 			}
 		});
 		//uncomment only to test, because C1 is created for every capacitor, and R1
-		//list.set(name, comp);
+		list.set(name, comp);
 	}
 
 	//disconnects and remove component from DOM
@@ -57,7 +57,7 @@ function createComponent(name: string | null): ItemSolid {
 	app.svgBoard.insertBefore(comp.g, app.tooltip.g);
 	//do after DOM inserted work
 	comp.afterDOMinserted();
-	
+
 	//create properties
 	app.winProps.clear();
 	comp.properties().forEach((name: string) => {
@@ -70,11 +70,11 @@ function updateRotation() {
 	app.prop("rot_lbl").value = ` ${<string><unknown>((<ItemSolid>app.ec).rotation)}°`;
 }
 
-function updateCompLocation() {
+/*function updateCompLocation() {
 	//format
 	app.pos = app.ec.p;
 	app.prop("comp_pos").value = app.ec.p.toString(0x06); // no vars and no parenthesis `${app.ec.x}, ${app.ec.y}`;
-}
+}*/
 
 function selectedTool(): string {
 	let
@@ -153,9 +153,9 @@ function hookEvents() {
 		enableDisableTools();
 	}, false);
 	//HtmlWindow
-	aEL(qS('.bar-item[tool="ec-props"]'), "click", (e: MouseEvent) => {
+	/*aEL(qS('.bar-item[tool="ec-props"]'), "click", (e: MouseEvent) => {
 		app.winProps.setVisible(!app.winProps.visible);
-	}, false);
+	}, false);*/
 }
 
 function createStateMachine() {
@@ -246,7 +246,8 @@ function createStateMachine() {
 					p = Point.minus(newCtx.offset, <Point>(this as StateMachine).ctx.vector);
 				//moves EC to new location
 				(this as StateMachine).ctx.it?.move(p.x, p.y);
-				updateCompLocation()
+				app.winProps.property("p")?.refresh();
+				//updateCompLocation()
 			},
 			OUT: function () {
 				//has to be empty so dragging is not STOP when passing over another component
@@ -638,20 +639,16 @@ window.addEventListener("DOMContentLoaded", () => {
 							updateRotation();
 						}
 					},
-					comp_pos: {
+					/*comp_pos: {
 						tag: "#comp-pos",
 						onChange: function (value: number | string | string[], where: number) {
 							if (where != 1)		// 1 == "ui"
 								return;
-							let
-								arr = (<string>value).split(",");
-							if (arr.length == 2 && isNumeric(arr[0]) && isNumeric(arr[1])) {
-								app.pos = new Point(parseInt(arr[0]), parseInt(arr[1]));
-								app.ec.move(app.pos.x, app.pos.y);
-							}
+							(app.pos = Point.parse(<string>value)) && app.ec.move(app.pos.x, app.pos.y);
 							updateCompLocation();
+							(<any>document.activeElement).blur();
 						}
-					}
+					}*/
 				},
 				list: json
 			});

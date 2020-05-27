@@ -181,6 +181,7 @@ var AppWindow = /** @class */ (function (_super) {
     AppWindow.prototype.clear = function () {
         //don't call base.clear because it clears all innerHTML
         this.setTextHtml("");
+        this.settings.properties = [];
         return this;
     };
     /**
@@ -204,8 +205,12 @@ var AppWindow = /** @class */ (function (_super) {
             var root = this.main;
             wrap && (root = root.appendChild(document.createElement("div")), root.classList.add("ec-wrap"));
             root.appendChild(el.html);
+            this.settings.properties.push(el);
         }
         return this;
+    };
+    AppWindow.prototype.property = function (name) {
+        return this.settings.properties.find(function (p) { return p.name == name; });
     };
     //public propertyDefaults = (): IItemBaseProperties => {
     AppWindow.prototype.propertyDefaults = function () {
@@ -214,7 +219,8 @@ var AppWindow = /** @class */ (function (_super) {
             content: "",
             bar: "",
             //dragging: false,
-            selected: false
+            selected: false,
+            properties: []
         });
     };
     return AppWindow;

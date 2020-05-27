@@ -26,6 +26,7 @@ var app_window_1 = require("./app-window");
 var stateMachine_1 = require("./stateMachine");
 var components_1 = require("./components");
 var context_window_1 = require("./context-window");
+var ec_1 = require("./ec");
 var MyApp = /** @class */ (function (_super) {
     __extends(MyApp, _super);
     function MyApp(options) {
@@ -77,17 +78,17 @@ var MyApp = /** @class */ (function (_super) {
                     break;
             }
             //UI logs
-            arr.push(" " + state.event + " " + state.id + " " + state.type + "^" + state.over.type);
-            arr.push("multiplier: " + that.multiplier);
+            arr.push(utils_1.pad(state.event, 5, '&nbsp;') + " " + state.id + " " + state.type + "^" + state.over.type);
+            //arr.push(`multiplier: ${that.multiplier}`);
             arr.push("state: " + interfaces_1.StateType[that.state.value]);
             arr.push(state.offset.toString()); //`x: ${round(state.offset.x, 1)} y: ${round(state.offset.y, 1)}`
-            arr.push("client " + clientXY.toString());
+            //arr.push(`client ${clientXY.toString()}`);
             //arr.push(`scaled: x: ${clientXYScaled.x} y: ${clientXYScaled.y}`);
             //render
-            that.topBarLeft.innerText = arr.join(", ");
+            that.topBarLeft.innerHTML = arr.join(", ");
             return state;
         };
-        ;
+        _this.compList = new Map();
         //location is panning, size is for scaling
         _this.viewBox = new rect_1.default(point_1.default.origin, size_1.default.empty);
         //scaling multipler
@@ -127,7 +128,6 @@ var MyApp = /** @class */ (function (_super) {
             commonActions: {
                 HIDE_NODE: function (newContext) {
                     newContext.it && newContext.it.hideNode();
-                    //hide tooltip
                     that.tooltip.setVisible(false);
                 },
                 SHOW_BODY_TOOLTIP: function (newContext) {
@@ -143,7 +143,6 @@ var MyApp = /** @class */ (function (_super) {
                     //data has current state
                     if (!((_a = newContext.it) === null || _a === void 0 ? void 0 : _a.highlighted)) {
                         (_b = newContext.it) === null || _b === void 0 ? void 0 : _b.showNode(newContext.over.nodeNumber);
-                        //show tooltip
                         var p = point_1.default.translateBy(newContext.offset, 20);
                         that.tooltip.setVisible(true)
                             .move(p.x, p.y)
@@ -154,9 +153,7 @@ var MyApp = /** @class */ (function (_super) {
                 FORWARD_OVER: function (newContext) {
                     //accepts transitions to new state on mouse OVER
                     var prefix = !newContext.it ? "" : newContext.it.type == 1 ? "EC_" : "WIRE_", stateName = (prefix + newContext.over.type).toUpperCase(), state = interfaces_1.StateType[stateName];
-                    //EC_NODE		WIRE_NODE
-                    that.state.transition(state, interfaces_1.ActionType.START, newContext);
-                    //console.log(`transition: ${transition}.${action}`)
+                    that.state.transition(state, interfaces_1.ActionType.START, newContext); //EC_NODE		WIRE_NODE
                 }
             }
         });
@@ -192,7 +189,7 @@ var MyApp = /** @class */ (function (_super) {
         //right click o board
         dab_1.aEL(_this.svgBoard, "contextmenu", function (evt) {
             evt.stopPropagation();
-            var target = evt.target, type = dab_1.attr(target, "svg-type"), key = that.rightClick.setTrigger(dab_1.attr(target.parentNode, "id"), dab_1.attr(target.parentNode, "svg-comp"), type, dab_1.attr(target, type));
+            var target = evt.target, type = dab_1.attr(target, "svg-type"), key = that.rightClick.setTrigger(dab_1.attr(target.parentNode, "id"), dab_1.attr(target.parentNode, "svg-comp"), type, type && dab_1.attr(target, type));
             if (key) {
                 that.rightClick
                     .build(key)
@@ -231,6 +228,33 @@ var MyApp = /** @class */ (function (_super) {
     MyApp.prototype.getAspectRatio = function (width, height) {
         var ratio = width / height;
         return (Math.abs(ratio - 4 / 3) < Math.abs(ratio - 16 / 9)) ? '4:3' : '16:9';
+    };
+    MyApp.prototype.hasComponent = function (id) { return this.compList.has(id); };
+    MyApp.prototype.addComponent = function (name) {
+        var comp = void 0;
+        if (name == "wire") {
+            //
+        }
+        else {
+            comp = new ec_1.default({
+                name: name,
+                x: this.pos.x,
+                y: this.pos.y,
+                onProp: function (e) {
+                    //this happens when this component is created
+                }
+            });
+        }
+        if (comp) {
+            if (this.hasComponent(comp.id))
+                throw "duplicated component " + comp.id;
+            this.compList.set(comp.id, comp);
+            //add it to SVG DOM
+            this.svgBoard.insertBefore(comp.g, this.tooltip.g);
+            //do after DOM inserted work
+            comp.afterDOMinserted();
+        }
+        return comp;
     };
     return MyApp;
 }(app_1.Application));

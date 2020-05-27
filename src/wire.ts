@@ -1,9 +1,8 @@
 //wire.ts
-import { addClass, removeClass, attr, isArr } from './dab';
+import { addClass, removeClass, attr, isArr, extend } from './dab';
 import { tag } from './utils';
 import { Type } from './types';
 import { IItemWireOptions, IItemNode, IPoint, IWireProperties } from './interfaces';
-import { Color, Colors } from './colors';
 import ItemBoard from './itemsBoard';
 import Comp from './components';
 import Point from './point';
@@ -21,7 +20,7 @@ export default class Wire extends ItemBoard {
 	get lastLine(): number { return this.editMode ? this.settings.lines.length : 0 }
 
 	//edit-mode
-	get editMode(): boolean { return (<any>this.settings).edit }
+	get editMode(): boolean { return this.settings.edit }
 
 	set editMode(value: boolean) {
 		if (this.editMode == value)		//avoid duplicated
@@ -60,28 +59,17 @@ export default class Wire extends ItemBoard {
 				a = b;
 			}
 		}
-		(<any>this.settings).edit = value
+		this.settings.edit = value
 	}
 
 	constructor(options: IItemWireOptions) {
-		//set defaults
-		options.name = "wire";
-		options.class = "wire";
-		options.highlightNodeName = "node";
-		options.color = Color.getcolor(options.color, Colors.black);	//set default wire color to black if not defined
 		super(options);
-		//
-		this.settings.pad = 10;		//radius of the highlight circle
 		this.settings.polyline = tag("polyline", "", {
 			"svg-type": "line",
 			line: "0",
-			points: "",		//empty points
-			//style: "fill: none;"
+			points: "",
 		});
 		this.g.insertBefore(this.settings.polyline, this.highlight.g);
-
-		//hack sot editMode property is not called
-		(<any>this.settings).edit = false;
 
 		//set new points in polyline
 		this.setPoints(options.points);
@@ -94,6 +82,7 @@ export default class Wire extends ItemBoard {
 		if (options.end) {
 			//...
 		}
+
 		//place it
 		this.move(this.settings.points[0].x, this.settings.points[0].y);
 		//signal component creation
@@ -111,7 +100,6 @@ export default class Wire extends ItemBoard {
 			method: 'create',
 			where: 1			//signals it was a change inside the object
 		});
-		//
 		Comp.save(this);
 	}
 
@@ -223,4 +211,16 @@ export default class Wire extends ItemBoard {
 			return node == -1 ? this.last : <any>node;
 		return -1;
 	}
+
+	public propertyDefaults(): IWireProperties {
+		return extend(super.propertyDefaults(), {
+			name: "wire",
+			class: "wire",
+			highlightNodeName: "node",
+			pad: 10,					// radius of the highlight circle
+			color: "black",
+			edit: false					// initial is false
+		})
+	}
+
 }

@@ -17,30 +17,19 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var dab_1 = require("./dab");
 var utils_1 = require("./utils");
 var types_1 = require("./types");
-var colors_1 = require("./colors");
 var itemsBoard_1 = require("./itemsBoard");
 var components_1 = require("./components");
 var point_1 = require("./point");
 var Wire = /** @class */ (function (_super) {
     __extends(Wire, _super);
     function Wire(options) {
-        var _this = this;
-        //set defaults
-        options.name = "wire";
-        options.class = "wire";
-        options.highlightNodeName = "node";
-        options.color = colors_1.Color.getcolor(options.color, colors_1.Colors.black); //set default wire color to black if not defined
-        _this = _super.call(this, options) || this;
-        //
-        _this.settings.pad = 10; //radius of the highlight circle
+        var _this = _super.call(this, options) || this;
         _this.settings.polyline = utils_1.tag("polyline", "", {
             "svg-type": "line",
             line: "0",
             points: "",
         });
         _this.g.insertBefore(_this.settings.polyline, _this.highlight.g);
-        //hack sot editMode property is not called
-        _this.settings.edit = false;
         //set new points in polyline
         _this.setPoints(options.points);
         //bond wire ends if any
@@ -67,7 +56,6 @@ var Wire = /** @class */ (function (_super) {
             method: 'create',
             where: 1 //signals it was a change inside the object
         });
-        //
         components_1.default.save(_this);
         return _this;
     }
@@ -228,6 +216,16 @@ var Wire = /** @class */ (function (_super) {
         if (this.valid(node))
             return node == -1 ? this.last : node;
         return -1;
+    };
+    Wire.prototype.propertyDefaults = function () {
+        return dab_1.extend(_super.prototype.propertyDefaults.call(this), {
+            name: "wire",
+            class: "wire",
+            highlightNodeName: "node",
+            pad: 10,
+            color: "black",
+            edit: false // initial is false
+        });
     };
     return Wire;
 }(itemsBoard_1.default));

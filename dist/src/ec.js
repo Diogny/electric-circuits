@@ -26,11 +26,7 @@ var label_1 = require("./label");
 var EC = /** @class */ (function (_super) {
     __extends(EC, _super);
     function EC(options) {
-        var _this = this;
-        //set defaults
-        options.class = "ec";
-        options.highlightNodeName = "node";
-        _this = _super.call(this, options) || this;
+        var _this = _super.call(this, options) || this;
         //this ensures all path, rect, circles are inserted before the highlight circle node
         //_.svg is used because _.html doesn't work for SVG
         [].slice.call(utils_1.svg("<g>" + _this.base.data + "</g>").children).forEach(function (n) {
@@ -90,8 +86,8 @@ var EC = /** @class */ (function (_super) {
     EC.prototype.refresh = function () {
         var _this = this;
         var attrs = {
-            dragx: this.x,
-            dragy: this.y,
+            //dragx: this.x,
+            //dragy: this.y,
             transform: "translate(" + this.x + " " + this.y + ")"
         }, center = this.origin;
         if (this.rotation) {
@@ -174,6 +170,12 @@ var EC = /** @class */ (function (_super) {
     };
     EC.prototype.afterDOMinserted = function () {
         this.label && (this.g.insertAdjacentElement("afterend", this.label.g), this.label.setVisible(true));
+    };
+    EC.prototype.propertyDefaults = function () {
+        return dab_1.extend(_super.prototype.propertyDefaults.call(this), {
+            class: "ec",
+            highlightNodeName: "node"
+        });
     };
     return EC;
 }(itemSolid_1.default));

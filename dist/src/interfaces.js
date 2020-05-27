@@ -33,7 +33,9 @@ var ActionType;
     ActionType[ActionType["SHOW_NODE_TOOLTIP"] = 18] = "SHOW_NODE_TOOLTIP";
     ActionType[ActionType["SHOW_BODY_TOOLTIP"] = 19] = "SHOW_BODY_TOOLTIP";
     ActionType[ActionType["FORWARD_OVER"] = 20] = "FORWARD_OVER";
+    ActionType[ActionType["SELECT_ALL"] = 21] = "SELECT_ALL";
+    ActionType[ActionType["UNSELECT_ALL"] = 22] = "UNSELECT_ALL";
     //check this one is used
-    ActionType[ActionType["AFTER_DRAG"] = 21] = "AFTER_DRAG";
+    ActionType[ActionType["AFTER_DRAG"] = 51] = "AFTER_DRAG";
 })(ActionType = exports.ActionType || (exports.ActionType = {}));
 //# sourceMappingURL=interfaces.js.map

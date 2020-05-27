@@ -18,7 +18,14 @@ var EcProp = /** @class */ (function () {
             (prop.type == "unit")
                 && (this.unit = new units_1.default(prop.value));
         }
-        var htmlProp;
+        var htmlProp, that = this;
+        //hack to capture inside variables, not exposed outside
+        this.refresh = function () {
+            //get value from component property
+            that.propValue = prop.value;
+            //set it's UI value, so far only for INPUT
+            (htmlProp.nodeName == "INPUT") && (htmlProp.value = that.propValue);
+        };
         //create html
         if (this.editable) {
             this.propValue = prop.value;
@@ -32,19 +39,28 @@ var EcProp = /** @class */ (function () {
                 htmlProp = utils_1.html("<input class=\"ec-prop\" value=\"" + this.value + "\">");
             }
             //hook onchange event if editable
-            var that_1 = this;
             onChange && (this.onChange = onChange, htmlProp.addEventListener('change', function () {
                 //save new value
                 if (htmlProp.nodeName == "INPUT") {
-                    that_1.propValue = htmlProp.value;
+                    that.propValue = htmlProp.value;
                 }
                 else {
-                    that_1.propValue = htmlProp.selectedOptions[0].value;
+                    that.propValue = htmlProp.selectedOptions[0].value;
                 }
                 //create unit if defined
-                that_1.unit && (that_1.unit = new units_1.default(that_1.propValue));
-                prop.value = that_1.propValue;
-                that_1.onChange.call(that_1, that_1.value);
+                that.unit && (that.unit = new units_1.default(that.propValue));
+                //set new value
+                if (prop.type == "property") {
+                    //we need feed back that it was successfully set
+                    //  only for INPUT for now
+                    !prop.setValue(that.propValue)
+                        && that.refresh();
+                }
+                else
+                    prop.value = that.propValue;
+                document.activeElement.blur();
+                //call onchange event if any
+                that.onChange.call(that, that.value);
             }));
         }
         else {
@@ -53,7 +69,7 @@ var EcProp = /** @class */ (function () {
         }
         if (addTitle) {
             //wrap title
-            this.html = utils_1.html("<span><label class=\"ec-prop-title\">" + name + "</label></span>");
+            this.html = utils_1.html("<span><label class=\"ec-prop-title\">" + (prop.title || name) + "</label></span>");
             this.html.appendChild(htmlProp);
         }
         else {
@@ -69,6 +85,7 @@ var EcProp = /** @class */ (function () {
         enumerable: false,
         configurable: true
     });
+    EcProp.prototype.refresh = function () { };
     return EcProp;
 }());
 exports.default = EcProp;

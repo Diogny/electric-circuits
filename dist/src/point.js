@@ -41,6 +41,18 @@ var Point = /** @class */ (function () {
     Point.create = function (p) {
         return new Point(p.x, p.y);
     };
+    /**
+     * @description parse an string into an (x,y) Point
+     * @param value string in the for "x, y"
+     */
+    Point.parse = function (value) {
+        var arr = value.split(",");
+        if (arr.length == 2 && dab_1.isNumeric(arr[0]) && dab_1.isNumeric(arr[1])) {
+            return new Point(parseInt(arr[0]), parseInt(arr[1]));
+        }
+        //invalid point
+        return void 0;
+    };
     Point.distance = function (p1, p2) {
         return p1.distance(p2);
     };

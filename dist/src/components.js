@@ -1,10 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var dab_1 = require("./dab");
-var defaultIdTemplate = "{name}-{count}";
+var defaultIdTemplate = "{this.name}-{base.count}";
 var defaultComponent = function (name) { return ({
     name: name,
-    obj: {
+    comp: {
         name: name,
         type: name,
         meta: {
@@ -21,11 +21,11 @@ var Comp = /** @class */ (function () {
         this.settings = dab_1.obj(options);
         //check to see if this component derivates from a template
         if (template) {
-            var comp = Comp.find(template.name, true);
+            var base = Comp.find(template.name, true);
             //copy SVG data
-            this.settings.data = comp.obj.data;
+            this.settings.data = base.comp.data;
             //deep copy meta, it has simple object and values
-            this.settings.meta = JSON.parse(JSON.stringify(comp.obj.meta));
+            this.settings.meta = JSON.parse(JSON.stringify(base.comp.meta));
             //copy label if any
             template.label && (this.settings.meta.label = dab_1.obj(template.label));
             //update node labels
@@ -74,7 +74,7 @@ var Comp = /** @class */ (function () {
         return map.set(name, dab_1.obj({
             //interface IBaseComponent
             count: o.meta.countStart | 0,
-            obj: o
+            comp: o
         }));
     };
     Comp.initializeComponents = function (list) {
@@ -83,12 +83,15 @@ var Comp = /** @class */ (function () {
             set = new Map();
         }
         list.forEach(function (c) {
-            Comp.storeComponent(set, c.name, c.obj);
+            Comp.storeComponent(set, c.name, c.comp);
         });
         return set;
     };
     // all base components with metadata
     Comp.baseComps = Comp.initializeComponents([defaultComponent("tooltip"), defaultComponent("wire")]);
+    //global static variables
+    Comp.resistorCount = 1;
+    Comp.capacitorCount = 1;
     //all ecs, wires in the board
     Comp.boardItems = new Map();
     ////////////////////////////// STATIC ////////////////////////////////
@@ -103,16 +106,16 @@ var Comp = /** @class */ (function () {
     //BASE COMPONENT METADATA
     //register a new base component template
     Comp.register = function (options) { return new Comp(options); };
-    Comp.store = function (name, obj) {
+    Comp.store = function (name, comp) {
         return Comp.baseComps.has(name) ?
             false :
-            (Comp.storeComponent(Comp.baseComps, name, obj), true);
+            (Comp.storeComponent(Comp.baseComps, name, comp), true);
     };
     Comp.has = function (name) { return Comp.baseComps.has(name); };
     Comp.find = function (name, original) {
         var entry = Comp.baseComps.get(name);
         return (!entry || original) ? entry : dab_1.obj({
-            obj: entry.obj,
+            comp: entry.comp,
             count: entry.count
         });
     };

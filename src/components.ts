@@ -5,10 +5,10 @@ import {
 	IBaseComponent, IComponentOptions, IBaseStoreComponent, IComponentMetadata
 } from './interfaces';
 
-const defaultIdTemplate = "{name}-{count}";
+const defaultIdTemplate = "{this.name}-{base.count}";
 const defaultComponent = (name: string): IBaseStoreComponent => (<any>{
 	name: name,
-	obj: {
+	comp: {
 		name: name,
 		type: name,
 		meta: {
@@ -22,10 +22,16 @@ export default class Comp {
 	// all base components with metadata
 	private static baseComps: Map<string, IBaseComponent> =
 		Comp.initializeComponents([defaultComponent("tooltip"), defaultComponent("wire")]);
+	//global static variables
+	private static resistorCount: number = 1;
+	private static capacitorCount: number = 1;
 
 	//all ecs, wires in the board
 	private static boardItems: Map<string, ItemBoard> = new Map();
 	protected settings: IComponentOptions;
+	//references
+	resistorCount: number;
+	capacitorCount: number;
 
 	get name(): string { return this.settings.name }
 	get type(): string { return this.settings.type }
@@ -47,11 +53,11 @@ export default class Comp {
 		//check to see if this component derivates from a template
 		if (template) {
 			let
-				comp = Comp.find(template.name, true);
+				base = Comp.find(template.name, true);
 			//copy SVG data
-			this.settings.data = comp.obj.data;
+			this.settings.data = base.comp.data;
 			//deep copy meta, it has simple object and values
-			this.settings.meta = JSON.parse(JSON.stringify(comp.obj.meta));
+			this.settings.meta = JSON.parse(JSON.stringify(base.comp.meta));
 			//copy label if any
 			template.label && (this.settings.meta.label = obj(template.label));
 			//update node labels
@@ -89,7 +95,7 @@ export default class Comp {
 		return map.set(name, obj({
 			//interface IBaseComponent
 			count: o.meta.countStart | 0,
-			obj: o
+			comp: o
 		}))
 	}
 
@@ -100,15 +106,15 @@ export default class Comp {
 			set = new Map();
 		}
 		list.forEach((c) => {
-			Comp.storeComponent(set, c.name, c.obj)
+			Comp.storeComponent(set, c.name, c.comp)
 		});
 		return set;
 	}
 
-	public static store = (name: string, obj: Comp): boolean =>
+	public static store = (name: string, comp: Comp): boolean =>
 		Comp.baseComps.has(name) ?
 			false :
-			(Comp.storeComponent(Comp.baseComps, name, obj), true);
+			(Comp.storeComponent(Comp.baseComps, name, comp), true);
 
 	public static has = (name: string) => Comp.baseComps.has(name);
 
@@ -116,7 +122,7 @@ export default class Comp {
 		let
 			entry = Comp.baseComps.get(name);
 		return (!entry || original) ? entry : obj({
-			obj: entry.obj,
+			comp: entry.comp,
 			count: entry.count
 		})
 	}

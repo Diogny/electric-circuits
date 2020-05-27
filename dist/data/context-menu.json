@@ -18,90 +18,90 @@
 	"ec-body": [
 		{
 			"text": "Delete",
-			"action": 0,
+			"action": 10,
 			"shortcut": "Del"
 		},
 		{
 			"text": "Properties",
-			"action": 0,
+			"action": 11,
 			"shortcut": "Ctrl+P"
 		},
 		{
 			"text": "Rotate 45 clockwise",
-			"action": 110
+			"action": 20
 		},
 		{
 			"text": "Rotate 45 counter clockwise",
-			"action": 111
+			"action": 21
 		},
 		{
 			"text": "Rotate 90 clockwise",
-			"action": 112
+			"action": 22
 		},
 		{
 			"text": "Rotate 90 counter clockwise",
-			"action": 113
+			"action": 23
 		},
 		{
 			"text": "Select",
-			"action": 0
+			"action": 1
 		},
 		{
 			"text": "Bring to Front",
-			"action": 0
+			"action": 3
 		}
 	],
 	"ec-node": [
 		{
 			"text": "Unbond",
-			"action": 0,
+			"action": 30,
 			"shortcut": "Ctrl-U"
 		},
 		{
 			"text": "Connections",
-			"action": 0,
+			"action": 31,
 			"shortcut": "Ctrl+P"
 		},
 		{
 			"text": "Select",
-			"action": 0
+			"action": 1
 		}
 	],
 	"wire-line": [
 		{
 			"text": "Properties",
-			"action": 0,
+			"action": 11,
 			"shortcut": "Ctrl+P"
 		},
 		{
 			"text": "Delete",
-			"action": 0,
+			"action": 10,
 			"shortcut": "Del"
 		},
 		{
 			"text": "Connections",
-			"action": 0,
+			"action": 31,
 			"shortcut": "Ctrl+P"
 		},
 		{
 			"text": "Select",
-			"action": 0
+			"action": 1
 		}
 	],
 	"wire-node": [
 		{
 			"text": "Delete",
-			"action": 0,
+			"action": 10,
 			"shortcut": "Del"
 		},
 		{
 			"text": "Connections",
-			"action": 0,
+			"action": 31,
 			"shortcut": "Ctrl+P"
 		},
 		{
 			"text": "Select",
-			"action": 0
+			"action": 1
 		}
 	]
 }

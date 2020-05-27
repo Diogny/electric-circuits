@@ -2,7 +2,7 @@
 //https://github.com/Microsoft/TypeScriptSamples/blob/master/raytracer/raytracer.ts
 
 import { IPoint, ISize } from './interfaces';
-import { round } from './dab';
+import { round, isNumeric } from './dab';
 
 export default class Point implements IPoint {
 	public x: number;
@@ -59,6 +59,20 @@ export default class Point implements IPoint {
 
 	static create(p: IPoint) {
 		return new Point(p.x, p.y)
+	}
+
+	/**
+	 * @description parse an string into an (x,y) Point
+	 * @param value string in the for "x, y"
+	 */
+	static parse(value: string): Point {
+		let
+			arr = value.split(",");
+		if (arr.length == 2 && isNumeric(arr[0]) && isNumeric(arr[1])) {
+			return new Point(parseInt(arr[0]), parseInt(arr[1]));
+		}
+		//invalid point
+		return <any>void 0;
 	}
 
 	static distance(p1: Point, p2: Point) {

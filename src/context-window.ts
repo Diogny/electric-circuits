@@ -2,6 +2,10 @@ import BaseWindow from "./base-window";
 import { IContextMenuOptions, IContextMenuItem, IContextMenuSettings } from "./interfaces";
 import { each } from "./utils";
 import { nano, aEL, getParentAttr, attr } from "./dab";
+import Comp from "./components";
+import { MyApp } from "./myapp";
+import EcProp from "./ecprop";
+import ItemBoard from "./itemsBoard";
 
 export default class ContextWindow extends BaseWindow {
 
@@ -26,10 +30,36 @@ export default class ContextWindow extends BaseWindow {
 		aEL(this.win, "click", (e: MouseEvent) => {
 			let
 				self = getParentAttr(e.target as HTMLElement, "data-action"),
-				action = attr(self, "data-action"),
+				action = attr(self, "data-action") | 0,
 				trigger = attr(self.parentElement, "data-trigger")
-			self && (console.log(self.nodeName, action, trigger), that.setVisible(false))
+			self && (that.setVisible(false), this.execute(action, trigger))
 		}, false)
+	}
+
+	public execute(action: number, trigger: string) {
+		let
+			arr = trigger.split('::'),
+			comp = Comp.item(<string>arr.shift()),
+			name = arr.shift(),
+			type = arr.shift(),
+			app = this.app as MyApp;
+		if (comp) {
+			switch (action) {
+				case 11:		//"Properties"
+					app.winProps.clear();
+					comp.properties().forEach((name: string) => {
+						app.winProps.appendPropChild(new EcProp(<ItemBoard>comp, name, true,
+							function onEcPropChange(value: any) {
+								console.log(this, value)
+							}), true);
+					});
+					app.winProps.setVisible(true);
+					break;
+			}
+			console.log(`action: ${action}, id: ${comp.id}, name: ${name}, type: ${type}, trigger: ${trigger}`);
+		} else {
+			console.log(`invalid trigger: ${trigger}`);
+		}
 	}
 
 	public setVisible(value: boolean): ContextWindow {
@@ -43,12 +73,12 @@ export default class ContextWindow extends BaseWindow {
 	 * @param type component child type
 	 * @returns {string} context key
 	 */
-	public setTrigger(id: string, comp: string, type: string, data: string): string {
+	public setTrigger(id: string, name: string, type: string, data: string): string {
 		let
 			ctx;
 		switch (type) {
 			case "node":
-				ctx = ((comp == "wire") ? "wire-" : "ec-") + type;
+				ctx = ((name == "wire") ? "wire-" : "ec-") + type;
 				break;
 			case "board":
 				ctx = type;
@@ -60,10 +90,14 @@ export default class ContextWindow extends BaseWindow {
 				ctx = "wire-" + type;
 				break;
 			default:
-				return <any>void 0;
+				//if id && comp has a value, then type is "body"
+				if (id && name) {
+					ctx = "ec-" + (type = "body");
+				} else
+					return <any>void 0;
 		}
-		let a = [id, comp, type, data].filter(v => v != null);
-		return this.win.setAttribute("data-trigger", `${a.join(':')}`), ctx
+		let a = [id, name, type, data].filter(v => v != null);
+		return this.win.setAttribute("data-trigger", `${a.join('::')}`), ctx
 	}
 
 	public build(key: string): ContextWindow {

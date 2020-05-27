@@ -359,7 +359,8 @@ g.tooltip > text {
 
 .bar-item[data-scale],
 .bar-item[tool],
-.bar-item[rot-dir] {
+.bar-item[rot-dir],
+.bar-item.link {
   cursor: pointer;
 }
 
@@ -369,7 +370,8 @@ g.tooltip > text {
 
 .bar-item[data-scale]:hover,
 .bar-item[tool]:hover,
-.bar-item[rot-dir]:hover {
+.bar-item[rot-dir]:hover,
+.bar-item.link:hover {
   /*opacity: 0.6;*/
   background: #73b2eb;
 }
