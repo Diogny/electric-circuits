@@ -5,6 +5,7 @@ import { html } from "./utils";
 import Point from "./point";
 import EcProp from "./ecprop";
 import { MyApp } from "./myapp";
+import ItemBoard from "./itemsBoard";
 
 export default class AppWindow extends BaseWindow {
 
@@ -23,6 +24,8 @@ export default class AppWindow extends BaseWindow {
 		}
 		return this;
 	}
+
+	public compId: string;
 
 	//title/header
 	titleHTML: HTMLDivElement;
@@ -176,6 +179,7 @@ export default class AppWindow extends BaseWindow {
 	public clear(): AppWindow {
 		//don't call base.clear because it clears all innerHTML
 		this.setTextHtml("");
+		this.compId = "";
 		this.settings.properties = [];
 		return this;
 	}
@@ -196,6 +200,21 @@ export default class AppWindow extends BaseWindow {
 	public appendHtmlChild(el: HTMLElement): AppWindow {
 		el && this.main.appendChild(el);
 		return this
+	}
+
+	public load(comp: ItemBoard): boolean {
+		if (!comp)
+			return false;
+		this.clear();
+		this.compId = comp.id;
+		comp.properties().forEach((name: string) => {
+			this.appendPropChild(new EcProp(<ItemBoard>comp, name, true,
+				function onEcPropChange(value: any) {
+					console.log(this, value)
+				}), true);
+		});
+		this.setVisible(true);
+		return true;
 	}
 
 	public appendPropChild(el: EcProp, wrap?: boolean): AppWindow {

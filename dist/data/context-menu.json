@@ -2,16 +2,16 @@
 	"board": [
 		{
 			"text": "Remove All",
-			"action": 0
+			"action": 1
 		},
 		{
 			"text": "Select All",
-			"action": 9,
+			"action": 8,
 			"shortcut": "Ctrl+A"
 		},
 		{
 			"text": "Deselect All",
-			"action": 19,
+			"action": 9,
 			"shortcut": "Ctrl+B"
 		}
 	],
@@ -44,7 +44,7 @@
 		},
 		{
 			"text": "Select",
-			"action": 1
+			"action": 7
 		},
 		{
 			"text": "Bring to Front",
@@ -64,7 +64,7 @@
 		},
 		{
 			"text": "Select",
-			"action": 1
+			"action": 7
 		}
 	],
 	"wire-line": [
@@ -85,7 +85,7 @@
 		},
 		{
 			"text": "Select",
-			"action": 1
+			"action": 7
 		}
 	],
 	"wire-node": [
@@ -101,7 +101,7 @@
 		},
 		{
 			"text": "Select",
-			"action": 1
+			"action": 7
 		}
 	]
 }

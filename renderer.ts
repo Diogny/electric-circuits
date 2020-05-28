@@ -2,16 +2,13 @@ import { ipcRenderer } from "electron";
 import { templatesDOM, qSA, qS } from "./src/utils"
 import * as fs from 'fs';
 import {
-	IComponentOptions, IApplicationOptions, IItemSolidOptions, IItemWireOptions, IPoint,
+	IComponentOptions, IApplicationOptions,
 	StateType as State, ActionType as Action, IMachineState, IMouseState, IItemNode
 } from "./src/interfaces";
 import Comp from "./src/components";
 import { MyApp } from "./src/myapp";
 import { attr, aEL, removeClass, toggleClass, addClass, getParentAttr } from "./src/dab";
 import Point from "./src/point";
-import ItemSolid from "./src/itemSolid";
-import EcProp from "./src/ecprop";
-import EC from "./src/ec";
 import Wire from "./src/wire";
 import StateMachine from "./src/stateMachine";
 import { Type } from "./src/types";
@@ -19,18 +16,14 @@ import ItemBoard from "./src/itemsBoard";
 import Size from "src/size";
 
 let
-	app: MyApp = <any>void 0,
-	//this will hold components created by key==name, to test set editable property and others...
-	//	only full refresh starts from scratch
-	list: Map<string, EC> = new Map();
+	app: MyApp = <any>void 0;
+//this will hold components created by key==name, to test set editable property and others...
+//	only full refresh starts from scratch
+//list: Map<string, EC> = new Map();
 
 //https://www.electronjs.org/docs/tutorial/security
 
-function onEcPropChange(value: any) {
-	console.log(this, value)
-}
-
-function createComponent(name: string | null): ItemSolid {
+/*function createComponent(name: string | null): ItemSolid {
 	!name && (name = <string>app.prop("comp_option").value);
 	let
 		comp: EC;
@@ -40,8 +33,8 @@ function createComponent(name: string | null): ItemSolid {
 	} else {
 		comp = new EC(<IItemSolidOptions><unknown>{
 			name: name,
-			x: app.pos.x,
-			y: app.pos.y,
+			x: app.center.x,
+			y: app.center.y,
 			onProp: function (e: any) {
 				//this happens when this component is created
 			}
@@ -64,11 +57,7 @@ function createComponent(name: string | null): ItemSolid {
 		app.winProps.appendPropChild(new EcProp(comp, name, true, onEcPropChange), true);
 	})
 	return comp;
-}
-
-function updateRotation() {
-	app.prop("rot_lbl").value = ` ${<string><unknown>((<ItemSolid>app.ec).rotation)}°`;
-}
+}*/
 
 /*function updateCompLocation() {
 	//format
@@ -119,14 +108,8 @@ function hookEvents() {
 		}, false);
 	});
 	//Rotations
-	aEL(qS('.bar-item[rot-dir="left"]'), "click", (e: MouseEvent) => {
-		app.ec.rotate(app.ec.rotation - 45);
-		updateRotation();
-	}, false);
-	aEL(qS('.bar-item[rot-dir="right"]'), "click", (e: MouseEvent) => {
-		app.ec.rotate(app.ec.rotation + 45);
-		updateRotation();
-	}, false);
+	aEL(qS('.bar-item[rot-dir="left"]'), "click", () => app.rotateEC(-45), false);
+	aEL(qS('.bar-item[rot-dir="right"]'), "click", () => app.rotateEC(45), false);
 	//wire editing
 	aEL(qS('.bar-item[tool="wire-edit"]'), "click", (e: MouseEvent) => {
 		if (!noToolSelectedOr("wire-edit")) {
@@ -156,6 +139,8 @@ function hookEvents() {
 	/*aEL(qS('.bar-item[tool="ec-props"]'), "click", (e: MouseEvent) => {
 		app.winProps.setVisible(!app.winProps.visible);
 	}, false);*/
+	//add component
+	aEL(qS('.bar-item[tool="comp-create"]'), "click", () => app.addComponent(<string>app.prop("comp_option").value), false);
 }
 
 function createStateMachine() {
@@ -196,6 +181,10 @@ function createStateMachine() {
 			DOWN: function (newCtx: IMouseState) {
 				//save new context
 				app.rightClick.setVisible(false);
+			},
+			UP: function (newCtx: IMouseState) {
+				actionDefaultCopyNewState(newCtx);
+				app.rightClick.execute(9, 'board::board::board');
 			},
 			//transitions
 			START: function (newCtx: IMouseState) {
@@ -295,7 +284,12 @@ function createStateMachine() {
 				//save new context
 				(this as StateMachine).ctx = newCtx;
 			},
-			UP: actionDefaultCopyNewState,	//up after down should be show properties, not now
+			UP: function (newCtx: IMouseState) {	//up after down should be show properties, not now
+				actionDefaultCopyNewState(newCtx);
+				//must exists an ec, left-click only
+				newCtx.it && (newCtx.button == 0)
+					&& app.rightClick.execute(7, [newCtx.it.id, newCtx.it.name, "body"].join('::'));
+			},
 			//transitions
 			START: function (newCtx: IMouseState) {
 				//uses machine current state
@@ -601,7 +595,6 @@ function readJson(path: string): any {
 	return json
 }
 
-// It has the same sandbox as a Chrome extension.
 window.addEventListener("DOMContentLoaded", () => {
 
 	//load DOM script HTML templates
@@ -634,21 +627,11 @@ window.addEventListener("DOMContentLoaded", () => {
 							if (where != 1)		// 1 == "ui"
 								return;
 							//create and save
-							(<any>window).ec = app.ec = createComponent(<string>value);
+							//(<any>window).ec = app.ec = createComponent(<string>value);
 							//new component has rotation == 0
-							updateRotation();
+							//updateRotation();
 						}
-					},
-					/*comp_pos: {
-						tag: "#comp-pos",
-						onChange: function (value: number | string | string[], where: number) {
-							if (where != 1)		// 1 == "ui"
-								return;
-							(app.pos = Point.parse(<string>value)) && app.ec.move(app.pos.x, app.pos.y);
-							updateCompLocation();
-							(<any>document.activeElement).blur();
-						}
-					}*/
+					}
 				},
 				list: json
 			});
@@ -660,39 +643,32 @@ window.addEventListener("DOMContentLoaded", () => {
 			app.board.appendChild(app.winProps.win);
 			//add right-click window
 			app.board.appendChild(app.rightClick.win);
-			(<any>window).rc = app.rightClick;
 
 			//this's the top SVG element and all other are inserted before, so it's always ON TOP z-index max
 			//add text tooltip to SVG DOM
 			app.svgBoard.append(app.tooltip.g);
 
+			hookEvents();
+			createStateMachine();
+
+			//enable state machine to accept commands
+			app.state.enabled = true;
+
 
 			//////////////////// TESTINGS /////////////////
 
 			//create default EC first
-			app.ec = createComponent(null);
+			app.addComponent(<string>app.prop("comp_option").value);
 
-			//Wire
-			//wire.setPoints([{x:50,y:100}, {x:200,y:100}, {x:200, y:25}, {x:250,y:25}])
-			app.wire = new Wire((<IItemWireOptions>{
-				points: <IPoint[]>[
-					{ x: 25, y: 50 },
-					{ x: 25, y: 100 },
-					{ x: 200, y: 100 },
-					{ x: 200, y: 25 },
-					{ x: 250, y: 25 }]
-			}));
-			//add it to SVG DOM before insertion point
-			app.svgBoard.insertBefore(app.wire.g, app.tooltip.g);
+			(<any>window).wire = app.addComponent("wire");
 
 			//testings
 			//to debug faster
 			//(<any>window).win = app.winProps;
 			//(<any>window).combo = app.prop("comp_option");
 			//(<any>window).board = app.board;
-			(<any>window).ec = app.ec;
 			(<any>window).tooltip = app.tooltip;
-			(<any>window).wire = app.wire;
+			(<any>window).rc = app.rightClick;
 			//(<any>window).compColor = app.prop("comp_color");
 
 			//(<any>window).Colors = Colors;
@@ -703,14 +679,6 @@ window.addEventListener("DOMContentLoaded", () => {
 			//var p = new Prop({ tag: "#inp02", onChange : function(e) { console.log(e) } })
 
 			(<any>window).MyApp = app;
-
-			//////////////////// TESTINGS /////////////////
-
-			hookEvents();
-			createStateMachine();
-
-			//enable state machine to accept commands
-			app.state.enabled = true;
 
 			const replaceText = (selector: string, text: string) => {
 				const element = document.getElementById(selector);
@@ -723,13 +691,13 @@ window.addEventListener("DOMContentLoaded", () => {
 				replaceText(`${type}-version`, (process.versions as any)[type]);
 			}
 
+			//////////////////// TESTINGS /////////////////
+
 		})
 		.catch((ex: any) => {
 			console.log(ex)
 		});
 });
-
-//this's a proof of concept of how to communicate with main process, the recommended new way...
 
 function updateViewBox(arg: any) {
 	//set body height
@@ -746,6 +714,9 @@ function updateViewBox(arg: any) {
 	app.setViewBox(<any>undefined);
 	//console.log(event, arg)
 }
+
+//this's a proof of concept of how to communicate with main process, the recommended new way...
+//	function updateViewBox(arg: any) built this way
 
 ipcRenderer.on("win-resize", (event, arg) => {
 	updateViewBox(arg)

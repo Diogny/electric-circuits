@@ -4,8 +4,9 @@ import { each } from "./utils";
 import { nano, aEL, getParentAttr, attr } from "./dab";
 import Comp from "./components";
 import { MyApp } from "./myapp";
-import EcProp from "./ecprop";
 import ItemBoard from "./itemsBoard";
+import { Type } from "./types";
+import EC from "./ec";
 
 export default class ContextWindow extends BaseWindow {
 
@@ -42,23 +43,52 @@ export default class ContextWindow extends BaseWindow {
 			comp = Comp.item(<string>arr.shift()),
 			name = arr.shift(),
 			type = arr.shift(),
-			app = this.app as MyApp;
-		if (comp) {
-			switch (action) {
-				case 11:		//"Properties"
-					app.winProps.clear();
-					comp.properties().forEach((name: string) => {
-						app.winProps.appendPropChild(new EcProp(<ItemBoard>comp, name, true,
-							function onEcPropChange(value: any) {
-								console.log(this, value)
-							}), true);
-					});
-					app.winProps.setVisible(true);
-					break;
+			app = this.app as MyApp,
+			compNull = false,
+			selectAll = (value: boolean): ItemBoard[] => {
+				let
+					arr = Array.from(app.compList.values());
+				arr.forEach(comp => comp.select(value));
+				return arr;
 			}
-			console.log(`action: ${action}, id: ${comp.id}, name: ${name}, type: ${type}, trigger: ${trigger}`);
-		} else {
+		//this's a temporary fix to make it work
+		//	final code will have a centralized action dispatcher
+		switch (action) {
+			case 7:			//"Select" just ONE
+				if (!(compNull = !comp)) {
+					selectAll(false);
+					app.selectedComponents = [comp.select(true)];
+					app.refreshRotation();
+					app.winProps.load(comp);
+					//temporary, for testings...
+					(<any>window).ec = app.ec;
+				}
+				break;
+			case 8:			//"Select All"
+				app.selectedComponents = selectAll(true);
+				app.refreshRotation();
+				app.winProps.clear();
+				break;
+			case 9:			//"Deselect All"
+				selectAll(false);
+				app.selectedComponents = [];
+				app.refreshRotation();
+				app.winProps.clear();
+				break;
+			case 10:		//"Delete"
+				//disconnects and remove component from DOM
+				//app.ec && (app.ec.disconnect(), app.ec.remove());
+				break;
+			case 11:		//"Properties"
+				if (!(compNull = !comp)) {
+					app.winProps.load(comp);
+				}
+				break;
+		}
+		if (compNull) {
 			console.log(`invalid trigger: ${trigger}`);
+		} else {
+			console.log(`action: ${action}, id: ${comp?.id}, name: ${name}, type: ${type}, trigger: ${trigger}`);
 		}
 	}
 

@@ -17,7 +17,6 @@ var base_window_1 = require("./base-window");
 var utils_1 = require("./utils");
 var dab_1 = require("./dab");
 var components_1 = require("./components");
-var ecprop_1 = require("./ecprop");
 var ContextWindow = /** @class */ (function (_super) {
     __extends(ContextWindow, _super);
     function ContextWindow(options) {
@@ -43,23 +42,50 @@ var ContextWindow = /** @class */ (function (_super) {
         return _this;
     }
     ContextWindow.prototype.execute = function (action, trigger) {
-        var arr = trigger.split('::'), comp = components_1.default.item(arr.shift()), name = arr.shift(), type = arr.shift(), app = this.app;
-        if (comp) {
-            switch (action) {
-                case 11: //"Properties"
-                    app.winProps.clear();
-                    comp.properties().forEach(function (name) {
-                        app.winProps.appendPropChild(new ecprop_1.default(comp, name, true, function onEcPropChange(value) {
-                            console.log(this, value);
-                        }), true);
-                    });
-                    app.winProps.setVisible(true);
-                    break;
-            }
-            console.log("action: " + action + ", id: " + comp.id + ", name: " + name + ", type: " + type + ", trigger: " + trigger);
+        var arr = trigger.split('::'), comp = components_1.default.item(arr.shift()), name = arr.shift(), type = arr.shift(), app = this.app, compNull = false, selectAll = function (value) {
+            var arr = Array.from(app.compList.values());
+            arr.forEach(function (comp) { return comp.select(value); });
+            return arr;
+        };
+        //this's a temporary fix to make it work
+        //	final code will have a centralized action dispatcher
+        switch (action) {
+            case 7: //"Select" just ONE
+                if (!(compNull = !comp)) {
+                    selectAll(false);
+                    app.selectedComponents = [comp.select(true)];
+                    app.refreshRotation();
+                    app.winProps.load(comp);
+                    //temporary, for testings...
+                    window.ec = app.ec;
+                }
+                break;
+            case 8: //"Select All"
+                app.selectedComponents = selectAll(true);
+                app.refreshRotation();
+                app.winProps.clear();
+                break;
+            case 9: //"Deselect All"
+                selectAll(false);
+                app.selectedComponents = [];
+                app.refreshRotation();
+                app.winProps.clear();
+                break;
+            case 10: //"Delete"
+                //disconnects and remove component from DOM
+                //app.ec && (app.ec.disconnect(), app.ec.remove());
+                break;
+            case 11: //"Properties"
+                if (!(compNull = !comp)) {
+                    app.winProps.load(comp);
+                }
+                break;
+        }
+        if (compNull) {
+            console.log("invalid trigger: " + trigger);
         }
         else {
-            console.log("invalid trigger: " + trigger);
+            console.log("action: " + action + ", id: " + (comp === null || comp === void 0 ? void 0 : comp.id) + ", name: " + name + ", type: " + type + ", trigger: " + trigger);
         }
     };
     ContextWindow.prototype.setVisible = function (value) {

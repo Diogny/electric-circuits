@@ -1,7 +1,7 @@
 {
 	"name": "electric-circuits",
 	"author": "Diogny A. B. <diognyab@outlook.com>",
-	"version": "1.0.6",
+	"version": "1.0.8",
 	"description": "Creates an electric circuits app",
 	"license": "ISC",
 	"main": "./dist/index.js",

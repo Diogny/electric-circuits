@@ -1,7 +1,7 @@
 import { Application } from "./app";
 import {
 	IApplicationOptions, IMyApp, ITooltipText, IAppWindowOptions, IStateMachineOptions,
-	StateType, ActionType, IMouseState, IContextMenuOptions, IItemSolidOptions
+	StateType, ActionType, IMouseState, IContextMenuOptions, IItemSolidOptions, IItemWireOptions, IPoint
 } from "./interfaces";
 import { basePath, qS, pad } from "./utils";
 import Rect from "./rect";
@@ -17,6 +17,7 @@ import Comp from "./components";
 import ContextWindow from "./context-window";
 import ItemBoard from "./itemsBoard";
 import EC from "./ec";
+import { Type } from "./types";
 
 export class MyApp extends Application implements IMyApp {
 
@@ -36,12 +37,17 @@ export class MyApp extends Application implements IMyApp {
 	multiplier: number;
 	ratioX: number;
 	ratioY: number;
-	pos: Point;
+	center: Point;
 	size: Size;
 	compList: Map<string, ItemBoard>;
+	selectedComponents: ItemBoard[];
+	//has value if only one comp selected, none or multiple has zero
+	get ec(): ItemBoard | null {
+		return this.selectedComponents.length == 1 ? this.selectedComponents[0] : null;
+	}
 
 	//temporary properties
-	ec: ItemSolid;
+
 	wire: Wire;
 
 	constructor(options: IApplicationOptions) {
@@ -108,6 +114,7 @@ export class MyApp extends Application implements IMyApp {
 				return state;
 			};
 		this.compList = new Map();
+		this.selectedComponents = [];
 		//location is panning, size is for scaling
 		this.viewBox = new Rect(Point.origin, Size.empty);
 		//scaling multipler
@@ -116,7 +123,6 @@ export class MyApp extends Application implements IMyApp {
 		this.ratio = window.screen.width / window.screen.height;
 		this.ratioX = 1;
 		this.ratioY = 1;
-		this.pos = new Point(50, 10);
 		//main SVG insertion point
 		this.tooltip = new Tooltip(<ITooltipText>{ id: "tooltip", borderRadius: 4 });
 		this.rootDir = <string>basePath();			//not used in electron
@@ -253,7 +259,7 @@ export class MyApp extends Application implements IMyApp {
 		//calculate ratio
 		this.ratioX = this.viewBox.width / this.svgBoard.clientWidth;
 		this.ratioY = this.viewBox.height / this.svgBoard.clientHeight;
-		//
+		this.center = new Point(this.viewBox.width / 2, this.viewBox.height / 2);
 		this.refreshTopBarRight();
 	}
 
@@ -277,12 +283,22 @@ export class MyApp extends Application implements IMyApp {
 			comp: ItemBoard = <any>void 0;
 
 		if (name == "wire") {
-			//
+			//this's temporary, until create wire tool works
+			//Wire
+			//wire.setPoints([{x:50,y:100}, {x:200,y:100}, {x:200, y:25}, {x:250,y:25}])
+			comp = this.wire = new Wire((<IItemWireOptions>{
+				points: <IPoint[]>[
+					{ x: 25, y: 50 },
+					{ x: 25, y: 100 },
+					{ x: 200, y: 100 },
+					{ x: 200, y: 25 },
+					{ x: 250, y: 25 }]
+			}))
 		} else {
 			comp = new EC(<IItemSolidOptions><unknown>{
 				name: name,
-				x: this.pos.x,
-				y: this.pos.y,
+				x: this.center.x,
+				y: this.center.y,
 				onProp: function (e: any) {
 					//this happens when this component is created
 				}
@@ -299,5 +315,18 @@ export class MyApp extends Application implements IMyApp {
 			comp.afterDOMinserted();
 		}
 		return <ItemBoard>comp;
+	}
+
+	public rotateEC(angle: number) {
+		let
+			ec = (this.ec as EC);
+		ec && ec.rotate(ec.rotation + angle);
+		this.refreshRotation();
+	}
+
+	public refreshRotation() {
+		let
+			rotation = (this.ec && this.ec.type == Type.EC) ? (this.ec as EC).rotation : 0;
+		this.prop("rot_lbl").value = ` ${rotation}°`;
 	}
 }

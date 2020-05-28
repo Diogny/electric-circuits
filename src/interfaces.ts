@@ -98,7 +98,7 @@ export interface IMyApp extends IApplication {
 	multiplier: number;
 	ratioX: number;
 	ratioY: number;
-	pos: Point;
+	center: Point;
 	tooltip: Tooltip;
 	topBarLeft: HTMLElement;
 	topBarRight: HTMLElement;
@@ -436,8 +436,8 @@ export enum ActionType {
 	SHOW_NODE_TOOLTIP = 18,
 	SHOW_BODY_TOOLTIP = 19,
 	FORWARD_OVER = 20,
-	SELECT_ALL = 21,
-	UNSELECT_ALL = 22,
+	//SELECT_ALL = 21,				//unified actions
+	//UNSELECT_ALL = 22,
 	//check this one is used
 	AFTER_DRAG = 51
 }

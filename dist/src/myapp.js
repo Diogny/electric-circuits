@@ -23,10 +23,12 @@ var point_1 = require("./point");
 var tooltip_1 = require("./tooltip");
 var dab_1 = require("./dab");
 var app_window_1 = require("./app-window");
+var wire_1 = require("./wire");
 var stateMachine_1 = require("./stateMachine");
 var components_1 = require("./components");
 var context_window_1 = require("./context-window");
 var ec_1 = require("./ec");
+var types_1 = require("./types");
 var MyApp = /** @class */ (function (_super) {
     __extends(MyApp, _super);
     function MyApp(options) {
@@ -89,6 +91,7 @@ var MyApp = /** @class */ (function (_super) {
             return state;
         };
         _this.compList = new Map();
+        _this.selectedComponents = [];
         //location is panning, size is for scaling
         _this.viewBox = new rect_1.default(point_1.default.origin, size_1.default.empty);
         //scaling multipler
@@ -97,7 +100,6 @@ var MyApp = /** @class */ (function (_super) {
         _this.ratio = window.screen.width / window.screen.height;
         _this.ratioX = 1;
         _this.ratioY = 1;
-        _this.pos = new point_1.default(50, 10);
         //main SVG insertion point
         _this.tooltip = new tooltip_1.default({ id: "tooltip", borderRadius: 4 });
         _this.rootDir = utils_1.basePath(); //not used in electron
@@ -199,6 +201,14 @@ var MyApp = /** @class */ (function (_super) {
         }, false);
         return _this;
     }
+    Object.defineProperty(MyApp.prototype, "ec", {
+        //has value if only one comp selected, none or multiple has zero
+        get: function () {
+            return this.selectedComponents.length == 1 ? this.selectedComponents[0] : null;
+        },
+        enumerable: false,
+        configurable: true
+    });
     MyApp.prototype.insideBoard = function (p) {
         //later include panning
         return p.x > 0 && p.y > 0 && p.x < this.viewBox.size.width && p.y < this.viewBox.size.height;
@@ -218,7 +228,7 @@ var MyApp = /** @class */ (function (_super) {
         //calculate ratio
         this.ratioX = this.viewBox.width / this.svgBoard.clientWidth;
         this.ratioY = this.viewBox.height / this.svgBoard.clientHeight;
-        //
+        this.center = new point_1.default(this.viewBox.width / 2, this.viewBox.height / 2);
         this.refreshTopBarRight();
     };
     MyApp.prototype.refreshTopBarRight = function () {
@@ -233,13 +243,24 @@ var MyApp = /** @class */ (function (_super) {
     MyApp.prototype.addComponent = function (name) {
         var comp = void 0;
         if (name == "wire") {
-            //
+            //this's temporary, until create wire tool works
+            //Wire
+            //wire.setPoints([{x:50,y:100}, {x:200,y:100}, {x:200, y:25}, {x:250,y:25}])
+            comp = this.wire = new wire_1.default({
+                points: [
+                    { x: 25, y: 50 },
+                    { x: 25, y: 100 },
+                    { x: 200, y: 100 },
+                    { x: 200, y: 25 },
+                    { x: 250, y: 25 }
+                ]
+            });
         }
         else {
             comp = new ec_1.default({
                 name: name,
-                x: this.pos.x,
-                y: this.pos.y,
+                x: this.center.x,
+                y: this.center.y,
                 onProp: function (e) {
                     //this happens when this component is created
                 }
@@ -255,6 +276,15 @@ var MyApp = /** @class */ (function (_super) {
             comp.afterDOMinserted();
         }
         return comp;
+    };
+    MyApp.prototype.rotateEC = function (angle) {
+        var ec = this.ec;
+        ec && ec.rotate(ec.rotation + angle);
+        this.refreshRotation();
+    };
+    MyApp.prototype.refreshRotation = function () {
+        var rotation = (this.ec && this.ec.type == types_1.Type.EC) ? this.ec.rotation : 0;
+        this.prop("rot_lbl").value = " " + rotation + "\u00B0";
     };
     return MyApp;
 }(app_1.Application));

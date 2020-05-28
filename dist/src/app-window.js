@@ -17,6 +17,7 @@ var dab_1 = require("./dab");
 var base_window_1 = require("./base-window");
 var utils_1 = require("./utils");
 var point_1 = require("./point");
+var ecprop_1 = require("./ecprop");
 var AppWindow = /** @class */ (function (_super) {
     __extends(AppWindow, _super);
     function AppWindow(options) {
@@ -181,6 +182,7 @@ var AppWindow = /** @class */ (function (_super) {
     AppWindow.prototype.clear = function () {
         //don't call base.clear because it clears all innerHTML
         this.setTextHtml("");
+        this.compId = "";
         this.settings.properties = [];
         return this;
     };
@@ -199,6 +201,20 @@ var AppWindow = /** @class */ (function (_super) {
     AppWindow.prototype.appendHtmlChild = function (el) {
         el && this.main.appendChild(el);
         return this;
+    };
+    AppWindow.prototype.load = function (comp) {
+        var _this = this;
+        if (!comp)
+            return false;
+        this.clear();
+        this.compId = comp.id;
+        comp.properties().forEach(function (name) {
+            _this.appendPropChild(new ecprop_1.default(comp, name, true, function onEcPropChange(value) {
+                console.log(this, value);
+            }), true);
+        });
+        this.setVisible(true);
+        return true;
     };
     AppWindow.prototype.appendPropChild = function (el, wrap) {
         if (el) {
