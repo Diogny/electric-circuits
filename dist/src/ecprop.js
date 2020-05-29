@@ -65,7 +65,8 @@ var EcProp = /** @class */ (function () {
         }
         else {
             this.propValue = this.valueObject ? prop.value : prop;
-            htmlProp = utils_1.html("<span class=\"ec-prop\">" + this.propValue + "</span>");
+            var readonlySpan = this.valueObject && prop.readonly;
+            htmlProp = utils_1.html("<span class=\"ec-prop" + (readonlySpan ? " readonly" : "") + "\">" + this.propValue + "</span>");
         }
         if (addTitle) {
             //wrap title

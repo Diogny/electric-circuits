@@ -2,106 +2,106 @@
 	"board": [
 		{
 			"text": "Remove All",
-			"action": 1
+			"name": "DELETE_ALL"
 		},
 		{
 			"text": "Select All",
-			"action": 8,
+			"name": "SELECT_ALL",
 			"shortcut": "Ctrl+A"
 		},
 		{
 			"text": "Deselect All",
-			"action": 9,
+			"name": "UNSELECT_ALL",
 			"shortcut": "Ctrl+B"
 		}
 	],
 	"ec-body": [
 		{
 			"text": "Delete",
-			"action": 10,
+			"name": "DELETE",
 			"shortcut": "Del"
 		},
 		{
 			"text": "Properties",
-			"action": 11,
+			"name": "SHOW_PROPERTIES",
 			"shortcut": "Ctrl+P"
 		},
 		{
 			"text": "Rotate 45 clockwise",
-			"action": 20
+			"name": "ROTATE_45_CLOCKWISE"
 		},
 		{
 			"text": "Rotate 45 counter clockwise",
-			"action": 21
+			"name": "ROTATE_45_COUNTER_CLOCKWISE"
 		},
 		{
 			"text": "Rotate 90 clockwise",
-			"action": 22
+			"name": "ROTATE_90_CLOCKWISE"
 		},
 		{
 			"text": "Rotate 90 counter clockwise",
-			"action": 23
+			"name": "ROTATE_90_COUNTER_CLOCKWISE"
 		},
 		{
 			"text": "Select",
-			"action": 7
+			"name": "SELECT"
 		},
 		{
 			"text": "Bring to Front",
-			"action": 3
+			"name": "BRING_TO_FRONT"
 		}
 	],
 	"ec-node": [
 		{
 			"text": "Unbond",
-			"action": 30,
+			"name": "UNBOND",
 			"shortcut": "Ctrl-U"
 		},
 		{
 			"text": "Connections",
-			"action": 31,
+			"name": "CONNECTIONS",
 			"shortcut": "Ctrl+P"
 		},
 		{
 			"text": "Select",
-			"action": 7
+			"name": "SELECT"
 		}
 	],
 	"wire-line": [
 		{
 			"text": "Properties",
-			"action": 11,
+			"name": "SHOW_PROPERTIES",
 			"shortcut": "Ctrl+P"
 		},
 		{
 			"text": "Delete",
-			"action": 10,
+			"name": "DELETE",
 			"shortcut": "Del"
 		},
 		{
 			"text": "Connections",
-			"action": 31,
+			"name": "CONNECTIONS",
 			"shortcut": "Ctrl+P"
 		},
 		{
 			"text": "Select",
-			"action": 7
+			"name": "SELECT"
 		}
 	],
 	"wire-node": [
 		{
 			"text": "Delete",
-			"action": 10,
+			"name": "DELETE",
 			"shortcut": "Del"
 		},
 		{
 			"text": "Connections",
-			"action": 31,
+			"name": "CONNECTIONS",
 			"shortcut": "Ctrl+P"
 		},
 		{
 			"text": "Select",
-			"action": 7
+			"name": "SELECT_ONE"
 		}
 	]
 }

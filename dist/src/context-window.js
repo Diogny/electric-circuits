@@ -14,6 +14,7 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 var base_window_1 = require("./base-window");
+var interfaces_1 = require("./interfaces");
 var utils_1 = require("./utils");
 var dab_1 = require("./dab");
 var components_1 = require("./components");
@@ -30,6 +31,10 @@ var ContextWindow = /** @class */ (function (_super) {
         //store right click context options
         _this.settings.list = new Map();
         utils_1.each(options.list, function (block, key) {
+            //load action numbers
+            block.forEach(function (b) {
+                b.action = interfaces_1.ActionType[b.name];
+            });
             _this.settings.list.set(key, block);
         });
         _this.settings.current = "board";
@@ -41,7 +46,8 @@ var ContextWindow = /** @class */ (function (_super) {
         }, false);
         return _this;
     }
-    ContextWindow.prototype.execute = function (action, trigger) {
+    //public execute({ action, trigger, data }: { action: ActionType; trigger: string; data?: any; }) {
+    ContextWindow.prototype.execute = function (action, trigger, data) {
         var arr = trigger.split('::'), comp = components_1.default.item(arr.shift()), name = arr.shift(), type = arr.shift(), app = this.app, compNull = false, selectAll = function (value) {
             var arr = Array.from(app.compList.values());
             arr.forEach(function (comp) { return comp.select(value); });
@@ -50,7 +56,15 @@ var ContextWindow = /** @class */ (function (_super) {
         //this's a temporary fix to make it work
         //	final code will have a centralized action dispatcher
         switch (action) {
-            case 7: //"Select" just ONE
+            case interfaces_1.ActionType.TOGGLE_SELECT: //"Toggle Select"	6
+                if (!(compNull = !comp)) {
+                    comp.select(!comp.selected);
+                    app.selectedComponents = Array.from(app.compList.values()).filter(function (c) { return c.selected; });
+                    app.refreshRotation();
+                    (app.ec && (app.winProps.load(app.ec), window.ec = app.ec, 1)) || app.winProps.clear();
+                }
+                break;
+            case interfaces_1.ActionType.SELECT: //"Select" just ONE		7
                 if (!(compNull = !comp)) {
                     selectAll(false);
                     app.selectedComponents = [comp.select(true)];
@@ -60,22 +74,36 @@ var ContextWindow = /** @class */ (function (_super) {
                     window.ec = app.ec;
                 }
                 break;
-            case 8: //"Select All"
+            case interfaces_1.ActionType.SELECT_ALL: //"Select All"		8
                 app.selectedComponents = selectAll(true);
                 app.refreshRotation();
                 app.winProps.clear();
+                //temporary, for testings...
+                window.ec = void 0;
                 break;
-            case 9: //"Deselect All"
+            case interfaces_1.ActionType.UNSELECT_ALL: //"Deselect All"		9
                 selectAll(false);
                 app.selectedComponents = [];
                 app.refreshRotation();
                 app.winProps.clear();
+                //temporary, for testings...
+                window.ec = void 0;
                 break;
-            case 10: //"Delete"
-                //disconnects and remove component from DOM
-                //app.ec && (app.ec.disconnect(), app.ec.remove());
+            case interfaces_1.ActionType.DELETE: //"Delete"		10
+                if (!(compNull = !comp)) {
+                    //disconnects and remove component from DOM
+                    comp.disconnect();
+                    comp.remove();
+                    app.compList.delete(comp.id);
+                    app.selectedComponents = Array.from(app.compList.values()).filter(function (c) { return c.selected; });
+                    app.refreshRotation();
+                    (app.winProps.compId == comp.id) && app.winProps.clear();
+                    app.tooltip.setVisible(false);
+                    //temporary, for testings...
+                    window.ec = void 0;
+                }
                 break;
-            case 11: //"Properties"
+            case interfaces_1.ActionType.SHOW_PROPERTIES: //"Properties"		11
                 if (!(compNull = !comp)) {
                     app.winProps.load(comp);
                 }

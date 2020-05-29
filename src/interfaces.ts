@@ -50,6 +50,7 @@ export interface IUIPropertySettings extends IUIProperty {
 //***************************************** Component Property ************************************//
 
 export interface IComponentProperty {
+	name: string;
 	value: string;
 	combo?: string[];
 	type?: string;
@@ -122,7 +123,7 @@ export interface IMouseState {
 	altKey: boolean;
 	it: ItemBoard;
 	//local
-	vector: Point;
+	dragging: { ec: ItemBoard, offset: Point }[];
 	className: string;
 	nodeNumber: number;
 	isEdgeNode: boolean;
@@ -350,6 +351,7 @@ export interface IAppWindowProperties extends IAppWindowOptions, IBaseWindowSett
 export interface IContextMenuItem {
 	text: string;
 	action: number;
+	name: string;
 	shortcut: string;
 }
 
@@ -436,8 +438,27 @@ export enum ActionType {
 	SHOW_NODE_TOOLTIP = 18,
 	SHOW_BODY_TOOLTIP = 19,
 	FORWARD_OVER = 20,
-	//SELECT_ALL = 21,				//unified actions
-	//UNSELECT_ALL = 22,
 	//check this one is used
-	AFTER_DRAG = 51
+	AFTER_DRAG = 21,
+
+	//unified actions
+	SELECT = 100,						//"Select"						7
+	TOGGLE_SELECT = 101,				//"Toggle Select"				6
+	SELECT_ALL = 102,					//"Select All"					8
+	UNSELECT_ALL = 103,					//"Deselect All"				9
+	DELETE = 104,						//"Delete"						10
+	DELETE_SELECTED = 105,				//
+	DELETE_ALL = 106,					//"Remove All"
+	SHOW_PROPERTIES = 200,				//"Properties"					11
+	BRING_TO_FRONT = 201,				//"Bring to Front"				3
+	ROTATE_45_CLOCKWISE = 202,			//"Rotate 45 clockwise"			20
+	ROTATE_45_COUNTER_CLOCKWISE = 203,	//"Rotate 45 counter clockwise"	21
+	ROTATE_90_CLOCKWISE = 204,			//"Rotate 90 clockwise"			22
+	ROTATE_90_COUNTER_CLOCKWISE = 205,	//"Rotate 90 counter clockwise"	23
+	UNBOND = 206,						//"Unbond"						30
+	CONNECTIONS = 207,					//"Connections"					31
 }
+/*
+
+
+*/

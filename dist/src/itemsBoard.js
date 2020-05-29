@@ -21,8 +21,12 @@ var boardCircle_1 = require("./boardCircle");
 var utils_1 = require("./utils");
 var point_1 = require("./point");
 var PropertyInjector = /** @class */ (function () {
-    function PropertyInjector(ec) {
+    function PropertyInjector(ec, name, readonly) {
         this.ec = ec;
+        this.name = name;
+        this.readonly = readonly;
+        if (!this.ec || !(this.name in this.ec))
+            throw "invalid property " + this.name;
     }
     Object.defineProperty(PropertyInjector.prototype, "type", {
         get: function () { return "property"; },
@@ -53,6 +57,21 @@ var PointInjector = /** @class */ (function (_super) {
         return p && (this.ec.move(p.x, p.y), true);
     };
     return PointInjector;
+}(PropertyInjector));
+var StringInjector = /** @class */ (function (_super) {
+    __extends(StringInjector, _super);
+    function StringInjector(ec, name, readonly) {
+        return _super.call(this, ec, name, readonly) || this;
+    }
+    Object.defineProperty(StringInjector.prototype, "value", {
+        get: function () { return this.ec[this.name]; },
+        enumerable: false,
+        configurable: true
+    });
+    StringInjector.prototype.setValue = function (val) {
+        return !this.readonly && (this.ec[this.name] = val, true);
+    };
+    return StringInjector;
 }(PropertyInjector));
 //ItemBoard->Wire
 var ItemBoard = /** @class */ (function (_super) {
@@ -143,7 +162,7 @@ var ItemBoard = /** @class */ (function (_super) {
     });
     Object.defineProperty(ItemBoard.prototype, "windowProperties", {
         //properties available to show up in property window
-        get: function () { return ["p"]; },
+        get: function () { return ["id", "p"]; },
         enumerable: false,
         configurable: true
     });
@@ -198,8 +217,10 @@ var ItemBoard = /** @class */ (function (_super) {
     ItemBoard.prototype.prop = function (propName) {
         //inject available properties if called
         switch (propName) {
+            case "id":
+                return new StringInjector(this, propName, true);
             case "p":
-                return new PointInjector(this);
+                return new PointInjector(this, propName, false);
         }
         return this.settings.props[propName];
     };

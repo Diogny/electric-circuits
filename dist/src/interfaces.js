@@ -33,9 +33,27 @@ var ActionType;
     ActionType[ActionType["SHOW_NODE_TOOLTIP"] = 18] = "SHOW_NODE_TOOLTIP";
     ActionType[ActionType["SHOW_BODY_TOOLTIP"] = 19] = "SHOW_BODY_TOOLTIP";
     ActionType[ActionType["FORWARD_OVER"] = 20] = "FORWARD_OVER";
-    //SELECT_ALL = 21,				//unified actions
-    //UNSELECT_ALL = 22,
     //check this one is used
-    ActionType[ActionType["AFTER_DRAG"] = 51] = "AFTER_DRAG";
+    ActionType[ActionType["AFTER_DRAG"] = 21] = "AFTER_DRAG";
+    //unified actions
+    ActionType[ActionType["SELECT"] = 100] = "SELECT";
+    ActionType[ActionType["TOGGLE_SELECT"] = 101] = "TOGGLE_SELECT";
+    ActionType[ActionType["SELECT_ALL"] = 102] = "SELECT_ALL";
+    ActionType[ActionType["UNSELECT_ALL"] = 103] = "UNSELECT_ALL";
+    ActionType[ActionType["DELETE"] = 104] = "DELETE";
+    ActionType[ActionType["DELETE_SELECTED"] = 105] = "DELETE_SELECTED";
+    ActionType[ActionType["DELETE_ALL"] = 106] = "DELETE_ALL";
+    ActionType[ActionType["SHOW_PROPERTIES"] = 200] = "SHOW_PROPERTIES";
+    ActionType[ActionType["BRING_TO_FRONT"] = 201] = "BRING_TO_FRONT";
+    ActionType[ActionType["ROTATE_45_CLOCKWISE"] = 202] = "ROTATE_45_CLOCKWISE";
+    ActionType[ActionType["ROTATE_45_COUNTER_CLOCKWISE"] = 203] = "ROTATE_45_COUNTER_CLOCKWISE";
+    ActionType[ActionType["ROTATE_90_CLOCKWISE"] = 204] = "ROTATE_90_CLOCKWISE";
+    ActionType[ActionType["ROTATE_90_COUNTER_CLOCKWISE"] = 205] = "ROTATE_90_COUNTER_CLOCKWISE";
+    ActionType[ActionType["UNBOND"] = 206] = "UNBOND";
+    ActionType[ActionType["CONNECTIONS"] = 207] = "CONNECTIONS";
 })(ActionType = exports.ActionType || (exports.ActionType = {}));
+/*
+
+
+*/ 
 //# sourceMappingURL=interfaces.js.map

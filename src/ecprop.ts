@@ -87,7 +87,9 @@ export default class EcProp {
 			}));
 		} else {
 			this.propValue = this.valueObject ? (<IComponentProperty>prop).value : <string>prop;
-			htmlProp = <HTMLElement>html(`<span class="ec-prop">${this.propValue}</span>`)
+			let
+				readonlySpan = this.valueObject && (<any>prop).readonly;
+			htmlProp = <HTMLElement>html(`<span class="ec-prop${readonlySpan ? " readonly" : ""}">${this.propValue}</span>`)
 		}
 		if (addTitle) {
 			//wrap title

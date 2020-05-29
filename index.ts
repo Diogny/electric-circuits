@@ -17,6 +17,7 @@ const store = new Store({
 	// data file
 	configName: 'user-preferences',
 	defaults: {
+		location: { x: 50, y: 50 },
 		// default size of our main window
 		windowBounds: { width: 1120, height: 800 }
 	}
@@ -32,6 +33,8 @@ let mainWindow: Electron.BrowserWindow;
 function createMainWindow(opt: any) {
 
 	const window = new BrowserWindow({
+		x: opt.x || 50,
+		y: opt.y || 50,
 		width: opt.width || 1120,
 		height: opt.height || 800,
 		useContentSize: true,
@@ -123,9 +126,11 @@ function createMenu() {
 // Some APIs can only be used after this event occurs.
 app.on("ready", () => {
 	// defaults if there wasn't anything saved
-	let { width, height } = store.get('windowBounds');
+	let
+		{ width, height } = store.get('windowBounds'),
+		{ x, y } = store.get('location');
 
-	mainWindow = createMainWindow({ width, height });
+	mainWindow = createMainWindow({ x, y, width, height });
 	//sendMainWindowSize(width, height);
 
 	// The BrowserWindow class extends the node.js core EventEmitter class, so we use that API
@@ -140,6 +145,10 @@ app.on("ready", () => {
 		sendMainWindowSize(width, height);
 	});
 
+	mainWindow.on('move', () => {
+		let pos = mainWindow.getPosition();
+		store.set('location', { x: pos[0], y: pos[1] });
+	});
 });
 
 // Quit when all windows are closed.

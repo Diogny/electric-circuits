@@ -532,6 +532,16 @@ label.ec-prop-title {
   margin-left: 5px;
 }
 
+.ec-prop.readonly {
+  background-color: white;
+  padding: 2px 5px;
+  border: 1px solid black;
+}
+
+.ec-prop.readonly:hover {
+  cursor: not-allowed;
+}
+
 div.ec-wrap {
   margin: 6px 2px;
 }

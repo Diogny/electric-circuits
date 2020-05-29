@@ -178,13 +178,12 @@ function createStateMachine() {
 			MOVE: function (newCtx: IMouseState) {
 			},
 			OUT: actionOutOfTool,
-			DOWN: function (newCtx: IMouseState) {
-				//save new context
-				app.rightClick.setVisible(false);
-			},
+			DOWN: actionDefaultCopyNewState,
 			UP: function (newCtx: IMouseState) {
 				actionDefaultCopyNewState(newCtx);
-				app.rightClick.execute(9, 'board::board::board');
+				if (newCtx.button == 0)
+					app.rightClick.execute(Action.UNSELECT_ALL, 'board::board::board');	// 9
+				app.rightClick.setVisible(false);
 			},
 			//transitions
 			START: function (newCtx: IMouseState) {
@@ -231,11 +230,18 @@ function createStateMachine() {
 			MOVE: function (newCtx: IMouseState) {
 				//updates component position
 				//newCtx.offset has the updated offset, don't save anything here
-				let
-					p = Point.minus(newCtx.offset, <Point>(this as StateMachine).ctx.vector);
+
+				(this as StateMachine).ctx.dragging.forEach(comp => {
+					let
+						p = Point.minus(newCtx.offset, comp.offset);
+					comp.ec.move(p.x, p.y);
+				});
+				app.ec && app.winProps.property("p")?.refresh();
+				//let
+				//	p = Point.minus(newCtx.offset, <Point>(this as StateMachine).ctx.vector);
 				//moves EC to new location
-				(this as StateMachine).ctx.it?.move(p.x, p.y);
-				app.winProps.property("p")?.refresh();
+				//(this as StateMachine).ctx.it?.move(p.x, p.y);
+				//app.winProps.property("p")?.refresh();
 				//updateCompLocation()
 			},
 			OUT: function () {
@@ -251,14 +257,24 @@ function createStateMachine() {
 			},
 			//transitions
 			START: function (newCtx: IMouseState) {
+				let
+					self = this as StateMachine;
 				//save new context
-				(this as StateMachine).ctx = newCtx;
-				(this as StateMachine).ctx.className = "dragging";
+				self.ctx = newCtx;
+				self.ctx.className = "dragging";
 				//show mouse cursor
 				addClass(app.svgBoard, "dragging");
 				//add to context vector
-				(this as StateMachine).ctx.vector =
-					Point.minus((this as StateMachine).ctx.offset, (this as StateMachine).ctx.it.p);
+				!app.selectedComponents.some(comp => comp.id == newCtx.it.id) &&
+					(app.rightClick.execute(Action.SELECT, `${newCtx.it.id}::${newCtx.it.name}::body`)); //7
+
+				//newCtx.it && !listToMove.some(comp => comp.id == newCtx.it.id) && listToMove.push(newCtx.it);
+				//new way for multiple drag
+				self.ctx.dragging =
+					app.selectedComponents.map(comp => ({
+						ec: comp,
+						offset: Point.minus(newCtx.offset, comp.p)
+					}));
 				app.state.send(Action.HIDE_NODE, newCtx);
 			}
 		}
@@ -280,15 +296,18 @@ function createStateMachine() {
 				app.tooltip.move(p.x, p.y);
 			},
 			OUT: actionOutOfTool,   //actionOutOfComponent
-			DOWN: function (newCtx: IMouseState) {
-				//save new context
-				(this as StateMachine).ctx = newCtx;
-			},
+			DOWN: actionDefaultCopyNewState,
 			UP: function (newCtx: IMouseState) {	//up after down should be show properties, not now
 				actionDefaultCopyNewState(newCtx);
 				//must exists an ec, left-click only
+				//Ctrl+click => toggle select
+				//click		 => select one
 				newCtx.it && (newCtx.button == 0)
-					&& app.rightClick.execute(7, [newCtx.it.id, newCtx.it.name, "body"].join('::'));
+					&& app.rightClick.execute(
+						newCtx.ctrlKey ?
+							Action.TOGGLE_SELECT :  // 6
+							Action.SELECT,  		// 7
+						[newCtx.it.id, newCtx.it.name, "body"].join('::'));
 			},
 			//transitions
 			START: function (newCtx: IMouseState) {

@@ -19,7 +19,10 @@ abstract class PropertyInjector implements IComponentProperty {
 
 	abstract setValue(val: string): boolean;
 
-	constructor(public ec: ItemBoard) { }
+	constructor(public ec: ItemBoard, public name: string, public readonly: boolean) {
+		if (!this.ec || !(this.name in this.ec))
+			throw `invalid property ${this.name}`;
+	}
 }
 
 class PointInjector extends PropertyInjector {
@@ -36,6 +39,19 @@ class PointInjector extends PropertyInjector {
 	}
 }
 
+class StringInjector extends PropertyInjector {
+
+	get value(): string { return this.ec[this.name] }
+
+	setValue(val: string): boolean {
+		return !this.readonly && (this.ec[this.name] = val, true);
+	}
+
+	constructor(ec: ItemBoard, name: string, readonly: boolean) {
+		super(ec, name, readonly);
+	}
+}
+
 //ItemBoard->Wire
 export default abstract class ItemBoard extends ItemBase {
 
@@ -48,7 +64,7 @@ export default abstract class ItemBoard extends ItemBase {
 	get bonds(): Bond[] { return this.settings.bonds }
 
 	//properties available to show up in property window
-	get windowProperties(): string[] { return ["p"] }
+	get windowProperties(): string[] { return ["id", "p"] }
 
 	abstract get count(): number;	// EC is node count, Wire is point count
 
@@ -184,8 +200,10 @@ export default abstract class ItemBoard extends ItemBase {
 	public prop(propName: string): ComponentPropertyType {
 		//inject available properties if called
 		switch (propName) {
+			case "id":
+				return new StringInjector(this, propName, true);
 			case "p":
-				return new PointInjector(this)
+				return new PointInjector(this, propName, false)
 		}
 		return this.settings.props[propName]
 	}
