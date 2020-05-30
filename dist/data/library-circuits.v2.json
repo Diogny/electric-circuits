@@ -384,13 +384,16 @@
 		"description" : "Generic LED diode",
 		"notes": "write here notes...",
 		"size" : {
-			"combo": [ "1.5mm", "3mm", "5mm" ],
 			"value" : "3mm",
-			"type": "unit"
+			"valueType": "unit",
+			"type": "select",
+			"options": [ "1.5mm", "3mm", "5mm" ]
 		},
 		"color" : {
-			"combo": [ "red", "green", "blue", "yellow", "white" ],
-			"value" : "red"
+			"value" : "red",
+			"valueType": "string",
+			"type": "select",
+			"options": [ "red", "green", "blue", "yellow", "white" ]
 		}
 	},
 	"meta" : {
@@ -954,12 +957,13 @@
 <path svg-type='node' node='27' d='M 5,0 V5 H15 V0 Z'/>"
 },
 {
-	"type" : "passive",
+	"type" : "capacitor",
 	"name" : "capacitor",
 	"properties" : {
 		"capacitance" : {
 			"value" : "0.1mF",
-			"type": "unit"
+			"valueType": "unit",
+			"type": "input"
 		},
 		"voltage": "50V",
 		"tolerance": "2%",
@@ -987,7 +991,7 @@
 <path svg-type='node' node='1' d='M 27,25 V35 H33 V25 Z'/>"
 },
 {
-	"type" : "passive",
+	"type" : "capacitor",
 	"name" : "capacitor-polarized",
 	"properties" : {
 		"description" : "Generic polarized capacitor"
@@ -1015,7 +1019,7 @@
 <path svg-type='node' node='1' d='M 25,25 V35 H30 V25 Z'/>"
 },
 {
-	"type" : "passive",
+	"type" : "capacitor",
 	"name" : "capacitor-variable",
 	"properties" : {
 		"description" : "Generic variable capacitor"
@@ -1064,13 +1068,14 @@
 <path svg-type='node' node='1' d='M 25,70 H35 V65 H25 Z'/>"
 },
 {
-	"type" : "passive",
+	"type" : "resistor",
 	"name" : "resistor",
 	"properties" : {
 		"description": "Generic resistor",
 		"resistance" : {
 			"value" : "5kΩ",
-			"type": "unit"
+			"valueType": "unit",
+			"type": "input"
 		},
 		"tolerance": "2%"
 	},
@@ -1095,7 +1100,43 @@
 <path svg-type='node' node='1' d='M 45,5 V15 H50 V5 Z'/>"
 },
 {
-	"type" : "passive",
+	"type" : "resistor",
+	"name" : "variable-resistor",
+	"properties" : {
+		"description": "variable resistor",
+		"comments": "node 3 not working with wire drag yet, it's commented in index.html",
+		"resistance" : {
+			"value" : "10kΩ",
+			"valueType": "unit",
+			"type": "input"
+		},
+		"tolerance": "2%"
+	},
+	"meta" : {
+		"class": "next",
+		"countStart": 1,
+		"nameTmpl": "VR{Comp.variableResistorCount}",
+		"labelId": {
+			"x": 10,
+			"y": -5
+		},
+		"nodes": {
+			"length": 2,
+			"list" : [
+				{ "x": 0, "y": 10, "label": "node 0" },
+				{ "x": 50, "y": 10, "label": "node 1" },
+				{ "x": 25, "y": 40, "label": "variable input" }
+			]
+		}
+	},
+	"data" : "<rect svg-type='body' x='5' y='0' width='40' height='20'/>
+<path class='thick no-fill' d='M 25,20 L 20,30 H30 L 25,20 M 25,30 V40'/>
+<path svg-type='node' node='0' d='M 0,5 V15 H5 V5 Z'/>
+<path svg-type='node' node='1' d='M 45,5 V15 H50 V5 Z'/>
+<circle svg-type='node' node='2' r='3' cx='25' cy='40'/>"
+},
+{
+	"type" : "switch",
 	"name" : "push-button",
 	"properties" : {
 		"description" : "Generic Push Button"
@@ -1119,7 +1160,7 @@
 <circle svg-type='body' cx='55' cy='40' r='7'/>"
 },
 {
-	"type" : "passive",
+	"type" : "switch",
 	"name" : "switch",
 	"properties" : {
 		"description" : "Generic Switch"
@@ -1141,7 +1182,7 @@
 <circle svg-type='body' r='7' cx='55' cy='25'/>"
 },
 {
-	"type" : "passive",
+	"type" : "switch",
 	"name" : "switch-sdpt",
 	"properties" : {
 		"description": "Generic SDPT Switch"
@@ -1157,13 +1198,13 @@
 			]
 		}
 	},
-	"data" : "<path svg-type='body' d='M 13,19 L 49,6 L52,14 L 16,27 Z'/>
-<circle svg-type='node' node='0' r='7' cx='7' cy='25'/>
-<circle svg-type='node' node='1' r='7' cx='58' cy='7'/>
-<circle svg-type='node' node='2' r='7' cx='58' cy='43'/>"
+	"data" : "<path svg-type='body' d='M 10,22 H25 L 54,6 L 57,11 L 25,28 H10 Z'/>
+<circle svg-type='node' node='0' r='3' cx='7' cy='25'/>
+<circle svg-type='node' node='1' r='3' cx='58' cy='7'/>
+<circle svg-type='node' node='2' r='3' cx='58' cy='43'/>"
 },
 {
-	"type" : "passive",
+	"type" : "inductor",
 	"name" : "inductor",
 	"properties" : {
 		"description" : "Generic inductor"

@@ -6,7 +6,7 @@ import Comp from './components';
 import Bond from './bonds';
 import Point from './point';
 import { IItemSolidOptions, IPoint, IItemNode, IItemBoardProperties } from './interfaces';
-import ItemSolid from './itemSolid';
+import { ItemSolid } from './itemSolid';
 import Rect from './rect';
 import Size from './size';
 import { Label } from './label';
@@ -154,6 +154,7 @@ export default class EC extends ItemSolid {
 	}
 
 	public setNode(node: number, p: IPoint): EC {
+		//State.WIRE_NODE_DRAG tries to call this, investigate later...
 		throw 'somebody called me, not good!';
 	}
 

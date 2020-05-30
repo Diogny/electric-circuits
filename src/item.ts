@@ -1,7 +1,7 @@
 import { ISize, IItemBaseOptions } from "./interfaces";
 import Point from "./point";
 import { Color, Colors } from "./colors";
-import { obj, copy } from "./dab";
+import { obj, copy, unique } from "./dab";
 import { TypedClass } from "./types";
 
 export default abstract class Item extends TypedClass {
@@ -26,8 +26,14 @@ export default abstract class Item extends TypedClass {
 		//merge defaults and deep copy
 		//all default properties must be refrenced from this or this.settings
 		// options is for custom options only
+		let
+			optionsClass = options.class || "";
+		//delete class from options so it doesn't override default settings
+		delete options.class;
 		this.settings = obj(copy(this.propertyDefaults(), options));
-		//fix (x,y) coordiinates if wrongly initially provided
+		//update this.settings.class with unique values
+		this.settings.class = unique((this.class + " " + optionsClass).split(' ')).join(' ');
+		//fix (x,y) coordinates if wrongly initially provided
 		this.settings.x = this.settings.x || 0;
 		this.settings.y = this.settings.y || 0;
 		//fix color if wrongly provided, default is "white"
@@ -55,12 +61,12 @@ export default abstract class Item extends TypedClass {
 
 	public propertyDefaults(): IItemBaseOptions {
 		return <IItemBaseOptions>{
-			id: "",				//have to be here so it's copied
-			name: "",			//have to be here so it's copied
+			id: "",
+			name: "",
 			x: 0,
 			y: 0,
-			color: "white",		//have to be here so it's copied
-			class: "",			//have to be here so it's copied
+			color: "white",		//default color
+			class: "",
 			visible: true,		//defaults is visible
 		}
 	}

@@ -10,12 +10,11 @@ import Point from './point';
 import Tooltip from "./tooltip";
 import { attr, aEL, nano } from "./dab";
 import AppWindow from "./app-window";
-import ItemSolid from "./itemSolid";
 import Wire from "./wire";
 import StateMachine from "./stateMachine";
 import Comp from "./components";
 import ContextWindow from "./context-window";
-import ItemBoard from "./itemsBoard";
+import { ItemBoard } from "./itemsBoard";
 import EC from "./ec";
 import { Type } from "./types";
 
@@ -55,36 +54,36 @@ export class MyApp extends Application implements IMyApp {
 		let
 			that: MyApp = this,
 			//HTML
-			getClientXY = (evt: MouseEvent) =>
-				new Point(evt.clientX - that.board.offsetLeft, evt.clientY - that.board.offsetTop),
+			getClientXY = (ev: MouseEvent) =>
+				new Point(ev.clientX - that.board.offsetLeft, ev.clientY - that.board.offsetTop),
 			//SVG
-			getOffset = (clientXY: Point, evt: MouseEvent) =>
+			getOffset = (clientXY: Point, ev: MouseEvent) =>
 				Point.times(clientXY, that.ratioX, that.ratioY).round(),
-			handleMouseEvent = function (evt: MouseEvent): IMouseState {
+			handleMouseEvent = function (ev: MouseEvent): IMouseState {
 				//this is MyApp
-				evt.preventDefault();
-				evt.stopPropagation();
+				ev.preventDefault();
+				ev.stopPropagation();
 				let
 					arr = [],
-					target = <any>evt.target as SVGElement,
+					target = <any>ev.target as SVGElement,
 					parent = <any>target.parentNode as Element,
-					clientXY = getClientXY(evt),
+					clientXY = getClientXY(ev),
 					state: IMouseState = <IMouseState>{
 						id: '#' + parent.id,
 						type: attr(parent, "svg-comp"),
-						button: evt.button,	//https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
+						button: ev.button,	//https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
 						//parent: parent,
 						client: clientXY,
-						offset: getOffset(clientXY, evt),
-						event: evt.type.replace('mouse', ''),
-						timeStamp: evt.timeStamp,
+						offset: getOffset(clientXY, ev),
+						event: ev.type.replace('mouse', ''),
+						timeStamp: ev.timeStamp,
 						over: {
 							type: attr(target, "svg-type"),
 							svg: target
 						},
-						ctrlKey: evt.ctrlKey,
-						shiftKey: evt.shiftKey,
-						altKey: evt.altKey,
+						ctrlKey: ev.ctrlKey,
+						shiftKey: ev.shiftKey,
+						altKey: ev.altKey,
 						it: Comp.item(parent.id)
 					};
 				//post actions
@@ -200,27 +199,27 @@ export class MyApp extends Application implements IMyApp {
 			list: options.list
 		});
 
-		aEL(<any>this.svgBoard, "mouseover", function (evt: MouseEvent) {
-			that.state.enabled && that.state.send(ActionType.OVER, handleMouseEvent.call(that, evt));
+		aEL(<any>this.svgBoard, "mouseover", function (ev: MouseEvent) {
+			that.state.enabled && that.state.send(ActionType.OVER, handleMouseEvent.call(that, ev));
 		}, false);
-		aEL(<any>this.svgBoard, "mousemove", function (evt: MouseEvent) {
-			that.state.enabled && that.state.send(ActionType.MOVE, handleMouseEvent.call(that, evt));
+		aEL(<any>this.svgBoard, "mousemove", function (ev: MouseEvent) {
+			that.state.enabled && that.state.send(ActionType.MOVE, handleMouseEvent.call(that, ev));
 		}, false);
-		aEL(<any>this.svgBoard, "mouseout", function (evt: MouseEvent) {
-			that.state.enabled && that.state.send(ActionType.OUT, handleMouseEvent.call(that, evt));
+		aEL(<any>this.svgBoard, "mouseout", function (ev: MouseEvent) {
+			that.state.enabled && that.state.send(ActionType.OUT, handleMouseEvent.call(that, ev));
 		}, false);
 		//
-		aEL(<any>this.svgBoard, "mousedown", function (evt: MouseEvent) {
-			that.state.enabled && that.state.send(ActionType.DOWN, handleMouseEvent.call(that, evt));
+		aEL(<any>this.svgBoard, "mousedown", function (ev: MouseEvent) {
+			that.state.enabled && that.state.send(ActionType.DOWN, handleMouseEvent.call(that, ev));
 		}, false);
-		aEL(<any>this.svgBoard, "mouseup", function (evt: MouseEvent) {
-			that.state.enabled && that.state.send(ActionType.UP, handleMouseEvent.call(that, evt));
+		aEL(<any>this.svgBoard, "mouseup", function (ev: MouseEvent) {
+			that.state.enabled && that.state.send(ActionType.UP, handleMouseEvent.call(that, ev));
 		}, false);
-		//right click o board
-		aEL(<any>this.svgBoard, "contextmenu", function (evt: MouseEvent) {
-			evt.stopPropagation();
+		//right click on board
+		aEL(<any>this.svgBoard, "contextmenu", function (ev: MouseEvent) {
+			ev.stopPropagation();
 			let
-				target = evt.target as Element,
+				target = ev.target as Element,
 				type = attr(target, "svg-type"),
 				key = that.rightClick.setTrigger(
 					attr(target.parentNode, "id"),
@@ -230,10 +229,22 @@ export class MyApp extends Application implements IMyApp {
 			if (key) {
 				that.rightClick
 					.build(key)
-					.movePoint(getClientXY(evt))
+					.movePoint(getClientXY(ev))
 					.setVisible(true);
 			}
 		}, false);
+		document.onkeydown = function (ev: KeyboardEvent) {
+			switch (ev.keyCode) {
+				case 13:	// ENTER
+				case 27:	// ESC
+				case 37:	// LEFT
+				case 38:	// UP
+				case 39:	// RIGHT
+				case 40:	// DOWN
+				case 46:	// DEL
+					break;
+			}
+		}
 	}
 
 	public insideBoard(p: Point): boolean {
@@ -284,7 +295,6 @@ export class MyApp extends Application implements IMyApp {
 
 		if (name == "wire") {
 			//this's temporary, until create wire tool works
-			//Wire
 			//wire.setPoints([{x:50,y:100}, {x:200,y:100}, {x:200, y:25}, {x:250,y:25}])
 			comp = this.wire = new Wire((<IItemWireOptions>{
 				points: <IPoint[]>[
@@ -328,5 +338,85 @@ export class MyApp extends Application implements IMyApp {
 		let
 			rotation = (this.ec && this.ec.type == Type.EC) ? (this.ec as EC).rotation : 0;
 		this.prop("rot_lbl").value = ` ${rotation}°`;
+		this.ec && this.winProps.property("rotation")?.refresh();
+	}
+
+	//public execute({ action, trigger, data }: { action: ActionType; trigger: string; data?: any; }) {
+	public execute(action: ActionType, trigger: string, data?: any) {
+		let
+			arr = trigger.split('::'),
+			comp = Comp.item(<string>arr.shift()),
+			name = arr.shift(),
+			type = arr.shift(),
+			app = this as MyApp,
+			compNull = false,
+			selectAll = (value: boolean): ItemBoard[] => {
+				let
+					arr = Array.from(app.compList.values());
+				arr.forEach(comp => comp.select(value));
+				return arr;
+			}
+		//this's a temporary fix to make it work
+		//	final code will have a centralized action dispatcher
+		switch (action) {
+			case ActionType.TOGGLE_SELECT:			//"Toggle Select"	6
+				if (!(compNull = !comp)) {
+					comp.select(!comp.selected);
+					app.selectedComponents = Array.from(app.compList.values()).filter(c => c.selected);
+					app.refreshRotation();
+					(app.ec && (app.winProps.load(app.ec), (<any>window).ec = app.ec, 1)) || app.winProps.clear();
+				}
+				break;
+			case ActionType.SELECT:			//"Select" just ONE		7
+				if (!(compNull = !comp)) {
+					selectAll(false);
+					app.selectedComponents = [comp.select(true)];
+					app.refreshRotation();
+					app.winProps.load(comp);
+					//temporary, for testings...
+					(<any>window).ec = app.ec;
+				}
+				break;
+			case ActionType.SELECT_ALL:			//"Select All"		8
+				app.selectedComponents = selectAll(true);
+				app.refreshRotation();
+				app.winProps.clear();
+				//temporary, for testings...
+				(<any>window).ec = void 0;
+				break;
+			case ActionType.UNSELECT_ALL:			//"Deselect All"		9
+				selectAll(false);
+				app.selectedComponents = [];
+				app.refreshRotation();
+				app.winProps.clear();
+				//temporary, for testings...
+				(<any>window).ec = void 0;
+				break;
+			case ActionType.DELETE:		//"Delete"		10
+				if (!(compNull = !comp)) {
+					//disconnects and remove component from DOM
+					comp.disconnect();
+					comp.remove();
+					app.compList.delete(comp.id);
+					app.selectedComponents = Array.from(app.compList.values()).filter(c => c.selected);
+					app.refreshRotation();
+					(app.winProps.compId == comp.id) && app.winProps.clear();
+					app.tooltip.setVisible(false);
+					//temporary, for testings...
+					(<any>window).ec = void 0;
+				}
+				break;
+			case ActionType.SHOW_PROPERTIES:		//"Properties"		11
+				if (!(compNull = !comp)) {
+					app.winProps.load(comp);
+				}
+				break;
+		}
+		//logs
+		if (compNull) {
+			console.log(`invalid trigger: ${trigger}`);
+		} else {
+			console.log(`action: ${action}, id: ${comp?.id}, name: ${name}, type: ${type}, trigger: ${trigger}`);
+		}
 	}
 }

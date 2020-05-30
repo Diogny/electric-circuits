@@ -8,9 +8,8 @@ import Size from "./size";
 import Tooltip from "./tooltip";
 import HtmlWindow from "./app-window";
 import StateMachine from "./stateMachine";
-import ItemBoard from "./itemsBoard";
+import { ItemBoard } from "./itemsBoard";
 import { Application } from "./app";
-import EC from "./ec";
 import EcProp from "./ecprop";
 
 export interface IExec {
@@ -52,10 +51,14 @@ export interface IUIPropertySettings extends IUIProperty {
 export interface IComponentProperty {
 	name: string;
 	value: string;
-	combo?: string[];
-	type?: string;
-	readonly?: boolean;
-	title?: string;
+	valueType: string;
+	type: string;
+	isProperty: boolean;
+	readonly: boolean;
+	label: string;
+	class: string;
+	options?: string[];
+
 	//this's for EC properties like this.p show in property window
 	ec: ItemBoard;
 	setValue(val: string): boolean;

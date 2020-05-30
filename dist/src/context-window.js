@@ -17,21 +17,12 @@ var base_window_1 = require("./base-window");
 var interfaces_1 = require("./interfaces");
 var utils_1 = require("./utils");
 var dab_1 = require("./dab");
-var components_1 = require("./components");
 var ContextWindow = /** @class */ (function (_super) {
     __extends(ContextWindow, _super);
     function ContextWindow(options) {
-        var _this = this;
-        options.templateName = "ctxWin01";
-        //extend with specific class
-        options.class = (options.class || "") + " ctx";
-        //do not set size.height
-        options.ignoreHeight = true;
-        _this = _super.call(this, options) || this;
-        //store right click context options
+        var _this = _super.call(this, options) || this;
         _this.settings.list = new Map();
         utils_1.each(options.list, function (block, key) {
-            //load action numbers
             block.forEach(function (b) {
                 b.action = interfaces_1.ActionType[b.name];
             });
@@ -42,82 +33,11 @@ var ContextWindow = /** @class */ (function (_super) {
         //register global click event
         dab_1.aEL(_this.win, "click", function (e) {
             var self = dab_1.getParentAttr(e.target, "data-action"), action = dab_1.attr(self, "data-action") | 0, trigger = dab_1.attr(self.parentElement, "data-trigger");
-            self && (that.setVisible(false), _this.execute(action, trigger));
+            self && (that.setVisible(false), _this.app.execute(action, trigger));
         }, false);
         return _this;
     }
-    //public execute({ action, trigger, data }: { action: ActionType; trigger: string; data?: any; }) {
-    ContextWindow.prototype.execute = function (action, trigger, data) {
-        var arr = trigger.split('::'), comp = components_1.default.item(arr.shift()), name = arr.shift(), type = arr.shift(), app = this.app, compNull = false, selectAll = function (value) {
-            var arr = Array.from(app.compList.values());
-            arr.forEach(function (comp) { return comp.select(value); });
-            return arr;
-        };
-        //this's a temporary fix to make it work
-        //	final code will have a centralized action dispatcher
-        switch (action) {
-            case interfaces_1.ActionType.TOGGLE_SELECT: //"Toggle Select"	6
-                if (!(compNull = !comp)) {
-                    comp.select(!comp.selected);
-                    app.selectedComponents = Array.from(app.compList.values()).filter(function (c) { return c.selected; });
-                    app.refreshRotation();
-                    (app.ec && (app.winProps.load(app.ec), window.ec = app.ec, 1)) || app.winProps.clear();
-                }
-                break;
-            case interfaces_1.ActionType.SELECT: //"Select" just ONE		7
-                if (!(compNull = !comp)) {
-                    selectAll(false);
-                    app.selectedComponents = [comp.select(true)];
-                    app.refreshRotation();
-                    app.winProps.load(comp);
-                    //temporary, for testings...
-                    window.ec = app.ec;
-                }
-                break;
-            case interfaces_1.ActionType.SELECT_ALL: //"Select All"		8
-                app.selectedComponents = selectAll(true);
-                app.refreshRotation();
-                app.winProps.clear();
-                //temporary, for testings...
-                window.ec = void 0;
-                break;
-            case interfaces_1.ActionType.UNSELECT_ALL: //"Deselect All"		9
-                selectAll(false);
-                app.selectedComponents = [];
-                app.refreshRotation();
-                app.winProps.clear();
-                //temporary, for testings...
-                window.ec = void 0;
-                break;
-            case interfaces_1.ActionType.DELETE: //"Delete"		10
-                if (!(compNull = !comp)) {
-                    //disconnects and remove component from DOM
-                    comp.disconnect();
-                    comp.remove();
-                    app.compList.delete(comp.id);
-                    app.selectedComponents = Array.from(app.compList.values()).filter(function (c) { return c.selected; });
-                    app.refreshRotation();
-                    (app.winProps.compId == comp.id) && app.winProps.clear();
-                    app.tooltip.setVisible(false);
-                    //temporary, for testings...
-                    window.ec = void 0;
-                }
-                break;
-            case interfaces_1.ActionType.SHOW_PROPERTIES: //"Properties"		11
-                if (!(compNull = !comp)) {
-                    app.winProps.load(comp);
-                }
-                break;
-        }
-        if (compNull) {
-            console.log("invalid trigger: " + trigger);
-        }
-        else {
-            console.log("action: " + action + ", id: " + (comp === null || comp === void 0 ? void 0 : comp.id) + ", name: " + name + ", type: " + type + ", trigger: " + trigger);
-        }
-    };
     ContextWindow.prototype.setVisible = function (value) {
-        //clear data trigger info
         return (!_super.prototype.setVisible.call(this, value).visible && this.win.setAttribute("data-trigger", "")), this;
     };
     /**
@@ -162,6 +82,13 @@ var ContextWindow = /** @class */ (function (_super) {
             this.win.innerHTML = html;
         }
         return this;
+    };
+    ContextWindow.prototype.propertyDefaults = function () {
+        return dab_1.extend(_super.prototype.propertyDefaults.call(this), {
+            class: "win ctx",
+            ignoreHeight: true,
+            templateName: "ctxWin01"
+        });
     };
     return ContextWindow;
 }(base_window_1.default));

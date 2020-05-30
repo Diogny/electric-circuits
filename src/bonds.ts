@@ -1,17 +1,16 @@
 
 import { Type, TypedClass } from './types';
 import { obj } from './dab';
-import ItemBoard from './itemsBoard';
+import { ItemBoard } from './itemsBoard';
 import { IBondItem } from './interfaces';
 
 export default class Bond implements TypedClass {
 
 	public from: IBondItem;
 	public to: IBondItem[];
-	
+
 	get type(): Type { return Type.BOND }
 
-	//amount of connections to this node
 	get count(): number { return this.to.length }
 
 	// [0>#id-0(Y), -1>#id-1(12)]
@@ -36,6 +35,10 @@ export default class Bond implements TypedClass {
 
 	//returns true if this bond is connected to an specific EC
 	public has(id: string): boolean { return this.to.some((b) => id == b.id) }
+
+	public get(id: string): IBondItem | undefined {
+		return this.to.find((b) => id == b.id)
+	}
 
 	public add(t: ItemBoard, ndx: number): boolean {
 		if (t && !this.has(t.id)) {

@@ -13,6 +13,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.ItemBoard = exports.BondsInjector = exports.StringInjector = exports.PointInjector = exports.PropertyInjector = void 0;
 var dab_1 = require("./dab");
 var bonds_1 = require("./bonds");
 var itemsBase_1 = require("./itemsBase");
@@ -27,20 +28,37 @@ var PropertyInjector = /** @class */ (function () {
         this.readonly = readonly;
         if (!this.ec || !(this.name in this.ec))
             throw "invalid property " + this.name;
+        this.class = "";
     }
-    Object.defineProperty(PropertyInjector.prototype, "type", {
-        get: function () { return "property"; },
+    Object.defineProperty(PropertyInjector.prototype, "valueType", {
+        get: function () { return "string"; },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(PropertyInjector.prototype, "isProperty", {
+        get: function () { return true; },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(PropertyInjector.prototype, "label", {
+        get: function () { return this.name; },
         enumerable: false,
         configurable: true
     });
     return PropertyInjector;
 }());
+exports.PropertyInjector = PropertyInjector;
 var PointInjector = /** @class */ (function (_super) {
     __extends(PointInjector, _super);
     function PointInjector() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
-    Object.defineProperty(PointInjector.prototype, "title", {
+    Object.defineProperty(PointInjector.prototype, "type", {
+        get: function () { return "point"; },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(PointInjector.prototype, "label", {
         //later can be atomized to different, now burned to this.p
         get: function () { return "position"; },
         enumerable: false,
@@ -58,11 +76,17 @@ var PointInjector = /** @class */ (function (_super) {
     };
     return PointInjector;
 }(PropertyInjector));
+exports.PointInjector = PointInjector;
 var StringInjector = /** @class */ (function (_super) {
     __extends(StringInjector, _super);
     function StringInjector(ec, name, readonly) {
         return _super.call(this, ec, name, readonly) || this;
     }
+    Object.defineProperty(StringInjector.prototype, "type", {
+        get: function () { return "string"; },
+        enumerable: false,
+        configurable: true
+    });
     Object.defineProperty(StringInjector.prototype, "value", {
         get: function () { return this.ec[this.name]; },
         enumerable: false,
@@ -73,6 +97,23 @@ var StringInjector = /** @class */ (function (_super) {
     };
     return StringInjector;
 }(PropertyInjector));
+exports.StringInjector = StringInjector;
+var BondsInjector = /** @class */ (function (_super) {
+    __extends(BondsInjector, _super);
+    function BondsInjector(ec, name) {
+        var _this = _super.call(this, ec, name, true) || this;
+        _this.class = "simple";
+        return _this;
+    }
+    Object.defineProperty(BondsInjector.prototype, "value", {
+        get: function () { return this.ec.bonds.map(function (o) { return o.link; }).join(' '); },
+        enumerable: false,
+        configurable: true
+    });
+    BondsInjector.prototype.setValue = function (val) { return false; };
+    return BondsInjector;
+}(StringInjector));
+exports.BondsInjector = BondsInjector;
 //ItemBoard->Wire
 var ItemBoard = /** @class */ (function (_super) {
     __extends(ItemBoard, _super);
@@ -160,12 +201,6 @@ var ItemBoard = /** @class */ (function (_super) {
         enumerable: false,
         configurable: true
     });
-    Object.defineProperty(ItemBoard.prototype, "windowProperties", {
-        //properties available to show up in property window
-        get: function () { return ["id", "p"]; },
-        enumerable: false,
-        configurable: true
-    });
     ItemBoard.prototype.select = function (value) {
         if (this.selected != value) {
             //set new value
@@ -214,6 +249,11 @@ var ItemBoard = /** @class */ (function (_super) {
         //for object chaining
         return this;
     };
+    //properties available to show up in property window
+    ItemBoard.prototype.windowProperties = function () { return ["id", "p", "bonds"]; };
+    ItemBoard.prototype.properties = function () {
+        return this.windowProperties().concat(utils_1.map(this.settings.props, function (value, key) { return key; }));
+    };
     ItemBoard.prototype.prop = function (propName) {
         //inject available properties if called
         switch (propName) {
@@ -221,11 +261,10 @@ var ItemBoard = /** @class */ (function (_super) {
                 return new StringInjector(this, propName, true);
             case "p":
                 return new PointInjector(this, propName, false);
+            case "bonds":
+                return new BondsInjector(this, propName);
         }
         return this.settings.props[propName];
-    };
-    ItemBoard.prototype.properties = function () {
-        return this.windowProperties.concat(utils_1.map(this.settings.props, function (value, key) { return key; }));
     };
     //poly.bond(0, ec, 1)
     //poly.bond(poly.last, ec, 1)
@@ -311,5 +350,5 @@ var ItemBoard = /** @class */ (function (_super) {
     };
     return ItemBoard;
 }(itemsBase_1.default));
-exports.default = ItemBoard;
+exports.ItemBoard = ItemBoard;
 //# sourceMappingURL=itemsBoard.js.map

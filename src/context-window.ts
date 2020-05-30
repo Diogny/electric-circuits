@@ -1,28 +1,17 @@
 import BaseWindow from "./base-window";
-import { IContextMenuOptions, IContextMenuItem, IContextMenuSettings, ActionType } from "./interfaces";
+import { IContextMenuOptions, IContextMenuItem, IContextMenuSettings, ActionType, IBaseWindowOptions } from "./interfaces";
 import { each } from "./utils";
-import { nano, aEL, getParentAttr, attr } from "./dab";
-import Comp from "./components";
+import { nano, aEL, getParentAttr, attr, extend } from "./dab";
 import { MyApp } from "./myapp";
-import ItemBoard from "./itemsBoard";
-import { Type } from "./types";
-import EC from "./ec";
 
 export default class ContextWindow extends BaseWindow {
 
 	protected settings: IContextMenuSettings;
 
 	constructor(options: IContextMenuOptions) {
-		options.templateName = "ctxWin01";
-		//extend with specific class
-		options.class = (options.class || "") + " ctx";
-		//do not set size.height
-		options.ignoreHeight = true;
 		super(options);
-		//store right click context options
 		this.settings.list = new Map();
 		each(options.list, (block: IContextMenuItem[], key: string) => {
-			//load action numbers
 			block.forEach(b => {
 				b.action = ActionType[b.name]
 			})
@@ -37,90 +26,11 @@ export default class ContextWindow extends BaseWindow {
 				self = getParentAttr(e.target as HTMLElement, "data-action"),
 				action = attr(self, "data-action") | 0,
 				trigger = attr(self.parentElement, "data-trigger")
-			self && (that.setVisible(false), this.execute(action, trigger))
+			self && (that.setVisible(false), (this.app as MyApp).execute(action, trigger))
 		}, false)
 	}
 
-	//public execute({ action, trigger, data }: { action: ActionType; trigger: string; data?: any; }) {
-	public execute(action: ActionType, trigger: string, data?: any) {
-		let
-			arr = trigger.split('::'),
-			comp = Comp.item(<string>arr.shift()),
-			name = arr.shift(),
-			type = arr.shift(),
-			app = this.app as MyApp,
-			compNull = false,
-			selectAll = (value: boolean): ItemBoard[] => {
-				let
-					arr = Array.from(app.compList.values());
-				arr.forEach(comp => comp.select(value));
-				return arr;
-			}
-		//this's a temporary fix to make it work
-		//	final code will have a centralized action dispatcher
-		switch (action) {
-			case ActionType.TOGGLE_SELECT:			//"Toggle Select"	6
-				if (!(compNull = !comp)) {
-					comp.select(!comp.selected);
-					app.selectedComponents = Array.from(app.compList.values()).filter(c => c.selected);
-					app.refreshRotation();
-					(app.ec && (app.winProps.load(app.ec), (<any>window).ec = app.ec, 1)) || app.winProps.clear();
-				}
-				break;
-			case ActionType.SELECT:			//"Select" just ONE		7
-				if (!(compNull = !comp)) {
-					selectAll(false);
-					app.selectedComponents = [comp.select(true)];
-					app.refreshRotation();
-					app.winProps.load(comp);
-					//temporary, for testings...
-					(<any>window).ec = app.ec;
-				}
-				break;
-			case ActionType.SELECT_ALL:			//"Select All"		8
-				app.selectedComponents = selectAll(true);
-				app.refreshRotation();
-				app.winProps.clear();
-				//temporary, for testings...
-				(<any>window).ec = void 0;
-				break;
-			case ActionType.UNSELECT_ALL:			//"Deselect All"		9
-				selectAll(false);
-				app.selectedComponents = [];
-				app.refreshRotation();
-				app.winProps.clear();
-				//temporary, for testings...
-				(<any>window).ec = void 0;
-				break;
-			case ActionType.DELETE:		//"Delete"		10
-				if (!(compNull = !comp)) {
-					//disconnects and remove component from DOM
-					comp.disconnect();
-					comp.remove();
-					app.compList.delete(comp.id);
-					app.selectedComponents = Array.from(app.compList.values()).filter(c => c.selected);
-					app.refreshRotation();
-					(app.winProps.compId == comp.id) && app.winProps.clear();
-					app.tooltip.setVisible(false);
-					//temporary, for testings...
-					(<any>window).ec = void 0;
-				}
-				break;
-			case ActionType.SHOW_PROPERTIES:		//"Properties"		11
-				if (!(compNull = !comp)) {
-					app.winProps.load(comp);
-				}
-				break;
-		}
-		if (compNull) {
-			console.log(`invalid trigger: ${trigger}`);
-		} else {
-			console.log(`action: ${action}, id: ${comp?.id}, name: ${name}, type: ${type}, trigger: ${trigger}`);
-		}
-	}
-
 	public setVisible(value: boolean): ContextWindow {
-		//clear data trigger info
 		return (!super.setVisible(value).visible && this.win.setAttribute("data-trigger", "")), this
 	}
 
@@ -170,4 +80,11 @@ export default class ContextWindow extends BaseWindow {
 		return this;
 	}
 
+	public propertyDefaults(): IBaseWindowOptions {
+		return extend(super.propertyDefaults(), {
+			class: "win ctx",
+			ignoreHeight: true,
+			templateName: "ctxWin01"
+		})
+	}
 }

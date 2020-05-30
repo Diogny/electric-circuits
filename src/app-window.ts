@@ -5,7 +5,7 @@ import { html } from "./utils";
 import Point from "./point";
 import EcProp from "./ecprop";
 import { MyApp } from "./myapp";
-import ItemBoard from "./itemsBoard";
+import { ItemBoard } from "./itemsBoard";
 
 export default class AppWindow extends BaseWindow {
 
@@ -55,9 +55,6 @@ export default class AppWindow extends BaseWindow {
 	}
 
 	constructor(options: IAppWindowOptions) {
-		options.templateName = "propWin01";
-		//extend with specific class
-		options.class = (options.class || "") + " props";
 		super(options);
 		let
 			header = <HTMLElement>this.win.querySelector("header"),
@@ -150,7 +147,10 @@ export default class AppWindow extends BaseWindow {
 		aEL(this.titleHTML, "mouseup", function (e: MouseEvent) {
 			//console.log(`mouseup, eventPhase: ${e.eventPhase} tag: ${(<Element>e.target).tagName}`);
 			if (!that.settings.dragging) {
-				that.select(!that.selected);	//click, toggle
+				that.select(!that.selected);
+				//set state machine to this state
+
+
 				//console.log(`win: ${that.selected}`);
 			} else {
 				//console.log("stop dragging");
@@ -169,6 +169,11 @@ export default class AppWindow extends BaseWindow {
 	public onMouseOver(e: MouseEvent) {
 		(this.app as MyApp).topBarLeft.innerHTML = "&nbsp;";
 		this.settings.offset && (this.settings.offset = new Point(e.offsetX, e.offsetY));
+		//console.log("inside window")
+	}
+
+	public onMouseOut(e: MouseEvent) {
+		//console.log("left window")
 	}
 
 	public renderBar(text: string) {
@@ -208,21 +213,18 @@ export default class AppWindow extends BaseWindow {
 		this.clear();
 		this.compId = comp.id;
 		comp.properties().forEach((name: string) => {
-			this.appendPropChild(new EcProp(<ItemBoard>comp, name, true,
+			this.appendPropChild(new EcProp(<ItemBoard>comp, name,
 				function onEcPropChange(value: any) {
 					console.log(this, value)
-				}), true);
+				}, true));
 		});
 		this.setVisible(true);
 		return true;
 	}
 
-	public appendPropChild(el: EcProp, wrap?: boolean): AppWindow {
+	public appendPropChild(el: EcProp): AppWindow {
 		if (el) {
-			let
-				root = this.main;
-			wrap && (root = root.appendChild(document.createElement("div")), root.classList.add("ec-wrap"));
-			root.appendChild(el.html);
+			this.main.appendChild(el.html);
 			this.settings.properties.push(el);
 		}
 		return this
@@ -235,10 +237,11 @@ export default class AppWindow extends BaseWindow {
 	//public propertyDefaults = (): IItemBaseProperties => {
 	public propertyDefaults(): IAppWindowProperties {
 		return extend(super.propertyDefaults(), {
+			class: "win props",
+			templateName: "propWin01",
 			title: "Window",
 			content: "",
 			bar: "",
-			//dragging: false,
 			selected: false,
 			properties: []
 		})

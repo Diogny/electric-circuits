@@ -1,12 +1,27 @@
-import ItemBoard from "./itemsBoard";
-import { IItemSolidOptions, IItemSolidProperties } from "./interfaces";
+import { ItemBoard, PropertyInjector } from "./itemsBoard";
+import { IItemSolidOptions, IItemSolidProperties, ComponentPropertyType } from "./interfaces";
 import ItemBase from "./itemsBase";
 import Rect from "./rect";
 import Size from "./size";
 import Point from "./point";
 
+export class RotationInjector extends PropertyInjector {
+
+	get type(): string { return "rotation" }
+
+	get value(): string { return `${this.ec[this.name]}°` }
+
+	setValue(val: string): boolean {
+		return false;
+	}
+
+	constructor(ec: ItemBoard, name: string) {
+		super(ec, name, true);
+	}
+}
+
 //ItemBoard->ItemSolid->EC
-export default abstract class ItemSolid extends ItemBoard {
+export abstract class ItemSolid extends ItemBoard {
 
 	protected settings: IItemSolidProperties;
 
@@ -15,6 +30,17 @@ export default abstract class ItemSolid extends ItemBoard {
 		//I've to set new properties always, because super just copy defaults()
 		//later override method propertyDefaults()
 		this.settings.rotation = Point.validateRotation(options.rotation);
+	}
+
+	public windowProperties(): string[] { return super.windowProperties().concat(["rotation"]) }
+
+	public prop(propName: string): ComponentPropertyType {
+		//inject available properties if called
+		switch (propName) {
+			case "rotation":
+				return new RotationInjector(this, propName)
+		}
+		return super.prop(propName)
 	}
 
 	get rotation(): number { return this.settings.rotation }

@@ -12,23 +12,34 @@ import { map, tag } from './utils';
 import EC from './ec';
 import Point from './point';
 
-abstract class PropertyInjector implements IComponentProperty {
-	abstract value: string;
+export abstract class PropertyInjector implements IComponentProperty {
 
-	get type(): string { return "property" }
+	class: string;
+
+	abstract value: string;
+	get valueType(): string { return "string" }
+
+	abstract type: string;
+
+	get isProperty(): boolean { return true }
+
+	get label(): string { return this.name }
 
 	abstract setValue(val: string): boolean;
 
 	constructor(public ec: ItemBoard, public name: string, public readonly: boolean) {
 		if (!this.ec || !(this.name in this.ec))
 			throw `invalid property ${this.name}`;
+		this.class = "";
 	}
 }
 
-class PointInjector extends PropertyInjector {
+export class PointInjector extends PropertyInjector {
+
+	get type(): string { return "point" }
 
 	//later can be atomized to different, now burned to this.p
-	get title(): string { return "position" }
+	get label(): string { return "position" }
 
 	get value(): string { return this.ec.p.toString(0x06) }	//no vars and no parenthesis
 
@@ -39,7 +50,9 @@ class PointInjector extends PropertyInjector {
 	}
 }
 
-class StringInjector extends PropertyInjector {
+export class StringInjector extends PropertyInjector {
+
+	get type(): string { return "string" }
 
 	get value(): string { return this.ec[this.name] }
 
@@ -52,8 +65,20 @@ class StringInjector extends PropertyInjector {
 	}
 }
 
+export class BondsInjector extends StringInjector {
+
+	get value(): string { return this.ec.bonds.map((o) => o.link).join(' ') }
+
+	setValue(val: string): boolean { return false }
+
+	constructor(ec: ItemBoard, name: string) {
+		super(ec, name, true);
+		this.class = "simple";
+	}
+}
+
 //ItemBoard->Wire
-export default abstract class ItemBoard extends ItemBase {
+export abstract class ItemBoard extends ItemBase {
 
 	protected settings: IItemBoardProperties;
 	public highlight: IHighlightable;
@@ -62,9 +87,6 @@ export default abstract class ItemBoard extends ItemBase {
 	get onProp(): Function { return this.settings.onProp }
 	get selected(): boolean { return this.settings.selected }
 	get bonds(): Bond[] { return this.settings.bonds }
-
-	//properties available to show up in property window
-	get windowProperties(): string[] { return ["id", "p"] }
 
 	abstract get count(): number;	// EC is node count, Wire is point count
 
@@ -197,20 +219,25 @@ export default abstract class ItemBoard extends ItemBase {
 		return this;
 	}
 
+	//properties available to show up in property window
+	public windowProperties(): string[] { return ["id", "p", "bonds"] }
+
+	public properties(): string[] {
+		return this.windowProperties().concat(map(this.settings.props,
+			(value: ComponentPropertyType, key: string) => key))
+	}
+
 	public prop(propName: string): ComponentPropertyType {
 		//inject available properties if called
 		switch (propName) {
 			case "id":
-				return new StringInjector(this, propName, true);
+				return new StringInjector(this, propName, true)
 			case "p":
 				return new PointInjector(this, propName, false)
+			case "bonds":
+				return new BondsInjector(this, propName)
 		}
 		return this.settings.props[propName]
-	}
-
-	public properties(): string[] {
-		return this.windowProperties.concat(map(this.settings.props,
-			(value: ComponentPropertyType, key: string) => key))
 	}
 
 	//poly.bond(0, ec, 1)

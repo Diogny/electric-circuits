@@ -12,6 +12,8 @@ Used in my testing website [Electric Circuits](http://diogny.com/tests/circuits.
 
 ![working example](dist/img/img03.png)
 
+![working example](dist/img/img04.png)
+
 ### Last compilation:
 	We are using Node.js 12.14.1, Chromium 83.0.4103.64, and Electron 9.0.0.
 
@@ -54,6 +56,6 @@ Used in my testing website [Electric Circuits](http://diogny.com/tests/circuits.
 	git add -u					stage the modified and deleted files
 	git add -A
 	git commit -m "update message"
-	git tag v1.0.9
+	git tag v1.0.10
 	git push origin master --tags
 

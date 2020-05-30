@@ -217,6 +217,11 @@ g.tooltip > text {
   stroke-linejoin: round;
 }
 
+.wire.selected > line,
+.wire.selected > polyline {
+  stroke-width: 4px;
+}
+
 .wire.white > line {
   stroke: whitesmoke;
 }
@@ -226,23 +231,28 @@ g.tooltip > text {
   stroke: rgb(82, 80, 80);
 }
 
-.wire.green > line {
+.wire.green > line,
+.wire.green > polyline {
   stroke: #3cbf71;
 }
 
-.wire.red > line {
+.wire.red > line,
+.wire.red > polyline {
   stroke: #fa646c;
 }
 
-.wire.blue > line {
+.wire.blue > line,
+.wire.blue > polyline {
   stroke: #479dee;
 }
 
-.wire.yellow > line {
+.wire.yellow > line,
+.wire.yellow > polyline {
   stroke: #e6e614;
 }
 
-.wire.orange > line {
+.wire.orange > line,
+.wire.orange > polyline {
   stroke: orange;
 }
 
@@ -250,51 +260,44 @@ g.tooltip > text {
   stroke: purple;
 }
 
-.wire.brown > line {
+.wire.brown > line,
+.wire.brown > polyline {
   stroke: brown;
 }
 
-.wire.aqua > line {
+.wire.aqua > line,
+.wire.aqua > polyline {
   stroke: aqua;
 }
 
-.wire.bisque > line {
+.wire.bisque > line,
+.wire.bisque > polyline {
   stroke: bisque;
 }
 
-.wire.navy > line {
+.wire.navy > line,
+.wire.navy > polyline {
   stroke: navy;
 }
 
-.wire.teal > line {
+.wire.teal > line,
+.wire.teal > polyline {
   stroke: teal;
 }
 
-.wire.violet > line {
+.wire.violet > line,
+.wire.violet > polyline {
   stroke: violet;
 }
 
-.wire.black > line:hover,
-.wire.black > polyline:hover,
-.wire.violet > line:hover,
-.wire.teal > line:hover,
-.wire.navy > line:hover,
-.wire.bisque > line:hover,
-.wire.aqua > line:hover,
-.wire.white > line:hover,
-.wire.green > line:hover,
-.wire.red > line:hover,
-.wire.blue > line:hover,
-.wire.yellow > line:hover,
-.wire.orange > line:hover,
-.wire.purple > line:hover,
-.wire.brown > line:hover,
+.wire > line:hover,
+.wire > polyline:hover,
 .wire.selected > line {
   /*stroke: black;
 					  filter: brightness(60%) sepia(100%);
 		  stroke-dasharray: 10 10;*/
   opacity: 0.9;
-  stroke-width: 8px; /*12px;*/
+  stroke-width: 7px; /*12px;*/
 }
 
 /*.wire:hover {
@@ -357,9 +360,6 @@ g.tooltip > text {
   vertical-align: middle; /* parent must have height: 100%  px em   https://stackoverflow.com/questions/7273338/how-to-vertically-align-an-image-inside-a-div*/
 }
 
-.bar-item[data-scale],
-.bar-item[tool],
-.bar-item[rot-dir],
 .bar-item.link {
   cursor: pointer;
 }
@@ -368,9 +368,6 @@ g.tooltip > text {
   background: #2464a7; /*cadetblue;*/
 }
 
-.bar-item[data-scale]:hover,
-.bar-item[tool]:hover,
-.bar-item[rot-dir]:hover,
 .bar-item.link:hover {
   /*opacity: 0.6;*/
   background: #73b2eb;
@@ -521,29 +518,50 @@ div.win.props > main input {
   height: 16px;
 }
 
-label.ec-prop-title {
+.ec-container {
+  margin: 6px 2px;
+}
+
+.ec-container > .label {
   background-color: #e7e5e5;
   padding: 1px;
-  margin: 1px;
+  margin-right: 5px;
   border: 1px solid #d6d5d5;
 }
 
-.ec-prop {
-  margin-left: 5px;
-}
-
-.ec-prop.readonly {
+.ec-container > .prop.readonly {
   background-color: white;
   padding: 2px 5px;
   border: 1px solid black;
 }
 
-.ec-prop.readonly:hover {
+.ec-container > .prop.simple {
+  background-color: initial !important;
+  border: none !important;
+}
+
+.ec-container > .prop.readonly:hover {
   cursor: not-allowed;
 }
 
-div.ec-wrap {
-  margin: 6px 2px;
+.ec-container > .prop.simple:hover {
+  cursor: initial !important;
+}
+
+.ec-container > .rot {
+  display: inline-block;
+  background-color: #3988ce;
+  padding: 1px 2px;
+}
+
+.rot > .prop {
+  /* border: 1px solid gray; */
+  padding: 1px 6px;
+  color: white;
+}
+
+.rot > img {
+  cursor: pointer;
 }
 
 /* FOOTER */

@@ -1,6 +1,6 @@
 
-import { obj } from './dab';
-import ItemBoard from './itemsBoard';
+import { obj, dP } from './dab';
+import { ItemBoard } from './itemsBoard';
 import {
 	IBaseComponent, IComponentOptions, IBaseStoreComponent, IComponentMetadata
 } from './interfaces';
@@ -22,16 +22,10 @@ export default class Comp {
 	// all base components with metadata
 	private static baseComps: Map<string, IBaseComponent> =
 		Comp.initializeComponents([defaultComponent("tooltip"), defaultComponent("wire")]);
-	//global static variables
-	private static resistorCount: number = 1;
-	private static capacitorCount: number = 1;
 
 	//all ecs, wires in the board
 	private static boardItems: Map<string, ItemBoard> = new Map();
 	protected settings: IComponentOptions;
-	//references
-	resistorCount: number;
-	capacitorCount: number;
 
 	get name(): string { return this.settings.name }
 	get type(): string { return this.settings.type }
@@ -67,6 +61,12 @@ export default class Comp {
 		}
 		//set default id template if not defined
 		!this.settings.meta.nameTmpl && (this.settings.meta.nameTmpl = defaultIdTemplate);
+		//create static counter for id name template if any
+		let
+			match = /\.*Comp\.(\w+)\.*/gm.exec(this.settings.meta.nameTmpl);
+		match &&
+			(Comp[match[1]] == undefined) &&
+			(Comp[match[1]] = this.settings.meta.countStart | 0, console.log(`Comp.${match[1]} = ${Comp[match[1]]}`))
 		if (!Comp.store(this.settings.name, this))
 			throw `duplicated: ${this.settings.name}`;
 	}

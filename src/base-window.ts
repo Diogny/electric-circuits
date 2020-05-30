@@ -2,7 +2,7 @@ import Item from "./item";
 import { Type } from "./types";
 import { Application } from "./app";
 import { IBaseWindowSettings, ISize, IBaseWindowOptions } from "./interfaces";
-import { obj, pojo, removeClass, addClass, css, extend, nano, addClassX, aEL } from "./dab";
+import { obj, pojo, removeClass, addClass, css, extend, nano, aEL } from "./dab";
 import { html } from "./utils";
 
 export default class BaseWindow extends Item {
@@ -29,13 +29,8 @@ export default class BaseWindow extends Item {
 		return (<any>this.win).getBBox()
 	}
 
-	get visible(): boolean {
-		return this.settings.visible
-	}
-
 	public setVisible(value: boolean): BaseWindow {
-		super.setVisible(value).visible ? removeClass(this.win, "hide") : addClass(this.win, "hide");
-		return this;
+		return super.setVisible(value).visible ? removeClass(this.win, "hide") : addClass(this.win, "hide"), this
 	}
 
 	get size(): ISize { return this.settings.size }
@@ -54,26 +49,23 @@ export default class BaseWindow extends Item {
 
 	constructor(options: IBaseWindowOptions) {
 		super(options);
-		//create HTML main win template
-		!options.templateName && (options.templateName = "baseWin01");
-		this.settings.win = <HTMLElement>html(nano(this.app.templates[options.templateName], {
-			id: options.id,
-			class: "win"		//default class
+		!this.settings.templateName && (this.settings.templateName = "baseWin01");
+		this.settings.win = <HTMLElement>html(nano(this.app.templates[this.settings.templateName], {
+			id: this.id,
+			class: this.class
 		}));
-		addClassX(this.win, this.settings.class);
-		//move to location
 		this.move(this.x, this.y);
-		//size accordingly
-		this.size = options.size;
+		this.size = this.settings.size;
 		this.setVisible(!!this.settings.visible);
 		let
 			that = this as BaseWindow;
-		//default
 		aEL(this.win, "mouseover", (e: MouseEvent) => that.onMouseOver.call(that, e), false);
+		aEL(this.win, "mouseout", (e: MouseEvent) => that.onMouseOut.call(that, e), false);
 	}
 
-	public onMouseOver(e: MouseEvent) {
-	}
+	public onMouseOver(e: MouseEvent) { }
+
+	public onMouseOut(e: MouseEvent) { }
 
 	public move(x: number, y: number): BaseWindow {
 		super.move(x, y);
@@ -89,7 +81,7 @@ export default class BaseWindow extends Item {
 	}
 
 	public dispose() {
-		//release hook handlers
+		//release hook handlers, ...
 	}
 
 	public propertyDefaults(): IBaseWindowOptions {

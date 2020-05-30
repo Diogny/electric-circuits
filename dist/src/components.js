@@ -35,6 +35,11 @@ var Comp = /** @class */ (function () {
         }
         //set default id template if not defined
         !this.settings.meta.nameTmpl && (this.settings.meta.nameTmpl = defaultIdTemplate);
+        //create static counter for id name template if any
+        var match = /\.*Comp\.(\w+)\.*/gm.exec(this.settings.meta.nameTmpl);
+        match &&
+            (Comp[match[1]] == undefined) &&
+            (Comp[match[1]] = this.settings.meta.countStart | 0, console.log("Comp." + match[1] + " = " + Comp[match[1]]));
         if (!Comp.store(this.settings.name, this))
             throw "duplicated: " + this.settings.name;
     }
@@ -89,9 +94,6 @@ var Comp = /** @class */ (function () {
     };
     // all base components with metadata
     Comp.baseComps = Comp.initializeComponents([defaultComponent("tooltip"), defaultComponent("wire")]);
-    //global static variables
-    Comp.resistorCount = 1;
-    Comp.capacitorCount = 1;
     //all ecs, wires in the board
     Comp.boardItems = new Map();
     ////////////////////////////// STATIC ////////////////////////////////

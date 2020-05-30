@@ -13,10 +13,32 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.ItemSolid = exports.RotationInjector = void 0;
 var itemsBoard_1 = require("./itemsBoard");
 var rect_1 = require("./rect");
 var size_1 = require("./size");
 var point_1 = require("./point");
+var RotationInjector = /** @class */ (function (_super) {
+    __extends(RotationInjector, _super);
+    function RotationInjector(ec, name) {
+        return _super.call(this, ec, name, true) || this;
+    }
+    Object.defineProperty(RotationInjector.prototype, "type", {
+        get: function () { return "rotation"; },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(RotationInjector.prototype, "value", {
+        get: function () { return this.ec[this.name] + "\u00B0"; },
+        enumerable: false,
+        configurable: true
+    });
+    RotationInjector.prototype.setValue = function (val) {
+        return false;
+    };
+    return RotationInjector;
+}(itemsBoard_1.PropertyInjector));
+exports.RotationInjector = RotationInjector;
 //ItemBoard->ItemSolid->EC
 var ItemSolid = /** @class */ (function (_super) {
     __extends(ItemSolid, _super);
@@ -27,6 +49,15 @@ var ItemSolid = /** @class */ (function (_super) {
         _this.settings.rotation = point_1.default.validateRotation(options.rotation);
         return _this;
     }
+    ItemSolid.prototype.windowProperties = function () { return _super.prototype.windowProperties.call(this).concat(["rotation"]); };
+    ItemSolid.prototype.prop = function (propName) {
+        //inject available properties if called
+        switch (propName) {
+            case "rotation":
+                return new RotationInjector(this, propName);
+        }
+        return _super.prototype.prop.call(this, propName);
+    };
     Object.defineProperty(ItemSolid.prototype, "rotation", {
         get: function () { return this.settings.rotation; },
         enumerable: false,
@@ -57,6 +88,6 @@ var ItemSolid = /** @class */ (function (_super) {
         return new rect_1.default(p, size);
     };
     return ItemSolid;
-}(itemsBoard_1.default));
-exports.default = ItemSolid;
+}(itemsBoard_1.ItemBoard));
+exports.ItemSolid = ItemSolid;
 //# sourceMappingURL=itemSolid.js.map

@@ -36,32 +36,32 @@ var MyApp = /** @class */ (function (_super) {
         _this.tooltipFontSize = function () { return Math.max(10, 35 * _this.multiplier); };
         var that = _this, 
         //HTML
-        getClientXY = function (evt) {
-            return new point_1.default(evt.clientX - that.board.offsetLeft, evt.clientY - that.board.offsetTop);
+        getClientXY = function (ev) {
+            return new point_1.default(ev.clientX - that.board.offsetLeft, ev.clientY - that.board.offsetTop);
         }, 
         //SVG
-        getOffset = function (clientXY, evt) {
+        getOffset = function (clientXY, ev) {
             return point_1.default.times(clientXY, that.ratioX, that.ratioY).round();
-        }, handleMouseEvent = function (evt) {
+        }, handleMouseEvent = function (ev) {
             //this is MyApp
-            evt.preventDefault();
-            evt.stopPropagation();
-            var arr = [], target = evt.target, parent = target.parentNode, clientXY = getClientXY(evt), state = {
+            ev.preventDefault();
+            ev.stopPropagation();
+            var arr = [], target = ev.target, parent = target.parentNode, clientXY = getClientXY(ev), state = {
                 id: '#' + parent.id,
                 type: dab_1.attr(parent, "svg-comp"),
-                button: evt.button,
+                button: ev.button,
                 //parent: parent,
                 client: clientXY,
-                offset: getOffset(clientXY, evt),
-                event: evt.type.replace('mouse', ''),
-                timeStamp: evt.timeStamp,
+                offset: getOffset(clientXY, ev),
+                event: ev.type.replace('mouse', ''),
+                timeStamp: ev.timeStamp,
                 over: {
                     type: dab_1.attr(target, "svg-type"),
                     svg: target
                 },
-                ctrlKey: evt.ctrlKey,
-                shiftKey: evt.shiftKey,
-                altKey: evt.altKey,
+                ctrlKey: ev.ctrlKey,
+                shiftKey: ev.shiftKey,
+                altKey: ev.altKey,
                 it: components_1.default.item(parent.id)
             };
             //post actions
@@ -172,33 +172,45 @@ var MyApp = /** @class */ (function (_super) {
             class: "no-select",
             list: options.list
         });
-        dab_1.aEL(_this.svgBoard, "mouseover", function (evt) {
-            that.state.enabled && that.state.send(interfaces_1.ActionType.OVER, handleMouseEvent.call(that, evt));
+        dab_1.aEL(_this.svgBoard, "mouseover", function (ev) {
+            that.state.enabled && that.state.send(interfaces_1.ActionType.OVER, handleMouseEvent.call(that, ev));
         }, false);
-        dab_1.aEL(_this.svgBoard, "mousemove", function (evt) {
-            that.state.enabled && that.state.send(interfaces_1.ActionType.MOVE, handleMouseEvent.call(that, evt));
+        dab_1.aEL(_this.svgBoard, "mousemove", function (ev) {
+            that.state.enabled && that.state.send(interfaces_1.ActionType.MOVE, handleMouseEvent.call(that, ev));
         }, false);
-        dab_1.aEL(_this.svgBoard, "mouseout", function (evt) {
-            that.state.enabled && that.state.send(interfaces_1.ActionType.OUT, handleMouseEvent.call(that, evt));
+        dab_1.aEL(_this.svgBoard, "mouseout", function (ev) {
+            that.state.enabled && that.state.send(interfaces_1.ActionType.OUT, handleMouseEvent.call(that, ev));
         }, false);
         //
-        dab_1.aEL(_this.svgBoard, "mousedown", function (evt) {
-            that.state.enabled && that.state.send(interfaces_1.ActionType.DOWN, handleMouseEvent.call(that, evt));
+        dab_1.aEL(_this.svgBoard, "mousedown", function (ev) {
+            that.state.enabled && that.state.send(interfaces_1.ActionType.DOWN, handleMouseEvent.call(that, ev));
         }, false);
-        dab_1.aEL(_this.svgBoard, "mouseup", function (evt) {
-            that.state.enabled && that.state.send(interfaces_1.ActionType.UP, handleMouseEvent.call(that, evt));
+        dab_1.aEL(_this.svgBoard, "mouseup", function (ev) {
+            that.state.enabled && that.state.send(interfaces_1.ActionType.UP, handleMouseEvent.call(that, ev));
         }, false);
-        //right click o board
-        dab_1.aEL(_this.svgBoard, "contextmenu", function (evt) {
-            evt.stopPropagation();
-            var target = evt.target, type = dab_1.attr(target, "svg-type"), key = that.rightClick.setTrigger(dab_1.attr(target.parentNode, "id"), dab_1.attr(target.parentNode, "svg-comp"), type, type && dab_1.attr(target, type));
+        //right click on board
+        dab_1.aEL(_this.svgBoard, "contextmenu", function (ev) {
+            ev.stopPropagation();
+            var target = ev.target, type = dab_1.attr(target, "svg-type"), key = that.rightClick.setTrigger(dab_1.attr(target.parentNode, "id"), dab_1.attr(target.parentNode, "svg-comp"), type, type && dab_1.attr(target, type));
             if (key) {
                 that.rightClick
                     .build(key)
-                    .movePoint(getClientXY(evt))
+                    .movePoint(getClientXY(ev))
                     .setVisible(true);
             }
         }, false);
+        document.onkeydown = function (ev) {
+            switch (ev.keyCode) {
+                case 13: // ENTER
+                case 27: // ESC
+                case 37: // LEFT
+                case 38: // UP
+                case 39: // RIGHT
+                case 40: // DOWN
+                case 46: // DEL
+                    break;
+            }
+        };
         return _this;
     }
     Object.defineProperty(MyApp.prototype, "ec", {
@@ -244,7 +256,6 @@ var MyApp = /** @class */ (function (_super) {
         var comp = void 0;
         if (name == "wire") {
             //this's temporary, until create wire tool works
-            //Wire
             //wire.setPoints([{x:50,y:100}, {x:200,y:100}, {x:200, y:25}, {x:250,y:25}])
             comp = this.wire = new wire_1.default({
                 points: [
@@ -283,8 +294,81 @@ var MyApp = /** @class */ (function (_super) {
         this.refreshRotation();
     };
     MyApp.prototype.refreshRotation = function () {
+        var _a;
         var rotation = (this.ec && this.ec.type == types_1.Type.EC) ? this.ec.rotation : 0;
         this.prop("rot_lbl").value = " " + rotation + "\u00B0";
+        this.ec && ((_a = this.winProps.property("rotation")) === null || _a === void 0 ? void 0 : _a.refresh());
+    };
+    //public execute({ action, trigger, data }: { action: ActionType; trigger: string; data?: any; }) {
+    MyApp.prototype.execute = function (action, trigger, data) {
+        var arr = trigger.split('::'), comp = components_1.default.item(arr.shift()), name = arr.shift(), type = arr.shift(), app = this, compNull = false, selectAll = function (value) {
+            var arr = Array.from(app.compList.values());
+            arr.forEach(function (comp) { return comp.select(value); });
+            return arr;
+        };
+        //this's a temporary fix to make it work
+        //	final code will have a centralized action dispatcher
+        switch (action) {
+            case interfaces_1.ActionType.TOGGLE_SELECT: //"Toggle Select"	6
+                if (!(compNull = !comp)) {
+                    comp.select(!comp.selected);
+                    app.selectedComponents = Array.from(app.compList.values()).filter(function (c) { return c.selected; });
+                    app.refreshRotation();
+                    (app.ec && (app.winProps.load(app.ec), window.ec = app.ec, 1)) || app.winProps.clear();
+                }
+                break;
+            case interfaces_1.ActionType.SELECT: //"Select" just ONE		7
+                if (!(compNull = !comp)) {
+                    selectAll(false);
+                    app.selectedComponents = [comp.select(true)];
+                    app.refreshRotation();
+                    app.winProps.load(comp);
+                    //temporary, for testings...
+                    window.ec = app.ec;
+                }
+                break;
+            case interfaces_1.ActionType.SELECT_ALL: //"Select All"		8
+                app.selectedComponents = selectAll(true);
+                app.refreshRotation();
+                app.winProps.clear();
+                //temporary, for testings...
+                window.ec = void 0;
+                break;
+            case interfaces_1.ActionType.UNSELECT_ALL: //"Deselect All"		9
+                selectAll(false);
+                app.selectedComponents = [];
+                app.refreshRotation();
+                app.winProps.clear();
+                //temporary, for testings...
+                window.ec = void 0;
+                break;
+            case interfaces_1.ActionType.DELETE: //"Delete"		10
+                if (!(compNull = !comp)) {
+                    //disconnects and remove component from DOM
+                    comp.disconnect();
+                    comp.remove();
+                    app.compList.delete(comp.id);
+                    app.selectedComponents = Array.from(app.compList.values()).filter(function (c) { return c.selected; });
+                    app.refreshRotation();
+                    (app.winProps.compId == comp.id) && app.winProps.clear();
+                    app.tooltip.setVisible(false);
+                    //temporary, for testings...
+                    window.ec = void 0;
+                }
+                break;
+            case interfaces_1.ActionType.SHOW_PROPERTIES: //"Properties"		11
+                if (!(compNull = !comp)) {
+                    app.winProps.load(comp);
+                }
+                break;
+        }
+        //logs
+        if (compNull) {
+            console.log("invalid trigger: " + trigger);
+        }
+        else {
+            console.log("action: " + action + ", id: " + (comp === null || comp === void 0 ? void 0 : comp.id) + ", name: " + name + ", type: " + type + ", trigger: " + trigger);
+        }
     };
     return MyApp;
 }(app_1.Application));

@@ -12,7 +12,7 @@ import Point from "./src/point";
 import Wire from "./src/wire";
 import StateMachine from "./src/stateMachine";
 import { Type } from "./src/types";
-import ItemBoard from "./src/itemsBoard";
+import { ItemBoard } from "./src/itemsBoard";
 import Size from "src/size";
 
 let
@@ -130,17 +130,18 @@ function hookEvents() {
 			removeClass(toolTarget, "selected");
 			transition = Action.STOP;
 		}
-		app.state.transition(State.WIRE_EDIT, transition, void 0);
 		//change tooltip title
 		attr(e.target, { title: `Wire edit is ${fn(wire.editMode)}` });
 		enableDisableTools();
+		app.execute(Action.UNSELECT_ALL, "");
+		app.state.transition(State.WIRE_EDIT, transition, void 0);
 	}, false);
 	//HtmlWindow
 	/*aEL(qS('.bar-item[tool="ec-props"]'), "click", (e: MouseEvent) => {
 		app.winProps.setVisible(!app.winProps.visible);
 	}, false);*/
 	//add component
-	aEL(qS('.bar-item[tool="comp-create"]'), "click", () => app.addComponent(<string>app.prop("comp_option").value), false);
+	aEL(qS('.bar-item[action="comp-create"]'), "click", () => app.addComponent(<string>app.prop("comp_option").value), false);
 }
 
 function createStateMachine() {
@@ -182,7 +183,7 @@ function createStateMachine() {
 			UP: function (newCtx: IMouseState) {
 				actionDefaultCopyNewState(newCtx);
 				if (newCtx.button == 0)
-					app.rightClick.execute(Action.UNSELECT_ALL, 'board::board::board');	// 9
+					app.execute(Action.UNSELECT_ALL, 'board::board::board');	// 9
 				app.rightClick.setVisible(false);
 			},
 			//transitions
@@ -266,7 +267,7 @@ function createStateMachine() {
 				addClass(app.svgBoard, "dragging");
 				//add to context vector
 				!app.selectedComponents.some(comp => comp.id == newCtx.it.id) &&
-					(app.rightClick.execute(Action.SELECT, `${newCtx.it.id}::${newCtx.it.name}::body`)); //7
+					(app.execute(Action.SELECT, `${newCtx.it.id}::${newCtx.it.name}::body`)); //7
 
 				//newCtx.it && !listToMove.some(comp => comp.id == newCtx.it.id) && listToMove.push(newCtx.it);
 				//new way for multiple drag
@@ -299,14 +300,12 @@ function createStateMachine() {
 			DOWN: actionDefaultCopyNewState,
 			UP: function (newCtx: IMouseState) {	//up after down should be show properties, not now
 				actionDefaultCopyNewState(newCtx);
-				//must exists an ec, left-click only
-				//Ctrl+click => toggle select
-				//click		 => select one
+				//must exists an ec
 				newCtx.it && (newCtx.button == 0)
-					&& app.rightClick.execute(
+					&& app.execute(
 						newCtx.ctrlKey ?
-							Action.TOGGLE_SELECT :  // 6
-							Action.SELECT,  		// 7
+							Action.TOGGLE_SELECT :  // 6	Ctrl+click => toggle select
+							Action.SELECT,  		// 7	click		 => select one
 						[newCtx.it.id, newCtx.it.name, "body"].join('::'));
 			},
 			//transitions
@@ -339,6 +338,16 @@ function createStateMachine() {
 					.move(p.x, p.y)
 					.setFontSize(app.tooltipFontSize())
 					.setText(newCtx.it.id);
+			},
+			UP: function (newCtx: IMouseState) {	//up after down should be show properties, not now
+				actionDefaultCopyNewState(newCtx);
+				//must exists an ec
+				newCtx.it && (newCtx.button == 0)
+					&& app.execute(
+						newCtx.ctrlKey ?
+							Action.TOGGLE_SELECT :  // 6	Ctrl+click => toggle select
+							Action.SELECT,  		// 7	click		 => select one
+						[newCtx.it.id, newCtx.it.name, "line"].join('::'));
 			},
 			OUT: actionOutOfTool,
 			DEFAULT: actionDefaultCopyNewState,	//state must be saved so MOVE can capture prev
@@ -392,8 +401,7 @@ function createStateMachine() {
 				//check if mouse is close enough to a wire node
 				let
 					node = self.ctx.it.overNode(self.ctx.offset, self.ctx.over.line);
-				if (node != -1 && self.ctx.it.nodeHighlightable(node)) {
-					//will hide node if it's not highlightable
+				if (node != -1 && (newCtx.ctrlKey || self.ctx.it.nodeHighlightable(node))) {
 					self.ctx.it.showNode(node);
 					////console.log(`over wire line node: ${node}`);
 				} else {
@@ -477,36 +485,40 @@ function createStateMachine() {
 					self = this as StateMachine;
 				//newCtx.offset has the updated offset, don't save anything here
 				//update wire node location
-				self.ctx.it?.setNode(self.ctx.over.nodeNumber, newCtx.offset);
-				//update highlighted wire node location
-				self.ctx.it?.showNode(self.ctx.over.nodeNumber);
+				if (self.ctx.it && self.ctx.it.type == Type.WIRE) {
+					//for some reason it's trying to setNode on an EC
+					self.ctx.it.setNode(self.ctx.over.nodeNumber, newCtx.offset);
+					//update highlighted wire node location
+					self.ctx.it.showNode(self.ctx.over.nodeNumber);
 
-				if (self.ctx.isEdgeNode) {
-					let
-						bond: { ec: ItemBoard, node: number } = <any>void 0;
-					//tests if over an EC node
-					Comp.each((ec) => {
-						if (bond || ec.type != Type.EC)
-							return;
-						if (ec.rect().inside(newCtx.offset)) {
-							let
-								node = ec.overNode(newCtx.offset, 1);
-							if (node != -1) {
-								bond = {
-									ec: ec,
-									node: node
-								};
-								////console.log(`inside: ${ec.id}:[${node}]`)
+					if (self.ctx.isEdgeNode) {
+						let
+							bond: { ec: ItemBoard, node: number } = <any>void 0;
+						//tests if over an EC node
+						Comp.each((ec) => {
+							if (bond || ec.type != Type.EC)
+								return;
+							if (ec.rect().inside(newCtx.offset)) {
+								let
+									node = ec.overNode(newCtx.offset, 1);
+								if (node != -1) {
+									bond = {
+										ec: ec,
+										node: node
+									};
+									////console.log(`inside: ${ec.id}:[${node}]`)
+								}
 							}
-						}
-					});
-					//deselect previous ec if any
-					self.ctx.bond && self.ctx.bond.ec.select(false);
-					//presists bond data
-					self.ctx.bond = bond;
-					//select new matched ec node if any
-					bond && bond.ec.select(true);
+						});
+						//deselect previous ec if any
+						self.ctx.bond && self.ctx.bond.ec.select(false);
+						//presists bond data
+						self.ctx.bond = bond;
+						//select new matched ec node if any
+						bond && bond.ec.select(true);
+					}
 				}
+
 			},
 			UP: function (newCtx: IMouseState) {
 				let
@@ -551,6 +563,11 @@ function createStateMachine() {
 				self.ctx.className = "drag-node";
 				self.ctx.nodeNumber = self.ctx.over.nodeNumber;
 				self.ctx.isEdgeNode = self.ctx.nodeNumber == 0 || self.ctx.nodeNumber == (<Wire>self.ctx.it)?.last;
+				let
+					bonds = newCtx.it.nodeBonds(self.ctx.nodeNumber);
+				bonds?.to.forEach(element => {
+					newCtx.it.unbond(self.ctx.nodeNumber, element.id);
+				});
 				//show mouse cursor
 				addClass(app.svgBoard, "drag-node");
 			}

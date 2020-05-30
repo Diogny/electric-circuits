@@ -21,21 +21,17 @@ var BaseWindow = /** @class */ (function (_super) {
     __extends(BaseWindow, _super);
     function BaseWindow(options) {
         var _this = _super.call(this, options) || this;
-        //create HTML main win template
-        !options.templateName && (options.templateName = "baseWin01");
-        _this.settings.win = utils_1.html(dab_1.nano(_this.app.templates[options.templateName], {
-            id: options.id,
-            class: "win" //default class
+        !_this.settings.templateName && (_this.settings.templateName = "baseWin01");
+        _this.settings.win = utils_1.html(dab_1.nano(_this.app.templates[_this.settings.templateName], {
+            id: _this.id,
+            class: _this.class
         }));
-        dab_1.addClassX(_this.win, _this.settings.class);
-        //move to location
         _this.move(_this.x, _this.y);
-        //size accordingly
-        _this.size = options.size;
+        _this.size = _this.settings.size;
         _this.setVisible(!!_this.settings.visible);
         var that = _this;
-        //default
         dab_1.aEL(_this.win, "mouseover", function (e) { return that.onMouseOver.call(that, e); }, false);
+        dab_1.aEL(_this.win, "mouseout", function (e) { return that.onMouseOut.call(that, e); }, false);
         return _this;
     }
     Object.defineProperty(BaseWindow.prototype, "type", {
@@ -71,16 +67,8 @@ var BaseWindow = /** @class */ (function (_super) {
         enumerable: false,
         configurable: true
     });
-    Object.defineProperty(BaseWindow.prototype, "visible", {
-        get: function () {
-            return this.settings.visible;
-        },
-        enumerable: false,
-        configurable: true
-    });
     BaseWindow.prototype.setVisible = function (value) {
-        _super.prototype.setVisible.call(this, value).visible ? dab_1.removeClass(this.win, "hide") : dab_1.addClass(this.win, "hide");
-        return this;
+        return _super.prototype.setVisible.call(this, value).visible ? dab_1.removeClass(this.win, "hide") : dab_1.addClass(this.win, "hide"), this;
     };
     Object.defineProperty(BaseWindow.prototype, "size", {
         get: function () { return this.settings.size; },
@@ -98,8 +86,8 @@ var BaseWindow = /** @class */ (function (_super) {
         enumerable: false,
         configurable: true
     });
-    BaseWindow.prototype.onMouseOver = function (e) {
-    };
+    BaseWindow.prototype.onMouseOver = function (e) { };
+    BaseWindow.prototype.onMouseOut = function (e) { };
     BaseWindow.prototype.move = function (x, y) {
         _super.prototype.move.call(this, x, y);
         dab_1.css(this.win, {
@@ -112,7 +100,7 @@ var BaseWindow = /** @class */ (function (_super) {
         return this.win.innerHTML = "", this;
     };
     BaseWindow.prototype.dispose = function () {
-        //release hook handlers
+        //release hook handlers, ...
     };
     BaseWindow.prototype.propertyDefaults = function () {
         return dab_1.extend(_super.prototype.propertyDefaults.call(this), {

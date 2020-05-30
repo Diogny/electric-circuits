@@ -21,11 +21,7 @@ var ecprop_1 = require("./ecprop");
 var AppWindow = /** @class */ (function (_super) {
     __extends(AppWindow, _super);
     function AppWindow(options) {
-        var _this = this;
-        options.templateName = "propWin01";
-        //extend with specific class
-        options.class = (options.class || "") + " props";
-        _this = _super.call(this, options) || this;
+        var _this = _super.call(this, options) || this;
         var header = _this.win.querySelector("header"), footer = _this.win.querySelector("footer");
         //
         _this.titleHTML = header.children[0];
@@ -105,7 +101,8 @@ var AppWindow = /** @class */ (function (_super) {
         dab_1.aEL(_this.titleHTML, "mouseup", function (e) {
             //console.log(`mouseup, eventPhase: ${e.eventPhase} tag: ${(<Element>e.target).tagName}`);
             if (!that.settings.dragging) {
-                that.select(!that.selected); //click, toggle
+                that.select(!that.selected);
+                //set state machine to this state
                 //console.log(`win: ${that.selected}`);
             }
             else {
@@ -174,6 +171,10 @@ var AppWindow = /** @class */ (function (_super) {
     AppWindow.prototype.onMouseOver = function (e) {
         this.app.topBarLeft.innerHTML = "&nbsp;";
         this.settings.offset && (this.settings.offset = new point_1.default(e.offsetX, e.offsetY));
+        //console.log("inside window")
+    };
+    AppWindow.prototype.onMouseOut = function (e) {
+        //console.log("left window")
     };
     AppWindow.prototype.renderBar = function (text) {
         //this's temporary
@@ -209,18 +210,16 @@ var AppWindow = /** @class */ (function (_super) {
         this.clear();
         this.compId = comp.id;
         comp.properties().forEach(function (name) {
-            _this.appendPropChild(new ecprop_1.default(comp, name, true, function onEcPropChange(value) {
+            _this.appendPropChild(new ecprop_1.default(comp, name, function onEcPropChange(value) {
                 console.log(this, value);
-            }), true);
+            }, true));
         });
         this.setVisible(true);
         return true;
     };
-    AppWindow.prototype.appendPropChild = function (el, wrap) {
+    AppWindow.prototype.appendPropChild = function (el) {
         if (el) {
-            var root = this.main;
-            wrap && (root = root.appendChild(document.createElement("div")), root.classList.add("ec-wrap"));
-            root.appendChild(el.html);
+            this.main.appendChild(el.html);
             this.settings.properties.push(el);
         }
         return this;
@@ -231,10 +230,11 @@ var AppWindow = /** @class */ (function (_super) {
     //public propertyDefaults = (): IItemBaseProperties => {
     AppWindow.prototype.propertyDefaults = function () {
         return dab_1.extend(_super.prototype.propertyDefaults.call(this), {
+            class: "win props",
+            templateName: "propWin01",
             title: "Window",
             content: "",
             bar: "",
-            //dragging: false,
             selected: false,
             properties: []
         });

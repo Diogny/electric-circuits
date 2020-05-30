@@ -149,6 +149,7 @@ var EC = /** @class */ (function (_super) {
         return -1;
     };
     EC.prototype.setNode = function (node, p) {
+        //State.WIRE_NODE_DRAG tries to call this, investigate later...
         throw 'somebody called me, not good!';
     };
     EC.prototype.valid = function (node) {
@@ -178,6 +179,6 @@ var EC = /** @class */ (function (_super) {
         });
     };
     return EC;
-}(itemSolid_1.default));
+}(itemSolid_1.ItemSolid));
 exports.default = EC;
 //# sourceMappingURL=ec.js.map

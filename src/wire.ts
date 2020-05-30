@@ -2,8 +2,8 @@
 import { addClass, removeClass, attr, isArr, extend } from './dab';
 import { tag } from './utils';
 import { Type } from './types';
-import { IItemWireOptions, IItemNode, IPoint, IWireProperties } from './interfaces';
-import ItemBoard from './itemsBoard';
+import { IItemWireOptions, IItemNode, IPoint, IWireProperties, ComponentPropertyType } from './interfaces';
+import { ItemBoard } from './itemsBoard';
 import Comp from './components';
 import Point from './point';
 
@@ -210,6 +210,15 @@ export default class Wire extends ItemBoard {
 		if (this.valid(node))
 			return node == -1 ? this.last : <any>node;
 		return -1;
+	}
+
+	public windowProperties(): string[] { return ["id", "bonds"] }
+
+	public prop(propName: string): ComponentPropertyType {
+		//a wire discards position property this.p
+		if (propName == "p")
+			return <any>void 0;
+		return super.prop(propName)
 	}
 
 	public propertyDefaults(): IWireProperties {

@@ -217,6 +217,13 @@ var Wire = /** @class */ (function (_super) {
             return node == -1 ? this.last : node;
         return -1;
     };
+    Wire.prototype.windowProperties = function () { return ["id", "bonds"]; };
+    Wire.prototype.prop = function (propName) {
+        //a wire discards position property this.p
+        if (propName == "p")
+            return void 0;
+        return _super.prototype.prop.call(this, propName);
+    };
     Wire.prototype.propertyDefaults = function () {
         return dab_1.extend(_super.prototype.propertyDefaults.call(this), {
             name: "wire",
@@ -228,6 +235,6 @@ var Wire = /** @class */ (function (_super) {
         });
     };
     return Wire;
-}(itemsBoard_1.default));
+}(itemsBoard_1.ItemBoard));
 exports.default = Wire;
 //# sourceMappingURL=wire.js.map
