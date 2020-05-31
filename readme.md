@@ -4,7 +4,7 @@
 Used in my testing website [Electric Circuits](http://diogny.com/tests/circuits.php).
 
 ### Issues
-	have to use "@types/node": "12.12.21" because of a bug
+	have to use "@types/node": "12.12.21" because of a compatibility bug with Typescript
 
 ![working example](dist/img/img01.png)
 
@@ -13,6 +13,9 @@ Used in my testing website [Electric Circuits](http://diogny.com/tests/circuits.
 ![working example](dist/img/img03.png)
 
 ![working example](dist/img/img04.png)
+
+![working example](dist/img/img05.png)
+
 
 ### Last compilation:
 	We are using Node.js 12.14.1, Chromium 83.0.4103.64, and Electron 9.0.0.
@@ -56,6 +59,6 @@ Used in my testing website [Electric Circuits](http://diogny.com/tests/circuits.
 	git add -u					stage the modified and deleted files
 	git add -A
 	git commit -m "update message"
-	git tag v1.0.11
+	git tag v1.0.12
 	git push origin master --tags
 

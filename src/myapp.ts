@@ -89,7 +89,7 @@ export class MyApp extends Application implements IMyApp {
 				//post actions
 				switch (state.over.type) {
 					case "node":
-						state.over.nodeNumber = attr(state.over.svg, state.over.type);
+						state.over.nodeNumber = parseInt(attr(state.over.svg, state.over.type));
 						state.it && (state.over.node = state.it.getNode(<number>state.over.nodeNumber))
 						break;
 					case "line":

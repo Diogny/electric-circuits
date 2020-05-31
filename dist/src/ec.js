@@ -34,12 +34,12 @@ var EC = /** @class */ (function (_super) {
         });
         //create label if defined
         if (_this.base.meta.labelId) {
-            _this.label = new label_1.Label({
+            _this.labelSVG = new label_1.Label({
                 fontSize: 15,
                 x: _this.base.meta.labelId.x,
                 y: _this.base.meta.labelId.y
             });
-            _this.label.setText(_this.id);
+            _this.labelSVG.setText(_this.label);
         }
         //this shows dragx, dragy, and rotate
         _this.refresh();
@@ -100,14 +100,14 @@ var EC = /** @class */ (function (_super) {
             _this.nodeRefresh(key);
         });
         //update label if any
-        if (this.label) {
-            var pos = point_1.default.plus(this.p, this.label.p);
+        if (this.labelSVG) {
+            var pos = point_1.default.plus(this.p, this.labelSVG.p);
             attrs = {
                 transform: "translate(" + pos.x + " " + pos.y + ")"
             };
             this.rotation && (center = point_1.default.minus(point_1.default.plus(this.p, center), pos),
                 attrs.transform += " rotate(" + this.rotation + " " + center.x + " " + center.y + ")");
-            dab_1.attr(this.label.g, attrs);
+            dab_1.attr(this.labelSVG.g, attrs);
         }
         return this;
     };
@@ -160,17 +160,17 @@ var EC = /** @class */ (function (_super) {
     };
     EC.prototype.setVisible = function (value) {
         _super.prototype.setVisible.call(this, value);
-        this.label && this.label.setVisible(value);
+        this.labelSVG && this.labelSVG.setVisible(value);
         return this;
     };
     EC.prototype.remove = function () {
         var _a;
         //delete label if any first
-        this.label && ((_a = this.g.parentNode) === null || _a === void 0 ? void 0 : _a.removeChild(this.label.g));
+        this.labelSVG && ((_a = this.g.parentNode) === null || _a === void 0 ? void 0 : _a.removeChild(this.labelSVG.g));
         _super.prototype.remove.call(this);
     };
     EC.prototype.afterDOMinserted = function () {
-        this.label && (this.g.insertAdjacentElement("afterend", this.label.g), this.label.setVisible(true));
+        this.labelSVG && (this.g.insertAdjacentElement("afterend", this.labelSVG.g), this.labelSVG.setVisible(true));
     };
     EC.prototype.propertyDefaults = function () {
         return dab_1.extend(_super.prototype.propertyDefaults.call(this), {

@@ -51,6 +51,5 @@ var ActionType;
 })(ActionType = exports.ActionType || (exports.ActionType = {}));
 /*
 
-
 */ 
 //# sourceMappingURL=interfaces.js.map

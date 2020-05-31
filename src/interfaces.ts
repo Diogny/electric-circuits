@@ -173,12 +173,13 @@ export interface IComponentMetadata {
 	nodes: IMetadataNodes;
 	logic: IMetadataLogic;
 	label: IComponentTemplateLabel;
-	nodeLabel: boolean;
+	//createNodeLabels: boolean;
 }
 
 export interface IMetadataNodes {
 	//length: number;
 	//size: ISize;
+	createLabels: boolean;
 	list: IMetadataNodeInfo[];
 }
 
@@ -199,7 +200,7 @@ export interface IMetadataLogic {
 export interface IComponentTemplate {
 	name: string;
 	label: IComponentTemplateLabel;
-	labels: string[];
+	nodeLabels: string[];
 }
 
 export interface IComponentTemplateLabel {

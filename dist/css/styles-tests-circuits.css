@@ -632,3 +632,8 @@ div.win.ctx > div > span.right {
 .expandable:hover * {
   display: inline;
 }
+
+line.dash {
+  stroke: rgb(150, 150, 150);
+  stroke-width: 1px;
+}

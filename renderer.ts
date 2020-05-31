@@ -1,5 +1,5 @@
 import { ipcRenderer } from "electron";
-import { templatesDOM, qSA, qS } from "./src/utils"
+import { templatesDOM, qSA, qS, tag } from "./src/utils"
 import * as fs from 'fs';
 import {
 	IComponentOptions, IApplicationOptions,
@@ -15,8 +15,82 @@ import { Type } from "./src/types";
 import { ItemBoard } from "./src/itemsBoard";
 import Size from "src/size";
 
+
+class Dashed {
+
+	line0: SVGLineElement;
+	line1: SVGLineElement;
+	wire: Wire;
+	node: number;
+	p: Point;
+	match: boolean;
+
+	constructor() {
+		let
+			create = (id: string) => <SVGLineElement>tag("line", id, {
+				class: "dash hide",
+				x1: 0,
+				y1: 0,
+				x2: 0,
+				y2: 0,
+				"stroke-dasharray": "3, 3"
+			})
+		this.line0 = create("line0");
+		this.line1 = create("line1");
+	}
+
+	public hide() {
+		addClass(this.line0, "hide");
+		addClass(this.line1, "hide");
+	}
+
+	public calculate(wire: Wire, node: number): boolean {
+		let
+			nodePoint = wire.getNode(node),
+			fn = (line: SVGLineElement, otherNodePoint: IItemNode): number => {
+				if (!otherNodePoint)
+					return 0;
+				let
+					ofs = Point.minus(otherNodePoint, nodePoint);
+				if (Math.abs(ofs.x) < 3) {
+					attr(line, {
+						x1: nodePoint.x = otherNodePoint.x,
+						y1: 0,
+						x2: nodePoint.x,
+						y2: app.viewBox.height
+					});
+					return 1;			//vertical
+				} else if (Math.abs(ofs.y) < 3) {
+					attr(line, {
+						x1: 0,
+						y1: nodePoint.y = otherNodePoint.y,
+						x2: app.viewBox.width,
+						y2: nodePoint.y
+					});
+					return -1;			//horizontal
+				}
+				return 0
+			};
+		this.hide();
+		let
+			before = fn(this.line0, wire.getNode(node - 1)),
+			after = fn(this.line1, wire.getNode(node + 1));
+		if (before | after) {
+			this.wire = wire;
+			this.node = node;
+			this.p = new Point(nodePoint.x, nodePoint.y);
+			before && removeClass(this.line0, "hide");
+			after && removeClass(this.line1, "hide");
+			return this.match = true
+		}
+		return this.match = false;
+	}
+
+}
+
 let
-	app: MyApp = <any>void 0;
+	app: MyApp = <any>void 0,
+	dash = new Dashed();
 
 //https://www.electronjs.org/docs/tutorial/security
 
@@ -409,6 +483,8 @@ function createStateMachine() {
 					//update highlighted wire node location
 					self.ctx.it.showNode(self.ctx.over.nodeNumber);
 
+					dash.calculate(self.ctx.it as Wire, self.ctx.over.nodeNumber);
+
 					if (self.ctx.isEdgeNode) {
 						let
 							bond: { ec: ItemBoard, node: number } = <any>void 0;
@@ -441,6 +517,7 @@ function createStateMachine() {
 				let
 					self = this as StateMachine;
 				removeClass(app.svgBoard, <string>self.ctx.className);
+				dash.hide();
 				//released over an EC node
 				if (self.ctx.bond) {
 					//deselect matched ec node
@@ -451,6 +528,7 @@ function createStateMachine() {
 					//console.log(`inside: ${self.ctx.bond.ec.id}:[${self.ctx.bond.node}]`);
 					app.state.transition(State.WIRE_EDIT, Action.RESUME, newCtx);
 				} else {
+					dash.match && (dash.wire.setNode(dash.node, dash.p), dash.wire.showNode(dash.node));
 					app.state.transition(State.WIRE_EDIT_NODE, Action.START, newCtx);
 				}
 			},
@@ -644,6 +722,9 @@ window.addEventListener("DOMContentLoaded", () => {
 			//this's the top SVG element and all other are inserted before, so it's always ON TOP z-index max
 			//add text tooltip to SVG DOM
 			app.svgBoard.append(app.tooltip.g);
+
+			app.svgBoard.append(dash.line0);
+			app.svgBoard.append(dash.line1);
 
 			hookEvents();
 			createStateMachine();

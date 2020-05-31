@@ -12,7 +12,8 @@ const defaultComponent = (name: string): IBaseStoreComponent => (<any>{
 		name: name,
 		type: name,
 		meta: {
-			nameTmpl: defaultIdTemplate
+			nameTmpl: defaultIdTemplate,
+			nodes: []
 		}
 	}
 });
@@ -55,7 +56,7 @@ export default class Comp {
 			//copy label if any
 			template.label && (this.settings.meta.label = obj(template.label));
 			//update node labels
-			template.labels.forEach((lbl, ndx) => {
+			template.nodeLabels.forEach((lbl, ndx) => {
 				that.settings.meta.nodes.list[ndx].label = lbl;
 			})
 		}

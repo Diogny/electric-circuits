@@ -328,7 +328,7 @@
 	},
 	"tmpl" : {
 		"name" : "gen_power",
-		"labels" : ["GND", "3.3V VCC"]
+		"nodeLabels" : ["GND", "3.3V VCC"]
 	}
 },
 {
@@ -341,7 +341,7 @@
 	},
 	"tmpl" : {
 		"name" : "gen_power",
-		"labels" : ["GND", "5V VCC"]
+		"nodeLabels" : ["GND", "5V VCC"]
 	}
 },
 {
@@ -554,8 +554,8 @@
 	},
 	"meta" : {
 		"class": "next",
-		"nodeLabel": true,
 		"nodes": {
+			"createLabels" : true,
 			"list" : [
 				{ "x": 10, "y": 70, "label": "GND" },
 				{ "x": 30, "y": 70, "label": "Output 1" },
@@ -579,8 +579,8 @@
 	},
 	"meta" : {
 		"class": "next",
-		"nodeLabel": true,
 		"nodes": {
+			"createLabels" : true,
 			"list" : [
 				{ "x": 10, "y": 70, "label": "GND" },
 				{ "x": 30, "y": 70, "label": "Output 1" },
@@ -608,8 +608,8 @@
 	},
 	"meta" : {
 		"class": "next",
-		"nodeLabel": true,
 		"nodes": {
+			"createLabels" : true,
 			"list" : [
 				{ "x": 10, "y": 70, "label": "GND" },
 				{ "x": 30, "y": 70, "label": "Output 1" },
@@ -650,7 +650,7 @@
 			"class" : "title",
 			"text" : "N555"
 		},
-		"labels" : ["GND", "TRIG", "OUT", "RESET", "CONT", "THRES", "DISCH", "VCC"]
+		"nodeLabels" : ["GND", "TRIG", "OUT", "RESET", "CONT", "THRES", "DISCH", "VCC"]
 	}
 },
 {
@@ -661,8 +661,8 @@
 	},
 	"meta": {
 		"class": "next",
-		"nodeLabel": true,
 		"nodes": {
+			"createLabels" : true,
 			"list" : [
 				{ "x": 10, "y": 70, "label": "GND" },
 				{ "x": 30, "y": 70, "label": "Output 3" },
@@ -698,8 +698,8 @@
 	},
 	"meta" : {
 		"class": "next",
-		"nodeLabel": true,
 		"nodes": {
+			"createLabels" : true,
 			"list" : [
 				{ "x": 10, "y": 70, "label": "GND" },
 				{ "x": 30, "y": 70, "label": "Output 4" },
@@ -739,8 +739,8 @@
 	},
 	"meta" : {
 		"class": "next",
-		"nodeLabel": true,
 		"nodes": {
+			"createLabels" : true,
 			"list" : [
 				{ "x": 10, "y": 70, "label": "GND" },
 				{ "x": 30, "y": 70, "label": "Output 5" },
@@ -793,7 +793,7 @@
 			"class" : "title",
 			"text" : "7408"
 		},
-		"labels" : ["Input 1-1", "Input 1-2", "Output 1", 
+		"nodeLabels" : ["Input 1-1", "Input 1-2", "Output 1", 
 				  "Input 2-1", "Input 2-2", "Output 2", "GND",
 				  "Output 3", "Input 3-2", "Input 3-1",
 				  "Output 4", "Input 4-2", "Input 4-1", "VCC"]
@@ -807,8 +807,8 @@
 	},
 	"meta" : {
 		"class": "next",
-		"nodeLabel": true,
 		"nodes": {
+			"createLabels" : true,
 			"list" : [
 				{ "x": 10, "y": 70, "label": "GND" },
 				{ "x": 30, "y": 70, "label": "Output 6" },
@@ -856,7 +856,6 @@
 	},
 	"meta": {
 		"class": "next",
-		"nodeLabel": true,
 		"label" : {
 			"x" : 15,
 			"y" : 40,
@@ -864,6 +863,7 @@
 			"text" : "Atmega168"
 		},
 		"nodes": {
+			"createLabels" : true,
 			"list": [
 				{ "x": 10, "y": 70, "label": "PC6 PCINT14/RESET" },
 				{ "x": 30, "y": 70, "label": "PD0 PCINT16/RXD" },

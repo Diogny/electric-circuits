@@ -1,5 +1,5 @@
 
-import { aCld, condClass, obj, attr, extend, isFn, isNum } from './dab';
+import { aCld, condClass, obj, attr, extend, isFn, isNum, dP, typeOf } from './dab';
 import Bond from './bonds';
 import ItemBase from './itemsBase';
 import Comp from './components';
@@ -12,73 +12,6 @@ import { map, tag } from './utils';
 import EC from './ec';
 import Point from './point';
 
-export abstract class PropertyInjector implements IComponentProperty {
-
-	class: string;
-
-	abstract value: string;
-	get valueType(): string { return "string" }
-
-	abstract type: string;
-
-	get isProperty(): boolean { return true }
-
-	get label(): string { return this.name }
-
-	abstract setValue(val: string): boolean;
-
-	constructor(public ec: ItemBoard, public name: string, public readonly: boolean) {
-		if (!this.ec || !(this.name in this.ec))
-			throw `invalid property ${this.name}`;
-		this.class = "";
-	}
-}
-
-export class PointInjector extends PropertyInjector {
-
-	get type(): string { return "point" }
-
-	//later can be atomized to different, now burned to this.p
-	get label(): string { return "position" }
-
-	get value(): string { return this.ec.p.toString(0x06) }	//no vars and no parenthesis
-
-	public setValue(val: string): boolean {
-		let
-			p = Point.parse(val);
-		return p && (this.ec.move(p.x, p.y), true);
-	}
-}
-
-export class StringInjector extends PropertyInjector {
-
-	get type(): string { return "string" }
-
-	get value(): string { return this.ec[this.name] }
-
-	setValue(val: string): boolean {
-		return !this.readonly && (this.ec[this.name] = val, true);
-	}
-
-	constructor(ec: ItemBoard, name: string, readonly: boolean) {
-		super(ec, name, readonly);
-	}
-}
-
-export class BondsInjector extends StringInjector {
-
-	get value(): string {
-		return this.ec.bonds.map((o) => o.link).filter(s => !!s).join(', ')
-	}
-
-	setValue(val: string): boolean { return false }
-
-	constructor(ec: ItemBoard, name: string) {
-		super(ec, name, true);
-		this.class = "simple";
-	}
-}
-
 //ItemBoard->Wire
 export abstract class ItemBoard extends ItemBase {
 
@@ -90,6 +23,7 @@ export abstract class ItemBoard extends ItemBase {
 	get selected(): boolean { return this.settings.selected }
 	get bonds(): Bond[] { return this.settings.bonds }
 
+	label: string;
 	abstract get count(): number;	// EC is node count, Wire is point count
 
 	constructor(options: IItemBoardOptions) {
@@ -104,7 +38,9 @@ export abstract class ItemBoard extends ItemBase {
 		this.settings.base = base.comp;
 		//use template to create id according to defined strategy
 		// nano(base.comp.meta.nameTmpl, { name: this.base.name, count: base.count++ });
-		this.settings.id = base.comp.meta.nameTmpl.replace(regex,
+		this.settings.id = `${this.base.name}-${base.count++}`;
+
+		this.label = base.comp.meta.nameTmpl.replace(regex,
 			function (match: string, group: string): string { //, offset: number, str: string
 				let
 					arr = group.split('.'),
@@ -145,6 +81,7 @@ export abstract class ItemBoard extends ItemBase {
 					svgText = tag("text", "", attr);
 				return svgText.innerHTML = text, svgText
 			}
+		//for labels in N555, 7408, Atmega168
 		if (base.comp.meta.label) {
 			aCld(this.g, createText({
 				x: base.comp.meta.label.x,
@@ -152,8 +89,8 @@ export abstract class ItemBoard extends ItemBase {
 				"class": base.comp.meta.label.class
 			}, base.comp.meta.label.text))
 		}
-		//add node labels
-		if (base.comp.meta.nodeLabel) {
+		//add node labels for DIP packages
+		if (base.comp.meta.nodes.createLabels) {
 			let
 				pins = (this as unknown as EC).count / 2;
 			for (let y = 60, x = 7, i = 0, factor = 20; y > 0; y -= 44, x += (factor = -factor))
@@ -230,11 +167,11 @@ export abstract class ItemBoard extends ItemBase {
 		//inject available properties if called
 		switch (propName) {
 			case "id":
-				return new StringInjector(this, propName, true)
+				return new IdInjector(this)
 			case "p":
-				return new PointInjector(this, propName, false)
+				return new PositionInjector(this)
 			case "bonds":
-				return new BondsInjector(this, propName)
+				return new BondsInjector(this)
 		}
 		return this.settings.props[propName]
 	}
@@ -341,5 +278,89 @@ export abstract class ItemBoard extends ItemBase {
 			onProp: void 0,
 			bonds: []
 		})
+	}
+}
+
+export abstract class PropertyInjector implements IComponentProperty {
+
+	class: string;
+
+	abstract value: string;
+	get valueType(): string { return "string" }
+
+	abstract type: string;
+
+	get isProperty(): boolean { return true }
+
+	get label(): string { return this.name }
+
+	abstract setValue(val: string): boolean;
+
+	constructor(public ec: ItemBoard, public name: string, public readonly: boolean) {
+		if (!this.ec || !(this.name in this.ec))
+			throw `invalid property ${this.name}`;
+		this.class = "";
+	}
+}
+
+export abstract class PointInjector extends PropertyInjector {
+
+	get type(): string { return "point" }
+
+	get value(): string { return this.ec[this.name].toString(0x06) }	//no vars and no parenthesis
+}
+
+export class PositionInjector extends PointInjector {
+
+	get label(): string { return "position" }
+
+	public setValue(val: string): boolean {
+		let
+			p = Point.parse(val);
+		return p && (this.ec.move(p.x, p.y), true);
+	}
+
+	constructor(public ec: ItemBoard) {
+		super(ec, "p", false)
+	}
+}
+
+export class StringInjector extends PropertyInjector {
+
+	get type(): string { return "string" }
+
+	get value(): string { return this.ec[this.name] }
+
+	setValue(val: string): boolean {
+		return !this.readonly && (this.ec[this.name] = val, true);
+	}
+
+	constructor(ec: ItemBoard, name: string, readonly: boolean) {
+		super(ec, name, readonly);
+	}
+}
+
+export class IdInjector extends StringInjector {
+
+	get value(): string { return this.ec[this.name] }
+
+	setValue(val: string): boolean { return false }
+
+	constructor(ec: ItemBoard) {
+		super(ec, "id", true);
+	}
+}
+
+export class BondsInjector extends StringInjector {
+
+	get value(): string {
+		return this.ec.bonds.map((o) => o.link).filter(s => !!s).join(', ')
+	}
+
+	setValue(val: string): boolean { return false }
+
+	constructor(ec: ItemBoard) {
+		super(ec, "bonds", true);
+		this.class = "simple";
 	}
 }

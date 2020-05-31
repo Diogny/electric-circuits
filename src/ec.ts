@@ -13,7 +13,7 @@ import { Label } from './label';
 
 export default class EC extends ItemSolid {
 
-	label: Label;
+	labelSVG: Label;
 
 	get type(): Type { return Type.EC }
 
@@ -31,12 +31,12 @@ export default class EC extends ItemSolid {
 			});
 		//create label if defined
 		if (this.base.meta.labelId) {
-			this.label = new Label(<any>{
+			this.labelSVG = new Label(<any>{
 				fontSize: 15,
 				x: this.base.meta.labelId.x,
 				y: this.base.meta.labelId.y
 			});
-			this.label.setText(this.id);
+			this.labelSVG.setText(this.label);
 		}
 		//this shows dragx, dragy, and rotate
 		this.refresh();
@@ -88,9 +88,9 @@ export default class EC extends ItemSolid {
 			this.nodeRefresh(key);
 		});
 		//update label if any
-		if (this.label) {
+		if (this.labelSVG) {
 			let
-				pos = Point.plus(this.p, this.label.p);
+				pos = Point.plus(this.p, this.labelSVG.p);
 			attrs = {
 				transform: `translate(${pos.x} ${pos.y})`
 			};
@@ -98,7 +98,7 @@ export default class EC extends ItemSolid {
 				center = Point.minus(Point.plus(this.p, center), pos),
 				attrs.transform += ` rotate(${this.rotation} ${center.x} ${center.y})`
 			);
-			attr(this.label.g, attrs)
+			attr(this.labelSVG.g, attrs)
 		}
 		return this;
 	}
@@ -168,18 +168,18 @@ export default class EC extends ItemSolid {
 
 	public setVisible(value: boolean): EC {
 		super.setVisible(value);
-		this.label && this.label.setVisible(value);
+		this.labelSVG && this.labelSVG.setVisible(value);
 		return this;
 	}
 
 	public remove() {
 		//delete label if any first
-		this.label && this.g.parentNode?.removeChild(this.label.g);
+		this.labelSVG && this.g.parentNode?.removeChild(this.labelSVG.g);
 		super.remove();
 	}
 
 	public afterDOMinserted() {
-		this.label && (this.g.insertAdjacentElement("afterend", this.label.g), this.label.setVisible(true))
+		this.labelSVG && (this.g.insertAdjacentElement("afterend", this.labelSVG.g), this.labelSVG.setVisible(true))
 	}
 
 	public propertyDefaults(): IItemBoardProperties {

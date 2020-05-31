@@ -8,7 +8,8 @@ var defaultComponent = function (name) { return ({
         name: name,
         type: name,
         meta: {
-            nameTmpl: defaultIdTemplate
+            nameTmpl: defaultIdTemplate,
+            nodes: []
         }
     }
 }); };
@@ -29,7 +30,7 @@ var Comp = /** @class */ (function () {
             //copy label if any
             template.label && (this.settings.meta.label = dab_1.obj(template.label));
             //update node labels
-            template.labels.forEach(function (lbl, ndx) {
+            template.nodeLabels.forEach(function (lbl, ndx) {
                 that.settings.meta.nodes.list[ndx].label = lbl;
             });
         }

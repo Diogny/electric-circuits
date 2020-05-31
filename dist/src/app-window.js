@@ -77,11 +77,9 @@ var AppWindow = /** @class */ (function (_super) {
             var client = new point_1.default(e.clientX, e.clientY), offset = new point_1.default(that.win.parentNode.offsetLeft, that.win.parentNode.offsetTop), dispP = point_1.default.minus(client, offset), maxX = that.win.parentNode.offsetWidth - that.win.offsetWidth, maxY = that.win.parentNode.offsetHeight - that.win.offsetHeight;
             if (that.settings.dragging) {
                 var p = point_1.default.minus(dispP, that.settings.offset);
-                //fix p
                 p = new point_1.default(dab_1.clamp(p.x, 0, maxX), dab_1.clamp(p.y, 0, maxY));
                 that.move(p.x, p.y);
                 //console.log('offset', offset, 'win.p', win.p, 'p', p, e);
-                //console.log("dragging");
             }
             else {
                 //console.log("mousemove");
@@ -219,16 +217,11 @@ var AppWindow = /** @class */ (function (_super) {
         return true;
     };
     AppWindow.prototype.appendPropChild = function (el) {
-        if (el) {
-            this.main.appendChild(el.html);
-            this.settings.properties.push(el);
-        }
-        return this;
+        return el && (this.main.appendChild(el.html), this.settings.properties.push(el)), this;
     };
     AppWindow.prototype.property = function (name) {
         return this.settings.properties.find(function (p) { return p.name == name; });
     };
-    //public propertyDefaults = (): IItemBaseProperties => {
     AppWindow.prototype.propertyDefaults = function () {
         return dab_1.extend(_super.prototype.propertyDefaults.call(this), {
             class: "win props",

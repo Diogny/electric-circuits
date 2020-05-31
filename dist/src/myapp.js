@@ -67,7 +67,7 @@ var MyApp = /** @class */ (function (_super) {
             //post actions
             switch (state.over.type) {
                 case "node":
-                    state.over.nodeNumber = dab_1.attr(state.over.svg, state.over.type);
+                    state.over.nodeNumber = parseInt(dab_1.attr(state.over.svg, state.over.type));
                     state.it && (state.over.node = state.it.getNode(state.over.nodeNumber));
                     break;
                 case "line":
@@ -213,7 +213,7 @@ var MyApp = /** @class */ (function (_super) {
         return _this;
     }
     Object.defineProperty(MyApp.prototype, "ec", {
-        //has value if only one comp selected, none or multiple has zero
+        //has value if only one comp selected, none or multiple has undefined
         get: function () {
             return this.selectedComponents.length == 1 ? this.selectedComponents[0] : void 0;
         },
