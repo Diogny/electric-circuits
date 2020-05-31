@@ -25,8 +25,9 @@ export default class ContextWindow extends BaseWindow {
 			let
 				self = getParentAttr(e.target as HTMLElement, "data-action"),
 				action = attr(self, "data-action") | 0,
+				data = attr(self, "data-data"),
 				trigger = attr(self.parentElement, "data-trigger")
-			self && (that.setVisible(false), (this.app as MyApp).execute(action, trigger))
+			self && (that.setVisible(false), data && (trigger += `::${data}`), (this.app as MyApp).execute(action, trigger))
 		}, false)
 	}
 
@@ -40,7 +41,7 @@ export default class ContextWindow extends BaseWindow {
 	 * @param type component child type
 	 * @returns {string} context key
 	 */
-	public setTrigger(id: string, name: string, type: string, data: string): string {
+	public setTrigger(id: string, name: string, type: string, nodeOrLine: string): string {
 		let
 			ctx;
 		switch (type) {
@@ -63,8 +64,8 @@ export default class ContextWindow extends BaseWindow {
 				} else
 					return <any>void 0;
 		}
-		let a = [id, name, type, data].filter(v => v != null);
-		return this.win.setAttribute("data-trigger", `${a.join('::')}`), ctx
+		//let a = [id, name, type, nodeOrLine];//.filter(v => v != null);
+		return this.win.setAttribute("data-trigger", `${[id, name, type, nodeOrLine].join('::')}`), ctx
 	}
 
 	public build(key: string): ContextWindow {

@@ -86,10 +86,10 @@ export default class AppWindow extends BaseWindow {
 			that.setVisible(false);
 		}, false);
 		//footer buttons
-		aEL(<HTMLElement>this.barButtons.querySelector('img:nth-of-type(1)'), "click", function (e: MouseEvent) {
+		/*aEL(<HTMLElement>this.barButtons.querySelector('img:nth-of-type(1)'), "click", function (e: MouseEvent) {
 			e.stopPropagation();
 			that.setText("")
-		}, false);
+		}, false);*/
 		//register handlers
 		aEL(this.titleHTML, "mousedown", function (e: MouseEvent) {
 			e.stopPropagation();
@@ -121,13 +121,10 @@ export default class AppWindow extends BaseWindow {
 			if (that.settings.dragging) {
 				let
 					p = Point.minus(dispP, that.settings.offset);
-				//fix p
 				p = new Point(clamp(p.x, 0, maxX), clamp(p.y, 0, maxY));
 
 				that.move(p.x, p.y);
 				//console.log('offset', offset, 'win.p', win.p, 'p', p, e);
-				//console.log("dragging");
-
 			} else {
 				//console.log("mousemove");
 			}
@@ -186,6 +183,7 @@ export default class AppWindow extends BaseWindow {
 		this.setTextHtml("");
 		this.compId = "";
 		this.settings.properties = [];
+		this.setVisible(false);
 		return this;
 	}
 
@@ -223,18 +221,13 @@ export default class AppWindow extends BaseWindow {
 	}
 
 	public appendPropChild(el: EcProp): AppWindow {
-		if (el) {
-			this.main.appendChild(el.html);
-			this.settings.properties.push(el);
-		}
-		return this
+		return el && (this.main.appendChild(el.html), this.settings.properties.push(el)), this
 	}
 
 	public property(name: string): EcProp | undefined {
 		return this.settings.properties.find(p => p.name == name)
 	}
 
-	//public propertyDefaults = (): IItemBaseProperties => {
 	public propertyDefaults(): IAppWindowProperties {
 		return extend(super.propertyDefaults(), {
 			class: "win props",

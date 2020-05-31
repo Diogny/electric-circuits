@@ -32,8 +32,8 @@ var ContextWindow = /** @class */ (function (_super) {
         var that = _this;
         //register global click event
         dab_1.aEL(_this.win, "click", function (e) {
-            var self = dab_1.getParentAttr(e.target, "data-action"), action = dab_1.attr(self, "data-action") | 0, trigger = dab_1.attr(self.parentElement, "data-trigger");
-            self && (that.setVisible(false), _this.app.execute(action, trigger));
+            var self = dab_1.getParentAttr(e.target, "data-action"), action = dab_1.attr(self, "data-action") | 0, data = dab_1.attr(self, "data-data"), trigger = dab_1.attr(self.parentElement, "data-trigger");
+            self && (that.setVisible(false), data && (trigger += "::" + data), _this.app.execute(action, trigger));
         }, false);
         return _this;
     }
@@ -46,7 +46,7 @@ var ContextWindow = /** @class */ (function (_super) {
      * @param type component child type
      * @returns {string} context key
      */
-    ContextWindow.prototype.setTrigger = function (id, name, type, data) {
+    ContextWindow.prototype.setTrigger = function (id, name, type, nodeOrLine) {
         var ctx;
         switch (type) {
             case "node":
@@ -69,8 +69,8 @@ var ContextWindow = /** @class */ (function (_super) {
                 else
                     return void 0;
         }
-        var a = [id, name, type, data].filter(function (v) { return v != null; });
-        return this.win.setAttribute("data-trigger", "" + a.join('::')), ctx;
+        //let a = [id, name, type, nodeOrLine];//.filter(v => v != null);
+        return this.win.setAttribute("data-trigger", "" + [id, name, type, nodeOrLine].join('::')), ctx;
     };
     ContextWindow.prototype.build = function (key) {
         var _this = this;

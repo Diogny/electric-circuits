@@ -49,10 +49,10 @@ var AppWindow = /** @class */ (function (_super) {
             that.setVisible(false);
         }, false);
         //footer buttons
-        dab_1.aEL(_this.barButtons.querySelector('img:nth-of-type(1)'), "click", function (e) {
+        /*aEL(<HTMLElement>this.barButtons.querySelector('img:nth-of-type(1)'), "click", function (e: MouseEvent) {
             e.stopPropagation();
-            that.setText("");
-        }, false);
+            that.setText("")
+        }, false);*/
         //register handlers
         dab_1.aEL(_this.titleHTML, "mousedown", function (e) {
             e.stopPropagation();
@@ -185,6 +185,7 @@ var AppWindow = /** @class */ (function (_super) {
         this.setTextHtml("");
         this.compId = "";
         this.settings.properties = [];
+        this.setVisible(false);
         return this;
     };
     /**

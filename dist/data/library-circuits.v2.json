@@ -8,7 +8,6 @@
 	"meta" : {
 		"class": "next",
 		"nodes": {
-			"length": 2,
 			"list" : [
 				{ "x": 0, "y": 30, "label": "Input A" },
 				{ "x": 90, "y": 30, "label": "Output Y" }
@@ -36,7 +35,6 @@
 	"meta" : {
 		"class": "next",
 		"nodes": {
-			"length": 2,
 			"list" : [
 				{ "x": 0, "y": 30, "label": "Input A" },
 				{ "x": 70, "y": 30, "label": "Output Y" }
@@ -56,7 +54,6 @@
 	"meta" : {
 		"class": "next",
 		"nodes": {
-			"length": 3,
 			"list" : [
 				{ "x": 0, "y": 15, "label": "Input A" },
 				{ "x": 0, "y": 45, "label": "Input B" },
@@ -87,7 +84,6 @@
 	"meta" : {
 		"class": "next",
 		"nodes": {
-			"length": 3,
 			"list" : [
 				{ "x": 0, "y": 15, "label": "Input A" },
 				{ "x": 0, "y": 45, "label": "Input B" },
@@ -119,7 +115,6 @@
 	"meta" : {
 		"class": "next",
 		"nodes": {
-			"length": 3,
 			"list" : [
 				{ "x": 2, "y": 15, "label": "Input A" },
 				{ "x": 2, "y": 45, "label": "Input B" },
@@ -150,7 +145,6 @@
 	"meta" : {
 		"class": "next",
 		"nodes": {
-			"length": 3,
 			"list" : [
 				{ "x": 2, "y": 15, "label": "Input A" },
 				{ "x": 2, "y": 45, "label": "Input B" },
@@ -182,7 +176,6 @@
 	"meta" : {
 		"class": "next",
 		"nodes": {
-			"length": 3,
 			"list" : [
 				{ "x": 2, "y": 15, "label": "Input A" },
 				{ "x": 2, "y": 45, "label": "Input B" },
@@ -214,7 +207,6 @@
 	"meta" : {
 		"class": "next",
 		"nodes": {
-			"length": 3,
 			"list" : [
 				{ "x": 2, "y": 15, "label": "Input A" },
 				{ "x": 2, "y": 45, "label": "Input B" },
@@ -247,7 +239,6 @@
 	"meta" : {
 		"class": "next",
 		"nodes": {
-			"length": 1,
 			"list" : [
 				{ "x": 40, "y": 0, "label": "GND" }
 			]
@@ -267,7 +258,6 @@
 	"meta" : {
 		"class": "next",
 		"nodes": {
-			"length": 2,
 			"list" : [
 				{ "x": 0, "y": 40, "label": "GND" },
 				{ "x": 25, "y": 40, "label": "VCC" }
@@ -289,7 +279,6 @@
 	"meta" : {
 		"class": "next",
 		"nodes": {
-			"length": 2,
 			"list" : [
 				{ "x": 0, "y": 40, "label": "GND" },
 				{ "x": 73, "y": 40, "label": "VCC" }
@@ -315,7 +304,6 @@
 	"meta" : {
 		"class": "next",
 		"nodes": {
-			"length": 2,
 			"list" : [
 				{ "x": 0, "y": 40, "label": "GND" },
 				{ "x": 70, "y": 40, "label": "VCC" }
@@ -365,7 +353,6 @@
 	"meta" : {
 		"class": "next",
 		"nodes": {
-			"length": 2,
 			"list" : [
 				{ "x": 0, "y": 30, "label": "Anode (+)" },
 				{ "x": 71, "y": 30, "label": "Catode (-)" }
@@ -399,7 +386,6 @@
 	"meta" : {
 		"class": "next",
 		"nodes": {
-			"length": 2,
 			"list" : [
 				{ "x": 0, "y": 40, "label": "Anode (+)" },
 				{ "x": 71, "y": 40, "label": "Catode (-)" }
@@ -422,7 +408,6 @@
 	"meta" : {
 		"class": "next",
 		"nodes": {
-			"length": 2,
 			"list" : [
 				{ "x": 0, "y": 40, "label": "Anode (+)" },
 				{ "x": 71, "y": 40, "label": "Catode (-)" }
@@ -445,7 +430,6 @@
 	"meta" : {
 		"class": "next",
 		"nodes": {
-			"length": 2,
 			"list" : [
 				{ "x": 0, "y": 30, "label": "Anode (+)" },
 				{ "x": 71, "y": 30, "label": "Catode (-)" }
@@ -466,7 +450,6 @@
 	"meta" : {
 		"class": "next",
 		"nodes": {
-			"length": 2,
 			"list" : [
 				{ "x": 0, "y": 30, "label": "Anode (+)" },
 				{ "x": 71, "y": 30, "label": "Catode (-)" }
@@ -487,7 +470,6 @@
 	"meta" : {
 		"class": "next",
 		"nodes": {
-			"length": 2,
 			"list" : [
 				{ "x": 0, "y": 30, "label": "Anode (+)" },
 				{ "x": 80, "y": 30, "label": "Catode (-)" }
@@ -509,7 +491,6 @@
 	"meta" : {
 		"class": "next",
 		"nodes": {
-			"length": 2,
 			"list" : [
 				{ "x": 0, "y": 30, "label": "Anode (+)" },
 				{ "x": 71, "y": 30, "label": "Catode (-)" }
@@ -530,7 +511,6 @@
 	"meta" : {
 		"class": "next",
 		"nodes": {
-			"length": 3,
 			"list" : [
 				{ "x": 0, "y": 30, "label": "Base" },
 				{ "x": 58, "y": 4, "label": "Collector" },
@@ -553,7 +533,6 @@
 	"meta" : {
 		"class": "next",
 		"nodes": {
-			"length": 3,
 			"list" : [
 				{ "x": 0, "y": 30, "label": "Base" },
 				{ "x": 58, "y": 4, "label": "Collector" },
@@ -577,7 +556,6 @@
 		"class": "next",
 		"nodeLabel": true,
 		"nodes": {
-			"length": 4,
 			"list" : [
 				{ "x": 10, "y": 70, "label": "GND" },
 				{ "x": 30, "y": 70, "label": "Output 1" },
@@ -603,7 +581,6 @@
 		"class": "next",
 		"nodeLabel": true,
 		"nodes": {
-			"length": 6,
 			"list" : [
 				{ "x": 10, "y": 70, "label": "GND" },
 				{ "x": 30, "y": 70, "label": "Output 1" },
@@ -633,7 +610,6 @@
 		"class": "next",
 		"nodeLabel": true,
 		"nodes": {
-			"length": 8,
 			"list" : [
 				{ "x": 10, "y": 70, "label": "GND" },
 				{ "x": 30, "y": 70, "label": "Output 1" },
@@ -687,7 +663,6 @@
 		"class": "next",
 		"nodeLabel": true,
 		"nodes": {
-			"length": 10,
 			"list" : [
 				{ "x": 10, "y": 70, "label": "GND" },
 				{ "x": 30, "y": 70, "label": "Output 3" },
@@ -725,7 +700,6 @@
 		"class": "next",
 		"nodeLabel": true,
 		"nodes": {
-			"length": 12,
 			"list" : [
 				{ "x": 10, "y": 70, "label": "GND" },
 				{ "x": 30, "y": 70, "label": "Output 4" },
@@ -767,7 +741,6 @@
 		"class": "next",
 		"nodeLabel": true,
 		"nodes": {
-			"length": 14,
 			"list" : [
 				{ "x": 10, "y": 70, "label": "GND" },
 				{ "x": 30, "y": 70, "label": "Output 5" },
@@ -836,7 +809,6 @@
 		"class": "next",
 		"nodeLabel": true,
 		"nodes": {
-			"length": 16,
 			"list" : [
 				{ "x": 10, "y": 70, "label": "GND" },
 				{ "x": 30, "y": 70, "label": "Output 6" },
@@ -892,7 +864,6 @@
 			"text" : "Atmega168"
 		},
 		"nodes": {
-			"length": 28,
 			"list": [
 				{ "x": 10, "y": 70, "label": "PC6 PCINT14/RESET" },
 				{ "x": 30, "y": 70, "label": "PD0 PCINT16/RXD" },
@@ -978,7 +949,6 @@
 			"y": -5
 		},
 		"nodes": {
-			"length": 2,
 			"list" : [
 				{ "x": 0, "y": 30, "label": "node 0" },
 				{ "x": 35, "y": 30, "label": "node 1" }
@@ -1005,7 +975,6 @@
 			"y": -5
 		},
 		"nodes": {
-			"length": 2,
 			"list" : [
 				{ "x": 5, "y": 30, "label": "node (-)" },
 				{ "x": 30, "y": 30, "label": "node (+)" }
@@ -1033,7 +1002,6 @@
 			"y": -5
 		},
 		"nodes": {
-			"length": 2,
 			"list" : [
 				{ "x": 15, "y": 30, "label": "node 0" },
 				{ "x": 54, "y": 30, "label": "node 1" }
@@ -1055,7 +1023,6 @@
 	"meta" : {
 		"class": "next",
 		"nodes": {
-			"length": 2,
 			"list" : [
 				{ "x": 30, "y": 0, "label": "node (-)" },
 				{ "x": 30, "y": 70, "label": "node (+)" }
@@ -1088,7 +1055,6 @@
 			"y": -5
 		},
 		"nodes": {
-			"length": 2,
 			"list" : [
 				{ "x": 0, "y": 10, "label": "node 0" },
 				{ "x": 50, "y": 10, "label": "node 1" }
@@ -1104,9 +1070,8 @@
 	"name" : "variable-resistor",
 	"properties" : {
 		"description": "variable resistor",
-		"comments": "node 3 not working with wire drag yet, it's commented in index.html",
 		"resistance" : {
-			"value" : "10kΩ",
+			"value" : "5kΩ",
 			"valueType": "unit",
 			"type": "input"
 		},
@@ -1121,19 +1086,45 @@
 			"y": -5
 		},
 		"nodes": {
-			"length": 2,
 			"list" : [
-				{ "x": 0, "y": 10, "label": "node 0" },
-				{ "x": 50, "y": 10, "label": "node 1" },
-				{ "x": 25, "y": 40, "label": "variable input" }
+				{ "x": 0, "y": 20, "label": "node 0" },
+				{ "x": 50, "y": 20, "label": "node 1" }
 			]
 		}
 	},
-	"data" : "<rect svg-type='body' x='5' y='0' width='40' height='20'/>
-<path class='thick no-fill' d='M 25,20 L 20,30 H30 L 25,20 M 25,30 V40'/>
-<path svg-type='node' node='0' d='M 0,5 V15 H5 V5 Z'/>
-<path svg-type='node' node='1' d='M 45,5 V15 H50 V5 Z'/>
-<circle svg-type='node' node='2' r='3' cx='25' cy='40'/>"
+	"data" : "<rect svg-type='body' x='5' y='10' width='40' height='20'/>
+<path class='thick no-fill' d='M 5,40 L 46,4.5 L 42,0 H50 V8 L 46,4.5'/>
+<path svg-type='node' node='0' d='M 0,15 V25 H5 V15 Z'/>
+<path svg-type='node' node='1' d='M 45,15 V25 H50 V15 Z'/>"
+},
+{
+	"type" : "potentiometer",
+	"name" : "potentiometer",
+	"properties" : {
+		"description": "potentiometer",
+		"comments": "original in notes.md",
+		"resistance" : {
+			"value" : "10kΩ",
+			"valueType": "unit",
+			"type": "input"
+		},
+		"tolerance": "2%"
+	},
+	"meta" : {
+		"class": "next",
+		"nodes": {
+			"list" : [
+				{ "x": 10, "y": 0, "label": "node 0" },
+				{ "x": 10, "y": 50, "label": "node 1" },
+				{ "x": 40, "y": 25, "label": "variable input" }
+			]
+		}
+	},
+	"data" : "<rect svg-type='body' x='0' y='5' width='20' height='40'/>
+<path class='thick no-fill' d='M 20,25 L 30,20 V30 L 20,25 M 30,25 H40'/>
+<path svg-type='node' node='0' d='M 5,0 H15 V5 H5 Z'/>
+<path svg-type='node' node='1' d='M 5,45 H15 V50 H5 Z'/>
+<circle svg-type='node' node='2' r='3' cx='40' cy='25'/>"
 },
 {
 	"type" : "switch",
@@ -1144,7 +1135,6 @@
 	"meta" : {
 		"class": "next",
 		"nodes": {
-			"length": 2,
 			"list" : [
 				{ "x": 0, "y": 40, "label": "node 0" },
 				{ "x": 71, "y": 40, "label": "node 1" }
@@ -1168,7 +1158,6 @@
 	"meta" : {
 		"class": "next",
 		"nodes": {
-			"length": 2,
 			"list" : [
 				{ "x": 0, "y": 25, "label": "node 0" },
 				{ "x": 71, "y": 25, "label": "node 1" }
@@ -1190,7 +1179,6 @@
 	"meta" : {
 		"class": "next",
 		"nodes": {
-			"length": 3,
 			"list" : [
 				{ "x": 7, "y": 25, "label": "node 0" },
 				{ "x": 58, "y": 7, "label": "node 1" },
@@ -1212,7 +1200,6 @@
 	"meta" : {
 		"class": "next",
 		"nodes": {
-			"length": 2,
 			"list" : [
 				{ "x": 0, "y": 25, "label": "node 0" },
 				{ "x": 100, "y": 25, "label": "node 1" }
@@ -1232,7 +1219,6 @@
 	"meta" : {
 		"class": "next",
 		"nodes": {
-			"length": 5,
 			"list" : [
 				{ "x": 0, "y": 15, "label": "Coil 0" },
 				{ "x": 0, "y": 75, "label": "Coil 1" },
@@ -1256,5 +1242,32 @@
 <path svg-type='node' node='2' d='M 75,40 V50 H80 V40 Z'/>
 <path svg-type='node' node='3' d='M 45,0 H55 V5 H45 Z'/>
 <path svg-type='node' node='4' d='M 45,90 H55 V85 H45 Z'/>"
+},
+{
+	"type" : "transformer",
+	"name" : "transformer",
+	"properties" : {
+		"description" : "transformer"
+	},
+	"meta" : {
+		"class": "next",
+		"nodes": {
+			"list" : [
+				{ "x": 0, "y": 10, "label": "input 0" },
+				{ "x": 0, "y": 70, "label": "input 1" },
+				{ "x": 70, "y": 10, "label": "output 0" },
+				{ "x": 70, "y": 70, "label": "output 1" }
+			]
+		}
+	},
+	"data" : "<rect svg-type='body' x='5' y='0' width='60' height='80'/>
+<path class='thick3 no-fill' d='M 5,10 H20 V15 Q 30,20 20,25 Q 30,30 20,35 Q 30,40 20,45 Q 30,50 20,55 Q 30,60 20,65 V70 H5'/>
+<line class='thick' x1='32.5' y1='10' x2='32.5' y2='70'/>
+<line class='thick' x1='37.5' y1='10' x2='37.5' y2='70'/>
+<path class='thick3 no-fill' d='M 65,10 H50 V15 Q 40,20 50,25 Q 40,30 50,35 Q 40,40 50,45 Q 40,50 50,55 Q 40,60 50,65 V70 H65'/>
+<path svg-type='node' node='0' d='M 0,5 V15 H5 V5 Z'/>
+<path svg-type='node' node='1' d='M 0,65 V75 H5 V65 Z'/>
+<path svg-type='node' node='2' d='M 65,5 V15 H70 V5 Z'/>
+<path svg-type='node' node='3' d='M 65,65 V75 H70 V65 Z'/>"
 }
 ]

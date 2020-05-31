@@ -106,7 +106,9 @@ var BondsInjector = /** @class */ (function (_super) {
         return _this;
     }
     Object.defineProperty(BondsInjector.prototype, "value", {
-        get: function () { return this.ec.bonds.map(function (o) { return o.link; }).join(' '); },
+        get: function () {
+            return this.ec.bonds.map(function (o) { return o.link; }).filter(function (s) { return !!s; }).join(', ');
+        },
         enumerable: false,
         configurable: true
     });
@@ -152,7 +154,7 @@ var ItemBoard = /** @class */ (function (_super) {
             "svg-comp": _this.base.type,
         });
         //check for custom class
-        _this.base.meta.class && dab_1.addClassX(_this.g, _this.base.meta.class);
+        //this.base.meta.class && addClassX(this.g, this.base.meta.class);
         //create the highligh object
         _this.highlight = new boardCircle_1.default(_this.settings.highlightNodeName);
         //add it to component, this's the insertion point (insertBefore) for all inherited objects

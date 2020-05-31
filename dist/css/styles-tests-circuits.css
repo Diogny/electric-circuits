@@ -601,8 +601,8 @@ div.win.props > footer > div > img:hover {
 
 /**/
 div.win.ctx > div {
-  padding: 10px 8px;
-  font-size: 16px;
+  padding: 6px 8px;
+  font-size: 14px;
 }
 
 div.win.ctx > div:hover {

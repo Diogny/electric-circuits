@@ -1,5 +1,5 @@
 
-import { obj, dP } from './dab';
+import { obj } from './dab';
 import { ItemBoard } from './itemsBoard';
 import {
 	IBaseComponent, IComponentOptions, IBaseStoreComponent, IComponentMetadata

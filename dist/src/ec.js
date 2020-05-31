@@ -68,7 +68,7 @@ var EC = /** @class */ (function (_super) {
     });
     Object.defineProperty(EC.prototype, "count", {
         get: function () {
-            return this.base.meta.nodes.length;
+            return this.base.meta.nodes.list.length;
         },
         enumerable: false,
         configurable: true
@@ -149,7 +149,7 @@ var EC = /** @class */ (function (_super) {
         return -1;
     };
     EC.prototype.setNode = function (node, p) {
-        //State.WIRE_NODE_DRAG tries to call this, investigate later...
+        //State.WIRE_EDIT_NODE_DRAG tries to call this, investigate later...
         throw 'somebody called me, not good!';
     };
     EC.prototype.valid = function (node) {

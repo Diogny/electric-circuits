@@ -35,10 +35,10 @@
 			</div>
 			<div class="bar-group">
 				<div class="bar-item pure-u select-css">
-					<!-- <span class="">Component</span> -->
 					<select id="comp-option" class="pure-input-1-2">
 						<option value="resistor">RESISTOR</option>
-						<!--<option value="variable-resistor">VARIABLE RESISTOR</option>-->
+						<option value="variable-resistor">VARIABLE RESISTOR</option>
+						<option value="potentiometer">POTENTIOMETER</option>
 						<option value="diode">DIODE</option>
 						<option value="led">LED</option>
 						<option value="photodiode">PHOTODIODE</option>
@@ -59,6 +59,7 @@
 						<option value="switch">SWITCH</option>
 						<option value="switch-sdpt">SDPT SWITCH</option>
 						<option value="inductor">INDUCTOR</option>
+						<option value="transformer">TRANSFORMER</option>
 						<option value="and">AND</option>
 						<option value="nand">NAND</option>
 						<option value="or">OR</option>
@@ -162,7 +163,7 @@
 		</div>
 	</script>
 	<script type="text/html" id="ctxItem01">
-		<div class="{class}" data-action="{action}">
+		<div class="{class}" data-action="{action}" data-data="{data}">
 			<span>{text}</span><span class="right">{shortcut}</span>
 		</div>
 	</script>
@@ -179,7 +180,7 @@
 			<footer class="no-select">
 				<span></span>
 				<div>
-					<img width="16px" height="16px">
+					<!--<img width="16px" height="16px">-->
 				</div>
 			</footer>
 		</div>

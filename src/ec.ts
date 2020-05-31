@@ -18,7 +18,7 @@ export default class EC extends ItemSolid {
 	get type(): Type { return Type.EC }
 
 	get count(): number {
-		return this.base.meta.nodes.length
+		return this.base.meta.nodes.list.length
 	}
 
 	constructor(options: IItemSolidOptions) {
@@ -154,7 +154,7 @@ export default class EC extends ItemSolid {
 	}
 
 	public setNode(node: number, p: IPoint): EC {
-		//State.WIRE_NODE_DRAG tries to call this, investigate later...
+		//State.WIRE_EDIT_NODE_DRAG tries to call this, investigate later...
 		throw 'somebody called me, not good!';
 	}
 

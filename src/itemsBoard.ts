@@ -1,5 +1,5 @@
 
-import { aCld, condClass, obj, attr, extend, isFn, addClassX, isNum } from './dab';
+import { aCld, condClass, obj, attr, extend, isFn, isNum } from './dab';
 import Bond from './bonds';
 import ItemBase from './itemsBase';
 import Comp from './components';
@@ -67,7 +67,9 @@ export class StringInjector extends PropertyInjector {
 
 export class BondsInjector extends StringInjector {
 
-	get value(): string { return this.ec.bonds.map((o) => o.link).join(' ') }
+	get value(): string {
+		return this.ec.bonds.map((o) => o.link).filter(s => !!s).join(', ')
+	}
 
 	setValue(val: string): boolean { return false }
 
@@ -92,7 +94,6 @@ export abstract class ItemBoard extends ItemBase {
 
 	constructor(options: IItemBoardOptions) {
 		super(options);
-		//I can use a MAC address for a board item in components.ts to access all base info of component
 		let
 			base = Comp.find(this.name, true),
 			regex = /(?:{([^}]+?)})+/g,
@@ -133,8 +134,6 @@ export abstract class ItemBoard extends ItemBase {
 			id: this.id,
 			"svg-comp": this.base.type,
 		});
-		//check for custom class
-		this.base.meta.class && addClassX(this.g, this.base.meta.class);
 		//create the highligh object
 		this.highlight = new BoardCircle(this.settings.highlightNodeName);
 		//add it to component, this's the insertion point (insertBefore) for all inherited objects

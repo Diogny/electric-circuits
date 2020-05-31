@@ -28,19 +28,23 @@
 		},
 		{
 			"text": "Rotate 45 clockwise",
-			"name": "ROTATE_45_CLOCKWISE"
+			"name": "ROTATE_45_CLOCKWISE",
+			"data": 45
 		},
 		{
 			"text": "Rotate 45 counter clockwise",
-			"name": "ROTATE_45_COUNTER_CLOCKWISE"
+			"name": "ROTATE_45_COUNTER_CLOCKWISE",
+			"data": -45
 		},
 		{
 			"text": "Rotate 90 clockwise",
-			"name": "ROTATE_90_CLOCKWISE"
+			"name": "ROTATE_90_CLOCKWISE",
+			"data": 90
 		},
 		{
 			"text": "Rotate 90 counter clockwise",
-			"name": "ROTATE_90_COUNTER_CLOCKWISE"
+			"name": "ROTATE_90_COUNTER_CLOCKWISE",
+			"data": -90
 		},
 		{
 			"text": "Select",

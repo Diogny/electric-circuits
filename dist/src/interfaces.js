@@ -11,12 +11,11 @@ var StateType;
     StateType[StateType["EC_BODY"] = 6] = "EC_BODY";
     StateType[StateType["WIRE_LINE"] = 7] = "WIRE_LINE";
     StateType[StateType["WIRE_EDIT"] = 8] = "WIRE_EDIT";
-    StateType[StateType["WIRE_NODE"] = 9] = "WIRE_NODE";
-    StateType[StateType["WIRE_NODE_DRAG"] = 10] = "WIRE_NODE_DRAG";
-    StateType[StateType["WIRE_LINE_DRAG"] = 11] = "WIRE_LINE_DRAG";
-    //BOND_WIRE = 13,					// bond_wire
-    //BOND_WIRE_NODE = 14,			// bond_wire_node
-    //BOND_WIRE_NODE_DRAG = 15,		// bond_wire_node_dragging
+    StateType[StateType["WIRE_EDIT_NODE"] = 9] = "WIRE_EDIT_NODE";
+    StateType[StateType["WIRE_EDIT_NODE_DRAG"] = 10] = "WIRE_EDIT_NODE_DRAG";
+    StateType[StateType["WIRE_EDIT_LINE_DRAG"] = 11] = "WIRE_EDIT_LINE_DRAG";
+    StateType[StateType["WIRE_EDIT_EC"] = 12] = "WIRE_EDIT_EC";
+    StateType[StateType["WIRE_EDIT_EC_DRAG"] = 13] = "WIRE_EDIT_EC_DRAG";
 })(StateType = exports.StateType || (exports.StateType = {}));
 var ActionType;
 (function (ActionType) {
@@ -33,8 +32,6 @@ var ActionType;
     ActionType[ActionType["SHOW_NODE_TOOLTIP"] = 18] = "SHOW_NODE_TOOLTIP";
     ActionType[ActionType["SHOW_BODY_TOOLTIP"] = 19] = "SHOW_BODY_TOOLTIP";
     ActionType[ActionType["FORWARD_OVER"] = 20] = "FORWARD_OVER";
-    //check this one is used
-    ActionType[ActionType["AFTER_DRAG"] = 21] = "AFTER_DRAG";
     //unified actions
     ActionType[ActionType["SELECT"] = 100] = "SELECT";
     ActionType[ActionType["TOGGLE_SELECT"] = 101] = "TOGGLE_SELECT";

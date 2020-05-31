@@ -155,7 +155,7 @@ var MyApp = /** @class */ (function (_super) {
                 FORWARD_OVER: function (newContext) {
                     //accepts transitions to new state on mouse OVER
                     var prefix = !newContext.it ? "" : newContext.it.type == 1 ? "EC_" : "WIRE_", stateName = (prefix + newContext.over.type).toUpperCase(), state = interfaces_1.StateType[stateName];
-                    that.state.transition(state, interfaces_1.ActionType.START, newContext); //EC_NODE		WIRE_NODE
+                    that.state.transition(state, interfaces_1.ActionType.START, newContext); //EC_NODE		WIRE_EDIT_NODE
                 }
             }
         });
@@ -192,12 +192,11 @@ var MyApp = /** @class */ (function (_super) {
         dab_1.aEL(_this.svgBoard, "contextmenu", function (ev) {
             ev.stopPropagation();
             var target = ev.target, type = dab_1.attr(target, "svg-type"), key = that.rightClick.setTrigger(dab_1.attr(target.parentNode, "id"), dab_1.attr(target.parentNode, "svg-comp"), type, type && dab_1.attr(target, type));
-            if (key) {
+            key &&
                 that.rightClick
                     .build(key)
                     .movePoint(getClientXY(ev))
                     .setVisible(true);
-            }
         }, false);
         document.onkeydown = function (ev) {
             switch (ev.keyCode) {
@@ -216,7 +215,7 @@ var MyApp = /** @class */ (function (_super) {
     Object.defineProperty(MyApp.prototype, "ec", {
         //has value if only one comp selected, none or multiple has zero
         get: function () {
-            return this.selectedComponents.length == 1 ? this.selectedComponents[0] : null;
+            return this.selectedComponents.length == 1 ? this.selectedComponents[0] : void 0;
         },
         enumerable: false,
         configurable: true
@@ -289,76 +288,90 @@ var MyApp = /** @class */ (function (_super) {
         return comp;
     };
     MyApp.prototype.rotateEC = function (angle) {
-        var ec = this.ec;
-        ec && ec.rotate(ec.rotation + angle);
-        this.refreshRotation();
+        this.rotateComponentBy(angle, this.ec);
     };
-    MyApp.prototype.refreshRotation = function () {
+    MyApp.prototype.rotateComponentBy = function (angle, comp) {
+        if (!comp || comp.type != types_1.Type.EC)
+            return;
+        var ec = comp;
+        ec && ec.rotate(ec.rotation + angle);
+        this.refreshRotation(ec);
+    };
+    MyApp.prototype.refreshRotation = function (ec) {
         var _a;
-        var rotation = (this.ec && this.ec.type == types_1.Type.EC) ? this.ec.rotation : 0;
+        var isEC = ec && (ec.type == types_1.Type.EC), rotation = isEC ? ec.rotation : 0;
         this.prop("rot_lbl").value = " " + rotation + "\u00B0";
-        this.ec && ((_a = this.winProps.property("rotation")) === null || _a === void 0 ? void 0 : _a.refresh());
+        isEC && (this.winProps.compId == (ec === null || ec === void 0 ? void 0 : ec.id)) && ((_a = this.winProps.property("rotation")) === null || _a === void 0 ? void 0 : _a.refresh());
     };
     //public execute({ action, trigger, data }: { action: ActionType; trigger: string; data?: any; }) {
-    MyApp.prototype.execute = function (action, trigger, data) {
-        var arr = trigger.split('::'), comp = components_1.default.item(arr.shift()), name = arr.shift(), type = arr.shift(), app = this, compNull = false, selectAll = function (value) {
-            var arr = Array.from(app.compList.values());
+    MyApp.prototype.execute = function (action, trigger) {
+        var _this = this;
+        var arr = trigger.split('::'), comp = components_1.default.item(arr.shift()), name = arr.shift(), type = arr.shift(), nodeOrLine = arr.shift(), data = arr.shift(), compNull = false, selectAll = function (value) {
+            var arr = Array.from(_this.compList.values());
             arr.forEach(function (comp) { return comp.select(value); });
             return arr;
         };
         //this's a temporary fix to make it work
         //	final code will have a centralized action dispatcher
         switch (action) {
-            case interfaces_1.ActionType.TOGGLE_SELECT: //"Toggle Select"	6
+            case interfaces_1.ActionType.TOGGLE_SELECT:
                 if (!(compNull = !comp)) {
                     comp.select(!comp.selected);
-                    app.selectedComponents = Array.from(app.compList.values()).filter(function (c) { return c.selected; });
-                    app.refreshRotation();
-                    (app.ec && (app.winProps.load(app.ec), window.ec = app.ec, 1)) || app.winProps.clear();
+                    this.selectedComponents = Array.from(this.compList.values()).filter(function (c) { return c.selected; });
+                    this.refreshRotation(this.ec);
+                    (this.ec && (this.winProps.load(this.ec), window.ec = this.ec, 1)) || this.winProps.clear();
                 }
                 break;
-            case interfaces_1.ActionType.SELECT: //"Select" just ONE		7
+            case interfaces_1.ActionType.SELECT:
                 if (!(compNull = !comp)) {
                     selectAll(false);
-                    app.selectedComponents = [comp.select(true)];
-                    app.refreshRotation();
-                    app.winProps.load(comp);
+                    this.selectedComponents = [comp.select(true)];
+                    this.refreshRotation(comp);
+                    this.winProps.load(comp);
                     //temporary, for testings...
-                    window.ec = app.ec;
+                    window.ec = this.ec;
                 }
                 break;
-            case interfaces_1.ActionType.SELECT_ALL: //"Select All"		8
-                app.selectedComponents = selectAll(true);
-                app.refreshRotation();
-                app.winProps.clear();
+            case interfaces_1.ActionType.SELECT_ALL:
+                this.selectedComponents = selectAll(true);
+                this.refreshRotation();
+                this.winProps.clear();
                 //temporary, for testings...
                 window.ec = void 0;
                 break;
-            case interfaces_1.ActionType.UNSELECT_ALL: //"Deselect All"		9
+            case interfaces_1.ActionType.UNSELECT_ALL:
                 selectAll(false);
-                app.selectedComponents = [];
-                app.refreshRotation();
-                app.winProps.clear();
+                this.selectedComponents = [];
+                this.refreshRotation();
+                this.winProps.clear();
                 //temporary, for testings...
                 window.ec = void 0;
                 break;
-            case interfaces_1.ActionType.DELETE: //"Delete"		10
+            case interfaces_1.ActionType.DELETE:
                 if (!(compNull = !comp)) {
                     //disconnects and remove component from DOM
                     comp.disconnect();
                     comp.remove();
-                    app.compList.delete(comp.id);
-                    app.selectedComponents = Array.from(app.compList.values()).filter(function (c) { return c.selected; });
-                    app.refreshRotation();
-                    (app.winProps.compId == comp.id) && app.winProps.clear();
-                    app.tooltip.setVisible(false);
+                    this.compList.delete(comp.id);
+                    this.selectedComponents = Array.from(this.compList.values()).filter(function (c) { return c.selected; });
+                    this.refreshRotation();
+                    (this.winProps.compId == comp.id) && this.winProps.clear();
+                    this.tooltip.setVisible(false);
                     //temporary, for testings...
                     window.ec = void 0;
                 }
                 break;
-            case interfaces_1.ActionType.SHOW_PROPERTIES: //"Properties"		11
+            case interfaces_1.ActionType.SHOW_PROPERTIES:
                 if (!(compNull = !comp)) {
-                    app.winProps.load(comp);
+                    this.winProps.load(comp);
+                }
+                break;
+            case interfaces_1.ActionType.ROTATE_45_CLOCKWISE:
+            case interfaces_1.ActionType.ROTATE_45_COUNTER_CLOCKWISE:
+            case interfaces_1.ActionType.ROTATE_90_CLOCKWISE:
+            case interfaces_1.ActionType.ROTATE_90_COUNTER_CLOCKWISE:
+                if (!(compNull = !comp) && data) {
+                    this.rotateComponentBy(data | 0, comp);
                 }
                 break;
         }
@@ -367,7 +380,7 @@ var MyApp = /** @class */ (function (_super) {
             console.log("invalid trigger: " + trigger);
         }
         else {
-            console.log("action: " + action + ", id: " + (comp === null || comp === void 0 ? void 0 : comp.id) + ", name: " + name + ", type: " + type + ", trigger: " + trigger);
+            //console.log(`action: ${action}, id: ${comp?.id}, name: ${name}, type: ${type}, trigger: ${trigger}`);
         }
     };
     return MyApp;

@@ -31,8 +31,8 @@ export class MyApp extends Application implements IMyApp {
 	readonly state: StateMachine;
 	readonly rightClick: ContextWindow;
 
-	viewBox: Rect;			//vb_x: 0, vb_y: 0,	vb_width: 0, vb_height: 0
-	baseViewBox: Size;		//base_vb_width, base_vb_height
+	viewBox: Rect;
+	baseViewBox: Size;
 	multiplier: number;
 	ratioX: number;
 	ratioY: number;
@@ -40,13 +40,13 @@ export class MyApp extends Application implements IMyApp {
 	size: Size;
 	compList: Map<string, ItemBoard>;
 	selectedComponents: ItemBoard[];
-	//has value if only one comp selected, none or multiple has zero
-	get ec(): ItemBoard | null {
-		return this.selectedComponents.length == 1 ? this.selectedComponents[0] : null;
+
+	//has value if only one comp selected, none or multiple has undefined
+	get ec(): ItemBoard | undefined {
+		return this.selectedComponents.length == 1 ? this.selectedComponents[0] : void 0;
 	}
 
 	//temporary properties
-
 	wire: Wire;
 
 	constructor(options: IApplicationOptions) {
@@ -181,7 +181,7 @@ export class MyApp extends Application implements IMyApp {
 						prefix = !newContext.it ? "" : newContext.it.type == 1 ? "EC_" : "WIRE_",
 						stateName = (prefix + newContext.over.type).toUpperCase(),
 						state = <StateType><unknown>StateType[<any>stateName];
-					that.state.transition(state, ActionType.START, newContext);	//EC_NODE		WIRE_NODE
+					that.state.transition(state, ActionType.START, newContext);	//EC_NODE		WIRE_EDIT_NODE
 				}
 			}
 		});
@@ -226,12 +226,11 @@ export class MyApp extends Application implements IMyApp {
 					attr(target.parentNode, "svg-comp"),
 					type,
 					type && attr(target, type));
-			if (key) {
+			key &&
 				that.rightClick
 					.build(key)
 					.movePoint(getClientXY(ev))
 					.setVisible(true);
-			}
 		}, false);
 		document.onkeydown = function (ev: KeyboardEvent) {
 			switch (ev.keyCode) {
@@ -328,87 +327,103 @@ export class MyApp extends Application implements IMyApp {
 	}
 
 	public rotateEC(angle: number) {
-		let
-			ec = (this.ec as EC);
-		ec && ec.rotate(ec.rotation + angle);
-		this.refreshRotation();
+		this.rotateComponentBy(angle, this.ec)
 	}
 
-	public refreshRotation() {
+	public rotateComponentBy(angle: number, comp?: ItemBoard) {
+		if (!comp || comp.type != Type.EC)
+			return;
 		let
-			rotation = (this.ec && this.ec.type == Type.EC) ? (this.ec as EC).rotation : 0;
+			ec = (comp as EC);
+		ec && ec.rotate(ec.rotation + angle);
+		this.refreshRotation(ec);
+	}
+
+	public refreshRotation(ec?: ItemBoard) {
+		let
+			isEC = ec && (ec.type == Type.EC),
+			rotation = isEC ? (ec as EC).rotation : 0;
 		this.prop("rot_lbl").value = ` ${rotation}°`;
-		this.ec && this.winProps.property("rotation")?.refresh();
+		isEC && (this.winProps.compId == ec?.id) && this.winProps.property("rotation")?.refresh();
 	}
 
 	//public execute({ action, trigger, data }: { action: ActionType; trigger: string; data?: any; }) {
-	public execute(action: ActionType, trigger: string, data?: any) {
+	public execute(action: ActionType, trigger: string) {
 		let
 			arr = trigger.split('::'),
 			comp = Comp.item(<string>arr.shift()),
 			name = arr.shift(),
 			type = arr.shift(),
-			app = this as MyApp,
+			nodeOrLine = arr.shift(),
+			data = arr.shift(),
 			compNull = false,
 			selectAll = (value: boolean): ItemBoard[] => {
 				let
-					arr = Array.from(app.compList.values());
+					arr = Array.from(this.compList.values());
 				arr.forEach(comp => comp.select(value));
 				return arr;
 			}
 		//this's a temporary fix to make it work
 		//	final code will have a centralized action dispatcher
 		switch (action) {
-			case ActionType.TOGGLE_SELECT:			//"Toggle Select"	6
+			case ActionType.TOGGLE_SELECT:
 				if (!(compNull = !comp)) {
 					comp.select(!comp.selected);
-					app.selectedComponents = Array.from(app.compList.values()).filter(c => c.selected);
-					app.refreshRotation();
-					(app.ec && (app.winProps.load(app.ec), (<any>window).ec = app.ec, 1)) || app.winProps.clear();
+					this.selectedComponents = Array.from(this.compList.values()).filter(c => c.selected);
+					this.refreshRotation(this.ec);
+					(this.ec && (this.winProps.load(this.ec), (<any>window).ec = this.ec, 1)) || this.winProps.clear();
 				}
 				break;
-			case ActionType.SELECT:			//"Select" just ONE		7
+			case ActionType.SELECT:
 				if (!(compNull = !comp)) {
 					selectAll(false);
-					app.selectedComponents = [comp.select(true)];
-					app.refreshRotation();
-					app.winProps.load(comp);
+					this.selectedComponents = [comp.select(true)];
+					this.refreshRotation(comp);
+					this.winProps.load(comp);
 					//temporary, for testings...
-					(<any>window).ec = app.ec;
+					(<any>window).ec = this.ec;
 				}
 				break;
-			case ActionType.SELECT_ALL:			//"Select All"		8
-				app.selectedComponents = selectAll(true);
-				app.refreshRotation();
-				app.winProps.clear();
+			case ActionType.SELECT_ALL:
+				this.selectedComponents = selectAll(true);
+				this.refreshRotation();
+				this.winProps.clear();
 				//temporary, for testings...
 				(<any>window).ec = void 0;
 				break;
-			case ActionType.UNSELECT_ALL:			//"Deselect All"		9
+			case ActionType.UNSELECT_ALL:
 				selectAll(false);
-				app.selectedComponents = [];
-				app.refreshRotation();
-				app.winProps.clear();
+				this.selectedComponents = [];
+				this.refreshRotation();
+				this.winProps.clear();
 				//temporary, for testings...
 				(<any>window).ec = void 0;
 				break;
-			case ActionType.DELETE:		//"Delete"		10
+			case ActionType.DELETE:
 				if (!(compNull = !comp)) {
 					//disconnects and remove component from DOM
 					comp.disconnect();
 					comp.remove();
-					app.compList.delete(comp.id);
-					app.selectedComponents = Array.from(app.compList.values()).filter(c => c.selected);
-					app.refreshRotation();
-					(app.winProps.compId == comp.id) && app.winProps.clear();
-					app.tooltip.setVisible(false);
+					this.compList.delete(comp.id);
+					this.selectedComponents = Array.from(this.compList.values()).filter(c => c.selected);
+					this.refreshRotation();
+					(this.winProps.compId == comp.id) && this.winProps.clear();
+					this.tooltip.setVisible(false);
 					//temporary, for testings...
 					(<any>window).ec = void 0;
 				}
 				break;
-			case ActionType.SHOW_PROPERTIES:		//"Properties"		11
+			case ActionType.SHOW_PROPERTIES:
 				if (!(compNull = !comp)) {
-					app.winProps.load(comp);
+					this.winProps.load(comp);
+				}
+				break;
+			case ActionType.ROTATE_45_CLOCKWISE:
+			case ActionType.ROTATE_45_COUNTER_CLOCKWISE:
+			case ActionType.ROTATE_90_CLOCKWISE:
+			case ActionType.ROTATE_90_COUNTER_CLOCKWISE:
+				if (!(compNull = !comp) && data) {
+					this.rotateComponentBy(<any>data | 0, comp);
 				}
 				break;
 		}
@@ -416,7 +431,7 @@ export class MyApp extends Application implements IMyApp {
 		if (compNull) {
 			console.log(`invalid trigger: ${trigger}`);
 		} else {
-			console.log(`action: ${action}, id: ${comp?.id}, name: ${name}, type: ${type}, trigger: ${trigger}`);
+			//console.log(`action: ${action}, id: ${comp?.id}, name: ${name}, type: ${type}, trigger: ${trigger}`);
 		}
 	}
 }

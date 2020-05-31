@@ -177,7 +177,7 @@ export interface IComponentMetadata {
 }
 
 export interface IMetadataNodes {
-	length: number;
+	//length: number;
 	//size: ISize;
 	list: IMetadataNodeInfo[];
 }
@@ -355,6 +355,7 @@ export interface IContextMenuItem {
 	text: string;
 	action: number;
 	name: string;
+	data: string;
 	shortcut: string;
 }
 
@@ -418,13 +419,11 @@ export enum StateType {
 	EC_BODY = 6,					// ec_body
 	WIRE_LINE = 7,					// wire_line
 	WIRE_EDIT = 8,					// wire_edit
-	WIRE_NODE = 9,					// wire_node
-	WIRE_NODE_DRAG = 10,			// wire_node_dragging
-	WIRE_LINE_DRAG = 11,			// wire_line_dragging
-
-	//BOND_WIRE = 13,					// bond_wire
-	//BOND_WIRE_NODE = 14,			// bond_wire_node
-	//BOND_WIRE_NODE_DRAG = 15,		// bond_wire_node_dragging
+	WIRE_EDIT_NODE = 9,				// wire_node
+	WIRE_EDIT_NODE_DRAG = 10,		// wire_node_dragging
+	WIRE_EDIT_LINE_DRAG = 11,		// wire_line_dragging
+	WIRE_EDIT_EC = 12,
+	WIRE_EDIT_EC_DRAG = 13
 }
 
 export enum ActionType {
@@ -441,8 +440,6 @@ export enum ActionType {
 	SHOW_NODE_TOOLTIP = 18,
 	SHOW_BODY_TOOLTIP = 19,
 	FORWARD_OVER = 20,
-	//check this one is used
-	AFTER_DRAG = 21,
 
 	//unified actions
 	SELECT = 100,						//"Select"						7
@@ -462,6 +459,5 @@ export enum ActionType {
 	CONNECTIONS = 207,					//"Connections"					31
 }
 /*
-
 
 */
