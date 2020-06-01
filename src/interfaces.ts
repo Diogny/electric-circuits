@@ -20,7 +20,7 @@ export interface IExec {
 //***************************************** UIProperty ************************************//
 
 export interface IUIPropertyCallback {
-	(value: number | string | string[], where: number, prop: Prop, e: any): void;
+	(value: number | boolean | string | string[], where: number, prop: Prop, e: any): void;
 }
 
 export interface IUIPropertyOptions {
@@ -36,7 +36,7 @@ export interface IUIProperty extends IUIPropertyOptions {
 	html: HTMLElement;
 	editable: boolean;
 	nodeName: string;
-	value: number | string | string[];
+	value: number | boolean | string | string[];
 }
 
 export interface IUIPropertySettings extends IUIProperty {
@@ -113,13 +113,13 @@ export interface IMyApp extends IApplication {
 
 export interface IMouseState {
 	//always
-	id: string;
+	//id: string;
 	type: string;
 	button: number;
 	client: Point;
 	offset: Point;
 	event: string;
-	timeStamp: number;
+	//timeStamp: number;
 	over: ICompOverState;
 	ctrlKey: boolean;
 	shiftKey: boolean;
@@ -138,8 +138,7 @@ export interface IMouseState {
 export interface ICompOverState {
 	type: string;
 	svg: SVGElement;
-	nodeNumber: number;
-	node: IItemNode;
+	node: number;
 	line: number;
 }
 //***************************************** General ************************************//
@@ -384,6 +383,7 @@ export interface IMachineActionCallback {
 export interface IStateMachineOptions extends IStateMachineBaseOptions {
 	states?: Object;
 	commonActions?: { [key: string]: IMachineActionCallback };
+	log?: boolean;
 }
 
 export interface IStateMachineSettings extends IStateMachineBaseOptions {
@@ -391,6 +391,7 @@ export interface IStateMachineSettings extends IStateMachineBaseOptions {
 	value: StateType;		//this's the value
 	states: Map<string, IMachineState>;
 	commonActions: Map<string, IMachineActionCallback>;
+	log: boolean;
 }
 
 
@@ -434,6 +435,8 @@ export enum ActionType {
 	MOVE = 4,
 	DOWN = 5,
 	UP = 6,
+	ENTER = 7,
+	LEAVE = 8,
 	START = 14,						//jump to leave space for basic actions
 	RESUME = 15,
 	STOP = 16,
@@ -444,12 +447,13 @@ export enum ActionType {
 
 	//unified actions
 	SELECT = 100,						//"Select"						7
-	TOGGLE_SELECT = 101,				//"Toggle Select"				6
-	SELECT_ALL = 102,					//"Select All"					8
-	UNSELECT_ALL = 103,					//"Deselect All"				9
-	DELETE = 104,						//"Delete"						10
-	DELETE_SELECTED = 105,				//
-	DELETE_ALL = 106,					//"Remove All"
+	SELECT_ONLY = 101,
+	TOGGLE_SELECT = 102,				//"Toggle Select"				6
+	SELECT_ALL = 103,					//"Select All"					8
+	UNSELECT_ALL = 104,					//"Deselect All"				9
+	DELETE = 110,						//"Delete"						10
+	DELETE_SELECTED = 111,				//
+	DELETE_ALL = 112,					//"Remove All"
 	SHOW_PROPERTIES = 200,				//"Properties"					11
 	BRING_TO_FRONT = 201,				//"Bring to Front"				3
 	ROTATE_45_CLOCKWISE = 202,			//"Rotate 45 clockwise"			20

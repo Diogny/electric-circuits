@@ -4,9 +4,6 @@ var interfaces_1 = require("./interfaces");
 var utils_1 = require("./utils");
 var dab_1 = require("./dab");
 var StateMachine = /** @class */ (function () {
-    /*public stateBy(id: number): IMachineState {
-        return <any>Object.keys(this.settings.states).find((key: string) => this.settings.states.get(key)?.id == id)
-    }*/
     function StateMachine(options) {
         var _this = this;
         this.settings = dab_1.obj({
@@ -15,7 +12,8 @@ var StateMachine = /** @class */ (function () {
             value: options.initial,
             ctx: options.ctx || {},
             enabled: false,
-            states: new Map()
+            states: new Map(),
+            log: !!options.log || false
         });
         //all defined states
         utils_1.each(options.states, function (value, key) {
@@ -29,6 +27,8 @@ var StateMachine = /** @class */ (function () {
         utils_1.each(options.commonActions, function (value, key) {
             _this.settings.commonActions.set(key, value);
         });
+        this.sendCmd = "";
+        this.log && console.log("[" + interfaces_1.StateType[this.value] + "]");
     }
     Object.defineProperty(StateMachine.prototype, "id", {
         get: function () { return this.settings.id; },
@@ -57,6 +57,13 @@ var StateMachine = /** @class */ (function () {
         enumerable: false,
         configurable: true
     });
+    Object.defineProperty(StateMachine.prototype, "log", {
+        //console logging
+        get: function () { return this.settings.log; },
+        set: function (value) { this.settings.log = !!value; },
+        enumerable: false,
+        configurable: true
+    });
     StateMachine.prototype.state = function (name) {
         return this.settings.states.get(name);
     };
@@ -69,7 +76,7 @@ var StateMachine = /** @class */ (function () {
         var current = this.state(interfaces_1.StateType[this.value]);
         if (!current)
             return false;
-        var actionName = interfaces_1.ActionType[action], fn;
+        var actionName = interfaces_1.ActionType[action], fn, newSendCmd = "  ::" + actionName;
         //check action.OVER and overType
         if (action == interfaces_1.ActionType.OVER) {
             switch (current.overType) {
@@ -78,11 +85,12 @@ var StateMachine = /** @class */ (function () {
                     //deny transitions here, by not calling app.state.transition
                     //  so DEFAULT action is not called
                     //and on all others, accept, this way I can prevent stop dragging while OVER event
+                    this.log && console.log(newSendCmd + " -> deny");
                     return true;
                 case "forward":
                     //send action.FORWARD_OVER from common actions
                     //accepts transitions to new state on mouse OVER
-                    fn = this.settings.commonActions.get("FORWARD_OVER");
+                    fn = this.settings.commonActions.get(actionName = "FORWARD_OVER");
                     break;
                 case "function":
                     //call function if provided
@@ -96,13 +104,14 @@ var StateMachine = /** @class */ (function () {
             // fall back to default action if available
             fn = current.actions[actionName]
                 || this.settings.commonActions.get(actionName)
-                || current.actions.DEFAULT;
+                || current.actions[actionName = "DEFAULT"];
         }
-        if (!fn)
-            return false;
-        //execute action
-        fn.call(this, data); //, this.machine.context, data
-        return true;
+        if (this.log && newSendCmd != this.sendCmd) {
+            var postSendCmd = "  ::" + actionName;
+            console.log("" + (this.sendCmd = newSendCmd) + (newSendCmd != postSendCmd ? " -> " + postSendCmd : "") + (fn ? "" : " not found"));
+        }
+        //execute action if found
+        return fn === null || fn === void 0 ? void 0 : fn.call(this, data), !!fn;
     };
     /**
      * @description transition to a new state and executes and action on that new state
@@ -116,6 +125,7 @@ var StateMachine = /** @class */ (function () {
         var newStateDef = this.state(stateName);
         if (!newStateDef)
             return false;
+        this.log && (this.value != state) && console.log("[" + stateName + "]");
         //save new state to receive SEND commands
         this.settings.value = state;
         //
@@ -134,7 +144,7 @@ var StateMachine = /** @class */ (function () {
         this.settings.states.set(key, dab_1.obj({
             key: state.key,
             overType: state.overType,
-            actions: state.actions //extend({ on: {}, transitions: {} }, state.state) //state.state
+            actions: state.actions
         }));
         return true;
     };

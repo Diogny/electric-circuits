@@ -16,7 +16,7 @@ import { ItemBoard } from "./src/itemsBoard";
 import Size from "src/size";
 
 
-class Dashed {
+class LinesAligner {
 
 	line0: SVGLineElement;
 	line1: SVGLineElement;
@@ -44,53 +44,66 @@ class Dashed {
 		addClass(this.line1, "hide");
 	}
 
-	public calculate(wire: Wire, node: number): boolean {
+	private calculate(line: SVGLineElement, nodePoint: Point, otherNodePoint: IItemNode): number {
+		if (!otherNodePoint)
+			return 0;
 		let
-			nodePoint = wire.getNode(node),
-			fn = (line: SVGLineElement, otherNodePoint: IItemNode): number => {
-				if (!otherNodePoint)
-					return 0;
-				let
-					ofs = Point.minus(otherNodePoint, nodePoint);
-				if (Math.abs(ofs.x) < 3) {
-					attr(line, {
-						x1: nodePoint.x = otherNodePoint.x,
-						y1: 0,
-						x2: nodePoint.x,
-						y2: app.viewBox.height
-					});
-					return 1;			//vertical
-				} else if (Math.abs(ofs.y) < 3) {
-					attr(line, {
-						x1: 0,
-						y1: nodePoint.y = otherNodePoint.y,
-						x2: app.viewBox.width,
-						y2: nodePoint.y
-					});
-					return -1;			//horizontal
-				}
-				return 0
-			};
+			ofs = Point.minus(otherNodePoint, nodePoint);
+		if (Math.abs(ofs.x) < 3) {
+			attr(line, {
+				x1: nodePoint.x = otherNodePoint.x,
+				y1: 0,
+				x2: nodePoint.x,
+				y2: app.viewBox.height
+			});
+			return 1;			//vertical
+		} else if (Math.abs(ofs.y) < 3) {
+			attr(line, {
+				x1: 0,
+				y1: nodePoint.y = otherNodePoint.y,
+				x2: app.viewBox.width,
+				y2: nodePoint.y
+			});
+			return -1;			//horizontal
+		}
+		return 0
+	}
+
+	public matchWireLine(wire: Wire, line: number): boolean {
 		this.hide();
+		this.p = Point.create(wire.getNode(this.node = line));	//line is 1-based
+		if (this.calculate(this.line0, this.p, wire.getNode(line + 1)) ||
+			(this.p = Point.create(wire.getNode(this.node = --line)),
+				this.calculate(this.line0, this.p, wire.getNode(--line)))
+		) {
+			this.wire = wire;
+			removeClass(this.line0, "hide");
+			return this.match = true
+		}
+		return false;
+	}
+
+	public matchWireNode(wire: Wire, node: number): boolean {
+		this.hide();
+		this.p = Point.create(wire.getNode(node));
 		let
-			before = fn(this.line0, wire.getNode(node - 1)),
-			after = fn(this.line1, wire.getNode(node + 1));
+			before = this.calculate(this.line0, this.p, wire.getNode(node - 1)),
+			after = this.calculate(this.line1, this.p, wire.getNode(node + 1));
 		if (before | after) {
 			this.wire = wire;
 			this.node = node;
-			this.p = new Point(nodePoint.x, nodePoint.y);
 			before && removeClass(this.line0, "hide");
 			after && removeClass(this.line1, "hide");
 			return this.match = true
 		}
-		return this.match = false;
+		return this.match = false
 	}
 
 }
 
 let
 	app: MyApp = <any>void 0,
-	dash = new Dashed();
+	dash = new LinesAligner();
 
 //https://www.electronjs.org/docs/tutorial/security
 
@@ -201,6 +214,14 @@ function createStateMachine() {
 			MOVE: function (newCtx: IMouseState) {
 			},
 			OUT: actionOutOfTool,
+			ENTER: function (newCtx: IMouseState) {
+				actionDefaultCopyNewState(newCtx);
+				//console.log("INSIDE board")
+			},
+			LEAVE: function (newCtx: IMouseState) {
+				actionDefaultCopyNewState(newCtx);
+				//console.log("OUSIDE board")
+			},
 			DOWN: actionDefaultCopyNewState,
 			UP: function (newCtx: IMouseState) {
 				actionDefaultCopyNewState(newCtx);
@@ -258,11 +279,12 @@ function createStateMachine() {
 				//has to be empty so dragging is not STOP when passing over another component
 				//console.log("ec_dragging.OUT");
 			},
-			DEFAULT: function (newCtx: IMouseState) {
+			UP: function (newCtx: IMouseState) {
 				//this catches the UP action too,  stops dragging
 				removeClass(app.svgBoard, (this as StateMachine).ctx.className);
 				app.state.transition(State.EC_BODY, Action.START, newCtx);
 			},
+
 			//transitions
 			START: function (newCtx: IMouseState) {
 				let
@@ -272,7 +294,7 @@ function createStateMachine() {
 				addClass(app.svgBoard, self.ctx.className = "dragging");
 				//add to context vector
 				!app.selectedComponents.some(comp => comp.id == newCtx.it.id) &&
-					(app.execute(Action.SELECT, `${newCtx.it.id}::${newCtx.it.name}::body`));
+					(app.execute(Action.SELECT_ONLY, `${newCtx.it.id}::${newCtx.it.name}::body`));
 				//new way for multiple drag
 				self.ctx.dragging =
 					app.selectedComponents.map(comp => ({
@@ -280,6 +302,7 @@ function createStateMachine() {
 						offset: Point.minus(newCtx.offset, comp.p)
 					}));
 				app.state.send(Action.HIDE_NODE, newCtx);
+				app.rightClick.setVisible(false);
 			}
 		}
 	});
@@ -302,6 +325,7 @@ function createStateMachine() {
 			DOWN: actionDefaultCopyNewState,
 			UP: function (newCtx: IMouseState) {	//up after down should be show properties, not now
 				actionDefaultCopyNewState(newCtx);
+				app.rightClick.setVisible(false);
 				//must exists an ec
 				newCtx.it && (newCtx.button == 0)
 					&& app.execute(
@@ -317,9 +341,6 @@ function createStateMachine() {
 				(this as StateMachine).ctx = newCtx;		//save new context
 				app.state.send(Action.SHOW_BODY_TOOLTIP, (this as StateMachine).ctx);
 			},
-			/*AFTER_DRAG: function (newCtx: IMouseState) {
-				app.state.send(Action.SHOW_BODY_TOOLTIP, newCtx);
-			}*/
 		}
 	});
 	app.state.register(<IMachineState>{
@@ -340,6 +361,7 @@ function createStateMachine() {
 			},
 			UP: function (newCtx: IMouseState) {	//up after down should be show properties, not now
 				actionDefaultCopyNewState(newCtx);
+				app.rightClick.setVisible(false);
 				//must exists an ec
 				newCtx.it && (newCtx.button == 0)
 					&& app.execute(
@@ -432,6 +454,7 @@ function createStateMachine() {
 			},
 			START: function () {
 				//console.log("wire_edit.START transition - start wiring editing");
+				app.rightClick.setVisible(false);
 			},
 			STOP: function () {
 				//console.log("WIRE_EDIT.STOP transition - stop wiring editing");
@@ -479,11 +502,11 @@ function createStateMachine() {
 				//update wire node location
 				if (self.ctx.it && self.ctx.it.type == Type.WIRE) {
 					//for some reason it's trying to setNode on an EC
-					self.ctx.it.setNode(self.ctx.over.nodeNumber, newCtx.offset);
+					self.ctx.it.setNode(self.ctx.over.node, newCtx.offset);
 					//update highlighted wire node location
-					self.ctx.it.showNode(self.ctx.over.nodeNumber);
+					self.ctx.it.showNode(self.ctx.over.node);
 
-					dash.calculate(self.ctx.it as Wire, self.ctx.over.nodeNumber);
+					dash.matchWireNode(self.ctx.it as Wire, self.ctx.over.node);
 
 					if (self.ctx.isEdgeNode) {
 						let
@@ -536,19 +559,13 @@ function createStateMachine() {
 				//has to be empty so dragging is not STOP when passing over another component
 				//console.log("ec_dragging.OUT");
 			},
-			DEFAULT: function (newCtx: IMouseState) {
-				//this catches the UP action too
-				//stops dragging, hide mouse cursor
-				removeClass(app.svgBoard, <string>(this as StateMachine).ctx.className);
-				app.state.transition(State.WIRE_EDIT_NODE, Action.START, newCtx);
-			},
 			//transitions
 			START: function (newCtx: IMouseState) {
 				let
 					self = this as StateMachine;
 				//save new context only here, because what changes is only position
 				self.ctx = newCtx;
-				self.ctx.nodeNumber = self.ctx.over.nodeNumber;
+				self.ctx.nodeNumber = self.ctx.over.node;
 				self.ctx.isEdgeNode = self.ctx.nodeNumber == 0 || self.ctx.nodeNumber == (<Wire>self.ctx.it)?.last;
 				let
 					bonds = newCtx.it.nodeBonds(self.ctx.nodeNumber);
@@ -571,15 +588,25 @@ function createStateMachine() {
 
 				self.ctx.it?.setNode(ln - 1, Point.minus(newCtx.offset, self.ctx.A));
 				self.ctx.it?.setNode(ln, Point.minus(newCtx.offset, self.ctx.B));
+
+				dash.matchWireLine(self.ctx.it as Wire, self.ctx.over.line)
+			},
+			UP: function (newCtx: IMouseState) {
+				//this catches the UP action too
+				removeClass(app.svgBoard, (this as StateMachine).ctx.className);
+				dash.hide();
+				if (dash.match) {
+					let
+						ln = (this as StateMachine).ctx.over.line,
+						vector = Point.minus(dash.p, dash.wire.getNode(dash.node));
+					dash.wire.setNode(ln - 1, Point.plus(dash.wire.getNode(ln - 1), vector));
+					dash.wire.setNode(ln, Point.plus(dash.wire.getNode(ln), vector));
+				}
+				app.state.transition(State.WIRE_EDIT, Action.START, newCtx);
 			},
 			OUT: function () {
 				//has to be empty so dragging is not STOP when passing over another component
 				//console.log("ec_dragging.OUT");
-			},
-			DEFAULT: function (newCtx: IMouseState) {
-				//this catches the UP action too
-				removeClass(app.svgBoard, (this as StateMachine).ctx.className);
-				app.state.transition(State.WIRE_EDIT, Action.RESUME, newCtx);
 			},
 			//transitions
 			START: function (newCtx: IMouseState) {
@@ -698,13 +725,16 @@ window.addEventListener("DOMContentLoaded", () => {
 					},
 					comp_option: {
 						tag: "#comp-option",
-						onChange: function (value: number | string | string[], where: number) {
+						onChange: function (value: string, where: number) {
 							if (where != 1)		// 1 == "ui"
 								return;
-							//create and save
-							//(<any>window).ec = app.ec = createComponent(<string>value);
-							//new component has rotation == 0
-							//updateRotation();
+							//"value" has the string name of the selected component
+						}
+					},
+					cons_log: {
+						tag: "#cons-log",
+						onChange: function (value: boolean, where: number) {
+							app.state.log = value;
 						}
 					}
 				},

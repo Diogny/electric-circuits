@@ -34,8 +34,6 @@ var AppWindow = /** @class */ (function (_super) {
         _this.setTitle(_this.settings.title);
         _this.setText(_this.settings.content);
         _this.setBar(_this.settings.bar);
-        //selectable
-        _this.select(_this.selected);
         //register this to this.win
         _this.win.__win = _this;
         var that = _this;
@@ -54,85 +52,9 @@ var AppWindow = /** @class */ (function (_super) {
             that.setText("")
         }, false);*/
         //register handlers
-        dab_1.aEL(_this.titleHTML, "mousedown", function (e) {
-            e.stopPropagation();
-            //
-            that.settings.dragging = false;
-            that.settings.offset = new point_1.default(e.offsetX, e.offsetY); // Point.minus(win.p, offset);
-            //console.log(`mousedown, eventPhase: ${e.eventPhase} tag: ${(<Element>e.target).tagName}`);
-            //console.log('offset', offset, 'win.p', win.p, 'dragging', win.settings.dragging, e);
-        }, false);
-        //
-        dab_1.aEL(_this.titleHTML, "mousemove", function (e) {
-            //console.log(`mousemove, eventPhase: ${e.eventPhase} tag: ${(<Element>e.target).tagName}`);
-            e.stopPropagation();
-            if (!that.settings.dragging) {
-                if (that.settings.offset) {
-                    //this's the start of dragging
-                    that.settings.dragging = true;
-                    dab_1.addClass(header, "dragging");
-                    //console.log("dragging started");
-                }
-            }
-            var client = new point_1.default(e.clientX, e.clientY), offset = new point_1.default(that.win.parentNode.offsetLeft, that.win.parentNode.offsetTop), dispP = point_1.default.minus(client, offset), maxX = that.win.parentNode.offsetWidth - that.win.offsetWidth, maxY = that.win.parentNode.offsetHeight - that.win.offsetHeight;
-            if (that.settings.dragging) {
-                var p = point_1.default.minus(dispP, that.settings.offset);
-                p = new point_1.default(dab_1.clamp(p.x, 0, maxX), dab_1.clamp(p.y, 0, maxY));
-                that.move(p.x, p.y);
-                //console.log('offset', offset, 'win.p', win.p, 'p', p, e);
-            }
-            else {
-                //console.log("mousemove");
-            }
-            that.renderBar("(" + dispP.x + ", " + dispP.y + ")");
-        }, false);
-        var stopDragging = function (e) {
-            //e.preventDefault();
-            e.stopPropagation();
-            //delete dragging flags
-            that.settings.dragging = false;
-            delete that.settings.offset;
-            //remove dragging class
-            dab_1.removeClass(header, "dragging");
-            //that.bar = `...`;
-        };
-        dab_1.aEL(_this.titleHTML, "mouseup", function (e) {
-            //console.log(`mouseup, eventPhase: ${e.eventPhase} tag: ${(<Element>e.target).tagName}`);
-            if (!that.settings.dragging) {
-                that.select(!that.selected);
-                //set state machine to this state
-                //console.log(`win: ${that.selected}`);
-            }
-            else {
-                //console.log("stop dragging");
-            }
-            stopDragging(e);
-        }, false);
-        dab_1.aEL(_this.titleHTML, "mouseout", function (e) {
-            if (that.settings.dragging)
-                return;
-            stopDragging(e);
-            //console.log(`mouseout, eventPhase: ${e.eventPhase} tag: ${(<Element>e.target).tagName}`);
-            that.renderBar("");
-        }, false);
+        dragWindow(_this);
         return _this;
     }
-    Object.defineProperty(AppWindow.prototype, "selected", {
-        get: function () {
-            return this.settings.selected;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    AppWindow.prototype.select = function (value) {
-        if ((this.settings.selected = !!value)) {
-            dab_1.addClass(this.win, "selected");
-        }
-        else {
-            dab_1.removeClass(this.win, "selected");
-        }
-        return this;
-    };
     Object.defineProperty(AppWindow.prototype, "title", {
         get: function () { return this.settings.title; },
         enumerable: false,
@@ -166,13 +88,17 @@ var AppWindow = /** @class */ (function (_super) {
     AppWindow.prototype.setBar = function (value) {
         return this.barTitle.innerText = (this.settings.bar = value), this;
     };
-    AppWindow.prototype.onMouseOver = function (e) {
+    AppWindow.prototype.onMouseEnter = function (e) {
         this.app.topBarLeft.innerHTML = "&nbsp;";
         this.settings.offset && (this.settings.offset = new point_1.default(e.offsetX, e.offsetY));
-        //console.log("inside window")
+        //console.log('IN app window', e.eventPhase, (e.target as HTMLElement).id);
     };
-    AppWindow.prototype.onMouseOut = function (e) {
-        //console.log("left window")
+    AppWindow.prototype.onMouseLeave = function (e) {
+        this.renderBar("");
+        //console.log('OUT of app window', e.eventPhase, (e.target as HTMLElement).id);
+    };
+    AppWindow.prototype.setVisible = function (value) {
+        return _super.prototype.setVisible.call(this, value).visible ? dab_1.addClass(this.win, "selected") : dab_1.removeClass(this.win, "selected"), this;
     };
     AppWindow.prototype.renderBar = function (text) {
         //this's temporary
@@ -236,4 +162,29 @@ var AppWindow = /** @class */ (function (_super) {
     return AppWindow;
 }(base_window_1.default));
 exports.default = AppWindow;
+function dragWindow(win) {
+    var ofsx = 0, ofsy = 0, x = 0, y = 0, maxX = win.win.parentNode.offsetWidth - win.win.offsetWidth, maxY = win.win.parentNode.offsetHeight - win.win.offsetHeight;
+    win.titleHTML.onmousedown = dragMouseDown;
+    function dragMouseDown(e) {
+        e = e || window.event;
+        e.preventDefault();
+        ofsx = e.offsetX;
+        ofsy = e.offsetY;
+        document.onmouseup = closeDragElement;
+        document.onmousemove = elementDrag;
+        dab_1.addClass(win.titleHTML, "dragging");
+    }
+    function elementDrag(e) {
+        e = e || window.event;
+        e.preventDefault();
+        x = dab_1.clamp(e.clientX - ofsx - win.app.board.offsetLeft, 0, maxX);
+        y = dab_1.clamp(e.clientY - ofsy - win.app.board.offsetTop, 0, maxY);
+        win.move(x, y);
+    }
+    function closeDragElement() {
+        document.onmouseup = null;
+        document.onmousemove = null;
+        dab_1.removeClass(win.titleHTML, "dragging");
+    }
+}
 //# sourceMappingURL=app-window.js.map

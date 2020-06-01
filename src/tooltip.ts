@@ -27,7 +27,7 @@ export default class Tooltip extends Label {
 			height: Math.round(b.height) + this.gap
 		})
 	}
-	
+
 	constructor(options: ITooltipText) {
 		super(options);
 		this.svgRect = <SVGRectElement>tag("rect", "", {
@@ -46,7 +46,7 @@ export default class Tooltip extends Label {
 		this.text = this.t.innerHTML = '';
 		return this;
 	}
-	
+
 	public setBorderRadius(value: number): Tooltip {
 		this.settings.borderRadius = value | 0;
 		return this.build()
@@ -75,7 +75,10 @@ export default class Tooltip extends Label {
 				(<string>value).split(/\r?\n/) :
 				<[]>value,
 			txtArray: string[] = [];
-
+		//catch UI error here
+		//if (!Array.isArray(arr)) {
+		//	console.log("ooooh")
+		//}
 		this.t.innerHTML = arr.map((value: string | any[], ndx) => {
 			let txt: string = '',
 				attrs: string = '';

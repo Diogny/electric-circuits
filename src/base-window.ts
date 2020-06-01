@@ -59,13 +59,13 @@ export default class BaseWindow extends Item {
 		this.setVisible(!!this.settings.visible);
 		let
 			that = this as BaseWindow;
-		aEL(this.win, "mouseover", (e: MouseEvent) => that.onMouseOver.call(that, e), false);
-		aEL(this.win, "mouseout", (e: MouseEvent) => that.onMouseOut.call(that, e), false);
+		aEL(this.win, "mouseenter", (e: MouseEvent) => that.onMouseEnter.call(that, e), false);
+		aEL(this.win, "mouseleave", (e: MouseEvent) => that.onMouseLeave.call(that, e), false);
 	}
 
-	public onMouseOver(e: MouseEvent) { }
+	public onMouseEnter(e: MouseEvent) { }
 
-	public onMouseOut(e: MouseEvent) { }
+	public onMouseLeave(e: MouseEvent) { }
 
 	public move(x: number, y: number): BaseWindow {
 		super.move(x, y);

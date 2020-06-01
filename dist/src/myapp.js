@@ -32,6 +32,7 @@ var types_1 = require("./types");
 var MyApp = /** @class */ (function (_super) {
     __extends(MyApp, _super);
     function MyApp(options) {
+        var _a;
         var _this = _super.call(this, options) || this;
         _this.tooltipFontSize = function () { return Math.max(10, 35 * _this.multiplier); };
         var that = _this, 
@@ -47,14 +48,14 @@ var MyApp = /** @class */ (function (_super) {
             ev.preventDefault();
             ev.stopPropagation();
             var arr = [], target = ev.target, parent = target.parentNode, clientXY = getClientXY(ev), state = {
-                id: '#' + parent.id,
+                //id: parent.id,
                 type: dab_1.attr(parent, "svg-comp"),
                 button: ev.button,
                 //parent: parent,
                 client: clientXY,
                 offset: getOffset(clientXY, ev),
                 event: ev.type.replace('mouse', ''),
-                timeStamp: ev.timeStamp,
+                //timeStamp: ev.timeStamp,
                 over: {
                     type: dab_1.attr(target, "svg-type"),
                     svg: target
@@ -67,8 +68,7 @@ var MyApp = /** @class */ (function (_super) {
             //post actions
             switch (state.over.type) {
                 case "node":
-                    state.over.nodeNumber = parseInt(dab_1.attr(state.over.svg, state.over.type));
-                    state.it && (state.over.node = state.it.getNode(state.over.nodeNumber));
+                    state.over.node = dab_1.attr(state.over.svg, state.over.type) | 0;
                     break;
                 case "line":
                     state.over.line = dab_1.attr(state.over.svg, state.over.type) | 0;
@@ -80,7 +80,7 @@ var MyApp = /** @class */ (function (_super) {
                     break;
             }
             //UI logs
-            arr.push(utils_1.pad(state.event, 5, '&nbsp;') + " " + state.id + " " + state.type + "^" + state.over.type);
+            arr.push(utils_1.pad(state.event, 5, '&nbsp;') + " " + parent.id + " " + state.type + "^" + state.over.type);
             //arr.push(`multiplier: ${that.multiplier}`);
             arr.push("state: " + interfaces_1.StateType[that.state.value]);
             arr.push(state.offset.toString()); //`x: ${round(state.offset.x, 1)} y: ${round(state.offset.y, 1)}`
@@ -126,36 +126,37 @@ var MyApp = /** @class */ (function (_super) {
             id: "state-machine-01",
             initial: interfaces_1.StateType.IDLE,
             states: {},
+            log: (_a = _this.prop("cons_log")) === null || _a === void 0 ? void 0 : _a.value,
             ctx: {},
             commonActions: {
-                HIDE_NODE: function (newContext) {
-                    newContext.it && newContext.it.hideNode();
+                HIDE_NODE: function (newCtx) {
+                    newCtx.it && newCtx.it.hideNode();
                     that.tooltip.setVisible(false);
                 },
-                SHOW_BODY_TOOLTIP: function (newContext) {
+                SHOW_BODY_TOOLTIP: function (newCtx) {
                     var _a;
-                    var p = point_1.default.translateBy(newContext.offset, 20);
+                    var p = point_1.default.translateBy(newCtx.offset, 20);
                     that.tooltip.setVisible(true)
                         .move(p.x, p.y)
                         .setFontSize(that.tooltipFontSize())
-                        .setText((_a = newContext.it) === null || _a === void 0 ? void 0 : _a.id);
+                        .setText((_a = newCtx.it) === null || _a === void 0 ? void 0 : _a.id);
                 },
-                SHOW_NODE_TOOLTIP: function (newContext) {
-                    var _a, _b, _c;
+                SHOW_NODE_TOOLTIP: function (newCtx) {
+                    var _a, _b, _c, _d;
                     //data has current state
-                    if (!((_a = newContext.it) === null || _a === void 0 ? void 0 : _a.highlighted)) {
-                        (_b = newContext.it) === null || _b === void 0 ? void 0 : _b.showNode(newContext.over.nodeNumber);
-                        var p = point_1.default.translateBy(newContext.offset, 20);
+                    if (!((_a = newCtx.it) === null || _a === void 0 ? void 0 : _a.highlighted)) {
+                        (_b = newCtx.it) === null || _b === void 0 ? void 0 : _b.showNode(newCtx.over.node);
+                        var p = point_1.default.translateBy(newCtx.offset, 20), label = (_d = (_c = newCtx.it) === null || _c === void 0 ? void 0 : _c.getNode(newCtx.over.node)) === null || _d === void 0 ? void 0 : _d.label;
                         that.tooltip.setVisible(true)
                             .move(p.x, p.y)
                             .setFontSize(that.tooltipFontSize())
-                            .setText(newContext.over.nodeNumber + " -" + ((_c = newContext.over.node) === null || _c === void 0 ? void 0 : _c.label));
+                            .setText(newCtx.over.node + " -" + label);
                     }
                 },
-                FORWARD_OVER: function (newContext) {
+                FORWARD_OVER: function (newCtx) {
                     //accepts transitions to new state on mouse OVER
-                    var prefix = !newContext.it ? "" : newContext.it.type == 1 ? "EC_" : "WIRE_", stateName = (prefix + newContext.over.type).toUpperCase(), state = interfaces_1.StateType[stateName];
-                    that.state.transition(state, interfaces_1.ActionType.START, newContext); //EC_NODE		WIRE_EDIT_NODE
+                    var prefix = !newCtx.it ? "" : newCtx.it.type == 1 ? "EC_" : "WIRE_", stateName = (prefix + newCtx.over.type).toUpperCase(), state = interfaces_1.StateType[stateName];
+                    that.state.transition(state, interfaces_1.ActionType.START, newCtx); //EC_NODE		WIRE_EDIT_NODE
                 }
             }
         });
@@ -172,6 +173,12 @@ var MyApp = /** @class */ (function (_super) {
             class: "no-select",
             list: options.list
         });
+        dab_1.aEL(_this.svgBoard, "mouseenter", function (ev) {
+            that.state.enabled && that.state.send(interfaces_1.ActionType.ENTER, handleMouseEvent.call(that, ev));
+        }, false);
+        dab_1.aEL(_this.svgBoard, "mouseleave", function (ev) {
+            that.state.enabled && that.state.send(interfaces_1.ActionType.LEAVE, handleMouseEvent.call(that, ev));
+        }, false);
         dab_1.aEL(_this.svgBoard, "mouseover", function (ev) {
             that.state.enabled && that.state.send(interfaces_1.ActionType.OVER, handleMouseEvent.call(that, ev));
         }, false);
@@ -323,11 +330,12 @@ var MyApp = /** @class */ (function (_super) {
                 }
                 break;
             case interfaces_1.ActionType.SELECT:
+            case interfaces_1.ActionType.SELECT_ONLY:
                 if (!(compNull = !comp)) {
                     selectAll(false);
                     this.selectedComponents = [comp.select(true)];
                     this.refreshRotation(comp);
-                    this.winProps.load(comp);
+                    ((action == interfaces_1.ActionType.SELECT) && (this.winProps.load(comp), 1)) || this.winProps.clear();
                     //temporary, for testings...
                     window.ec = this.ec;
                 }

@@ -30,8 +30,8 @@ var BaseWindow = /** @class */ (function (_super) {
         _this.size = _this.settings.size;
         _this.setVisible(!!_this.settings.visible);
         var that = _this;
-        dab_1.aEL(_this.win, "mouseover", function (e) { return that.onMouseOver.call(that, e); }, false);
-        dab_1.aEL(_this.win, "mouseout", function (e) { return that.onMouseOut.call(that, e); }, false);
+        dab_1.aEL(_this.win, "mouseenter", function (e) { return that.onMouseEnter.call(that, e); }, false);
+        dab_1.aEL(_this.win, "mouseleave", function (e) { return that.onMouseLeave.call(that, e); }, false);
         return _this;
     }
     Object.defineProperty(BaseWindow.prototype, "type", {
@@ -86,8 +86,8 @@ var BaseWindow = /** @class */ (function (_super) {
         enumerable: false,
         configurable: true
     });
-    BaseWindow.prototype.onMouseOver = function (e) { };
-    BaseWindow.prototype.onMouseOut = function (e) { };
+    BaseWindow.prototype.onMouseEnter = function (e) { };
+    BaseWindow.prototype.onMouseLeave = function (e) { };
     BaseWindow.prototype.move = function (x, y) {
         _super.prototype.move.call(this, x, y);
         dab_1.css(this.win, {

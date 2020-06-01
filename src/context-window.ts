@@ -31,6 +31,16 @@ export default class ContextWindow extends BaseWindow {
 		}, false)
 	}
 
+	public onMouseEnter(e: MouseEvent) {
+		//console.log('IN context window', e.eventPhase, (e.target as HTMLElement).id);
+		//return false;
+	}
+
+	public onMouseLeave(e: MouseEvent) {
+		//console.log('OUT of context window', e.eventPhase, (e.target as HTMLElement).id);
+		//return false;
+	}
+
 	public setVisible(value: boolean): ContextWindow {
 		return (!super.setVisible(value).visible && this.win.setAttribute("data-trigger", "")), this
 	}

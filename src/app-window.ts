@@ -12,19 +12,6 @@ export default class AppWindow extends BaseWindow {
 	//extend
 	protected settings: IAppWindowProperties;
 
-	get selected(): boolean {
-		return this.settings.selected
-	}
-
-	public select(value: boolean): AppWindow {
-		if ((this.settings.selected = !!value)) {
-			addClass(this.win, "selected");
-		} else {
-			removeClass(this.win, "selected");
-		}
-		return this;
-	}
-
 	public compId: string;
 
 	//title/header
@@ -70,8 +57,6 @@ export default class AppWindow extends BaseWindow {
 		this.setTitle(this.settings.title);
 		this.setText(this.settings.content);
 		this.setBar(this.settings.bar);
-		//selectable
-		this.select(this.selected);
 		//register this to this.win
 		(<any>this.win).__win = this;
 		let
@@ -91,86 +76,22 @@ export default class AppWindow extends BaseWindow {
 			that.setText("")
 		}, false);*/
 		//register handlers
-		aEL(this.titleHTML, "mousedown", function (e: MouseEvent) {
-			e.stopPropagation();
-			//
-			that.settings.dragging = false;
-			that.settings.offset = new Point(e.offsetX, e.offsetY); // Point.minus(win.p, offset);
-			//console.log(`mousedown, eventPhase: ${e.eventPhase} tag: ${(<Element>e.target).tagName}`);
-			//console.log('offset', offset, 'win.p', win.p, 'dragging', win.settings.dragging, e);
-		}, false);
-		//
-		aEL(this.titleHTML, "mousemove", function (e: MouseEvent) {
-			//console.log(`mousemove, eventPhase: ${e.eventPhase} tag: ${(<Element>e.target).tagName}`);
-			e.stopPropagation();
-			if (!that.settings.dragging) {
-				if (that.settings.offset) {
-					//this's the start of dragging
-					that.settings.dragging = true;
-					addClass(header, "dragging");
-					//console.log("dragging started");
-				}
-			}
-			let
-				client = new Point(e.clientX, e.clientY),
-				offset = new Point((<any>that.win).parentNode.offsetLeft, (<any>that.win).parentNode.offsetTop),
-				dispP = Point.minus(client, offset),
-				maxX = (<any>that.win).parentNode.offsetWidth - (<any>that.win).offsetWidth,
-				maxY = (<any>that.win).parentNode.offsetHeight - (<any>that.win).offsetHeight;
-
-			if (that.settings.dragging) {
-				let
-					p = Point.minus(dispP, that.settings.offset);
-				p = new Point(clamp(p.x, 0, maxX), clamp(p.y, 0, maxY));
-
-				that.move(p.x, p.y);
-				//console.log('offset', offset, 'win.p', win.p, 'p', p, e);
-			} else {
-				//console.log("mousemove");
-			}
-			that.renderBar(`(${dispP.x}, ${dispP.y})`);
-		}, false);
-		let
-			stopDragging = function (e: MouseEvent) {
-				//e.preventDefault();
-				e.stopPropagation();
-				//delete dragging flags
-				that.settings.dragging = false;
-				delete that.settings.offset;
-				//remove dragging class
-				removeClass(header, "dragging");
-				//that.bar = `...`;
-			};
-		aEL(this.titleHTML, "mouseup", function (e: MouseEvent) {
-			//console.log(`mouseup, eventPhase: ${e.eventPhase} tag: ${(<Element>e.target).tagName}`);
-			if (!that.settings.dragging) {
-				that.select(!that.selected);
-				//set state machine to this state
-
-
-				//console.log(`win: ${that.selected}`);
-			} else {
-				//console.log("stop dragging");
-			}
-			stopDragging(e);
-		}, false);
-		aEL(this.titleHTML, "mouseout", function (e: MouseEvent) {
-			if (that.settings.dragging)
-				return;
-			stopDragging(e);
-			//console.log(`mouseout, eventPhase: ${e.eventPhase} tag: ${(<Element>e.target).tagName}`);
-			that.renderBar("")
-		}, false);
+		dragWindow(this);
 	}
 
-	public onMouseOver(e: MouseEvent) {
+	public onMouseEnter(e: MouseEvent) {
 		(this.app as MyApp).topBarLeft.innerHTML = "&nbsp;";
 		this.settings.offset && (this.settings.offset = new Point(e.offsetX, e.offsetY));
-		//console.log("inside window")
+		//console.log('IN app window', e.eventPhase, (e.target as HTMLElement).id);
 	}
 
-	public onMouseOut(e: MouseEvent) {
-		//console.log("left window")
+	public onMouseLeave(e: MouseEvent) {
+		this.renderBar("")
+		//console.log('OUT of app window', e.eventPhase, (e.target as HTMLElement).id);
+	}
+
+	public setVisible(value: boolean): AppWindow {
+		return super.setVisible(value).visible ? addClass(this.win, "selected") : removeClass(this.win, "selected"), this
 	}
 
 	public renderBar(text: string) {
@@ -240,4 +161,39 @@ export default class AppWindow extends BaseWindow {
 		})
 	}
 
+}
+
+function dragWindow(win: AppWindow) {
+	var
+		ofsx = 0,
+		ofsy = 0,
+		maxX = (win.win.parentNode as HTMLElement).offsetWidth - win.win.offsetWidth,
+		maxY = (win.win.parentNode as HTMLElement).offsetHeight - win.win.offsetHeight
+
+	win.titleHTML.onmousedown = dragMouseDown;
+
+	function dragMouseDown(e: MouseEvent) {
+		e = e || window.event;
+		e.preventDefault();
+		ofsx = e.offsetX;
+		ofsy = e.offsetY;
+		document.onmouseup = closeDragElement;
+		document.onmousemove = elementDrag;
+		addClass(win.titleHTML, "dragging")
+	}
+
+	function elementDrag(e: MouseEvent) {
+		e = e || window.event;
+		e.preventDefault();
+		let
+			x = clamp(e.clientX - ofsx - (win.app as MyApp).board.offsetLeft, 0, maxX),
+			y = clamp(e.clientY - ofsy - (win.app as MyApp).board.offsetTop, 0, maxY);
+		win.move(x, y);
+	}
+
+	function closeDragElement() {
+		document.onmouseup = null;
+		document.onmousemove = null;
+		removeClass(win.titleHTML, "dragging")
+	}
 }

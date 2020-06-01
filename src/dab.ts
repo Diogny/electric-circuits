@@ -175,7 +175,7 @@ export const propDescriptor = function (obj: any, prop: string): PropertyDescrip
 	return desc;
 }
 
-export const aEL = (el: HTMLElement, eventName: string, fn: Function, b: any): void => el.addEventListener(<any>eventName, <any>fn, b);
+export const aEL = (el: HTMLElement, eventName: string, fn: Function, b?: boolean | AddEventListenerOptions): void => el.addEventListener(<any>eventName, <any>fn, b);
 export const rEL = (el: HTMLElement, eventName: string, fn: Function): void => el.removeEventListener(<any>eventName, <any>fn);
 export const dP = (obj: any, propName: string, attrs: object) => Object.defineProperty(obj, propName, attrs);
 export const aCld = (parent: any, child: any) => parent.appendChild(child);

@@ -69,14 +69,14 @@ export class MyApp extends Application implements IMyApp {
 					parent = <any>target.parentNode as Element,
 					clientXY = getClientXY(ev),
 					state: IMouseState = <IMouseState>{
-						id: '#' + parent.id,
+						//id: parent.id,
 						type: attr(parent, "svg-comp"),
 						button: ev.button,	//https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
 						//parent: parent,
 						client: clientXY,
 						offset: getOffset(clientXY, ev),
 						event: ev.type.replace('mouse', ''),
-						timeStamp: ev.timeStamp,
+						//timeStamp: ev.timeStamp,
 						over: {
 							type: attr(target, "svg-type"),
 							svg: target
@@ -89,8 +89,7 @@ export class MyApp extends Application implements IMyApp {
 				//post actions
 				switch (state.over.type) {
 					case "node":
-						state.over.nodeNumber = parseInt(attr(state.over.svg, state.over.type));
-						state.it && (state.over.node = state.it.getNode(<number>state.over.nodeNumber))
+						state.over.node = attr(state.over.svg, state.over.type) | 0;
 						break;
 					case "line":
 						state.over.line = attr(state.over.svg, state.over.type) | 0;
@@ -102,7 +101,7 @@ export class MyApp extends Application implements IMyApp {
 						break;
 				}
 				//UI logs
-				arr.push(`${pad(state.event, 5, '&nbsp;')} ${state.id} ${state.type}^${state.over.type}`);
+				arr.push(`${pad(state.event, 5, '&nbsp;')} ${parent.id} ${state.type}^${state.over.type}`);
 				//arr.push(`multiplier: ${that.multiplier}`);
 				arr.push(`state: ${StateType[that.state.value]}`);
 				arr.push(state.offset.toString()); //`x: ${round(state.offset.x, 1)} y: ${round(state.offset.y, 1)}`
@@ -149,39 +148,41 @@ export class MyApp extends Application implements IMyApp {
 			id: "state-machine-01",
 			initial: StateType.IDLE,
 			states: {},
+			log: this.prop("cons_log")?.value,
 			ctx: <IMouseState>{},
 			commonActions: {
-				HIDE_NODE: function (newContext: IMouseState) {
-					newContext.it && newContext.it.hideNode();
+				HIDE_NODE: function (newCtx: IMouseState) {
+					newCtx.it && newCtx.it.hideNode();
 					that.tooltip.setVisible(false);
 				},
-				SHOW_BODY_TOOLTIP: function (newContext: IMouseState) {
+				SHOW_BODY_TOOLTIP: function (newCtx: IMouseState) {
 					let
-						p = Point.translateBy(newContext.offset, 20);
+						p = Point.translateBy(newCtx.offset, 20);
 					that.tooltip.setVisible(true)
 						.move(p.x, p.y)
 						.setFontSize(that.tooltipFontSize())
-						.setText(<string>newContext.it?.id);
+						.setText(<string>newCtx.it?.id);
 				},
-				SHOW_NODE_TOOLTIP: function (newContext: IMouseState) {
+				SHOW_NODE_TOOLTIP: function (newCtx: IMouseState) {
 					//data has current state
-					if (!newContext.it?.highlighted) {
-						newContext.it?.showNode(<number>newContext.over.nodeNumber);
+					if (!newCtx.it?.highlighted) {
+						newCtx.it?.showNode(<number>newCtx.over.node);
 						let
-							p = Point.translateBy(newContext.offset, 20);
+							p = Point.translateBy(newCtx.offset, 20),
+							label = newCtx.it?.getNode(newCtx.over.node)?.label;
 						that.tooltip.setVisible(true)
 							.move(p.x, p.y)
 							.setFontSize(that.tooltipFontSize())
-							.setText(`${newContext.over.nodeNumber} -${newContext.over.node?.label}`);
+							.setText(`${newCtx.over.node} -${label}`);
 					}
 				},
-				FORWARD_OVER: function (newContext: IMouseState) {
+				FORWARD_OVER: function (newCtx: IMouseState) {
 					//accepts transitions to new state on mouse OVER
 					let
-						prefix = !newContext.it ? "" : newContext.it.type == 1 ? "EC_" : "WIRE_",
-						stateName = (prefix + newContext.over.type).toUpperCase(),
+						prefix = !newCtx.it ? "" : newCtx.it.type == 1 ? "EC_" : "WIRE_",
+						stateName = (prefix + newCtx.over.type).toUpperCase(),
 						state = <StateType><unknown>StateType[<any>stateName];
-					that.state.transition(state, ActionType.START, newContext);	//EC_NODE		WIRE_EDIT_NODE
+					that.state.transition(state, ActionType.START, newCtx);	//EC_NODE		WIRE_EDIT_NODE
 				}
 			}
 		});
@@ -199,6 +200,12 @@ export class MyApp extends Application implements IMyApp {
 			list: options.list
 		});
 
+		aEL(<any>this.svgBoard, "mouseenter", function (ev: MouseEvent) {
+			that.state.enabled && that.state.send(ActionType.ENTER, handleMouseEvent.call(that, ev));
+		}, false);
+		aEL(<any>this.svgBoard, "mouseleave", function (ev: MouseEvent) {
+			that.state.enabled && that.state.send(ActionType.LEAVE, handleMouseEvent.call(that, ev));
+		}, false);
 		aEL(<any>this.svgBoard, "mouseover", function (ev: MouseEvent) {
 			that.state.enabled && that.state.send(ActionType.OVER, handleMouseEvent.call(that, ev));
 		}, false);
@@ -375,11 +382,12 @@ export class MyApp extends Application implements IMyApp {
 				}
 				break;
 			case ActionType.SELECT:
+			case ActionType.SELECT_ONLY:
 				if (!(compNull = !comp)) {
 					selectAll(false);
 					this.selectedComponents = [comp.select(true)];
 					this.refreshRotation(comp);
-					this.winProps.load(comp);
+					((action == ActionType.SELECT) && (this.winProps.load(comp), 1)) || this.winProps.clear();
 					//temporary, for testings...
 					(<any>window).ec = this.ec;
 				}

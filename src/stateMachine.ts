@@ -24,13 +24,16 @@ export default class StateMachine implements IStateMachine {
 
 	set enabled(value: boolean) { this.settings.enabled = value }
 
+	//console logging
+	get log(): boolean { return this.settings.log }
+	set log(value: boolean) { this.settings.log = !!value }
+
+	//development
+	private sendCmd: string;
+
 	public state(name: string): IMachineState {
 		return <any>this.settings.states.get(name)
 	}
-
-	/*public stateBy(id: number): IMachineState {
-		return <any>Object.keys(this.settings.states).find((key: string) => this.settings.states.get(key)?.id == id)
-	}*/
 
 	constructor(options: IStateMachineOptions) {
 		this.settings = obj(<IStateMachineSettings>{
@@ -39,7 +42,8 @@ export default class StateMachine implements IStateMachine {
 			value: options.initial,		//options.value is discarded
 			ctx: options.ctx || {},
 			enabled: false,
-			states: new Map()
+			states: new Map(),
+			log: !!options.log || false
 		});
 		//all defined states
 		each(options.states, (value: IMachineState, key: string) => {
@@ -52,7 +56,9 @@ export default class StateMachine implements IStateMachine {
 		//all common actions
 		each(options.commonActions, (value: IMachineActionCallback, key: string) => {
 			this.settings.commonActions.set(key, value)
-		})
+		});
+		this.sendCmd = "";
+		this.log && console.log(`[${StateType[this.value]}]`);
 	}
 
 	/**
@@ -66,7 +72,9 @@ export default class StateMachine implements IStateMachine {
 			return false;
 		let
 			actionName = ActionType[action],
-			fn: Function | undefined;
+			fn: Function | undefined,
+			newSendCmd = `  ::${actionName}`;
+
 		//check action.OVER and overType
 		if (action == ActionType.OVER) {
 			switch (current.overType) {
@@ -75,11 +83,12 @@ export default class StateMachine implements IStateMachine {
 					//deny transitions here, by not calling app.state.transition
 					//  so DEFAULT action is not called
 					//and on all others, accept, this way I can prevent stop dragging while OVER event
+					this.log && console.log(`${newSendCmd} -> deny`);
 					return true;
 				case "forward":
 					//send action.FORWARD_OVER from common actions
 					//accepts transitions to new state on mouse OVER
-					fn = <any>this.settings.commonActions.get("FORWARD_OVER");
+					fn = <any>this.settings.commonActions.get(actionName = "FORWARD_OVER");
 					break;
 				case "function":
 					//call function if provided
@@ -92,13 +101,17 @@ export default class StateMachine implements IStateMachine {
 			// fall back to default action if available
 			fn = (<any>current.actions)[actionName]
 				|| this.settings.commonActions.get(actionName)
-				|| (<any>current.actions).DEFAULT;
+				|| (<any>current.actions)[actionName = "DEFAULT"];
 		}
-		if (!fn)
-			return false;
-		//execute action
-		fn.call(this, data);	//, this.machine.context, data
-		return true;
+
+		if (this.log && newSendCmd != this.sendCmd) {
+			let
+				postSendCmd = `  ::${actionName}`;
+			console.log(`${this.sendCmd = newSendCmd}${newSendCmd != postSendCmd ? " -> " + postSendCmd : ""}${fn ? "" : " not found"}`);
+		}
+
+		//execute action if found
+		return fn?.call(this, data), !!fn;
 	}
 
 	/**
@@ -114,6 +127,7 @@ export default class StateMachine implements IStateMachine {
 		const newStateDef: IMachineState = this.state(stateName);
 		if (!newStateDef)
 			return false;
+		this.log && (this.value != state) && console.log(`[${stateName}]`);
 		//save new state to receive SEND commands
 		this.settings.value = state;
 		//
@@ -134,8 +148,8 @@ export default class StateMachine implements IStateMachine {
 		this.settings.states.set(key, obj(<IMachineState>{
 			key: state.key,
 			overType: state.overType,
-			actions: state.actions //extend({ on: {}, transitions: {} }, state.state) //state.state
+			actions: state.actions
 		}));
-		return true;
+		return true
 	}
 }

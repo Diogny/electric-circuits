@@ -37,6 +37,14 @@ var ContextWindow = /** @class */ (function (_super) {
         }, false);
         return _this;
     }
+    ContextWindow.prototype.onMouseEnter = function (e) {
+        //console.log('IN context window', e.eventPhase, (e.target as HTMLElement).id);
+        //return false;
+    };
+    ContextWindow.prototype.onMouseLeave = function (e) {
+        //console.log('OUT of context window', e.eventPhase, (e.target as HTMLElement).id);
+        //return false;
+    };
     ContextWindow.prototype.setVisible = function (value) {
         return (!_super.prototype.setVisible.call(this, value).visible && this.win.setAttribute("data-trigger", "")), this;
     };

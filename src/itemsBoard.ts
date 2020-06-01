@@ -1,5 +1,5 @@
 
-import { aCld, condClass, obj, attr, extend, isFn, isNum, dP, typeOf } from './dab';
+import { aCld, condClass, obj, attr, extend, isFn, isNum } from './dab';
 import Bond from './bonds';
 import ItemBase from './itemsBase';
 import Comp from './components';

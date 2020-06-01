@@ -87,6 +87,9 @@ var Tooltip = /** @class */ (function (_super) {
         var arr = dab_1.isStr(value) ?
             value.split(/\r?\n/) :
             value, txtArray = [];
+        if (!Array.isArray(arr)) {
+            console.log("ooooh");
+        }
         this.t.innerHTML = arr.map(function (value, ndx) {
             var txt = '', attrs = '';
             if (dab_1.isStr(value)) {
