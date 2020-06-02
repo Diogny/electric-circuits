@@ -60,7 +60,7 @@ export const isInt = (n: any) => (parseFloat(n) == parseInt(n)) && !isNaN(n);
 export const pInt = (s: string, mag?: number) => parseInt(s, mag || 10);
 
 // clamp(value, min, max) - limits value to the range min..max
-export const clamp = (v: number, min: number, max: number) => (v < min) ? min : (v > max) ? max : v;
+export const clamp = (v: number, min: number, max: number) => (v <= min) ? min : (v >= max) ? max : v;
 
 export const round = (v: number, decimals: number) => {
 	//https://expertcodeblog.wordpress.com/2018/02/12/typescript-javascript-round-number-by-decimal-pecision/

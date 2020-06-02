@@ -6,6 +6,8 @@ import Point from "./point";
 import EcProp from "./ecprop";
 import { MyApp } from "./myapp";
 import { ItemBoard } from "./itemsBoard";
+import { app } from "electron";
+import Size from "./size";
 
 export default class AppWindow extends BaseWindow {
 
@@ -65,6 +67,7 @@ export default class AppWindow extends BaseWindow {
 		aEL(<HTMLElement>this.titleButtons.querySelector('img:nth-of-type(1)'), "click", function (e: MouseEvent) {
 			e.stopPropagation();
 			toggleClass(that.win, "collapsed");
+			that.setVisible(true);
 		}, false);
 		aEL(<HTMLElement>this.titleButtons.querySelector('img:nth-of-type(2)'), "click", function (e: MouseEvent) {
 			e.stopPropagation();
@@ -91,7 +94,15 @@ export default class AppWindow extends BaseWindow {
 	}
 
 	public setVisible(value: boolean): AppWindow {
-		return super.setVisible(value).visible ? addClass(this.win, "selected") : removeClass(this.win, "selected"), this
+		super.setVisible(value); //.visible ? addClass(this.win, "selected") : removeClass(this.win, "selected");
+		if (this.visible) {
+			//correct (x,y) in case of mainwindow resize moves it outside
+			let
+				{ x, y } = checkPosition(this, this.x, this.y);
+			this.move(x, y);
+		}
+
+		return this
 	}
 
 	public renderBar(text: string) {
@@ -163,12 +174,17 @@ export default class AppWindow extends BaseWindow {
 
 }
 
+function checkPosition(win: AppWindow, x: number, y: number): { x: number, y: number } {
+	return {
+		x: clamp(x, 0, (win.app as MyApp).size.width - win.win.offsetWidth),
+		y: clamp(y, 0, (win.app as MyApp).contentHeight - win.win.offsetHeight)
+	}
+}
+
 function dragWindow(win: AppWindow) {
 	var
 		ofsx = 0,
-		ofsy = 0,
-		maxX = (win.win.parentNode as HTMLElement).offsetWidth - win.win.offsetWidth,
-		maxY = (win.win.parentNode as HTMLElement).offsetHeight - win.win.offsetHeight
+		ofsy = 0;
 
 	win.titleHTML.onmousedown = dragMouseDown;
 
@@ -186,8 +202,9 @@ function dragWindow(win: AppWindow) {
 		e = e || window.event;
 		e.preventDefault();
 		let
-			x = clamp(e.clientX - ofsx - (win.app as MyApp).board.offsetLeft, 0, maxX),
-			y = clamp(e.clientY - ofsy - (win.app as MyApp).board.offsetTop, 0, maxY);
+			{ x, y } = checkPosition(win,
+				e.clientX - ofsx - (win.app as MyApp).board.offsetLeft,
+				e.clientY - ofsy - (win.app as MyApp).board.offsetTop);
 		win.move(x, y);
 	}
 

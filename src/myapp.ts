@@ -37,6 +37,8 @@ export class MyApp extends Application implements IMyApp {
 	ratioX: number;
 	ratioY: number;
 	center: Point;
+	//all window height
+	contentHeight: number;
 	size: Size;
 	compList: Map<string, ItemBoard>;
 	selectedComponents: ItemBoard[];

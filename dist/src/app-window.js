@@ -41,6 +41,7 @@ var AppWindow = /** @class */ (function (_super) {
         dab_1.aEL(_this.titleButtons.querySelector('img:nth-of-type(1)'), "click", function (e) {
             e.stopPropagation();
             dab_1.toggleClass(that.win, "collapsed");
+            that.setVisible(true);
         }, false);
         dab_1.aEL(_this.titleButtons.querySelector('img:nth-of-type(2)'), "click", function (e) {
             e.stopPropagation();
@@ -98,7 +99,13 @@ var AppWindow = /** @class */ (function (_super) {
         //console.log('OUT of app window', e.eventPhase, (e.target as HTMLElement).id);
     };
     AppWindow.prototype.setVisible = function (value) {
-        return _super.prototype.setVisible.call(this, value).visible ? dab_1.addClass(this.win, "selected") : dab_1.removeClass(this.win, "selected"), this;
+        _super.prototype.setVisible.call(this, value); //.visible ? addClass(this.win, "selected") : removeClass(this.win, "selected");
+        if (this.visible) {
+            //correct (x,y) in case of mainwindow resize moves it outside
+            var _a = checkPosition(this, this.x, this.y), x = _a.x, y = _a.y;
+            this.move(x, y);
+        }
+        return this;
     };
     AppWindow.prototype.renderBar = function (text) {
         //this's temporary
@@ -162,8 +169,14 @@ var AppWindow = /** @class */ (function (_super) {
     return AppWindow;
 }(base_window_1.default));
 exports.default = AppWindow;
+function checkPosition(win, x, y) {
+    return {
+        x: dab_1.clamp(x, 0, win.app.size.width - win.win.offsetWidth),
+        y: dab_1.clamp(y, 0, win.app.contentHeight - win.win.offsetHeight)
+    };
+}
 function dragWindow(win) {
-    var ofsx = 0, ofsy = 0, x = 0, y = 0, maxX = win.win.parentNode.offsetWidth - win.win.offsetWidth, maxY = win.win.parentNode.offsetHeight - win.win.offsetHeight;
+    var ofsx = 0, ofsy = 0;
     win.titleHTML.onmousedown = dragMouseDown;
     function dragMouseDown(e) {
         e = e || window.event;
@@ -177,8 +190,7 @@ function dragWindow(win) {
     function elementDrag(e) {
         e = e || window.event;
         e.preventDefault();
-        x = dab_1.clamp(e.clientX - ofsx - win.app.board.offsetLeft, 0, maxX);
-        y = dab_1.clamp(e.clientY - ofsy - win.app.board.offsetTop, 0, maxY);
+        var _a = checkPosition(win, e.clientX - ofsx - win.app.board.offsetLeft, e.clientY - ofsy - win.app.board.offsetTop), x = _a.x, y = _a.y;
         win.move(x, y);
     }
     function closeDragElement() {

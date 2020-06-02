@@ -48,7 +48,7 @@ exports.isInt = function (n) { return (parseFloat(n) == parseInt(n)) && !isNaN(n
 //http://speakingjs.com/es5/ch11.html#converting_to_integer
 exports.pInt = function (s, mag) { return parseInt(s, mag || 10); };
 // clamp(value, min, max) - limits value to the range min..max
-exports.clamp = function (v, min, max) { return (v < min) ? min : (v > max) ? max : v; };
+exports.clamp = function (v, min, max) { return (v <= min) ? min : (v >= max) ? max : v; };
 exports.round = function (v, decimals) {
     //https://expertcodeblog.wordpress.com/2018/02/12/typescript-javascript-round-number-by-decimal-pecision/
     return (decimals = decimals | 0, Number(Math.round(Number(v + "e" + decimals)) + "e-" + decimals));

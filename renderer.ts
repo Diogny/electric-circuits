@@ -219,7 +219,8 @@ function createStateMachine() {
 				//console.log("INSIDE board")
 			},
 			LEAVE: function (newCtx: IMouseState) {
-				actionDefaultCopyNewState(newCtx);
+				app.state.send(Action.HIDE_NODE, newCtx);
+				app.topBarLeft.innerHTML = "&nbsp;";
 				//console.log("OUSIDE board")
 			},
 			DOWN: actionDefaultCopyNewState,
@@ -815,9 +816,11 @@ function updateViewBox(arg: any) {
 		mainHeight = qS("body").offsetHeight - qS("body>header").offsetHeight - qS("body>footer").offsetHeight;
 	qS("body>main").style.height = mainHeight + "px";
 	//update svg board height
-	app.svgBoard.style.height = mainHeight + "px";
+	//app.svgBoard.style.height = (mainHeight) + "px";
+	app.board.style.height = mainHeight + "px";
 	//set app reference size
 	app.size = new Size(arg.width, arg.height);
+	app.contentHeight = mainHeight; console.log(mainHeight);
 	//set SVG viewBox values
 	app.setViewBox(<any>undefined);
 	//console.log(event, arg)
