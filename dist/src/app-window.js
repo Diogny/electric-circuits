@@ -149,6 +149,12 @@ var AppWindow = /** @class */ (function (_super) {
         this.setVisible(true);
         return true;
     };
+    AppWindow.prototype.refresh = function () {
+        if (!this.compId)
+            return;
+        //refresh editable properties
+        this.settings.properties.forEach(function (p) { return p.refresh(); });
+    };
     AppWindow.prototype.appendPropChild = function (el) {
         return el && (this.main.appendChild(el.html), this.settings.properties.push(el)), this;
     };

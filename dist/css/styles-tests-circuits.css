@@ -219,7 +219,7 @@ g.tooltip > text {
 
 .wire.selected > line,
 .wire.selected > polyline {
-  stroke-width: 4px;
+  stroke-width: 5px;
 }
 
 .wire.white > line {
@@ -299,6 +299,11 @@ g.tooltip > text {
   opacity: 0.9;
   stroke-width: 7px; /*12px;*/
 }
+
+/*.wire.wiring > line:hover,
+.wire.wiring > polyline:hover {
+  stroke-width: 3px;
+}*/
 
 /*.wire:hover {
 					  stroke: rgb(0, 255, 0);

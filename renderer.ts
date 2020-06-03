@@ -3,7 +3,7 @@ import { templatesDOM, qSA, qS, tag } from "./src/utils"
 import * as fs from 'fs';
 import {
 	IComponentOptions, IApplicationOptions,
-	StateType as State, ActionType as Action, IMachineState, IMouseState, IItemNode
+	StateType as State, ActionType as Action, IMachineState, IMouseState, IItemNode, IItemWireOptions, IPoint, IItemSolidOptions
 } from "./src/interfaces";
 import Comp from "./src/components";
 import { MyApp } from "./src/myapp";
@@ -14,6 +14,7 @@ import StateMachine from "./src/stateMachine";
 import { Type } from "./src/types";
 import { ItemBoard } from "./src/itemsBoard";
 import Size from "src/size";
+import EC from "src/ec";
 
 
 class LinesAligner {
@@ -131,6 +132,17 @@ function enableDisableTools() {
 	}
 }
 
+function createEC(name: string): EC {
+	return new EC(<IItemSolidOptions><unknown>{
+		name: name,
+		x: app.center.x,
+		y: app.center.y,
+		onProp: function (e: any) {
+			//this happens when this component is created
+		}
+	})
+}
+
 function hookEvents() {
 	//ZOOM controls
 	qSA('.bar-item[data-scale]').forEach((item: any) => {
@@ -158,13 +170,12 @@ function hookEvents() {
 			return;		//there's a selected tool
 		}
 		let
-			wire: Wire = app.wire,
 			transition: Action,
 			fn = (b: any) => b ? "ON" : "OFF",
-			toolTarget = getParentAttr(<HTMLElement>e.target, "tool");
-		if (!wire)
-			return;
-		if (wire.editMode = !wire.editMode) {
+			toolTarget = getParentAttr(<HTMLElement>e.target, "tool"),
+			status = parseInt(attr(toolTarget, "data-status"));
+
+		if (status = (status + 1) & 1) {	//wire.editMode = !wire.editMode
 			addClass(toolTarget, "selected");
 			transition = Action.START;
 		}
@@ -172,33 +183,33 @@ function hookEvents() {
 			removeClass(toolTarget, "selected");
 			transition = Action.STOP;
 		}
+
+		attr(toolTarget, {
+			"data-status": status
+		});
+
 		//change tooltip title
-		attr(e.target, { title: `Wire edit is ${fn(wire.editMode)}` });
+		attr(e.target, { title: `Wire edit is ${fn(status)}` });
 		enableDisableTools();
 		app.execute(Action.UNSELECT_ALL, "");
-		app.state.transition(State.WIRE_EDIT, transition, void 0);
+		app.state.transition(State.WIRING, transition, void 0);
 	}, false);
 	//HtmlWindow
 	/*aEL(qS('.bar-item[tool="ec-props"]'), "click", (e: MouseEvent) => {
 		app.winProps.setVisible(!app.winProps.visible);
 	}, false);*/
 	//add component
-	aEL(qS('.bar-item[action="comp-create"]'), "click", () => app.addComponent(<string>app.prop("comp_option").value), false);
+	aEL(qS('.bar-item[action="comp-create"]'), "click", () =>
+		!selectedTool() &&
+		app.addComponent(createEC(<string>app.prop("comp_option").value)), false);
 }
 
 function createStateMachine() {
 	let
 		actionDefaultCopyNewState = function (newCtx: IMouseState) {
 			app.state.ctx = newCtx;		//for now just copy data
-		},
-		actionOutOfTool = function (newCtx: IMouseState) {
-			if (!app.insideBoard(newCtx.offset)) {
-				//this means to hide node and tooltip ONLY if going out of the board
-				app.state.send(Action.HIDE_NODE, newCtx);
-				app.topBarLeft.innerHTML = "&nbsp;";
-				//app.state.ctx == newCtx;		//save new context
-			}
 		};
+	//IDLE
 	app.state.register(<IMachineState>{
 		key: State.IDLE,
 		overType: "forward",
@@ -207,22 +218,14 @@ function createStateMachine() {
 			RESUME: function (newCtx: IMouseState) { }
 		}
 	});
+	//BOARD
 	app.state.register(<IMachineState>{
 		key: State.BOARD,
 		overType: "forward",
 		actions: {
 			MOVE: function (newCtx: IMouseState) {
 			},
-			OUT: actionOutOfTool,
-			ENTER: function (newCtx: IMouseState) {
-				actionDefaultCopyNewState(newCtx);
-				//console.log("INSIDE board")
-			},
-			LEAVE: function (newCtx: IMouseState) {
-				app.state.send(Action.HIDE_NODE, newCtx);
-				app.topBarLeft.innerHTML = "&nbsp;";
-				//console.log("OUSIDE board")
-			},
+			//OUT: actionOutOfTool,
 			DOWN: actionDefaultCopyNewState,
 			UP: function (newCtx: IMouseState) {
 				actionDefaultCopyNewState(newCtx);
@@ -238,6 +241,7 @@ function createStateMachine() {
 			}
 		}
 	});
+	//EC_NODE
 	app.state.register(<IMachineState>{
 		key: State.EC_NODE,
 		overType: "forward",
@@ -248,7 +252,7 @@ function createStateMachine() {
 					p = Point.translateBy((this as StateMachine).ctx.offset, 20);
 				app.tooltip.move(p.x, p.y);
 			},
-			OUT: actionOutOfTool,
+			//OUT: actionOutOfTool,
 			UP: function (newCtx: IMouseState) {
 				(this as StateMachine).ctx = newCtx;		//save new context
 				//check Ctrl-Click
@@ -263,6 +267,7 @@ function createStateMachine() {
 			}
 		}
 	});
+	//EC_DRAG
 	app.state.register(<IMachineState>{
 		key: State.EC_DRAG,
 		overType: "deny",
@@ -285,7 +290,6 @@ function createStateMachine() {
 				removeClass(app.svgBoard, (this as StateMachine).ctx.className);
 				app.state.transition(State.EC_BODY, Action.START, newCtx);
 			},
-
 			//transitions
 			START: function (newCtx: IMouseState) {
 				let
@@ -307,6 +311,7 @@ function createStateMachine() {
 			}
 		}
 	});
+	//EC_BODY
 	app.state.register(<IMachineState>{
 		key: State.EC_BODY,
 		overType: "forward",
@@ -322,7 +327,6 @@ function createStateMachine() {
 					p = Point.translateBy((this as StateMachine).ctx.offset, 20);
 				app.tooltip.move(p.x, p.y);
 			},
-			OUT: actionOutOfTool,
 			DOWN: actionDefaultCopyNewState,
 			UP: function (newCtx: IMouseState) {	//up after down should be show properties, not now
 				actionDefaultCopyNewState(newCtx);
@@ -344,6 +348,7 @@ function createStateMachine() {
 			},
 		}
 	});
+	//WIRE_LINE
 	app.state.register(<IMachineState>{
 		key: State.WIRE_LINE,
 		overType: "forward",
@@ -371,7 +376,6 @@ function createStateMachine() {
 							Action.SELECT,  		// click		 => select one
 						[newCtx.it.id, newCtx.it.name, "line"].join('::'));
 			},
-			OUT: actionOutOfTool,
 			DEFAULT: actionDefaultCopyNewState,	//state must be saved so MOVE can capture prev
 			//transitions
 			START: function (newCtx: IMouseState) {
@@ -379,100 +383,257 @@ function createStateMachine() {
 			}
 		}
 	});
+	//WIRING
 	app.state.register(<IMachineState>{
-		key: State.WIRE_EDIT,
+		key: State.WIRING,
 		overType: "function",
 		actions: {
 			OVER: function (newCtx: IMouseState) {
+				actionDefaultCopyNewState(newCtx);
 				//gets here when over any component: board, EC, Wire,...
-				if (newCtx.it) {
-					//real component, EC or Wire
-					switch (newCtx.over.type) {
-						case "node":
-							//only node from a Wire in editMode allowed for now
-							if ((<Wire>newCtx.it).editMode) {
-								//console.log("WIRE_EDIT.OVER -> WIRE_EDIT_NODE.OVER");
-								app.state.transition(State.WIRE_EDIT_NODE, Action.START, newCtx);
-							}
-							break;
-						case "body":
-							app.state.transition(State.WIRE_EDIT_EC, Action.START, newCtx);
-						default:
-							//"line"
-							//console.log(`WIRE_EDIT over ${newCtx.over.type} of: ${newCtx.it.id}`)
-							break;
-					}
+				if (!newCtx.it)
+					return
+				//real component, EC or Wire
+				switch (newCtx.over.type) {
+					case "node":
+						switch (newCtx.it.type) {
+							case Type.WIRE:
+								//only node from a Wire in editMode allowed for now
+								if ((<Wire>newCtx.it).editMode) {
+									//console.log("WIRING.OVER -> WIRING_WIRE_NODE.OVER");
+									app.state.transition(State.WIRING_WIRE_NODE, Action.START, newCtx);
+								}
+								break;
+							case Type.EC:
+								app.state.transition(State.WIRING_EC_NODE, Action.START, newCtx);
+								//console.log(`WIRING over ${newCtx.over.type} of: ${newCtx.it.id}`)
+								break;
+						}
+						break;
+					case "body":
+						app.state.transition(State.WIRING_EC_BODY, Action.START, newCtx);
+					default:
+						//console.log(`WIRING over ${newCtx.over.type} of: ${newCtx.it.id}`)
+						break;
 				}
 			},
 			MOVE: function (newCtx: IMouseState) {
 				let
 					self = this as StateMachine;
-				if (!newCtx.it || !(<Wire>newCtx.it).editMode) {
-					//console.log("MOVE on wire_edit -not over wire in edit mode!");
-					return;
+				switch (newCtx.it?.type) {
+					case Type.WIRE:
+						let
+							wire = newCtx.it as Wire;
+						if (!wire.editMode) {
+							//open up
+							//later implement a priority queue to turn editMode for unused of too far wires
+							wire.editMode = true;
+						}
+
+						if (self.ctx.event == "down") {
+							//can't drag first or last line if bonded
+							let
+								ln = self.ctx.over.line;
+							if ((ln == 1 && self.ctx.it.nodeBonds(0))
+								|| (ln == (<Wire>self.ctx.it).lastLine && self.ctx.it.nodeBonds((<Wire>self.ctx.it).last))) {
+								//console.log("cannot drag bonded wire line");
+							} else {
+								//console.log("start wire line dragging");
+								app.state.transition(State.WIRING_LINE_DRAG, Action.START, newCtx);
+							}
+							return;
+						}
+						//editMode = true
+						actionDefaultCopyNewState(newCtx);
+						//check if mouse is close enough to a wire node
+						let
+							node = self.ctx.it.overNode(self.ctx.offset, self.ctx.over.line);
+						if (node != -1 && (newCtx.ctrlKey || self.ctx.it.nodeHighlightable(node))) {
+							self.ctx.it.showNode(node);
+						} else {
+							self.ctx.it.hideNode();
+						}
+						break;
 				}
-				if (self.ctx.event == "down") {
-					//can't drag first or last line if bonded
-					let
-						ln = self.ctx.over.line;
-					if ((ln == 1 && self.ctx.it.nodeBonds(0))
-						|| (ln == (<Wire>self.ctx.it).lastLine && self.ctx.it.nodeBonds((<Wire>self.ctx.it).last))) {
-						//console.log("cannot drag bonded wire line");
-					} else {
-						//console.log("start wire line dragging");
-						app.state.transition(State.WIRE_EDIT_LINE_DRAG, Action.START, newCtx);
-					}
-					return;
-				}
-				//editMode = true
 				actionDefaultCopyNewState(newCtx);
-				//check if mouse is close enough to a wire node
-				let
-					node = self.ctx.it.overNode(self.ctx.offset, self.ctx.over.line);
-				if (node != -1 && (newCtx.ctrlKey || self.ctx.it.nodeHighlightable(node))) {
-					self.ctx.it.showNode(node);
-				} else {
-					self.ctx.it.hideNode();
-				}
 			},
-			DEFAULT: actionDefaultCopyNewState,	//state must be saved so MOVE can capture prev
-			OUT: actionOutOfTool,
+			DOWN: actionDefaultCopyNewState,	//state must be saved so MOVE can capture prev
 			UP: function (newCtx: IMouseState) {
 				(this as StateMachine).ctx = newCtx;		//save new context
 				app.rightClick.setVisible(false);
-				//check Ctrl-Click
-				if ((this as StateMachine).ctx.ctrlKey) {
-					//console.log(`Ctrl+Click on Wire line`);
-				}
 			},
 			//transitions
 			RESUME: function (newCtx: IMouseState) {
-				//gets here from WIRE_EDIT_NODE
-				app.state.send(Action.HIDE_NODE, (this as StateMachine).ctx);
-				//don't call action "Move" because then it's called two times
-				//app.state.send("MOVE", newCtx);
-				//console.log("wire_edit.RESUME transition ");
+				//resume wiring...
 			},
 			START: function () {
-				//console.log("wire_edit.START transition - start wiring editing");
+				//console.log("WIRING.START transition - start wiring editing");
 				app.rightClick.setVisible(false);
 			},
 			STOP: function () {
-				//console.log("WIRE_EDIT.STOP transition - stop wiring editing");
+				//console.log("WIRING.STOP transition - stop wiring editing");
+				app.compList
+					.forEach(c => (c.type == Type.WIRE) && ((c as Wire).editMode = false));
 				app.state.transition(State.IDLE, Action.DEFAULT, void 0);	//go idle
 			}
 		}
 	});
+	//WIRING_EC_NODE
 	app.state.register(<IMachineState>{
-		key: State.WIRE_EDIT_NODE,
+		key: State.WIRING_EC_NODE,
 		overType: "deny",
 		actions: {
 			OUT: function (newCtx: IMouseState) {
-				app.state.transition(State.WIRE_EDIT, Action.RESUME, newCtx);
+				//app.state.send(Action.HIDE_NODE, (this as StateMachine).ctx);
+				if (!(this as StateMachine).ctx.disableOut) {
+					app.state.transition(State.WIRING, Action.RESUME, newCtx);
+					(this as StateMachine).ctx.it.hideNode();
+				}
+				(this as StateMachine).ctx.disableOut = false;
+			},
+			UP: function (newCtx: IMouseState) {
+				if (newCtx.ctrlKey) {
+					app.state.transition(State.WIRING_WIRE_NEW, Action.START, newCtx);
+				}
+			},
+			//transitions
+			START: function (newCtx: IMouseState) {
+				let
+					self = this as StateMachine;
+				self.ctx = newCtx;						//save new context
+				if (!newCtx.it.nodeBonds(newCtx.over.node)) {
+					self.ctx.disableOut = true;
+					newCtx.it.showNode(newCtx.over.node);
+				}
+			}
+		}
+	});
+	//WIRING_LINE_DRAG
+	app.state.register(<IMachineState>{
+		key: State.WIRING_LINE_DRAG,
+		overType: "deny",
+		actions: {
+			MOVE: function (newCtx: IMouseState) {
+				//newCtx.offset has the updated offset, don't save anything here
+				let
+					self = this as StateMachine,
+					ln = self.ctx.over.line;
+
+				self.ctx.it?.setNode(ln - 1, Point.minus(newCtx.offset, self.ctx.A));
+				self.ctx.it?.setNode(ln, Point.minus(newCtx.offset, self.ctx.B));
+
+				dash.matchWireLine(self.ctx.it as Wire, self.ctx.over.line)
+			},
+			UP: function (newCtx: IMouseState) {
+				//this catches the UP action too
+				removeClass(app.svgBoard, (this as StateMachine).ctx.className);
+				dash.hide();
+				if (dash.match) {
+					let
+						ln = (this as StateMachine).ctx.over.line,
+						vector = Point.minus(dash.p, dash.wire.getNode(dash.node));
+					dash.wire.setNode(ln - 1, Point.plus(dash.wire.getNode(ln - 1), vector));
+					dash.wire.setNode(ln, Point.plus(dash.wire.getNode(ln), vector));
+				}
+				app.state.transition(State.WIRING, Action.START, newCtx);
+			},
+			OUT: function () {
+				//has to be empty so dragging is not STOP when passing over another component
+				//console.log("ec_dragging.OUT");
+			},
+			//transitions
+			START: function (newCtx: IMouseState) {
+				let
+					self = this as StateMachine;
+				//hide previous wire node if any selected
+				app.state.send(Action.HIDE_NODE, self.ctx);
+				//save new context only here, because what changes is only position
+				self.ctx = newCtx;
+				self.ctx.className = "drag-node";
+				//show mouse cursor
+				addClass(app.svgBoard, "drag-node");
+				//add to context vector
+				let
+					ln = self.ctx.over.line;
+				self.ctx.A =
+					Point.minus(self.ctx.offset, <IItemNode>self.ctx.it?.getNode(ln - 1));
+				self.ctx.B =
+					Point.minus(self.ctx.offset, <IItemNode>self.ctx.it?.getNode(ln));
+			}
+		}
+	});
+	//WIRING_EC_BODY
+	app.state.register(<IMachineState>{
+		key: State.WIRING_EC_BODY,
+		overType: "deny",
+		actions: {
+			OUT: function (newCtx: IMouseState) {
+				app.state.transition(State.WIRING, Action.RESUME, newCtx);
+			},
+			MOVE: function (newCtx: IMouseState) {
+				if ((this as StateMachine).ctx.event == "down"
+					&& (this as StateMachine).ctx.button == 0) {
+					app.state.transition(State.WIRING_EC_BODY_DRAG, Action.START, newCtx);
+					return;
+				}
+			},
+			UP: actionDefaultCopyNewState,
+			DOWN: actionDefaultCopyNewState,
+			//transitions
+			START: function (newCtx: IMouseState) {
+				(this as StateMachine).ctx = newCtx;	//save new context
+			}
+		}
+	});
+	//WIRING_EC_BODY_DRAG
+	app.state.register(<IMachineState>{
+		key: State.WIRING_EC_BODY_DRAG,
+		overType: "deny",
+		actions: {
+			MOVE: function (newCtx: IMouseState) {
+				//newCtx.offset has the updated offset, don't save anything here
+				(this as StateMachine).ctx.dragging.forEach(comp => {
+					let
+						p = Point.minus(newCtx.offset, comp.offset);
+					comp.ec.move(p.x, p.y);
+				});
+				(newCtx.it.id == app.winProps.compId) && app.winProps.property("p")?.refresh();
+			},
+			OUT: function () {
+				//has to be empty so dragging is not STOP when passing over another component
+				//console.log("ec_dragging.OUT");
+			},
+			UP: function (newCtx: IMouseState) {
+				//this catches the UP action too, stops dragging
+				removeClass(app.svgBoard, (this as StateMachine).ctx.className);
+				app.state.transition(State.WIRING_EC_BODY, Action.START, newCtx);
+			},
+			//transitions
+			START: function (newCtx: IMouseState) {
+				let
+					self = this as StateMachine;
+				self.ctx = newCtx;						//save new context
+				addClass(app.svgBoard, self.ctx.className = "dragging");		//show mouse cursor
+				//we've just one component here,  new way for multiple drag
+				self.ctx.dragging = [{
+					ec: newCtx.it,
+					offset: Point.minus(newCtx.offset, newCtx.it.p)
+				}]
+			}
+		}
+	});
+	//WIRING_WIRE_NODE
+	app.state.register(<IMachineState>{
+		key: State.WIRING_WIRE_NODE,
+		overType: "deny",
+		actions: {
+			OUT: function (newCtx: IMouseState) {
+				app.state.send(Action.HIDE_NODE, (this as StateMachine).ctx);
+				app.state.transition(State.WIRING, Action.RESUME, newCtx);
 			},
 			MOVE: function (newCtx: IMouseState) {
 				if ((this as StateMachine).ctx.event == "down") {
-					app.state.transition(State.WIRE_EDIT_NODE_DRAG, Action.START, newCtx);
+					app.state.transition(State.WIRING_WIRE_NODE_DRAG, Action.START, newCtx);
 				}
 			},
 			DOWN: function (newCtx: IMouseState) {
@@ -487,13 +648,14 @@ function createStateMachine() {
 			},
 			//transitions
 			START: function (newCtx: IMouseState) {
-				//we get here from wire_edit, so far do nothing
-				//console.log("WIRE_EDIT_NODE.OVER transition");
+				//we get here from WIRING, so far do nothing
+				//console.log("WIRING_WIRE_NODE.OVER transition");
 			}
 		}
 	});
+	//WIRING_WIRE_NODE_DRAG
 	app.state.register(<IMachineState>{
-		key: State.WIRE_EDIT_NODE_DRAG,
+		key: State.WIRING_WIRE_NODE_DRAG,
 		overType: "deny",
 		actions: {
 			MOVE: function (newCtx: IMouseState) {
@@ -550,10 +712,10 @@ function createStateMachine() {
 					self.ctx.it?.bond(self.ctx.nodeNumber,
 						self.ctx.bond.ec, self.ctx.bond.node);
 					//console.log(`inside: ${self.ctx.bond.ec.id}:[${self.ctx.bond.node}]`);
-					app.state.transition(State.WIRE_EDIT, Action.RESUME, newCtx);
+					app.state.transition(State.WIRING, Action.RESUME, newCtx);
 				} else {
 					dash.match && (dash.wire.setNode(dash.node, dash.p), dash.wire.showNode(dash.node));
-					app.state.transition(State.WIRE_EDIT_NODE, Action.START, newCtx);
+					app.state.transition(State.WIRING_WIRE_NODE, Action.START, newCtx);
 				}
 			},
 			OUT: function () {
@@ -577,113 +739,93 @@ function createStateMachine() {
 			}
 		}
 	});
+	//WIRING_WIRE_NEW
 	app.state.register(<IMachineState>{
-		key: State.WIRE_EDIT_LINE_DRAG,
+		key: State.WIRING_WIRE_NEW,
 		overType: "deny",
 		actions: {
-			MOVE: function (newCtx: IMouseState) {
-				//newCtx.offset has the updated offset, don't save anything here
-				let
-					self = this as StateMachine,
-					ln = self.ctx.over.line;
-
-				self.ctx.it?.setNode(ln - 1, Point.minus(newCtx.offset, self.ctx.A));
-				self.ctx.it?.setNode(ln, Point.minus(newCtx.offset, self.ctx.B));
-
-				dash.matchWireLine(self.ctx.it as Wire, self.ctx.over.line)
+			ENTER: function (newCtx: IMouseState) {
+				//cannot save new context, erases wiring status
+				console.log('ENTER board, continue wiring...')
+			},
+			KEY: function (code: any) {
+				if (code == "Escape") {
+					delete app.state.ctx.wiring;
+					app.state.transition(State.WIRING, Action.RESUME, (this as StateMachine).ctx);
+				}
+			},
+			OUT: function (newCtx: IMouseState) {
+				//console.log(`out of: ${newCtx.it?.id || "board"}`);
+				if (!(this as StateMachine).ctx.disableOut) {
+					(newCtx.over.type == "node") && newCtx.it.highlighted && newCtx.it.hideNode();
+				}
+				(this as StateMachine).ctx.disableOut = false;
 			},
 			UP: function (newCtx: IMouseState) {
-				//this catches the UP action too
-				removeClass(app.svgBoard, (this as StateMachine).ctx.className);
-				dash.hide();
-				if (dash.match) {
-					let
-						ln = (this as StateMachine).ctx.over.line,
-						vector = Point.minus(dash.p, dash.wire.getNode(dash.node));
-					dash.wire.setNode(ln - 1, Point.plus(dash.wire.getNode(ln - 1), vector));
-					dash.wire.setNode(ln, Point.plus(dash.wire.getNode(ln), vector));
-				}
-				app.state.transition(State.WIRE_EDIT, Action.START, newCtx);
-			},
-			OUT: function () {
-				//has to be empty so dragging is not STOP when passing over another component
-				//console.log("ec_dragging.OUT");
-			},
-			//transitions
-			START: function (newCtx: IMouseState) {
 				let
 					self = this as StateMachine;
-				//hide previous wire node if any selected
-				app.state.send(Action.HIDE_NODE, self.ctx);
-				//save new context only here, because what changes is only position
-				self.ctx = newCtx;
-				self.ctx.className = "drag-node";
-				//show mouse cursor
-				addClass(app.svgBoard, "drag-node");
-				//add to context vector
-				let
-					ln = self.ctx.over.line;
-				self.ctx.A =
-					Point.minus(self.ctx.offset, <IItemNode>self.ctx.it?.getNode(ln - 1));
-				self.ctx.B =
-					Point.minus(self.ctx.offset, <IItemNode>self.ctx.it?.getNode(ln));
-			}
-		}
-	});
-	app.state.register(<IMachineState>{
-		key: State.WIRE_EDIT_EC,
-		overType: "function",
-		actions: {
-			OVER: function (newCtx: IMouseState) {
-				app.state.transition(State.WIRE_EDIT, Action.RESUME, newCtx);
+
+				if (newCtx.over.type == "node" && newCtx.it.highlighted) {
+					self.ctx.wiring.wire.bond(self.ctx.wiring.wire.last, newCtx.it, newCtx.over.node);
+					delete app.state.ctx.wiring;
+					app.state.transition(State.WIRING, Action.RESUME, (this as StateMachine).ctx);
+					newCtx.it.hideNode();
+				} else {
+					//correct last node
+					self.ctx.wiring.wire.setNode(self.ctx.wiring.wire.last, newCtx.offset);
+					self.ctx.wiring.wire.appendNode(newCtx.offset);
+				}
+				//(newCtx.over.type == "node") && console.log(`click on: ${newCtx.it.id} node: ${newCtx.over.node}`)
 			},
 			MOVE: function (newCtx: IMouseState) {
-				if ((this as StateMachine).ctx.event == "down"
-					&& (this as StateMachine).ctx.button == 0) {
-					app.state.transition(State.WIRE_EDIT_EC_DRAG, Action.START, newCtx);
+				let
+					self = this as StateMachine,
+					prevNodePos = self.ctx.wiring.wire.getNode(self.ctx.wiring.wire.last - 1),
+					r = 7,
+					angle = Math.atan2(newCtx.offset.y - prevNodePos.y, newCtx.offset.x - prevNodePos.x),
+					p = new Point((newCtx.offset.x - r * Math.cos(angle)) | 0,
+						(newCtx.offset.y - r * Math.sin(angle)) | 0);
+				self.ctx.wiring.wire.setNode(self.ctx.wiring.wire.last, p);
+
+				(newCtx.over.type == "node")
+					&& !newCtx.it.highlighted
+					&& !((newCtx.over.node == self.ctx.wiring.start.node) && (newCtx.it.id == self.ctx.wiring.start.ec.id))
+					&& (self.ctx.disableOut = true, newCtx.it.showNode(newCtx.over.node));
+
+				//(newCtx.over.type == "node") && console.log(`move over: ${newCtx.it.id} node: ${newCtx.over.node}`);
+			},
+			AFTER_DELETE: function (deletedId: any) {
+				if ((this as StateMachine).ctx.wiring.wire.id == deletedId) {
+					//cancel all, components are already disconnected
+					delete (this as StateMachine).ctx.wiring;
+					app.state.transition(State.WIRING, Action.RESUME, (this as StateMachine).ctx);
 				}
 			},
-			OUT: actionOutOfTool,
-			DOWN: actionDefaultCopyNewState,
 			//transitions
 			START: function (newCtx: IMouseState) {
-				(this as StateMachine).ctx = newCtx;	//save new context
-			}
-		}
-	});
-	app.state.register(<IMachineState>{
-		key: State.WIRE_EDIT_EC_DRAG,
-		overType: "deny",
-		actions: {
-			MOVE: function (newCtx: IMouseState) {
-				//newCtx.offset has the updated offset, don't save anything here
-				(this as StateMachine).ctx.dragging.forEach(comp => {
-					let
-						p = Point.minus(newCtx.offset, comp.offset);
-					comp.ec.move(p.x, p.y);
-				});
-				(newCtx.it.id == app.winProps.compId) && app.winProps.property("p")?.refresh();
-			},
-			OUT: function () {
-				//has to be empty so dragging is not STOP when passing over another component
-				//console.log("ec_dragging.OUT");
-			},
-			DEFAULT: function (newCtx: IMouseState) {
-				//this catches the UP action too, stops dragging
-				removeClass(app.svgBoard, (this as StateMachine).ctx.className);
-				app.state.transition(State.WIRE_EDIT_EC, Action.START, newCtx);
-			},
-			//transitions
-			START: function (newCtx: IMouseState) {
+				actionDefaultCopyNewState(newCtx);
 				let
-					self = this as StateMachine;
-				self.ctx = newCtx;						//save new context
-				addClass(app.svgBoard, self.ctx.className = "dragging");		//show mouse cursor
-				//we've just one component here,  new way for multiple drag
-				self.ctx.dragging = [{
-					ec: newCtx.it,
-					offset: Point.minus(newCtx.offset, newCtx.it.p)
-				}]
+					self = this as StateMachine,
+					node = self.ctx.it.getNode(newCtx.over.node),
+					p = new Point(node && node.x, node && node.y);
+				self.ctx.it.hideNode();
+				if (!node)
+					throw `no node`;
+				p = Point.plus(p, self.ctx.it.p);
+				self.ctx.wiring = {
+					wire: new Wire(<IItemWireOptions>{
+						points: <IPoint[]>[
+							p,
+							p]
+					}),
+					start: {
+						ec: self.ctx.it,
+						node: newCtx.over.node
+					}
+				};
+				app.addComponent(self.ctx.wiring.wire);
+				//bond components
+				self.ctx.it.bond(self.ctx.over.node, self.ctx.wiring.wire, 0);
 			}
 		}
 	});
@@ -767,9 +909,20 @@ window.addEventListener("DOMContentLoaded", () => {
 			//////////////////// TESTINGS /////////////////
 
 			//create default EC first
-			app.addComponent(<string>app.prop("comp_option").value);
+			app.addComponent(createEC(<string>app.prop("comp_option").value));
 
-			(<any>window).wire = app.addComponent("wire");
+			//this's temporary, until create wire tool works
+			//wire.setPoints([{x:50,y:100}, {x:200,y:100}, {x:200, y:25}, {x:250,y:25}])
+			/*
+			app.addComponent(new Wire((<IItemWireOptions>{
+				points: <IPoint[]>[
+					{ x: 25, y: 50 },
+					{ x: 25, y: 100 },
+					{ x: 200, y: 100 },
+					{ x: 200, y: 25 },
+					{ x: 250, y: 25 }]
+			})));
+			*/
 
 			//testings
 			//to debug faster
@@ -816,11 +969,10 @@ function updateViewBox(arg: any) {
 		mainHeight = qS("body").offsetHeight - qS("body>header").offsetHeight - qS("body>footer").offsetHeight;
 	qS("body>main").style.height = mainHeight + "px";
 	//update svg board height
-	//app.svgBoard.style.height = (mainHeight) + "px";
 	app.board.style.height = mainHeight + "px";
 	//set app reference size
 	app.size = new Size(arg.width, arg.height);
-	app.contentHeight = mainHeight; console.log(mainHeight);
+	app.contentHeight = mainHeight; //console.log(mainHeight);
 	//set SVG viewBox values
 	app.setViewBox(<any>undefined);
 	//console.log(event, arg)

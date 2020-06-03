@@ -26,7 +26,10 @@ export default class StateMachine implements IStateMachine {
 
 	//console logging
 	get log(): boolean { return this.settings.log }
-	set log(value: boolean) { this.settings.log = !!value }
+	set log(value: boolean) {
+		(this.settings.log = !!value)
+			&& console.log(`[${StateType[this.value]}]`)	// to visually track who got the action
+	}
 
 	//development
 	private sendCmd: string;
@@ -96,17 +99,17 @@ export default class StateMachine implements IStateMachine {
 					break;
 			}
 		} else {
-			//get ON action first for current state
-			// if not try to get common action
-			// fall back to default action if available
-			fn = (<any>current.actions)[actionName]
-				|| this.settings.commonActions.get(actionName)
-				|| (<any>current.actions)[actionName = "DEFAULT"];
+			fn = (<any>current.actions)[actionName]					// first priority in state[action]
+				|| this.settings.commonActions.get(actionName)		// second priority are common actions to all states
+				|| (<any>current.actions)[actionName = "DEFAULT"];	// third priority is stae.DEFAULT action
 		}
 
 		if (this.log && newSendCmd != this.sendCmd) {
 			let
 				postSendCmd = `  ::${actionName}`;
+			//for ENTER show current state, to visually track who got the action
+			(action == ActionType.ENTER) &&
+				console.log(`[${StateType[this.value]}]`);
 			console.log(`${this.sendCmd = newSendCmd}${newSendCmd != postSendCmd ? " -> " + postSendCmd : ""}${fn ? "" : " not found"}`);
 		}
 
@@ -127,7 +130,7 @@ export default class StateMachine implements IStateMachine {
 		const newStateDef: IMachineState = this.state(stateName);
 		if (!newStateDef)
 			return false;
-		this.log && (this.value != state) && console.log(`[${stateName}]`);
+		this.log && console.log(`[${stateName}]${this.value == state ? " same state" : ""}`);
 		//save new state to receive SEND commands
 		this.settings.value = state;
 		//

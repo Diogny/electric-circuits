@@ -76,9 +76,9 @@ export abstract class ItemSolid extends ItemBoard {
 				y = Math.min.apply(Math, points.map(a => a.y)),
 				w = Math.max.apply(Math, points.map(a => a.x)),
 				h = Math.max.apply(Math, points.map(a => a.y));
-			return new Rect(new Point(Math.round(p.x + x), Math.round(p.y + y)), new Size(Math.round(w - x), Math.round(h - y)))
+			return new Rect(Math.round(p.x + x), Math.round(p.y + y), Math.round(w - x), Math.round(h - y))
 		}
-		return new Rect(p, size)
+		return new Rect(p.x, p.y, size.width, size.height)
 	}
 
 }

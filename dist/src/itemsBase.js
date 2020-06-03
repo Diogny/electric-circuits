@@ -18,7 +18,6 @@ var utils_1 = require("./utils");
 var colors_1 = require("./colors");
 var item_1 = require("./item");
 var rect_1 = require("./rect");
-var size_1 = require("./size");
 var point_1 = require("./point");
 var ItemBase = /** @class */ (function (_super) {
     __extends(ItemBase, _super);
@@ -63,7 +62,9 @@ var ItemBase = /** @class */ (function (_super) {
         enumerable: false,
         configurable: true
     });
-    ItemBase.prototype.rect = function () { return new rect_1.default(this.p, size_1.default.create(this.box)); };
+    ItemBase.prototype.rect = function () {
+        return new rect_1.default(this.p.x, this.p.y, this.box.width, this.box.height); //return new Rect(this.p, Size.create(this.box))
+    };
     ItemBase.prototype.setVisible = function (value) {
         _super.prototype.setVisible.call(this, value);
         this.visible ? dab_1.removeClass(this.g, "hide") : dab_1.addClass(this.g, "hide");

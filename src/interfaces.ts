@@ -11,6 +11,7 @@ import StateMachine from "./stateMachine";
 import { ItemBoard } from "./itemsBoard";
 import { Application } from "./app";
 import EcProp from "./ecprop";
+import Wire from "./wire";
 
 export interface IExec {
 	result: any;
@@ -130,9 +131,11 @@ export interface IMouseState {
 	className: string;
 	nodeNumber: number;
 	isEdgeNode: boolean;
+	disableOut: boolean;
 	bond: { ec: ItemBoard, node: number };
 	A: IPoint;
 	B: IPoint;
+	wiring: { wire: Wire, start: { ec: ItemBoard, node: number } };
 }
 
 export interface ICompOverState {
@@ -152,6 +155,8 @@ export interface ISize {
 	width: number;
 	height: number;
 }
+
+export interface IRect extends IPoint, ISize { }
 
 //***************************************** Component ************************************//
 export interface IComponentOptions {
@@ -416,16 +421,18 @@ export enum StateType {
 	IDLE = 1,						// idle
 	DEFAULT = 2,
 	BOARD = 3,						// board
-	EC_NODE = 4,					// ec_node
-	EC_DRAG = 5,					// ec_dragging
-	EC_BODY = 6,					// ec_body
-	WIRE_LINE = 7,					// wire_line
-	WIRE_EDIT = 8,					// wire_edit
-	WIRE_EDIT_NODE = 9,				// wire_node
-	WIRE_EDIT_NODE_DRAG = 10,		// wire_node_dragging
-	WIRE_EDIT_LINE_DRAG = 11,		// wire_line_dragging
-	WIRE_EDIT_EC = 12,
-	WIRE_EDIT_EC_DRAG = 13
+	EC_NODE = 4,
+	EC_DRAG = 5,
+	EC_BODY = 6,
+	WIRE_LINE = 7,
+	WIRING = 8,						// WIRING
+	WIRING_WIRE_NODE = 9,
+	WIRING_WIRE_NODE_DRAG = 10,
+	WIRING_LINE_DRAG = 11,
+	WIRING_EC_BODY = 12,
+	WIRING_EC_BODY_DRAG = 13,
+	WIRING_WIRE_NEW = 14,
+	WIRING_EC_NODE = 15
 }
 
 export enum ActionType {
@@ -444,6 +451,7 @@ export enum ActionType {
 	SHOW_NODE_TOOLTIP = 18,
 	SHOW_BODY_TOOLTIP = 19,
 	FORWARD_OVER = 20,
+	KEY = 40,
 
 	//unified actions
 	SELECT = 100,						//"Select"						7
@@ -454,6 +462,7 @@ export enum ActionType {
 	DELETE = 110,						//"Delete"						10
 	DELETE_SELECTED = 111,				//
 	DELETE_ALL = 112,					//"Remove All"
+	AFTER_DELETE = 113,
 	SHOW_PROPERTIES = 200,				//"Properties"					11
 	BRING_TO_FRONT = 201,				//"Bring to Front"				3
 	ROTATE_45_CLOCKWISE = 202,			//"Rotate 45 clockwise"			20

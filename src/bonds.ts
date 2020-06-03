@@ -13,8 +13,8 @@ export default class Bond implements TypedClass {
 
 	get count(): number { return this.to.length }
 
-	// [0>id-0(Y), -1>id-1(12)]
-	get link(): string { return `${this.from.ndx}>${this.to[0].id}(${this.to[0].ndx})` }
+	// 0>id-0(1)&id-1(12)
+	get link(): string { return `${this.from.ndx}>` + this.to.map(b => `${b.id}(${b.ndx})`).join('&') }
 
 	/**
 	 * @description implements a component bond, it must be created by default as a One-to-One bond

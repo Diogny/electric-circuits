@@ -1,42 +1,18 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var point_1 = require("./point");
 var Rect = /** @class */ (function () {
-    function Rect(location, size) {
-        this.location = location;
-        this.size = size;
+    function Rect(x, y, width, height) {
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
     }
-    Object.defineProperty(Rect.prototype, "x", {
-        get: function () { return this.location.x; },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Rect.prototype, "y", {
-        get: function () { return this.location.y; },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Rect.prototype, "width", {
-        get: function () { return this.size.width; },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Rect.prototype, "height", {
-        get: function () { return this.size.height; },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Rect.prototype, "w", {
-        get: function () { return this.location.x + this.size.width; },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Rect.prototype, "h", {
-        get: function () { return this.location.y + this.size.height; },
-        enumerable: false,
-        configurable: true
-    });
-    Rect.prototype.inside = function (p) { return point_1.default.inside(point_1.default.minus(p, this.location), this.size); };
+    Rect.prototype.inside = function (p) {
+        return p.x >= this.x && p.y >= this.y && p.x <= (this.x + this.width) && p.y <= (this.y + this.height);
+        // Point.inside(Point.minus(p, this.location), this.size)
+    };
+    Rect.create = function (r) { return new Rect(r.x, r.y, r.width, r.height); };
+    Rect.empty = function () { return new Rect(0, 0, 0, 0); };
     return Rect;
 }());
 exports.default = Rect;

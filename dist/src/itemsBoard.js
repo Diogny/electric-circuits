@@ -31,9 +31,9 @@ var ItemBoard = /** @class */ (function (_super) {
             throw "unknown component: " + _this.name;
         //save base data
         _this.settings.base = base.comp;
-        //use template to create id according to defined strategy
-        // nano(base.comp.meta.nameTmpl, { name: this.base.name, count: base.count++ });
+        //global component count incremented
         _this.settings.id = _this.base.name + "-" + base.count++;
+        //use template to create label according to defined strategy
         _this.label = base.comp.meta.nameTmpl.replace(regex, function (match, group) {
             var arr = group.split('.'), getRoot = function (name) {
                 //valid entry points
@@ -42,13 +42,13 @@ var ItemBoard = /** @class */ (function (_super) {
                     case "base": return base;
                     case "Comp": return components_1.default;
                 }
-            }, rootRef = getRoot(arr.shift()), prop = arr.pop(), result;
+            }, rootName = arr.shift() || "", rootRef = getRoot(rootName), prop = arr.pop(), result;
             while (rootRef && arr.length)
                 rootRef = rootRef[arr.shift()];
             if (rootRef == undefined || (result = rootRef[prop]) == undefined)
-                throw "invalid id naming template";
-            //increment counter if any
-            dab_1.isNum(result) && (rootRef[prop] = result + 1);
+                throw "invalid label template";
+            //increment counter only for static properties
+            (rootName == "Comp") && dab_1.isNum(result) && (rootRef[prop] = result + 1);
             return result;
         });
         //deep copy component properties

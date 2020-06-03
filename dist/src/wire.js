@@ -20,6 +20,7 @@ var types_1 = require("./types");
 var itemsBoard_1 = require("./itemsBoard");
 var components_1 = require("./components");
 var point_1 = require("./point");
+var rect_1 = require("./rect");
 var Wire = /** @class */ (function (_super) {
     __extends(Wire, _super);
     function Wire(options) {
@@ -79,6 +80,7 @@ var Wire = /** @class */ (function (_super) {
         enumerable: false,
         configurable: true
     });
+    Wire.prototype.rect = function () { return rect_1.default.create(this.box); };
     Object.defineProperty(Wire.prototype, "editMode", {
         //edit-mode
         get: function () { return this.settings.edit; },
@@ -165,6 +167,9 @@ var Wire = /** @class */ (function (_super) {
         p && (p = p.clone());
         return p;
     };
+    Wire.prototype.appendNode = function (p) {
+        return !this.editMode && (this.settings.points.push(p), this.refresh(), true);
+    };
     Wire.prototype.setNode = function (node, p) {
         //because no transformation, p is the same, just save it
         this.settings.points[node].x = p.x | 0; // remove decimals "trunc"
@@ -229,7 +234,7 @@ var Wire = /** @class */ (function (_super) {
             name: "wire",
             class: "wire",
             highlightNodeName: "node",
-            pad: 10,
+            pad: 5,
             color: "black",
             edit: false // initial is false
         });

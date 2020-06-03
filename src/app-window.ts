@@ -6,8 +6,6 @@ import Point from "./point";
 import EcProp from "./ecprop";
 import { MyApp } from "./myapp";
 import { ItemBoard } from "./itemsBoard";
-import { app } from "electron";
-import Size from "./size";
 
 export default class AppWindow extends BaseWindow {
 
@@ -150,6 +148,13 @@ export default class AppWindow extends BaseWindow {
 		});
 		this.setVisible(true);
 		return true;
+	}
+
+	public refresh() {
+		if (!this.compId)
+			return;
+		//refresh editable properties
+		this.settings.properties.forEach(p => p.refresh())
 	}
 
 	public appendPropChild(el: EcProp): AppWindow {

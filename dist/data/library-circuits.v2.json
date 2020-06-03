@@ -394,8 +394,8 @@
 	},
 	"data" : "<path svg-type='body' d='M 5,10 L 65,40 L 5,70 Z'/>
 <line x1='66' y1='10' x2='66' y2='65'/>
-<path svg-type='body' d='M 30,15 L 36.8,4.6 L 33,2 L 40,0 L 40,7.2 L 36.8,4.6'/>
-<path svg-type='body' d='M 43,23 L 49,13 L 45,10.2 L 52,8  L 52.9,15.5 L 49,13'/>
+<path svg-type='body' class='color' d='M 30,15 L 36.8,4.6 L 33,2 L 40,0 L 40,7.2 L 36.8,4.6'/>
+<path svg-type='body' class='color' d='M 43,23 L 49,13 L 45,10.2 L 52,8  L 52.9,15.5 L 49,13'/>
 <path svg-type='node' node='0' d='M 0,35 V45 H5 V35 Z'/>
 <path svg-type='node' node='1' d='M 66,35 V45 H71 V35 Z'/>"
 },
@@ -951,14 +951,14 @@
 		"nodes": {
 			"list" : [
 				{ "x": 0, "y": 30, "label": "node 0" },
-				{ "x": 35, "y": 30, "label": "node 1" }
+				{ "x": 32, "y": 30, "label": "node 1" }
 			]
 		}
 	},
 	"data" : "<rect svg-type='body' x='5' y='0' width='7' height='60'/>
 <rect svg-type='body' x='20' y='0' width='7' height='60'/>
 <path svg-type='node' node='0' d='M 0,25 V35 H5 V25 Z'/>
-<path svg-type='node' node='1' d='M 27,25 V35 H33 V25 Z'/>"
+<path svg-type='node' node='1' d='M 27,25 V35 H32 V25 Z'/>"
 },
 {
 	"type" : "capacitor",

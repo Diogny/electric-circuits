@@ -23,19 +23,22 @@ var point_1 = require("./point");
 var tooltip_1 = require("./tooltip");
 var dab_1 = require("./dab");
 var app_window_1 = require("./app-window");
-var wire_1 = require("./wire");
 var stateMachine_1 = require("./stateMachine");
 var components_1 = require("./components");
 var context_window_1 = require("./context-window");
-var ec_1 = require("./ec");
 var types_1 = require("./types");
 var MyApp = /** @class */ (function (_super) {
     __extends(MyApp, _super);
+    //temporary properties
+    //wire: Wire;
     function MyApp(options) {
         var _a;
         var _this = _super.call(this, options) || this;
         _this.tooltipFontSize = function () { return Math.max(10, 35 * _this.multiplier); };
-        var that = _this, 
+        var that = _this, hideNodeTooltip = function (newCtx) {
+            newCtx.it && newCtx.it.hideNode();
+            that.tooltip.setVisible(false);
+        }, 
         //HTML
         getClientXY = function (ev) {
             return new point_1.default(ev.clientX - that.board.offsetLeft, ev.clientY - that.board.offsetTop);
@@ -93,7 +96,7 @@ var MyApp = /** @class */ (function (_super) {
         _this.compList = new Map();
         _this.selectedComponents = [];
         //location is panning, size is for scaling
-        _this.viewBox = new rect_1.default(point_1.default.origin, size_1.default.empty);
+        _this.viewBox = rect_1.default.empty();
         //scaling multipler
         _this.multiplier = 0.5; // 2X UI default
         //this's a const value
@@ -129,10 +132,15 @@ var MyApp = /** @class */ (function (_super) {
             log: (_a = _this.prop("cons_log")) === null || _a === void 0 ? void 0 : _a.value,
             ctx: {},
             commonActions: {
-                HIDE_NODE: function (newCtx) {
-                    newCtx.it && newCtx.it.hideNode();
-                    that.tooltip.setVisible(false);
+                ENTER: function (newCtx) {
+                    that.state.ctx = newCtx; //for now just copy data
                 },
+                LEAVE: function (newCtx) {
+                    //cannot save new context, erases wiring status
+                    hideNodeTooltip(newCtx);
+                    that.topBarLeft.innerHTML = "&nbsp;";
+                },
+                HIDE_NODE: hideNodeTooltip,
                 SHOW_BODY_TOOLTIP: function (newCtx) {
                     var _a;
                     var p = point_1.default.translateBy(newCtx.offset, 20);
@@ -142,21 +150,24 @@ var MyApp = /** @class */ (function (_super) {
                         .setText((_a = newCtx.it) === null || _a === void 0 ? void 0 : _a.id);
                 },
                 SHOW_NODE_TOOLTIP: function (newCtx) {
-                    var _a, _b, _c, _d;
+                    var _a;
                     //data has current state
-                    if (!((_a = newCtx.it) === null || _a === void 0 ? void 0 : _a.highlighted)) {
-                        (_b = newCtx.it) === null || _b === void 0 ? void 0 : _b.showNode(newCtx.over.node);
-                        var p = point_1.default.translateBy(newCtx.offset, 20), label = (_d = (_c = newCtx.it) === null || _c === void 0 ? void 0 : _c.getNode(newCtx.over.node)) === null || _d === void 0 ? void 0 : _d.label;
-                        that.tooltip.setVisible(true)
-                            .move(p.x, p.y)
-                            .setFontSize(that.tooltipFontSize())
-                            .setText(newCtx.over.node + " -" + label);
+                    if (newCtx.it) {
+                        if (!newCtx.it.highlighted) {
+                            !newCtx.it.nodeBonds(newCtx.over.node)
+                                && newCtx.it.showNode(newCtx.over.node);
+                            var p = point_1.default.translateBy(newCtx.offset, 20), label = ((_a = newCtx.it.getNode(newCtx.over.node)) === null || _a === void 0 ? void 0 : _a.label) || "unknown";
+                            that.tooltip.setVisible(true)
+                                .move(p.x, p.y)
+                                .setFontSize(that.tooltipFontSize())
+                                .setText(newCtx.over.node + " -" + label);
+                        }
                     }
                 },
                 FORWARD_OVER: function (newCtx) {
                     //accepts transitions to new state on mouse OVER
                     var prefix = !newCtx.it ? "" : newCtx.it.type == 1 ? "EC_" : "WIRE_", stateName = (prefix + newCtx.over.type).toUpperCase(), state = interfaces_1.StateType[stateName];
-                    that.state.transition(state, interfaces_1.ActionType.START, newCtx); //EC_NODE		WIRE_EDIT_NODE
+                    that.state.transition(state, interfaces_1.ActionType.START, newCtx); //EC_NODE		WIRE_NODE
                 }
             }
         });
@@ -206,16 +217,19 @@ var MyApp = /** @class */ (function (_super) {
                     .setVisible(true);
         }, false);
         document.onkeydown = function (ev) {
-            switch (ev.keyCode) {
-                case 13: // ENTER
-                case 27: // ESC
-                case 37: // LEFT
-                case 38: // UP
-                case 39: // RIGHT
-                case 40: // DOWN
-                case 46: // DEL
+            //https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/code
+            switch (ev.code) {
+                case 'Enter':
+                case 'Escape':
+                case 'ArrowLeft':
+                case 'ArrowUp':
+                case 'ArrowRight':
+                case 'ArrowDown':
+                case 'Delete':
+                    that.state.send(interfaces_1.ActionType.KEY, ev.code);
                     break;
             }
+            //console.log(ev.code)
         };
         return _this;
     }
@@ -229,7 +243,7 @@ var MyApp = /** @class */ (function (_super) {
     });
     MyApp.prototype.insideBoard = function (p) {
         //later include panning
-        return p.x > 0 && p.y > 0 && p.x < this.viewBox.size.width && p.y < this.viewBox.size.height;
+        return p.x > 0 && p.y > 0 && p.x < this.viewBox.width && p.y < this.viewBox.height;
     };
     MyApp.prototype.setViewBox = function (m) {
         if (!m) {
@@ -240,7 +254,11 @@ var MyApp = /** @class */ (function (_super) {
         this.multiplier = m;
         this.baseViewBox = new size_1.default(this.board.clientWidth * this.ratio | 0, this.board.clientHeight * this.ratio | 0);
         //calculate size
-        this.viewBox.size = new size_1.default(this.baseViewBox.width * this.multiplier | 0, this.baseViewBox.height * this.multiplier | 0);
+        this.viewBox.width = this.baseViewBox.width * this.multiplier | 0;
+        this.viewBox.height = this.baseViewBox.height * this.multiplier | 0;
+        //this.viewBox.size = new Size(
+        //	this.baseViewBox.width * this.multiplier | 0,
+        //	this.baseViewBox.height * this.multiplier | 0);
         //set SVG DOM viewBox attribute
         dab_1.attr(this.svgBoard, { "viewBox": this.viewBox.x + " " + this.viewBox.y + " " + this.viewBox.width + " " + this.viewBox.height });
         //calculate ratio
@@ -258,31 +276,7 @@ var MyApp = /** @class */ (function (_super) {
         return (Math.abs(ratio - 4 / 3) < Math.abs(ratio - 16 / 9)) ? '4:3' : '16:9';
     };
     MyApp.prototype.hasComponent = function (id) { return this.compList.has(id); };
-    MyApp.prototype.addComponent = function (name) {
-        var comp = void 0;
-        if (name == "wire") {
-            //this's temporary, until create wire tool works
-            //wire.setPoints([{x:50,y:100}, {x:200,y:100}, {x:200, y:25}, {x:250,y:25}])
-            comp = this.wire = new wire_1.default({
-                points: [
-                    { x: 25, y: 50 },
-                    { x: 25, y: 100 },
-                    { x: 200, y: 100 },
-                    { x: 200, y: 25 },
-                    { x: 250, y: 25 }
-                ]
-            });
-        }
-        else {
-            comp = new ec_1.default({
-                name: name,
-                x: this.center.x,
-                y: this.center.y,
-                onProp: function (e) {
-                    //this happens when this component is created
-                }
-            });
-        }
+    MyApp.prototype.addComponent = function (comp) {
         if (comp) {
             if (this.hasComponent(comp.id))
                 throw "duplicated component " + comp.id;
@@ -326,7 +320,9 @@ var MyApp = /** @class */ (function (_super) {
                     comp.select(!comp.selected);
                     this.selectedComponents = Array.from(this.compList.values()).filter(function (c) { return c.selected; });
                     this.refreshRotation(this.ec);
-                    (this.ec && (this.winProps.load(this.ec), window.ec = this.ec, 1)) || this.winProps.clear();
+                    (this.ec && (this.winProps.load(this.ec), 1)) || this.winProps.clear();
+                    //temporary, for testings...
+                    this.ec && (window.ec = this.ec);
                 }
                 break;
             case interfaces_1.ActionType.SELECT:
@@ -357,30 +353,33 @@ var MyApp = /** @class */ (function (_super) {
                 break;
             case interfaces_1.ActionType.DELETE:
                 if (!(compNull = !comp)) {
-                    //disconnects and remove component from DOM
-                    comp.disconnect();
-                    comp.remove();
-                    this.compList.delete(comp.id);
-                    this.selectedComponents = Array.from(this.compList.values()).filter(function (c) { return c.selected; });
-                    this.refreshRotation();
-                    (this.winProps.compId == comp.id) && this.winProps.clear();
-                    this.tooltip.setVisible(false);
-                    //temporary, for testings...
-                    window.ec = void 0;
+                    if (this.compList.delete(comp.id)) {
+                        //disconnects and remove component from DOM
+                        comp.disconnect();
+                        comp.remove();
+                        this.selectedComponents = Array.from(this.compList.values()).filter(function (c) { return c.selected; });
+                        this.refreshRotation();
+                        if (this.winProps.compId == comp.id)
+                            this.winProps.clear();
+                        else
+                            this.winProps.refresh();
+                        this.tooltip.setVisible(false);
+                        //temporary, for testings...
+                        window.ec = void 0;
+                        this.state.send(interfaces_1.ActionType.AFTER_DELETE, comp.id);
+                    }
+                    else
+                        console.log("component #" + comp.id + " could not be removed or it doesn't exists");
                 }
                 break;
             case interfaces_1.ActionType.SHOW_PROPERTIES:
-                if (!(compNull = !comp)) {
-                    this.winProps.load(comp);
-                }
+                !(compNull = !comp) && this.winProps.load(comp);
                 break;
             case interfaces_1.ActionType.ROTATE_45_CLOCKWISE:
             case interfaces_1.ActionType.ROTATE_45_COUNTER_CLOCKWISE:
             case interfaces_1.ActionType.ROTATE_90_CLOCKWISE:
             case interfaces_1.ActionType.ROTATE_90_COUNTER_CLOCKWISE:
-                if (!(compNull = !comp) && data) {
-                    this.rotateComponentBy(data | 0, comp);
-                }
+                !(compNull = !comp) && data && this.rotateComponentBy(data | 0, comp);
                 break;
         }
         //logs

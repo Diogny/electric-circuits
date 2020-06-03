@@ -83,9 +83,9 @@ var ItemSolid = /** @class */ (function (_super) {
             //rotate (0,0) (width,0) (width,height) (0,height) and get the boundaries respectivelly to the location (x,y)
             var origin_1 = this.origin, angle_1 = -this.rotation, points = [[0, 0], [size.width, 0], [0, size.height], [size.width, size.height]]
                 .map(function (p) { return new point_1.default(p[0], p[1]).rotateBy(origin_1.x, origin_1.y, angle_1); }), x = Math.min.apply(Math, points.map(function (a) { return a.x; })), y = Math.min.apply(Math, points.map(function (a) { return a.y; })), w = Math.max.apply(Math, points.map(function (a) { return a.x; })), h = Math.max.apply(Math, points.map(function (a) { return a.y; }));
-            return new rect_1.default(new point_1.default(Math.round(p.x + x), Math.round(p.y + y)), new size_1.default(Math.round(w - x), Math.round(h - y)));
+            return new rect_1.default(Math.round(p.x + x), Math.round(p.y + y), Math.round(w - x), Math.round(h - y));
         }
-        return new rect_1.default(p, size);
+        return new rect_1.default(p.x, p.y, size.width, size.height);
     };
     return ItemSolid;
 }(itemsBoard_1.ItemBoard));

@@ -36,10 +36,9 @@ export abstract class ItemBoard extends ItemBase {
 			throw `unknown component: ${this.name}`;
 		//save base data
 		this.settings.base = base.comp;
-		//use template to create id according to defined strategy
-		// nano(base.comp.meta.nameTmpl, { name: this.base.name, count: base.count++ });
+		//global component count incremented
 		this.settings.id = `${this.base.name}-${base.count++}`;
-
+		//use template to create label according to defined strategy
 		this.label = base.comp.meta.nameTmpl.replace(regex,
 			function (match: string, group: string): string { //, offset: number, str: string
 				let
@@ -52,15 +51,16 @@ export abstract class ItemBoard extends ItemBase {
 							case "Comp": return Comp;
 						}
 					},
-					rootRef = getRoot(<string>arr.shift()),
+					rootName = arr.shift() || "",
+					rootRef = getRoot(rootName),
 					prop = arr.pop(),
 					result: any;
 				while (rootRef && arr.length)
 					rootRef = rootRef[<any>arr.shift()];
 				if (rootRef == undefined || (result = rootRef[<any>prop]) == undefined)
-					throw `invalid id naming template`;
-				//increment counter if any
-				isNum(result) && (rootRef[<any>prop] = result + 1)
+					throw `invalid label template`;
+				//increment counter only for static properties
+				(rootName == "Comp") && isNum(result) && (rootRef[<any>prop] = result + 1)
 				return result;
 			});
 		//deep copy component properties

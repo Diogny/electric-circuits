@@ -1,22 +1,17 @@
 
-import Point from "./point";
-import { IPoint, ISize } from "./interfaces";
+import { IPoint, IRect } from "./interfaces";
 
-export default class Rect {
+export default class Rect implements IRect {
 
-	constructor(public location: IPoint, public size: ISize) { }
+	constructor(public x: number, public y: number, public width: number, public height: number) { }
 
-	public get x(): number { return this.location.x }
+	public inside(p: IPoint): boolean {
 
-	public get y(): number { return this.location.y }
+		return p.x >= this.x && p.y >= this.y && p.x <= (this.x + this.width) && p.y <= (this.y + this.height)
+		// Point.inside(Point.minus(p, this.location), this.size)
+	}
 
-	public get width(): number { return this.size.width }
+	public static create(r: IRect) { return new Rect(r.x, r.y, r.width, r.height) }
 
-	public get height(): number { return this.size.height }
-
-	public get w(): number { return this.location.x + this.size.width }
-
-	public get h(): number { return this.location.y + this.size.height }
-
-	public inside(p: IPoint): boolean { return Point.inside(Point.minus(p, this.location), this.size) }
+	public static empty() { return new Rect(0, 0, 0, 0) }
 }

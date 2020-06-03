@@ -21,7 +21,6 @@ var components_1 = require("./components");
 var point_1 = require("./point");
 var itemSolid_1 = require("./itemSolid");
 var rect_1 = require("./rect");
-var size_1 = require("./size");
 var label_1 = require("./label");
 var EC = /** @class */ (function (_super) {
     __extends(EC, _super);
@@ -135,7 +134,7 @@ var EC = /** @class */ (function (_super) {
         return dab_1.obj(pin);
     };
     EC.prototype.overNode = function (p, ln) {
-        var px = (p.x - this.x) - 5, py = (p.y - this.y) - 5, rect = new rect_1.default(new point_1.default(px, py), new size_1.default(10, 10));
+        var px = (p.x - this.x) - 5, py = (p.y - this.y) - 5, rect = new rect_1.default(px, py, 10, 10);
         for (var i = 0, len = this.count; i < len; i++) {
             var pin = this.getNode(i);
             if (this.rotation) {

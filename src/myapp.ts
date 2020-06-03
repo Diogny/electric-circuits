@@ -17,6 +17,7 @@ import ContextWindow from "./context-window";
 import { ItemBoard } from "./itemsBoard";
 import EC from "./ec";
 import { Type } from "./types";
+import { app } from "electron";
 
 export class MyApp extends Application implements IMyApp {
 
@@ -49,12 +50,16 @@ export class MyApp extends Application implements IMyApp {
 	}
 
 	//temporary properties
-	wire: Wire;
+	//wire: Wire;
 
 	constructor(options: IApplicationOptions) {
 		super(options);
 		let
 			that: MyApp = this,
+			hideNodeTooltip = (newCtx: IMouseState) => {
+				newCtx.it && newCtx.it.hideNode();
+				that.tooltip.setVisible(false);
+			},
 			//HTML
 			getClientXY = (ev: MouseEvent) =>
 				new Point(ev.clientX - that.board.offsetLeft, ev.clientY - that.board.offsetTop),
@@ -116,7 +121,7 @@ export class MyApp extends Application implements IMyApp {
 		this.compList = new Map();
 		this.selectedComponents = [];
 		//location is panning, size is for scaling
-		this.viewBox = new Rect(Point.origin, Size.empty);
+		this.viewBox = Rect.empty();
 		//scaling multipler
 		this.multiplier = 0.5;  // 2X UI default
 		//this's a const value
@@ -153,10 +158,15 @@ export class MyApp extends Application implements IMyApp {
 			log: this.prop("cons_log")?.value,
 			ctx: <IMouseState>{},
 			commonActions: {
-				HIDE_NODE: function (newCtx: IMouseState) {
-					newCtx.it && newCtx.it.hideNode();
-					that.tooltip.setVisible(false);
+				ENTER: function (newCtx: IMouseState) {
+					that.state.ctx = newCtx;		//for now just copy data
 				},
+				LEAVE: function (newCtx: IMouseState) {
+					//cannot save new context, erases wiring status
+					hideNodeTooltip(newCtx);
+					that.topBarLeft.innerHTML = "&nbsp;";
+				},
+				HIDE_NODE: hideNodeTooltip,
 				SHOW_BODY_TOOLTIP: function (newCtx: IMouseState) {
 					let
 						p = Point.translateBy(newCtx.offset, 20);
@@ -167,15 +177,18 @@ export class MyApp extends Application implements IMyApp {
 				},
 				SHOW_NODE_TOOLTIP: function (newCtx: IMouseState) {
 					//data has current state
-					if (!newCtx.it?.highlighted) {
-						newCtx.it?.showNode(<number>newCtx.over.node);
-						let
-							p = Point.translateBy(newCtx.offset, 20),
-							label = newCtx.it?.getNode(newCtx.over.node)?.label;
-						that.tooltip.setVisible(true)
-							.move(p.x, p.y)
-							.setFontSize(that.tooltipFontSize())
-							.setText(`${newCtx.over.node} -${label}`);
+					if (newCtx.it) {
+						if (!newCtx.it.highlighted) {
+							!newCtx.it.nodeBonds(newCtx.over.node)
+								&& newCtx.it.showNode(newCtx.over.node);
+							let
+								p = Point.translateBy(newCtx.offset, 20),
+								label = newCtx.it.getNode(newCtx.over.node)?.label || "unknown";
+							that.tooltip.setVisible(true)
+								.move(p.x, p.y)
+								.setFontSize(that.tooltipFontSize())
+								.setText(`${newCtx.over.node} -${label}`);
+						}
 					}
 				},
 				FORWARD_OVER: function (newCtx: IMouseState) {
@@ -184,7 +197,7 @@ export class MyApp extends Application implements IMyApp {
 						prefix = !newCtx.it ? "" : newCtx.it.type == 1 ? "EC_" : "WIRE_",
 						stateName = (prefix + newCtx.over.type).toUpperCase(),
 						state = <StateType><unknown>StateType[<any>stateName];
-					that.state.transition(state, ActionType.START, newCtx);	//EC_NODE		WIRE_EDIT_NODE
+					that.state.transition(state, ActionType.START, newCtx);	//EC_NODE		WIRE_NODE
 				}
 			}
 		});
@@ -242,22 +255,25 @@ export class MyApp extends Application implements IMyApp {
 					.setVisible(true);
 		}, false);
 		document.onkeydown = function (ev: KeyboardEvent) {
-			switch (ev.keyCode) {
-				case 13:	// ENTER
-				case 27:	// ESC
-				case 37:	// LEFT
-				case 38:	// UP
-				case 39:	// RIGHT
-				case 40:	// DOWN
-				case 46:	// DEL
+			//https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/code
+			switch (ev.code) {
+				case 'Enter':
+				case 'Escape':
+				case 'ArrowLeft':
+				case 'ArrowUp':
+				case 'ArrowRight':
+				case 'ArrowDown':
+				case 'Delete':
+					that.state.send(ActionType.KEY, ev.code);
 					break;
 			}
+			//console.log(ev.code)
 		}
 	}
 
 	public insideBoard(p: Point): boolean {
 		//later include panning
-		return p.x > 0 && p.y > 0 && p.x < this.viewBox.size.width && p.y < this.viewBox.size.height
+		return p.x > 0 && p.y > 0 && p.x < this.viewBox.width && p.y < this.viewBox.height
 	}
 
 	public setViewBox(m: number) {
@@ -270,9 +286,12 @@ export class MyApp extends Application implements IMyApp {
 		this.multiplier = m;
 		this.baseViewBox = new Size(this.board.clientWidth * this.ratio | 0, this.board.clientHeight * this.ratio | 0);
 		//calculate size
-		this.viewBox.size = new Size(
-			this.baseViewBox.width * this.multiplier | 0,
-			this.baseViewBox.height * this.multiplier | 0);
+		this.viewBox.width = this.baseViewBox.width * this.multiplier | 0;
+		this.viewBox.height = this.baseViewBox.height * this.multiplier | 0;
+		//this.viewBox.size = new Size(
+		//	this.baseViewBox.width * this.multiplier | 0,
+		//	this.baseViewBox.height * this.multiplier | 0);
+
 		//set SVG DOM viewBox attribute
 		attr(this.svgBoard, { "viewBox": `${this.viewBox.x} ${this.viewBox.y} ${this.viewBox.width} ${this.viewBox.height}` });
 		//calculate ratio
@@ -297,31 +316,7 @@ export class MyApp extends Application implements IMyApp {
 
 	public hasComponent(id: string): boolean { return this.compList.has(id); }
 
-	public addComponent(name: string): ItemBoard {
-		let
-			comp: ItemBoard = <any>void 0;
-
-		if (name == "wire") {
-			//this's temporary, until create wire tool works
-			//wire.setPoints([{x:50,y:100}, {x:200,y:100}, {x:200, y:25}, {x:250,y:25}])
-			comp = this.wire = new Wire((<IItemWireOptions>{
-				points: <IPoint[]>[
-					{ x: 25, y: 50 },
-					{ x: 25, y: 100 },
-					{ x: 200, y: 100 },
-					{ x: 200, y: 25 },
-					{ x: 250, y: 25 }]
-			}))
-		} else {
-			comp = new EC(<IItemSolidOptions><unknown>{
-				name: name,
-				x: this.center.x,
-				y: this.center.y,
-				onProp: function (e: any) {
-					//this happens when this component is created
-				}
-			})
-		}
+	public addComponent(comp: ItemBoard): ItemBoard {
 		if (comp) {
 			if (this.hasComponent(comp.id))
 				throw `duplicated component ${comp.id}`;
@@ -380,7 +375,9 @@ export class MyApp extends Application implements IMyApp {
 					comp.select(!comp.selected);
 					this.selectedComponents = Array.from(this.compList.values()).filter(c => c.selected);
 					this.refreshRotation(this.ec);
-					(this.ec && (this.winProps.load(this.ec), (<any>window).ec = this.ec, 1)) || this.winProps.clear();
+					(this.ec && (this.winProps.load(this.ec), 1)) || this.winProps.clear();
+					//temporary, for testings...
+					this.ec && ((<any>window).ec = this.ec);
 				}
 				break;
 			case ActionType.SELECT:
@@ -411,30 +408,33 @@ export class MyApp extends Application implements IMyApp {
 				break;
 			case ActionType.DELETE:
 				if (!(compNull = !comp)) {
-					//disconnects and remove component from DOM
-					comp.disconnect();
-					comp.remove();
-					this.compList.delete(comp.id);
-					this.selectedComponents = Array.from(this.compList.values()).filter(c => c.selected);
-					this.refreshRotation();
-					(this.winProps.compId == comp.id) && this.winProps.clear();
-					this.tooltip.setVisible(false);
-					//temporary, for testings...
-					(<any>window).ec = void 0;
+					if (this.compList.delete(comp.id)) {
+						//disconnects and remove component from DOM
+						comp.disconnect();
+						comp.remove();
+						this.selectedComponents = Array.from(this.compList.values()).filter(c => c.selected);
+						this.refreshRotation();
+						if (this.winProps.compId == comp.id)
+							this.winProps.clear()
+						else
+							this.winProps.refresh();
+						this.tooltip.setVisible(false);
+						//temporary, for testings...
+						(<any>window).ec = void 0;
+						this.state.send(ActionType.AFTER_DELETE, comp.id);
+					}
+					else
+						console.log(`component #${comp.id} could not be removed or it doesn't exists`)
 				}
 				break;
 			case ActionType.SHOW_PROPERTIES:
-				if (!(compNull = !comp)) {
-					this.winProps.load(comp);
-				}
+				!(compNull = !comp) && this.winProps.load(comp);
 				break;
 			case ActionType.ROTATE_45_CLOCKWISE:
 			case ActionType.ROTATE_45_COUNTER_CLOCKWISE:
 			case ActionType.ROTATE_90_CLOCKWISE:
 			case ActionType.ROTATE_90_COUNTER_CLOCKWISE:
-				if (!(compNull = !comp) && data) {
-					this.rotateComponentBy(<any>data | 0, comp);
-				}
+				!(compNull = !comp) && data && this.rotateComponentBy(<any>data | 0, comp);
 				break;
 		}
 		//logs

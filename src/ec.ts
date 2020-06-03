@@ -138,7 +138,7 @@ export default class EC extends ItemSolid {
 		let
 			px = (p.x - this.x) - 5,
 			py = (p.y - this.y) - 5,
-			rect = new Rect(new Point(px, py), new Size(10, 10));
+			rect = new Rect(px, py, 10, 10);
 		for (let i = 0, len = this.count; i < len; i++) {
 			let
 				pin = this.getNode(i);

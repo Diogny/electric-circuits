@@ -36,8 +36,8 @@ var Bond = /** @class */ (function () {
         configurable: true
     });
     Object.defineProperty(Bond.prototype, "link", {
-        // [0>id-0(Y), -1>id-1(12)]
-        get: function () { return this.from.ndx + ">" + this.to[0].id + "(" + this.to[0].ndx + ")"; },
+        // 0>id-0(1)&id-1(12)
+        get: function () { return this.from.ndx + ">" + this.to.map(function (b) { return b.id + "(" + b.ndx + ")"; }).join('&'); },
         enumerable: false,
         configurable: true
     });

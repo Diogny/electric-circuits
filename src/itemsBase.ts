@@ -5,7 +5,6 @@ import { Color } from './colors';
 import { IItemBaseProperties, IItemBaseOptions, ISize } from './interfaces';
 import Item from './item';
 import Rect from './rect';
-import Size from './size';
 import Point from './point';
 
 export default abstract class ItemBase extends Item {
@@ -30,7 +29,9 @@ export default abstract class ItemBase extends Item {
 		return new Point((b.x + b.width / 2) | 0, (b.y + b.height / 2) | 0);
 	}
 
-	public rect(): Rect { return new Rect(this.p, Size.create(this.box)) }
+	public rect(): Rect {
+		return new Rect(this.p.x, this.p.y, this.box.width, this.box.height)	//return new Rect(this.p, Size.create(this.box))
+	}
 
 	public setVisible(value: boolean): ItemBase {
 		super.setVisible(value);

@@ -6,6 +6,7 @@ import { IItemWireOptions, IItemNode, IPoint, IWireProperties, ComponentProperty
 import { ItemBoard } from './itemsBoard';
 import Comp from './components';
 import Point from './point';
+import Rect from './rect';
 
 export default class Wire extends ItemBoard {
 
@@ -18,6 +19,8 @@ export default class Wire extends ItemBoard {
 	get last(): number { return this.settings.points.length - 1 }
 
 	get lastLine(): number { return this.editMode ? this.settings.lines.length : 0 }
+
+	public rect(): Rect { return Rect.create(this.box) }
 
 	//edit-mode
 	get editMode(): boolean { return this.settings.edit }
@@ -151,6 +154,10 @@ export default class Wire extends ItemBoard {
 		return <IItemNode><unknown>p;
 	}
 
+	public appendNode(p: Point): boolean {
+		return !this.editMode && (this.settings.points.push(p), this.refresh(), true)
+	}
+
 	public setNode(node: number, p: IPoint): Wire {
 		//because no transformation, p is the same, just save it
 		this.settings.points[node].x = p.x | 0;	// remove decimals "trunc"
@@ -226,7 +233,7 @@ export default class Wire extends ItemBoard {
 			name: "wire",
 			class: "wire",
 			highlightNodeName: "node",
-			pad: 10,					// radius of the highlight circle
+			pad: 5,					// radius of the highlight circle
 			color: "black",
 			edit: false					// initial is false
 		})

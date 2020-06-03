@@ -60,7 +60,10 @@ var StateMachine = /** @class */ (function () {
     Object.defineProperty(StateMachine.prototype, "log", {
         //console logging
         get: function () { return this.settings.log; },
-        set: function (value) { this.settings.log = !!value; },
+        set: function (value) {
+            (this.settings.log = !!value)
+                && console.log("[" + interfaces_1.StateType[this.value] + "]"); // to visually track who got the action
+        },
         enumerable: false,
         configurable: true
     });
@@ -99,15 +102,15 @@ var StateMachine = /** @class */ (function () {
             }
         }
         else {
-            //get ON action first for current state
-            // if not try to get common action
-            // fall back to default action if available
-            fn = current.actions[actionName]
-                || this.settings.commonActions.get(actionName)
-                || current.actions[actionName = "DEFAULT"];
+            fn = current.actions[actionName] // first priority in state[action]
+                || this.settings.commonActions.get(actionName) // second priority are common actions to all states
+                || current.actions[actionName = "DEFAULT"]; // third priority is stae.DEFAULT action
         }
         if (this.log && newSendCmd != this.sendCmd) {
             var postSendCmd = "  ::" + actionName;
+            //for ENTER show current state, to visually track who got the action
+            (action == interfaces_1.ActionType.ENTER) &&
+                console.log("[" + interfaces_1.StateType[this.value] + "]");
             console.log("" + (this.sendCmd = newSendCmd) + (newSendCmd != postSendCmd ? " -> " + postSendCmd : "") + (fn ? "" : " not found"));
         }
         //execute action if found
@@ -125,7 +128,7 @@ var StateMachine = /** @class */ (function () {
         var newStateDef = this.state(stateName);
         if (!newStateDef)
             return false;
-        this.log && (this.value != state) && console.log("[" + stateName + "]");
+        this.log && console.log("[" + stateName + "]" + (this.value == state ? " same state" : ""));
         //save new state to receive SEND commands
         this.settings.value = state;
         //
