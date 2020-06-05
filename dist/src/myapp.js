@@ -85,7 +85,7 @@ var MyApp = /** @class */ (function (_super) {
             //UI logs
             arr.push(utils_1.pad(state.event, 5, '&nbsp;') + " " + parent.id + " " + state.type + "^" + state.over.type);
             //arr.push(`multiplier: ${that.multiplier}`);
-            arr.push("state: " + interfaces_1.StateType[that.state.value]);
+            arr.push("state: " + interfaces_1.StateType[that.sm.state]);
             arr.push(state.offset.toString()); //`x: ${round(state.offset.x, 1)} y: ${round(state.offset.y, 1)}`
             //arr.push(`client ${clientXY.toString()}`);
             //arr.push(`scaled: x: ${clientXYScaled.x} y: ${clientXYScaled.y}`);
@@ -95,15 +95,11 @@ var MyApp = /** @class */ (function (_super) {
         };
         _this.compList = new Map();
         _this.selectedComponents = [];
-        //location is panning, size is for scaling
-        _this.viewBox = rect_1.default.empty();
-        //scaling multipler
-        _this.multiplier = 0.5; // 2X UI default
-        //this's a const value
-        _this.ratio = window.screen.width / window.screen.height;
+        _this.viewBox = rect_1.default.empty(); //location is panning, size is for scaling
+        _this.multiplier = 0.5; //scaling multipler 2X UI default
+        _this.ratio = window.screen.width / window.screen.height; //this's a const value
         _this.ratioX = 1;
         _this.ratioY = 1;
-        //main SVG insertion point
         _this.tooltip = new tooltip_1.default({ id: "tooltip", borderRadius: 4 });
         _this.rootDir = utils_1.basePath(); //not used in electron
         _this.board = utils_1.qS("#board");
@@ -125,7 +121,7 @@ var MyApp = /** @class */ (function (_super) {
             content: "Aaaaa...!  kjsdhj sjh sj d sj sd sdjs djsdj kkisaujn ak asd asdn askd askd aksdn aksd  ia hsdoia oa sdoas "
         });
         //create state machine
-        _this.state = new stateMachine_1.default({
+        _this.sm = new stateMachine_1.default({
             id: "state-machine-01",
             initial: interfaces_1.StateType.IDLE,
             states: {},
@@ -133,7 +129,7 @@ var MyApp = /** @class */ (function (_super) {
             ctx: {},
             commonActions: {
                 ENTER: function (newCtx) {
-                    that.state.ctx = newCtx; //for now just copy data
+                    that.sm.ctx = newCtx; //for now just copy data
                 },
                 LEAVE: function (newCtx) {
                     //cannot save new context, erases wiring status
@@ -167,7 +163,7 @@ var MyApp = /** @class */ (function (_super) {
                 FORWARD_OVER: function (newCtx) {
                     //accepts transitions to new state on mouse OVER
                     var prefix = !newCtx.it ? "" : newCtx.it.type == 1 ? "EC_" : "WIRE_", stateName = (prefix + newCtx.over.type).toUpperCase(), state = interfaces_1.StateType[stateName];
-                    that.state.transition(state, interfaces_1.ActionType.START, newCtx); //EC_NODE		WIRE_NODE
+                    that.sm.transition(state, interfaces_1.ActionType.START, newCtx); //EC_NODE		WIRE_NODE
                 }
             }
         });
@@ -185,34 +181,34 @@ var MyApp = /** @class */ (function (_super) {
             list: options.list
         });
         dab_1.aEL(_this.svgBoard, "mouseenter", function (ev) {
-            that.state.enabled && that.state.send(interfaces_1.ActionType.ENTER, handleMouseEvent.call(that, ev));
+            that.sm.send(interfaces_1.ActionType.ENTER, handleMouseEvent.call(that, ev));
         }, false);
         dab_1.aEL(_this.svgBoard, "mouseleave", function (ev) {
-            that.state.enabled && that.state.send(interfaces_1.ActionType.LEAVE, handleMouseEvent.call(that, ev));
+            that.sm.send(interfaces_1.ActionType.LEAVE, handleMouseEvent.call(that, ev));
         }, false);
         dab_1.aEL(_this.svgBoard, "mouseover", function (ev) {
-            that.state.enabled && that.state.send(interfaces_1.ActionType.OVER, handleMouseEvent.call(that, ev));
+            that.sm.send(interfaces_1.ActionType.OVER, handleMouseEvent.call(that, ev));
         }, false);
         dab_1.aEL(_this.svgBoard, "mousemove", function (ev) {
-            that.state.enabled && that.state.send(interfaces_1.ActionType.MOVE, handleMouseEvent.call(that, ev));
+            that.sm.send(interfaces_1.ActionType.MOVE, handleMouseEvent.call(that, ev));
         }, false);
         dab_1.aEL(_this.svgBoard, "mouseout", function (ev) {
-            that.state.enabled && that.state.send(interfaces_1.ActionType.OUT, handleMouseEvent.call(that, ev));
+            that.sm.send(interfaces_1.ActionType.OUT, handleMouseEvent.call(that, ev));
         }, false);
         //
         dab_1.aEL(_this.svgBoard, "mousedown", function (ev) {
-            that.state.enabled && that.state.send(interfaces_1.ActionType.DOWN, handleMouseEvent.call(that, ev));
+            that.sm.send(interfaces_1.ActionType.DOWN, handleMouseEvent.call(that, ev));
         }, false);
         dab_1.aEL(_this.svgBoard, "mouseup", function (ev) {
-            that.state.enabled && that.state.send(interfaces_1.ActionType.UP, handleMouseEvent.call(that, ev));
+            that.sm.send(interfaces_1.ActionType.UP, handleMouseEvent.call(that, ev));
         }, false);
         //right click on board
         dab_1.aEL(_this.svgBoard, "contextmenu", function (ev) {
             ev.stopPropagation();
-            var target = ev.target, type = dab_1.attr(target, "svg-type"), key = that.rightClick.setTrigger(dab_1.attr(target.parentNode, "id"), dab_1.attr(target.parentNode, "svg-comp"), type, type && dab_1.attr(target, type));
+            var target = ev.target, parent = target.parentNode, type = dab_1.attr(target, "svg-type"), key = that.rightClick.setTrigger(dab_1.attr(parent, "id"), dab_1.attr(parent, "svg-comp"), type, type && dab_1.attr(target, type));
             key &&
                 that.rightClick
-                    .build(key)
+                    .build(key, that.sm.state)
                     .movePoint(getClientXY(ev))
                     .setVisible(true);
         }, false);
@@ -226,7 +222,7 @@ var MyApp = /** @class */ (function (_super) {
                 case 'ArrowRight':
                 case 'ArrowDown':
                 case 'Delete':
-                    that.state.send(interfaces_1.ActionType.KEY, ev.code);
+                    that.sm.send(interfaces_1.ActionType.KEY, ev.code);
                     break;
             }
             //console.log(ev.code)
@@ -282,7 +278,7 @@ var MyApp = /** @class */ (function (_super) {
                 throw "duplicated component " + comp.id;
             this.compList.set(comp.id, comp);
             //add it to SVG DOM
-            this.svgBoard.insertBefore(comp.g, this.tooltip.g);
+            this.svgBoard.insertBefore(comp.g, (comp.type == types_1.Type.WIRE) ? this.svgBoard.firstChild : this.tooltip.g);
             //do after DOM inserted work
             comp.afterDOMinserted();
         }
@@ -366,7 +362,7 @@ var MyApp = /** @class */ (function (_super) {
                         this.tooltip.setVisible(false);
                         //temporary, for testings...
                         window.ec = void 0;
-                        this.state.send(interfaces_1.ActionType.AFTER_DELETE, comp.id);
+                        this.sm.send(interfaces_1.ActionType.AFTER_DELETE, comp.id);
                     }
                     else
                         console.log("component #" + comp.id + " could not be removed or it doesn't exists");

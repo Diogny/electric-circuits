@@ -2,17 +2,26 @@
 	"board": [
 		{
 			"text": "Remove All",
-			"name": "DELETE_ALL"
+			"name": "DELETE_ALL",
+			"enabled": [
+				"BOARD"
+			]
 		},
 		{
 			"text": "Select All",
 			"name": "SELECT_ALL",
-			"shortcut": "Ctrl+A"
+			"shortcut": "Ctrl+A",
+			"enabled": [
+				"BOARD"
+			]
 		},
 		{
 			"text": "Deselect All",
 			"name": "UNSELECT_ALL",
-			"shortcut": "Ctrl+B"
+			"shortcut": "Ctrl+B",
+			"enabled": [
+				"BOARD"
+			]
 		}
 	],
 	"ec-body": [
@@ -24,7 +33,10 @@
 		{
 			"text": "Properties",
 			"name": "SHOW_PROPERTIES",
-			"shortcut": "Ctrl+P"
+			"shortcut": "Ctrl+P",
+			"enabled": [
+				"EC_BODY"
+			]
 		},
 		{
 			"text": "Rotate 45 clockwise",
@@ -48,18 +60,27 @@
 		},
 		{
 			"text": "Select",
-			"name": "SELECT"
+			"name": "SELECT",
+			"enabled": [
+				"EC_BODY"
+			]
 		},
 		{
 			"text": "Bring to Front",
-			"name": "BRING_TO_FRONT"
+			"name": "BRING_TO_FRONT",
+			"enabled": [
+				"EC_BODY"
+			]
 		}
 	],
 	"ec-node": [
 		{
 			"text": "Unbond",
 			"name": "UNBOND",
-			"shortcut": "Ctrl-U"
+			"shortcut": "Ctrl-U",
+			"enabled": [
+				"WIRING_EC_NODE"
+			]
 		},
 		{
 			"text": "Connections",
@@ -75,7 +96,10 @@
 		{
 			"text": "Properties",
 			"name": "SHOW_PROPERTIES",
-			"shortcut": "Ctrl+P"
+			"shortcut": "Ctrl+P",
+			"enabled": [
+				"WIRE_LINE"
+			]
 		},
 		{
 			"text": "Delete",
@@ -83,20 +107,29 @@
 			"shortcut": "Del"
 		},
 		{
-			"text": "Connections",
-			"name": "CONNECTIONS",
-			"shortcut": "Ctrl+P"
+			"text": "Select",
+			"name": "SELECT",
+			"enabled": [
+				"WIRE_LINE"
+			]
 		},
 		{
-			"text": "Select",
-			"name": "SELECT"
+			"text": "Resume Edit",
+			"name": "RESUME_EDIT",
+			"shortcut": "Ctrl+P",
+			"enabled": [
+				"WIRING"
+			]
 		}
 	],
 	"wire-node": [
 		{
 			"text": "Delete",
 			"name": "DELETE",
-			"shortcut": "Del"
+			"shortcut": "Del",
+			"enabled": [
+				"WIRING_WIRE_NODE"
+			]
 		},
 		{
 			"text": "Connections",

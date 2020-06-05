@@ -109,7 +109,7 @@ export interface IMyApp extends IApplication {
 	topBarRight: HTMLElement;
 	winProps: HtmlWindow;
 
-	state: StateMachine;
+	sm: StateMachine;
 }
 
 export interface IMouseState {
@@ -126,16 +126,8 @@ export interface IMouseState {
 	shiftKey: boolean;
 	altKey: boolean;
 	it: ItemBoard;
-	//local
-	dragging: { ec: ItemBoard, offset: Point }[];
-	className: string;
-	nodeNumber: number;
-	isEdgeNode: boolean;
+	//[obsolete] will be eliminated
 	disableOut: boolean;
-	bond: { ec: ItemBoard, node: number };
-	A: IPoint;
-	B: IPoint;
-	wiring: { wire: Wire, start: { ec: ItemBoard, node: number } };
 }
 
 export interface ICompOverState {
@@ -362,6 +354,7 @@ export interface IContextMenuItem {
 	name: string;
 	data: string;
 	shortcut: string;
+	enabled: StateType[];
 }
 
 export interface IContextMenuOptions extends IBaseWindowOptions {
@@ -376,7 +369,6 @@ export interface IContextMenuSettings extends IContextMenuOptions {
 //***************************************** State Machine ************************************//
 export interface IStateMachineBaseOptions {
 	id: string;
-
 	initial: StateType;
 	ctx: IMouseState;		//this's the data held in every state
 }
@@ -393,8 +385,9 @@ export interface IStateMachineOptions extends IStateMachineBaseOptions {
 
 export interface IStateMachineSettings extends IStateMachineBaseOptions {
 	enabled: boolean;
-	value: StateType;		//this's the value
-	states: Map<string, IMachineState>;
+	state: StateType;		//this's the value
+	stateName: string;
+	stateList: Map<string, IMachineState>;
 	commonActions: Map<string, IMachineActionCallback>;
 	log: boolean;
 }
@@ -403,17 +396,22 @@ export interface IStateMachineSettings extends IStateMachineBaseOptions {
 export type MachineOverActionType = "forward" | "deny" | "function";
 
 export interface IMachineState {
-	key?: StateType;
+	key: StateType;
 	overType: MachineOverActionType;
 	actions: { [key: string]: (newContext: IMouseState) => boolean | undefined };
+	//data held in this state after a transition, initially is set to undefined
+	data?: any;
+	//persists data between transistions, it's not DELETED
+	persistData?: boolean;
 }
 
 export interface IStateMachine extends IStateMachineBaseOptions {
-	enabled: boolean;
-
-	value: StateType;
-	transition(newState: StateType, newAction: ActionType, data?: any): boolean;
-	send(newAction: ActionType, data?: any): boolean;
+	state: StateType;		//this's the value
+	stateName: string;
+	data: any;
+	getState(name: string): IMachineState;
+	transition(newState: StateType, newAction: ActionType, newContext?: any, data?: any): boolean;
+	send(newAction: ActionType, newContext?: any): boolean;
 	register(state: IMachineState): boolean;
 }
 
@@ -470,7 +468,7 @@ export enum ActionType {
 	ROTATE_90_CLOCKWISE = 204,			//"Rotate 90 clockwise"			22
 	ROTATE_90_COUNTER_CLOCKWISE = 205,	//"Rotate 90 counter clockwise"	23
 	UNBOND = 206,						//"Unbond"						30
-	CONNECTIONS = 207,					//"Connections"					31
+	RESUME_EDIT = 207,					//ex "Connections"					31
 }
 /*
 

@@ -25,6 +25,8 @@ var ContextWindow = /** @class */ (function (_super) {
         utils_1.each(options.list, function (block, key) {
             block.forEach(function (b) {
                 b.action = interfaces_1.ActionType[b.name];
+                b.enabled &&
+                    (b.enabled = b.enabled.map(function (stateName) { return interfaces_1.StateType[stateName]; }));
             });
             _this.settings.list.set(key, block);
         });
@@ -32,8 +34,10 @@ var ContextWindow = /** @class */ (function (_super) {
         var that = _this;
         //register global click event
         dab_1.aEL(_this.win, "click", function (e) {
-            var self = dab_1.getParentAttr(e.target, "data-action"), action = dab_1.attr(self, "data-action") | 0, data = dab_1.attr(self, "data-data"), trigger = dab_1.attr(self.parentElement, "data-trigger");
-            self && (that.setVisible(false), data && (trigger += "::" + data), _this.app.execute(action, trigger));
+            var self = dab_1.getParentAttr(e.target, "data-action"), action = dab_1.attr(self, "data-action") | 0, data = dab_1.attr(self, "data-data"), disabled = self.hasAttribute("disabled"), trigger = dab_1.attr(self.parentElement, "data-trigger");
+            self
+                && !disabled
+                && (that.setVisible(false), data && (trigger += "::" + data), _this.app.execute(action, trigger));
         }, false);
         return _this;
     }
@@ -80,13 +84,17 @@ var ContextWindow = /** @class */ (function (_super) {
         //let a = [id, name, type, nodeOrLine];//.filter(v => v != null);
         return this.win.setAttribute("data-trigger", "" + [id, name, type, nodeOrLine].join('::')), ctx;
     };
-    ContextWindow.prototype.build = function (key) {
+    ContextWindow.prototype.build = function (key, state) {
         var _this = this;
         var entry = this.settings.list.get(key);
         if (entry) {
             this.settings.current = key;
             this.clear();
-            var html = entry.map(function (value) { return dab_1.nano(_this.app.templates.ctxItem01, value); }).join('');
+            var html = entry.map(function (value) {
+                var o = Object.create(value);
+                (value.enabled && !value.enabled.some(function (i) { return i == state; })) && (o.disabled = "disabled");
+                return dab_1.nano(_this.app.templates.ctxItem01, o);
+            }).join('');
             this.win.innerHTML = html;
         }
         return this;

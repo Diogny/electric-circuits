@@ -1,5 +1,5 @@
 import BaseWindow from "./base-window";
-import { IContextMenuOptions, IContextMenuItem, IContextMenuSettings, ActionType, IBaseWindowOptions } from "./interfaces";
+import { IContextMenuOptions, IContextMenuItem, IContextMenuSettings, ActionType, IBaseWindowOptions, StateType } from "./interfaces";
 import { each } from "./utils";
 import { nano, aEL, getParentAttr, attr, extend } from "./dab";
 import { MyApp } from "./myapp";
@@ -13,7 +13,9 @@ export default class ContextWindow extends BaseWindow {
 		this.settings.list = new Map();
 		each(options.list, (block: IContextMenuItem[], key: string) => {
 			block.forEach(b => {
-				b.action = ActionType[b.name]
+				b.action = ActionType[b.name];
+				b.enabled &&
+					(b.enabled = b.enabled.map((stateName: any): StateType => StateType[<string>stateName]))
 			})
 			this.settings.list.set(key, block);
 		});
@@ -26,8 +28,11 @@ export default class ContextWindow extends BaseWindow {
 				self = getParentAttr(e.target as HTMLElement, "data-action"),
 				action = attr(self, "data-action") | 0,
 				data = attr(self, "data-data"),
-				trigger = attr(self.parentElement, "data-trigger")
-			self && (that.setVisible(false), data && (trigger += `::${data}`), (this.app as MyApp).execute(action, trigger))
+				disabled = self.hasAttribute("disabled"),
+				trigger = attr(self.parentElement, "data-trigger");
+			self
+				&& !disabled
+				&& (that.setVisible(false), data && (trigger += `::${data}`), (this.app as MyApp).execute(action, trigger))
 		}, false)
 	}
 
@@ -78,14 +83,20 @@ export default class ContextWindow extends BaseWindow {
 		return this.win.setAttribute("data-trigger", `${[id, name, type, nodeOrLine].join('::')}`), ctx
 	}
 
-	public build(key: string): ContextWindow {
+	public build(key: string, state: StateType): ContextWindow {
 		let
 			entry = this.settings.list.get(key);
 		if (entry) {
 			this.settings.current = key;
 			this.clear();
 			let
-				html = entry.map(value => nano(this.app.templates.ctxItem01, value)).join('');
+				html = entry.map(value => {
+					let
+						o = Object.create(value);
+					(value.enabled && !value.enabled.some(i => i == state)) && (o.disabled = "disabled");
+					return nano(this.app.templates.ctxItem01, o)
+				}
+				).join('');
 			this.win.innerHTML = html;
 		}
 		return this;

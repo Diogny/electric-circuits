@@ -43,6 +43,9 @@ export default class EcProp {
 		//hack to capture inside variables, not exposed outside
 		this.refresh = function () {
 			//get value from component property
+			if (!propObj || !propObj.value) {		//to debug, catch error
+				console.log('hhhmmmm');
+			}
 			that.propValue = propObj.value;
 			//set it's UI value, so far only for INPUT, SPAN
 			switch (htmlProp.nodeName) {

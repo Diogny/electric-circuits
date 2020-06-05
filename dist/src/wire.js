@@ -144,6 +144,13 @@ var Wire = /** @class */ (function (_super) {
             //full refresh because polyline
             this.refresh();
         }
+        if (!(node == 0 || node == this.last)) {
+            var bond = this.nodeBonds(node), p_1 = this.settings.points[node];
+            bond && bond.to.forEach(function (b) {
+                var _a;
+                (_a = components_1.default.item(b.id)) === null || _a === void 0 ? void 0 : _a.setNode(b.ndx, p_1);
+            });
+        }
         return this;
     };
     /**

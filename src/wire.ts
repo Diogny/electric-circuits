@@ -127,6 +127,14 @@ export default class Wire extends ItemBoard {
 			//full refresh because polyline
 			this.refresh();
 		}
+		if (!(node == 0 || node == this.last)) {
+			let
+				bond = this.nodeBonds(node),
+				p = this.settings.points[node];
+			bond && bond.to.forEach(b => {
+				Comp.item(b.id)?.setNode(b.ndx, p)
+			})
+		}
 		return this;
 	}
 

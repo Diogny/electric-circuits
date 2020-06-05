@@ -627,6 +627,17 @@ div.win.ctx > div > span.right {
 }
 
 /*   */
+div.win.ctx > div[disabled] {
+  background-color: #ececec;
+}
+div.win.ctx > div[disabled] > span {
+  color: #c7c3c3;
+}
+div.win.ctx > div[disabled]:hover {
+  cursor: not-allowed;
+}
+
+/*   */
 .expandable {
   display: inline-block;
 }

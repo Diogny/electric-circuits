@@ -1,4 +1,3 @@
-
 import {
 	IStateMachineSettings, IStateMachine, IStateMachineOptions, IMachineState, StateType, ActionType,
 	IMachineActionCallback, IMouseState
@@ -12,40 +11,48 @@ export default class StateMachine implements IStateMachine {
 
 	get id(): string { return this.settings.id }
 
-	get value(): StateType { return this.settings.value }
-
 	get initial(): StateType { return this.settings.initial }
 
-	get ctx(): IMouseState { return this.settings.ctx }
+	get state(): StateType { return this.settings.state }
+	get stateName(): string { return StateType[this.state] }
 
+	get ctx(): IMouseState { return this.settings.ctx }
 	set ctx(value: IMouseState) { this.settings.ctx = value }
 
 	get enabled(): boolean { return this.settings.enabled }
-
 	set enabled(value: boolean) { this.settings.enabled = value }
+
+	get data(): any {
+		let state = this.getState(this.stateName);
+		return state ? state.data : undefined
+	}
+	set data(value: any) {
+		let state = this.getState(this.stateName);
+		state && (state.data = value)
+	}
 
 	//console logging
 	get log(): boolean { return this.settings.log }
 	set log(value: boolean) {
 		(this.settings.log = !!value)
-			&& console.log(`[${StateType[this.value]}]`)	// to visually track who got the action
+			&& console.log(`[${this.stateName}]`)	// to visually track who got the action
 	}
 
 	//development
 	private sendCmd: string;
 
-	public state(name: string): IMachineState {
-		return <any>this.settings.states.get(name)
+	public getState(name: string): IMachineState {
+		return <any>this.settings.stateList.get(name)
 	}
 
 	constructor(options: IStateMachineOptions) {
 		this.settings = obj(<IStateMachineSettings>{
 			id: options.id,
 			initial: <StateType><unknown>StateType[options.initial],
-			value: options.initial,		//options.value is discarded
+			state: options.initial,		//options.value is discarded
 			ctx: options.ctx || {},
 			enabled: false,
-			states: new Map(),
+			stateList: new Map(),
 			log: !!options.log || false
 		});
 		//all defined states
@@ -61,7 +68,7 @@ export default class StateMachine implements IStateMachine {
 			this.settings.commonActions.set(key, value)
 		});
 		this.sendCmd = "";
-		this.log && console.log(`[${StateType[this.value]}]`);
+		this.log && console.log(`[${this.stateName}]`);
 	}
 
 	/**
@@ -69,9 +76,9 @@ export default class StateMachine implements IStateMachine {
 	 * @param action action to be executed
 	 * @param data data to be sent
 	 */
-	public send(action: ActionType, data?: any): boolean {
-		const current: IMachineState = this.state(StateType[this.value]);
-		if (!current)
+	public send(action: ActionType, newCtx?: any): boolean {
+		const current: IMachineState = this.getState(this.stateName);
+		if (!current || !this.enabled)
 			return false;
 		let
 			actionName = ActionType[action],
@@ -109,12 +116,12 @@ export default class StateMachine implements IStateMachine {
 				postSendCmd = `  ::${actionName}`;
 			//for ENTER show current state, to visually track who got the action
 			(action == ActionType.ENTER) &&
-				console.log(`[${StateType[this.value]}]`);
+				console.log(`[${this.stateName}]`);
 			console.log(`${this.sendCmd = newSendCmd}${newSendCmd != postSendCmd ? " -> " + postSendCmd : ""}${fn ? "" : " not found"}`);
 		}
 
 		//execute action if found
-		return fn?.call(this, data), !!fn;
+		return fn?.call(this, newCtx), !!fn;
 	}
 
 	/**
@@ -123,18 +130,23 @@ export default class StateMachine implements IStateMachine {
 	 * @param action action to be executed on the new state
 	 * @param data data to sent to new action
 	 */
-	public transition(state: StateType, action: ActionType, data?: any): boolean {
+	public transition(state: StateType, action: ActionType, newCtx?: any, data?: any): boolean {
 		let
 			stateName = StateType[state];
 		//https://kentcdodds.com/blog/implementing-a-simple-state-machine-library-in-javascript
-		const newStateDef: IMachineState = this.state(stateName);
-		if (!newStateDef)
+		const newStateDef: IMachineState = this.getState(stateName);
+		if (!newStateDef || !this.enabled)
 			return false;
-		this.log && console.log(`[${stateName}]${this.value == state ? " same state" : ""}`);
+		this.log && console.log(`[${stateName}]${this.state == state ? " same state" : ""}`);
 		//save new state to receive SEND commands
-		this.settings.value = state;
-		//
-		return this.send(action, data);
+		this.settings.state = state;
+		//persists data between state transitions
+		if (data == undefined)
+			!newStateDef.persistData && (this.data != undefined) && (this.data = undefined);
+		else
+			//overrides state persistData
+			this.data = data;
+		return this.send(action, newCtx);
 	}
 
 	/**
@@ -145,14 +157,17 @@ export default class StateMachine implements IStateMachine {
 		//find it by name
 		let
 			key = StateType[<StateType>state?.key];
-		if (!state || this.state(key))
+		if (!state || this.getState(key))
 			return false;
-		//save state actions
-		this.settings.states.set(key, obj(<IMachineState>{
+		//initial state value
+		!state.data && (state.data = undefined);
+		//save
+		this.settings.stateList.set(key, state);
+		/*this.settings.states.set(key, obj(<IMachineState>{
 			key: state.key,
 			overType: state.overType,
 			actions: state.actions
-		}));
+		}));*/
 		return true
 	}
 }

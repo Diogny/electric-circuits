@@ -1,4 +1,3 @@
-//ec.ts
 import { attr, obj, extend } from './dab';
 import { svg, each } from './utils';
 import { Type } from './types';
@@ -8,7 +7,6 @@ import Point from './point';
 import { IItemSolidOptions, IPoint, IItemNode, IItemBoardProperties } from './interfaces';
 import { ItemSolid } from './itemSolid';
 import Rect from './rect';
-import Size from './size';
 import { Label } from './label';
 
 export default class EC extends ItemSolid {
@@ -107,7 +105,7 @@ export default class EC extends ItemSolid {
 		let
 			bond = this.nodeBonds(node),
 			pos = this.getNode(node);
-		bond && bond.to.forEach((d) => {
+		pos && bond && bond.to.forEach((d) => {
 			let
 				ic = Comp.item(d.id),
 				p = Point.plus(this.p, this.rotation ? pos.rot : pos).round();
@@ -132,6 +130,12 @@ export default class EC extends ItemSolid {
 		pin.rot = rotate(new Point(pin.x, pin.y), this.rotation, this.origin);
 		//
 		return obj(pin);
+	}
+
+	public getNodeRealXY(node: number): Point {
+		let
+			pos = this.getNode(node);
+		return pos ? Point.plus(this.p, this.rotation ? pos.rot : pos).round() : <any>null;
 	}
 
 	public overNode(p: IPoint, ln: number): number {

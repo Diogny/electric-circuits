@@ -1,7 +1,7 @@
 import { Application } from "./app";
 import {
 	IApplicationOptions, IMyApp, ITooltipText, IAppWindowOptions, IStateMachineOptions,
-	StateType, ActionType, IMouseState, IContextMenuOptions, IItemSolidOptions, IItemWireOptions, IPoint
+	StateType, ActionType, IMouseState, IContextMenuOptions
 } from "./interfaces";
 import { basePath, qS, pad } from "./utils";
 import Rect from "./rect";
@@ -10,14 +10,12 @@ import Point from './point';
 import Tooltip from "./tooltip";
 import { attr, aEL, nano } from "./dab";
 import AppWindow from "./app-window";
-import Wire from "./wire";
 import StateMachine from "./stateMachine";
 import Comp from "./components";
 import ContextWindow from "./context-window";
 import { ItemBoard } from "./itemsBoard";
 import EC from "./ec";
 import { Type } from "./types";
-import { app } from "electron";
 
 export class MyApp extends Application implements IMyApp {
 
@@ -29,7 +27,7 @@ export class MyApp extends Application implements IMyApp {
 	readonly topBarLeft: HTMLElement;
 	readonly topBarRight: HTMLElement;
 	readonly winProps: AppWindow;
-	readonly state: StateMachine;
+	readonly sm: StateMachine;
 	readonly rightClick: ContextWindow;
 
 	viewBox: Rect;
@@ -110,7 +108,7 @@ export class MyApp extends Application implements IMyApp {
 				//UI logs
 				arr.push(`${pad(state.event, 5, '&nbsp;')} ${parent.id} ${state.type}^${state.over.type}`);
 				//arr.push(`multiplier: ${that.multiplier}`);
-				arr.push(`state: ${StateType[that.state.value]}`);
+				arr.push(`state: ${StateType[that.sm.state]}`);
 				arr.push(state.offset.toString()); //`x: ${round(state.offset.x, 1)} y: ${round(state.offset.y, 1)}`
 				//arr.push(`client ${clientXY.toString()}`);
 				//arr.push(`scaled: x: ${clientXYScaled.x} y: ${clientXYScaled.y}`);
@@ -120,15 +118,11 @@ export class MyApp extends Application implements IMyApp {
 			};
 		this.compList = new Map();
 		this.selectedComponents = [];
-		//location is panning, size is for scaling
-		this.viewBox = Rect.empty();
-		//scaling multipler
-		this.multiplier = 0.5;  // 2X UI default
-		//this's a const value
-		this.ratio = window.screen.width / window.screen.height;
+		this.viewBox = Rect.empty();		//location is panning, size is for scaling
+		this.multiplier = 0.5;  //scaling multipler 2X UI default
+		this.ratio = window.screen.width / window.screen.height;		//this's a const value
 		this.ratioX = 1;
 		this.ratioY = 1;
-		//main SVG insertion point
 		this.tooltip = new Tooltip(<ITooltipText>{ id: "tooltip", borderRadius: 4 });
 		this.rootDir = <string>basePath();			//not used in electron
 		this.board = (<HTMLElement>qS("#board"));
@@ -151,7 +145,7 @@ export class MyApp extends Application implements IMyApp {
 			content: "Aaaaa...!  kjsdhj sjh sj d sj sd sdjs djsdj kkisaujn ak asd asdn askd askd aksdn aksd  ia hsdoia oa sdoas "
 		});
 		//create state machine
-		this.state = new StateMachine(<IStateMachineOptions>{
+		this.sm = new StateMachine(<IStateMachineOptions>{
 			id: "state-machine-01",
 			initial: StateType.IDLE,
 			states: {},
@@ -159,7 +153,7 @@ export class MyApp extends Application implements IMyApp {
 			ctx: <IMouseState>{},
 			commonActions: {
 				ENTER: function (newCtx: IMouseState) {
-					that.state.ctx = newCtx;		//for now just copy data
+					that.sm.ctx = newCtx;		//for now just copy data
 				},
 				LEAVE: function (newCtx: IMouseState) {
 					//cannot save new context, erases wiring status
@@ -197,7 +191,7 @@ export class MyApp extends Application implements IMyApp {
 						prefix = !newCtx.it ? "" : newCtx.it.type == 1 ? "EC_" : "WIRE_",
 						stateName = (prefix + newCtx.over.type).toUpperCase(),
 						state = <StateType><unknown>StateType[<any>stateName];
-					that.state.transition(state, ActionType.START, newCtx);	//EC_NODE		WIRE_NODE
+					that.sm.transition(state, ActionType.START, newCtx);	//EC_NODE		WIRE_NODE
 				}
 			}
 		});
@@ -216,41 +210,42 @@ export class MyApp extends Application implements IMyApp {
 		});
 
 		aEL(<any>this.svgBoard, "mouseenter", function (ev: MouseEvent) {
-			that.state.enabled && that.state.send(ActionType.ENTER, handleMouseEvent.call(that, ev));
+			that.sm.send(ActionType.ENTER, handleMouseEvent.call(that, ev));
 		}, false);
 		aEL(<any>this.svgBoard, "mouseleave", function (ev: MouseEvent) {
-			that.state.enabled && that.state.send(ActionType.LEAVE, handleMouseEvent.call(that, ev));
+			that.sm.send(ActionType.LEAVE, handleMouseEvent.call(that, ev));
 		}, false);
 		aEL(<any>this.svgBoard, "mouseover", function (ev: MouseEvent) {
-			that.state.enabled && that.state.send(ActionType.OVER, handleMouseEvent.call(that, ev));
+			that.sm.send(ActionType.OVER, handleMouseEvent.call(that, ev));
 		}, false);
 		aEL(<any>this.svgBoard, "mousemove", function (ev: MouseEvent) {
-			that.state.enabled && that.state.send(ActionType.MOVE, handleMouseEvent.call(that, ev));
+			that.sm.send(ActionType.MOVE, handleMouseEvent.call(that, ev));
 		}, false);
 		aEL(<any>this.svgBoard, "mouseout", function (ev: MouseEvent) {
-			that.state.enabled && that.state.send(ActionType.OUT, handleMouseEvent.call(that, ev));
+			that.sm.send(ActionType.OUT, handleMouseEvent.call(that, ev));
 		}, false);
 		//
 		aEL(<any>this.svgBoard, "mousedown", function (ev: MouseEvent) {
-			that.state.enabled && that.state.send(ActionType.DOWN, handleMouseEvent.call(that, ev));
+			that.sm.send(ActionType.DOWN, handleMouseEvent.call(that, ev));
 		}, false);
 		aEL(<any>this.svgBoard, "mouseup", function (ev: MouseEvent) {
-			that.state.enabled && that.state.send(ActionType.UP, handleMouseEvent.call(that, ev));
+			that.sm.send(ActionType.UP, handleMouseEvent.call(that, ev));
 		}, false);
 		//right click on board
 		aEL(<any>this.svgBoard, "contextmenu", function (ev: MouseEvent) {
 			ev.stopPropagation();
 			let
 				target = ev.target as Element,
+				parent = target.parentNode,
 				type = attr(target, "svg-type"),
 				key = that.rightClick.setTrigger(
-					attr(target.parentNode, "id"),
-					attr(target.parentNode, "svg-comp"),
+					attr(parent, "id"),
+					attr(parent, "svg-comp"),
 					type,
 					type && attr(target, type));
 			key &&
 				that.rightClick
-					.build(key)
+					.build(key, that.sm.state)
 					.movePoint(getClientXY(ev))
 					.setVisible(true);
 		}, false);
@@ -264,7 +259,7 @@ export class MyApp extends Application implements IMyApp {
 				case 'ArrowRight':
 				case 'ArrowDown':
 				case 'Delete':
-					that.state.send(ActionType.KEY, ev.code);
+					that.sm.send(ActionType.KEY, ev.code);
 					break;
 			}
 			//console.log(ev.code)
@@ -323,7 +318,7 @@ export class MyApp extends Application implements IMyApp {
 			this.compList.set(comp.id, comp);
 
 			//add it to SVG DOM
-			this.svgBoard.insertBefore(comp.g, this.tooltip.g);
+			this.svgBoard.insertBefore(comp.g, (comp.type == Type.WIRE) ? this.svgBoard.firstChild : this.tooltip.g);
 			//do after DOM inserted work
 			comp.afterDOMinserted();
 		}
@@ -421,7 +416,7 @@ export class MyApp extends Application implements IMyApp {
 						this.tooltip.setVisible(false);
 						//temporary, for testings...
 						(<any>window).ec = void 0;
-						this.state.send(ActionType.AFTER_DELETE, comp.id);
+						this.sm.send(ActionType.AFTER_DELETE, comp.id);
 					}
 					else
 						console.log(`component #${comp.id} could not be removed or it doesn't exists`)

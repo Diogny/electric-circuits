@@ -2,8 +2,8 @@ import { ipcRenderer } from "electron";
 import { templatesDOM, qSA, qS, tag } from "./src/utils"
 import * as fs from 'fs';
 import {
-	IComponentOptions, IApplicationOptions,
-	StateType as State, ActionType as Action, IMachineState, IMouseState, IItemNode, IItemWireOptions, IPoint, IItemSolidOptions
+	IComponentOptions, IApplicationOptions, StateType as State, ActionType as Action,
+	IMachineState, IMouseState, IItemNode, IItemWireOptions, IPoint, IItemSolidOptions
 } from "./src/interfaces";
 import Comp from "./src/components";
 import { MyApp } from "./src/myapp";
@@ -15,96 +15,11 @@ import { Type } from "./src/types";
 import { ItemBoard } from "./src/itemsBoard";
 import Size from "src/size";
 import EC from "src/ec";
-
-
-class LinesAligner {
-
-	line0: SVGLineElement;
-	line1: SVGLineElement;
-	wire: Wire;
-	node: number;
-	p: Point;
-	match: boolean;
-
-	constructor() {
-		let
-			create = (id: string) => <SVGLineElement>tag("line", id, {
-				class: "dash hide",
-				x1: 0,
-				y1: 0,
-				x2: 0,
-				y2: 0,
-				"stroke-dasharray": "3, 3"
-			})
-		this.line0 = create("line0");
-		this.line1 = create("line1");
-	}
-
-	public hide() {
-		addClass(this.line0, "hide");
-		addClass(this.line1, "hide");
-	}
-
-	private calculate(line: SVGLineElement, nodePoint: Point, otherNodePoint: IItemNode): number {
-		if (!otherNodePoint)
-			return 0;
-		let
-			ofs = Point.minus(otherNodePoint, nodePoint);
-		if (Math.abs(ofs.x) < 3) {
-			attr(line, {
-				x1: nodePoint.x = otherNodePoint.x,
-				y1: 0,
-				x2: nodePoint.x,
-				y2: app.viewBox.height
-			});
-			return 1;			//vertical
-		} else if (Math.abs(ofs.y) < 3) {
-			attr(line, {
-				x1: 0,
-				y1: nodePoint.y = otherNodePoint.y,
-				x2: app.viewBox.width,
-				y2: nodePoint.y
-			});
-			return -1;			//horizontal
-		}
-		return 0
-	}
-
-	public matchWireLine(wire: Wire, line: number): boolean {
-		this.hide();
-		this.p = Point.create(wire.getNode(this.node = line));	//line is 1-based
-		if (this.calculate(this.line0, this.p, wire.getNode(line + 1)) ||
-			(this.p = Point.create(wire.getNode(this.node = --line)),
-				this.calculate(this.line0, this.p, wire.getNode(--line)))
-		) {
-			this.wire = wire;
-			removeClass(this.line0, "hide");
-			return this.match = true
-		}
-		return false;
-	}
-
-	public matchWireNode(wire: Wire, node: number): boolean {
-		this.hide();
-		this.p = Point.create(wire.getNode(node));
-		let
-			before = this.calculate(this.line0, this.p, wire.getNode(node - 1)),
-			after = this.calculate(this.line1, this.p, wire.getNode(node + 1));
-		if (before | after) {
-			this.wire = wire;
-			this.node = node;
-			before && removeClass(this.line0, "hide");
-			after && removeClass(this.line1, "hide");
-			return this.match = true
-		}
-		return this.match = false
-	}
-
-}
+import LinesAligner from "src/linealign";
 
 let
 	app: MyApp = <any>void 0,
-	dash = new LinesAligner();
+	dash: LinesAligner;
 
 //https://www.electronjs.org/docs/tutorial/security
 
@@ -192,7 +107,7 @@ function hookEvents() {
 		attr(e.target, { title: `Wire edit is ${fn(status)}` });
 		enableDisableTools();
 		app.execute(Action.UNSELECT_ALL, "");
-		app.state.transition(State.WIRING, transition, void 0);
+		app.sm.transition(State.WIRING, transition, void 0);
 	}, false);
 	//HtmlWindow
 	/*aEL(qS('.bar-item[tool="ec-props"]'), "click", (e: MouseEvent) => {
@@ -207,10 +122,10 @@ function hookEvents() {
 function createStateMachine() {
 	let
 		actionDefaultCopyNewState = function (newCtx: IMouseState) {
-			app.state.ctx = newCtx;		//for now just copy data
+			app.sm.ctx = newCtx;		//for now just copy data
 		};
 	//IDLE
-	app.state.register(<IMachineState>{
+	app.sm.register(<IMachineState>{
 		key: State.IDLE,
 		overType: "forward",
 		actions: {
@@ -219,9 +134,14 @@ function createStateMachine() {
 		}
 	});
 	//BOARD
-	app.state.register(<IMachineState>{
+	app.sm.register(<IMachineState>{
 		key: State.BOARD,
 		overType: "forward",
+		persistData: true,
+		data: {
+			count: 0,
+			label: "hi!"
+		},
 		actions: {
 			MOVE: function (newCtx: IMouseState) {
 			},
@@ -236,13 +156,15 @@ function createStateMachine() {
 			//transitions
 			START: function (newCtx: IMouseState) {
 				//uses machine current state
-				app.state.send(Action.HIDE_NODE, (this as StateMachine).ctx);
+				app.sm.send(Action.HIDE_NODE, (this as StateMachine).ctx);
 				(this as StateMachine).ctx = newCtx;		//save new context
+
+				//console.log((this as StateMachine).data);
 			}
 		}
 	});
 	//EC_NODE
-	app.state.register(<IMachineState>{
+	app.sm.register(<IMachineState>{
 		key: State.EC_NODE,
 		overType: "forward",
 		actions: {
@@ -263,18 +185,19 @@ function createStateMachine() {
 			//transitions
 			START: function (newCtx: IMouseState) {
 				(this as StateMachine).ctx = newCtx;		//save new context
-				app.state.send(Action.SHOW_NODE_TOOLTIP, (this as StateMachine).ctx);
+				app.sm.send(Action.SHOW_NODE_TOOLTIP, (this as StateMachine).ctx);
 			}
 		}
 	});
 	//EC_DRAG
-	app.state.register(<IMachineState>{
+	app.sm.register(<IMachineState>{
 		key: State.EC_DRAG,
 		overType: "deny",
+		persistData: true,
 		actions: {
 			MOVE: function (newCtx: IMouseState) {
 				//newCtx.offset has the updated offset, don't save anything here
-				(this as StateMachine).ctx.dragging.forEach(comp => {
+				(this as StateMachine).data.dragging.forEach((comp: { ec: ItemBoard, offset: Point }) => {
 					let
 						p = Point.minus(newCtx.offset, comp.offset);
 					comp.ec.move(p.x, p.y);
@@ -287,39 +210,38 @@ function createStateMachine() {
 			},
 			UP: function (newCtx: IMouseState) {
 				//this catches the UP action too,  stops dragging
-				removeClass(app.svgBoard, (this as StateMachine).ctx.className);
-				app.state.transition(State.EC_BODY, Action.START, newCtx);
+				removeClass(app.svgBoard, (this as StateMachine).data.className);
+				app.sm.transition(State.EC_BODY, Action.START, newCtx);
 			},
 			//transitions
 			START: function (newCtx: IMouseState) {
 				let
 					self = this as StateMachine;
-				self.ctx = newCtx;		//save new context
-				//show mouse cursor
-				addClass(app.svgBoard, self.ctx.className = "dragging");
 				//add to context vector
 				!app.selectedComponents.some(comp => comp.id == newCtx.it.id) &&
 					(app.execute(Action.SELECT_ONLY, `${newCtx.it.id}::${newCtx.it.name}::body`));
-				//new way for multiple drag
-				self.ctx.dragging =
-					app.selectedComponents.map(comp => ({
+				self.data = {
+					className: "dragging",
+					dragging: app.selectedComponents.map(comp => ({
 						ec: comp,
 						offset: Point.minus(newCtx.offset, comp.p)
-					}));
-				app.state.send(Action.HIDE_NODE, newCtx);
+					}))
+				};
+				addClass(app.svgBoard, self.data.className);
+				app.sm.send(Action.HIDE_NODE, newCtx);
 				app.rightClick.setVisible(false);
 			}
 		}
 	});
 	//EC_BODY
-	app.state.register(<IMachineState>{
+	app.sm.register(<IMachineState>{
 		key: State.EC_BODY,
 		overType: "forward",
 		actions: {
 			MOVE: function (newCtx: IMouseState) {
 				if ((this as StateMachine).ctx.event == "down"
 					&& (this as StateMachine).ctx.button == 0) {
-					app.state.transition(State.EC_DRAG, Action.START, newCtx);
+					app.sm.transition(State.EC_DRAG, Action.START, newCtx);
 					return;
 				}
 				(this as StateMachine).ctx = newCtx;		//save new context
@@ -342,28 +264,26 @@ function createStateMachine() {
 			//transitions
 			START: function (newCtx: IMouseState) {
 				//uses machine current state
-				app.state.send(Action.HIDE_NODE, (this as StateMachine).ctx);
-				(this as StateMachine).ctx = newCtx;		//save new context
-				app.state.send(Action.SHOW_BODY_TOOLTIP, (this as StateMachine).ctx);
+				app.sm.send(Action.HIDE_NODE, (this as StateMachine).ctx);
+				(this as StateMachine).ctx = newCtx;		// new context must be saved here
+				app.sm.send(Action.SHOW_BODY_TOOLTIP, (this as StateMachine).ctx);
 			},
 		}
 	});
 	//WIRE_LINE
-	app.state.register(<IMachineState>{
+	app.sm.register(<IMachineState>{
 		key: State.WIRE_LINE,
 		overType: "forward",
 		actions: {
 			MOVE: function (newCtx: IMouseState) {
-				if (!newCtx.it) {
-					//console.log('NO Component');
-					return
+				if (newCtx.it) {
+					let
+						p = Point.translateBy(newCtx.offset, 20);
+					app.tooltip.setVisible(true)
+						.move(p.x, p.y)
+						.setFontSize(app.tooltipFontSize())
+						.setText(newCtx.it.id);
 				}
-				let
-					p = Point.translateBy(newCtx.offset, 20);
-				app.tooltip.setVisible(true)
-					.move(p.x, p.y)
-					.setFontSize(app.tooltipFontSize())
-					.setText(newCtx.it.id);
 			},
 			UP: function (newCtx: IMouseState) {	//up after down should be show properties, not now
 				actionDefaultCopyNewState(newCtx);
@@ -378,15 +298,16 @@ function createStateMachine() {
 			},
 			DEFAULT: actionDefaultCopyNewState,	//state must be saved so MOVE can capture prev
 			//transitions
-			START: function (newCtx: IMouseState) {
-				app.state.send(Action.HIDE_NODE, (this as StateMachine).ctx);	//hides previous node tooltip if any
+			START: function () {
+				app.sm.send(Action.HIDE_NODE, (this as StateMachine).ctx);	//hides previous node tooltip if any
 			}
 		}
 	});
 	//WIRING
-	app.state.register(<IMachineState>{
+	app.sm.register(<IMachineState>{
 		key: State.WIRING,
 		overType: "function",
+		persistData: true,
 		actions: {
 			OVER: function (newCtx: IMouseState) {
 				actionDefaultCopyNewState(newCtx);
@@ -400,18 +321,18 @@ function createStateMachine() {
 							case Type.WIRE:
 								//only node from a Wire in editMode allowed for now
 								if ((<Wire>newCtx.it).editMode) {
-									//console.log("WIRING.OVER -> WIRING_WIRE_NODE.OVER");
-									app.state.transition(State.WIRING_WIRE_NODE, Action.START, newCtx);
+									console.log(`over: ${newCtx.it.id} node: ${newCtx.over.node} unbond: ${(this as StateMachine).data} State.WIRING_WIRE_NODE`);
+									app.sm.transition(State.WIRING_WIRE_NODE, Action.START, newCtx,
+										(this as StateMachine).data);
 								}
 								break;
 							case Type.EC:
-								app.state.transition(State.WIRING_EC_NODE, Action.START, newCtx);
-								//console.log(`WIRING over ${newCtx.over.type} of: ${newCtx.it.id}`)
+								app.sm.transition(State.WIRING_EC_NODE, Action.START, newCtx);
 								break;
 						}
 						break;
 					case "body":
-						app.state.transition(State.WIRING_EC_BODY, Action.START, newCtx);
+						app.sm.transition(State.WIRING_EC_BODY, Action.START, newCtx);
 					default:
 						//console.log(`WIRING over ${newCtx.over.type} of: ${newCtx.it.id}`)
 						break;
@@ -425,11 +346,9 @@ function createStateMachine() {
 						let
 							wire = newCtx.it as Wire;
 						if (!wire.editMode) {
-							//open up
 							//later implement a priority queue to turn editMode for unused of too far wires
-							wire.editMode = true;
+							wire.editMode = true;	//open up
 						}
-
 						if (self.ctx.event == "down") {
 							//can't drag first or last line if bonded
 							let
@@ -438,20 +357,33 @@ function createStateMachine() {
 								|| (ln == (<Wire>self.ctx.it).lastLine && self.ctx.it.nodeBonds((<Wire>self.ctx.it).last))) {
 								//console.log("cannot drag bonded wire line");
 							} else {
-								//console.log("start wire line dragging");
-								app.state.transition(State.WIRING_LINE_DRAG, Action.START, newCtx);
+								app.sm.transition(State.WIRING_LINE_DRAG, Action.START, newCtx);
 							}
 							return;
 						}
-						//editMode = true
 						actionDefaultCopyNewState(newCtx);
 						//check if mouse is close enough to a wire node
 						let
-							node = self.ctx.it.overNode(self.ctx.offset, self.ctx.over.line);
-						if (node != -1 && (newCtx.ctrlKey || self.ctx.it.nodeHighlightable(node))) {
-							self.ctx.it.showNode(node);
+							node = wire.overNode(self.ctx.offset, self.ctx.over.line),
+							bonds = wire.nodeBonds(node);
+						//this highlights the wire node
+						if (node != -1 && (
+							bonds ? (
+								(!self.ctx.ctrlKey && !(node == 0 || node == wire.last)) ||
+								(self.data.unbondNode = (self.ctx.ctrlKey && (node == 0 || node == wire.last)))
+							) :
+								true
+							//(self.ctx.unbondNode = (newCtx.ctrlKey && (node == 0 || node == wire.last))) ||	// XOR
+							//(!newCtx.ctrlKey && !(node == 0 || node == wire.last))
+						)
+							//		(self.ctx.it.nodeHighlightable(node) && !self.ctx.it.nodeBonds(node))
+						) {
+							//unbond only when node selected and drag is after Ctrl->click->move
+							console.log(`highlighted: ${wire.id} node: ${node} unbond: ${self.data.unbondNode}`);
+							bonds && console.log(`bonds`);
+							wire.showNode(node);
 						} else {
-							self.ctx.it.hideNode();
+							wire.hideNode();
 						}
 						break;
 				}
@@ -459,48 +391,53 @@ function createStateMachine() {
 			},
 			DOWN: actionDefaultCopyNewState,	//state must be saved so MOVE can capture prev
 			UP: function (newCtx: IMouseState) {
-				(this as StateMachine).ctx = newCtx;		//save new context
+				(this as StateMachine).ctx = newCtx;
 				app.rightClick.setVisible(false);
 			},
 			//transitions
 			RESUME: function (newCtx: IMouseState) {
 				//resume wiring...
+
 			},
-			START: function () {
+			START: function (newCtx: IMouseState) {
 				//console.log("WIRING.START transition - start wiring editing");
 				app.rightClick.setVisible(false);
+				(this as StateMachine).ctx = newCtx;
+				//initialize state variables
+				(this as StateMachine).data = {
+					unbondNode: false
+				};
 			},
 			STOP: function () {
-				//console.log("WIRING.STOP transition - stop wiring editing");
 				app.compList
 					.forEach(c => (c.type == Type.WIRE) && ((c as Wire).editMode = false));
-				app.state.transition(State.IDLE, Action.DEFAULT, void 0);	//go idle
+				app.sm.transition(State.IDLE, Action.DEFAULT, void 0);
 			}
 		}
 	});
-	//WIRING_EC_NODE
-	app.state.register(<IMachineState>{
+	//WIRING_EC_NODE fires WIRING_WIRE_NEW
+	app.sm.register(<IMachineState>{
 		key: State.WIRING_EC_NODE,
 		overType: "deny",
 		actions: {
 			OUT: function (newCtx: IMouseState) {
-				//app.state.send(Action.HIDE_NODE, (this as StateMachine).ctx);
+				//app.sm.send(Action.HIDE_NODE, (this as StateMachine).ctx);
 				if (!(this as StateMachine).ctx.disableOut) {
-					app.state.transition(State.WIRING, Action.RESUME, newCtx);
+					app.sm.transition(State.WIRING, Action.RESUME, newCtx);
 					(this as StateMachine).ctx.it.hideNode();
 				}
 				(this as StateMachine).ctx.disableOut = false;
 			},
 			UP: function (newCtx: IMouseState) {
 				if (newCtx.ctrlKey) {
-					app.state.transition(State.WIRING_WIRE_NEW, Action.START, newCtx);
+					app.sm.transition(State.WIRING_WIRE_NEW, Action.START, newCtx);
 				}
 			},
 			//transitions
 			START: function (newCtx: IMouseState) {
 				let
 					self = this as StateMachine;
-				self.ctx = newCtx;						//save new context
+				self.ctx = newCtx;
 				if (!newCtx.it.nodeBonds(newCtx.over.node)) {
 					self.ctx.disableOut = true;
 					newCtx.it.showNode(newCtx.over.node);
@@ -509,33 +446,34 @@ function createStateMachine() {
 		}
 	});
 	//WIRING_LINE_DRAG
-	app.state.register(<IMachineState>{
+	app.sm.register(<IMachineState>{
 		key: State.WIRING_LINE_DRAG,
 		overType: "deny",
+		persistData: true,
 		actions: {
 			MOVE: function (newCtx: IMouseState) {
 				//newCtx.offset has the updated offset, don't save anything here
 				let
 					self = this as StateMachine,
-					ln = self.ctx.over.line;
+					ln = self.data.line;
 
-				self.ctx.it?.setNode(ln - 1, Point.minus(newCtx.offset, self.ctx.A));
-				self.ctx.it?.setNode(ln, Point.minus(newCtx.offset, self.ctx.B));
+				self.ctx.it?.setNode(ln - 1, Point.minus(newCtx.offset, self.data.A));
+				self.ctx.it?.setNode(ln, Point.minus(newCtx.offset, self.data.B));
 
 				dash.matchWireLine(self.ctx.it as Wire, self.ctx.over.line)
 			},
 			UP: function (newCtx: IMouseState) {
 				//this catches the UP action too
-				removeClass(app.svgBoard, (this as StateMachine).ctx.className);
+				removeClass(app.svgBoard, (this as StateMachine).data.className);
 				dash.hide();
 				if (dash.match) {
 					let
-						ln = (this as StateMachine).ctx.over.line,
+						ln = (this as StateMachine).data.line,
 						vector = Point.minus(dash.p, dash.wire.getNode(dash.node));
 					dash.wire.setNode(ln - 1, Point.plus(dash.wire.getNode(ln - 1), vector));
 					dash.wire.setNode(ln, Point.plus(dash.wire.getNode(ln), vector));
 				}
-				app.state.transition(State.WIRING, Action.START, newCtx);
+				app.sm.transition(State.WIRING, Action.START, newCtx);
 			},
 			OUT: function () {
 				//has to be empty so dragging is not STOP when passing over another component
@@ -544,36 +482,32 @@ function createStateMachine() {
 			//transitions
 			START: function (newCtx: IMouseState) {
 				let
-					self = this as StateMachine;
+					line = newCtx.over.line;
 				//hide previous wire node if any selected
-				app.state.send(Action.HIDE_NODE, self.ctx);
-				//save new context only here, because what changes is only position
-				self.ctx = newCtx;
-				self.ctx.className = "drag-node";
+				app.sm.send(Action.HIDE_NODE, (this as StateMachine).ctx);
+				(this as StateMachine).data = {
+					className: "drag-node",
+					line: line,
+					A: Point.minus(newCtx.offset, <IItemNode>newCtx.it?.getNode(line - 1)),
+					B: Point.minus(newCtx.offset, <IItemNode>newCtx.it?.getNode(line))
+				};
 				//show mouse cursor
-				addClass(app.svgBoard, "drag-node");
-				//add to context vector
-				let
-					ln = self.ctx.over.line;
-				self.ctx.A =
-					Point.minus(self.ctx.offset, <IItemNode>self.ctx.it?.getNode(ln - 1));
-				self.ctx.B =
-					Point.minus(self.ctx.offset, <IItemNode>self.ctx.it?.getNode(ln));
+				addClass(app.svgBoard, (this as StateMachine).data.className);
 			}
 		}
 	});
 	//WIRING_EC_BODY
-	app.state.register(<IMachineState>{
+	app.sm.register(<IMachineState>{
 		key: State.WIRING_EC_BODY,
 		overType: "deny",
 		actions: {
 			OUT: function (newCtx: IMouseState) {
-				app.state.transition(State.WIRING, Action.RESUME, newCtx);
+				app.sm.transition(State.WIRING, Action.RESUME, newCtx);
 			},
 			MOVE: function (newCtx: IMouseState) {
 				if ((this as StateMachine).ctx.event == "down"
 					&& (this as StateMachine).ctx.button == 0) {
-					app.state.transition(State.WIRING_EC_BODY_DRAG, Action.START, newCtx);
+					app.sm.transition(State.WIRING_EC_BODY_DRAG, Action.START, newCtx);
 					return;
 				}
 			},
@@ -581,18 +515,19 @@ function createStateMachine() {
 			DOWN: actionDefaultCopyNewState,
 			//transitions
 			START: function (newCtx: IMouseState) {
-				(this as StateMachine).ctx = newCtx;	//save new context
+				(this as StateMachine).ctx = newCtx;
 			}
 		}
 	});
 	//WIRING_EC_BODY_DRAG
-	app.state.register(<IMachineState>{
+	app.sm.register(<IMachineState>{
 		key: State.WIRING_EC_BODY_DRAG,
 		overType: "deny",
+		persistData: true,
 		actions: {
 			MOVE: function (newCtx: IMouseState) {
 				//newCtx.offset has the updated offset, don't save anything here
-				(this as StateMachine).ctx.dragging.forEach(comp => {
+				(this as StateMachine).data.dragging.forEach((comp: { ec: ItemBoard, offset: Point }) => {
 					let
 						p = Point.minus(newCtx.offset, comp.offset);
 					comp.ec.move(p.x, p.y);
@@ -605,42 +540,44 @@ function createStateMachine() {
 			},
 			UP: function (newCtx: IMouseState) {
 				//this catches the UP action too, stops dragging
-				removeClass(app.svgBoard, (this as StateMachine).ctx.className);
-				app.state.transition(State.WIRING_EC_BODY, Action.START, newCtx);
+				removeClass(app.svgBoard, (this as StateMachine).data.className);
+				app.sm.transition(State.WIRING_EC_BODY, Action.START, newCtx);
 			},
 			//transitions
 			START: function (newCtx: IMouseState) {
-				let
-					self = this as StateMachine;
-				self.ctx = newCtx;						//save new context
-				addClass(app.svgBoard, self.ctx.className = "dragging");		//show mouse cursor
-				//we've just one component here,  new way for multiple drag
-				self.ctx.dragging = [{
-					ec: newCtx.it,
-					offset: Point.minus(newCtx.offset, newCtx.it.p)
-				}]
+				(this as StateMachine).data = {
+					className: "dragging",
+					dragging: [{
+						ec: newCtx.it,
+						offset: Point.minus(newCtx.offset, newCtx.it.p)
+					}]
+				};
+				addClass(app.svgBoard, (this as StateMachine).data.className);
 			}
 		}
 	});
 	//WIRING_WIRE_NODE
-	app.state.register(<IMachineState>{
+	app.sm.register(<IMachineState>{
 		key: State.WIRING_WIRE_NODE,
 		overType: "deny",
+		persistData: true,
 		actions: {
 			OUT: function (newCtx: IMouseState) {
-				app.state.send(Action.HIDE_NODE, (this as StateMachine).ctx);
-				app.state.transition(State.WIRING, Action.RESUME, newCtx);
+				app.sm.send(Action.HIDE_NODE, (this as StateMachine).ctx);
+				app.sm.transition(State.WIRING, Action.RESUME, newCtx);
 			},
 			MOVE: function (newCtx: IMouseState) {
 				if ((this as StateMachine).ctx.event == "down") {
-					app.state.transition(State.WIRING_WIRE_NODE_DRAG, Action.START, newCtx);
+					//don't save so drag checks Ctrl-key
+					app.sm.transition(State.WIRING_WIRE_NODE_DRAG, Action.START, newCtx,
+						(this as StateMachine).data);
 				}
 			},
 			DOWN: function (newCtx: IMouseState) {
-				(this as StateMachine).ctx = newCtx;		//save new context
+				(this as StateMachine).ctx = newCtx;
 			},
 			UP: function (newCtx: IMouseState) {
-				(this as StateMachine).ctx = newCtx;		//save new context
+				(this as StateMachine).ctx = newCtx;
 				//check Ctrl-Click
 				if ((this as StateMachine).ctx.ctrlKey) {
 					//console.log(`Ctrl+Click on Wire node`);
@@ -648,30 +585,37 @@ function createStateMachine() {
 			},
 			//transitions
 			START: function (newCtx: IMouseState) {
-				//we get here from WIRING, so far do nothing
-				//console.log("WIRING_WIRE_NODE.OVER transition");
+				!(this as StateMachine).data &&
+					((this as StateMachine).data = {
+						unbondNode: false
+					});
 			}
 		}
 	});
 	//WIRING_WIRE_NODE_DRAG
-	app.state.register(<IMachineState>{
+	app.sm.register(<IMachineState>{
 		key: State.WIRING_WIRE_NODE_DRAG,
 		overType: "deny",
+		persistData: true,
 		actions: {
 			MOVE: function (newCtx: IMouseState) {
 				let
 					self = this as StateMachine;
 				//newCtx.offset has the updated offset, don't save anything here
-				//update wire node location
-				if (self.ctx.it && self.ctx.it.type == Type.WIRE) {
+				if (self.ctx.it?.type == Type.WIRE) {
 					//for some reason it's trying to setNode on an EC
 					self.ctx.it.setNode(self.ctx.over.node, newCtx.offset);
 					//update highlighted wire node location
 					self.ctx.it.showNode(self.ctx.over.node);
+					console.log(`dragging: ${self.ctx.it.id} node: ${self.ctx.over.node}`);
+					//self.ctx.it.nodeRefresh(self.ctx.over.node);
 
 					dash.matchWireNode(self.ctx.it as Wire, self.ctx.over.node);
 
-					if (self.ctx.isEdgeNode) {
+					//this only wires to EC node allow Wire too
+
+
+					if (self.data.isEdgeNode) {
 						let
 							bond: { ec: ItemBoard, node: number } = <any>void 0;
 						//tests if over an EC node
@@ -691,9 +635,9 @@ function createStateMachine() {
 							}
 						});
 						//deselect previous ec if any
-						self.ctx.bond && self.ctx.bond.ec.select(false);
+						self.data.bond && self.data.bond.ec.select(false);
 						//persists bond data
-						self.ctx.bond = bond;
+						self.data.bond = bond;
 						//select new matched ec node if any
 						bond && bond.ec.select(true);
 					}
@@ -702,20 +646,18 @@ function createStateMachine() {
 			UP: function (newCtx: IMouseState) {
 				let
 					self = this as StateMachine;
-				removeClass(app.svgBoard, <string>self.ctx.className);
+				removeClass(app.svgBoard, <string>self.data.className);
 				dash.hide();
 				//released over an EC node
-				if (self.ctx.bond) {
-					//deselect matched ec node
-					self.ctx.bond.ec.select(false);
-					//bond components
-					self.ctx.it?.bond(self.ctx.nodeNumber,
-						self.ctx.bond.ec, self.ctx.bond.node);
+				if (self.data.bond) {
+					self.data.bond.ec.select(false);
+					self.ctx.it?.bond(self.data.nodeNumber, self.data.bond.ec, self.data.bond.node);
 					//console.log(`inside: ${self.ctx.bond.ec.id}:[${self.ctx.bond.node}]`);
-					app.state.transition(State.WIRING, Action.RESUME, newCtx);
+
+					app.sm.transition(State.WIRING, Action.RESUME, newCtx);
 				} else {
 					dash.match && (dash.wire.setNode(dash.node, dash.p), dash.wire.showNode(dash.node));
-					app.state.transition(State.WIRING_WIRE_NODE, Action.START, newCtx);
+					app.sm.transition(State.WIRING_WIRE_NODE, Action.START, newCtx);
 				}
 			},
 			OUT: function () {
@@ -725,24 +667,35 @@ function createStateMachine() {
 			//transitions
 			START: function (newCtx: IMouseState) {
 				let
-					self = this as StateMachine;
+					self = this as StateMachine,
+					unbondNode = self.data && self.data.unbondNode;
 				//save new context only here, because what changes is only position
+				self.data = {
+					unbondNode: unbondNode,
+					nodeNumber: self.ctx.over.node,
+					isEdgeNode: self.ctx.over.node == 0 || self.ctx.over.node == (<Wire>self.ctx.it)?.last,
+					className: "drag-node",
+					bond: void 0 // { ec: ItemBoard, node: number }
+				}
 				self.ctx = newCtx;
-				self.ctx.nodeNumber = self.ctx.over.node;
-				self.ctx.isEdgeNode = self.ctx.nodeNumber == 0 || self.ctx.nodeNumber == (<Wire>self.ctx.it)?.last;
-				let
-					bonds = newCtx.it.nodeBonds(self.ctx.nodeNumber);
-				bonds?.to.forEach(element => {
-					newCtx.it.unbond(self.ctx.nodeNumber, element.id);
-				});
-				addClass(app.svgBoard, self.ctx.className = "drag-node");
+				if (unbondNode) {
+					let
+						bonds = newCtx.it.nodeBonds(self.data.nodeNumber);
+					bonds?.to.forEach(element => {
+						newCtx.it.unbond(self.data.nodeNumber, element.id);
+					});
+					console.log(`unbond: ${newCtx.it.id} node: ${self.data.nodeNumber} ${bonds?.to.length || 0}`)
+				} else
+					console.log(`no unbond: ${newCtx.it.id} node: ${self.data.nodeNumber}`);
+				addClass(app.svgBoard, self.data.className);
 			}
 		}
 	});
 	//WIRING_WIRE_NEW
-	app.state.register(<IMachineState>{
+	app.sm.register(<IMachineState>{
 		key: State.WIRING_WIRE_NEW,
 		overType: "deny",
+		persistData: true,
 		actions: {
 			ENTER: function (newCtx: IMouseState) {
 				//cannot save new context, erases wiring status
@@ -750,8 +703,8 @@ function createStateMachine() {
 			},
 			KEY: function (code: any) {
 				if (code == "Escape") {
-					delete app.state.ctx.wiring;
-					app.state.transition(State.WIRING, Action.RESUME, (this as StateMachine).ctx);
+					app.sm.data = undefined;
+					app.sm.transition(State.WIRING, Action.RESUME, (this as StateMachine).ctx);
 				}
 			},
 			OUT: function (newCtx: IMouseState) {
@@ -765,40 +718,75 @@ function createStateMachine() {
 				let
 					self = this as StateMachine;
 
-				if (newCtx.over.type == "node" && newCtx.it.highlighted) {
-					self.ctx.wiring.wire.bond(self.ctx.wiring.wire.last, newCtx.it, newCtx.over.node);
-					delete app.state.ctx.wiring;
-					app.state.transition(State.WIRING, Action.RESUME, (this as StateMachine).ctx);
-					newCtx.it.hideNode();
-				} else {
-					//correct last node
-					self.ctx.wiring.wire.setNode(self.ctx.wiring.wire.last, newCtx.offset);
-					self.ctx.wiring.wire.appendNode(newCtx.offset);
+				switch (newCtx.over.type) {
+					case "node":
+						//EC | Wire
+						if (newCtx.it.highlighted) {
+							self.data.wire.bond(self.data.wire.last, newCtx.it, newCtx.over.node);
+							app.sm.data = undefined;
+							app.sm.transition(State.WIRING, Action.RESUME, (this as StateMachine).ctx);
+							newCtx.it.hideNode();
+							return;
+						}
+						break;
+					case "line":
+						console.log(`click on : ${newCtx.it.id} line: ${newCtx.over.line}`);
+						break;
+					default:
+						//Wire::line | board
+						if (!newCtx.it) {
+							console.log('click on board')
+						} else {
+							console.log(`click on: ${newCtx.it.id} node: ${newCtx.over.node}`);
+						}
+						break;
 				}
+				//otherwise correct last node
+				self.data.wire.setNode(self.data.wire.last, newCtx.offset);
+				self.data.wire.appendNode(newCtx.offset);
 				//(newCtx.over.type == "node") && console.log(`click on: ${newCtx.it.id} node: ${newCtx.over.node}`)
 			},
 			MOVE: function (newCtx: IMouseState) {
 				let
 					self = this as StateMachine,
-					prevNodePos = self.ctx.wiring.wire.getNode(self.ctx.wiring.wire.last - 1),
+					prevNodePos = self.data.wire.getNode(self.data.wire.last - 1),
 					r = 7,
 					angle = Math.atan2(newCtx.offset.y - prevNodePos.y, newCtx.offset.x - prevNodePos.x),
 					p = new Point((newCtx.offset.x - r * Math.cos(angle)) | 0,
 						(newCtx.offset.y - r * Math.sin(angle)) | 0);
-				self.ctx.wiring.wire.setNode(self.ctx.wiring.wire.last, p);
+				self.data.wire.setNode(self.data.wire.last, p);
 
-				(newCtx.over.type == "node")
-					&& !newCtx.it.highlighted
-					&& !((newCtx.over.node == self.ctx.wiring.start.node) && (newCtx.it.id == self.ctx.wiring.start.ec.id))
-					&& (self.ctx.disableOut = true, newCtx.it.showNode(newCtx.over.node));
+				switch (newCtx.over.type) {
+					case "node":
+						!newCtx.it.highlighted
+							&& !((newCtx.over.node == self.data.start.node)
+								&& (newCtx.it.id == self.data.start.ec.id))
+							&& (self.ctx.disableOut = true, newCtx.it.showNode(newCtx.over.node));
+						break;
+					case "line":
+						if (!newCtx.it.highlighted && (self.data.wire.id != newCtx.it.id)) {
 
+							if (!(newCtx.it as Wire).editMode) {
+								(newCtx.it as Wire).editMode = true;
+								console.log(`wire: ${newCtx.it.id} not in editMode on line`)
+							}
+							let
+								node = newCtx.it.overNode(newCtx.offset, newCtx.over.line);
+							if (node != -1 && newCtx.it.nodeHighlightable(node)) {
+								self.ctx.disableOut = true
+								newCtx.it.showNode(node);
+							}
+						}
+						console.log(`move over ${newCtx.it.id} line: ${newCtx.over.line}`)
+						break;
+				}
 				//(newCtx.over.type == "node") && console.log(`move over: ${newCtx.it.id} node: ${newCtx.over.node}`);
 			},
 			AFTER_DELETE: function (deletedId: any) {
-				if ((this as StateMachine).ctx.wiring.wire.id == deletedId) {
+				if ((this as StateMachine).data.wire.id == deletedId) {
 					//cancel all, components are already disconnected
-					delete (this as StateMachine).ctx.wiring;
-					app.state.transition(State.WIRING, Action.RESUME, (this as StateMachine).ctx);
+					(this as StateMachine).data = undefined;
+					app.sm.transition(State.WIRING, Action.RESUME, (this as StateMachine).ctx);
 				}
 			},
 			//transitions
@@ -812,29 +800,25 @@ function createStateMachine() {
 				if (!node)
 					throw `no node`;
 				p = Point.plus(p, self.ctx.it.p);
-				self.ctx.wiring = {
+				//{ wire: Wire, start: { ec: ItemBoard, node: number } }
+				self.data = {
 					wire: new Wire(<IItemWireOptions>{
-						points: <IPoint[]>[
-							p,
-							p]
+						points: <IPoint[]>[p, p]
 					}),
 					start: {
 						ec: self.ctx.it,
 						node: newCtx.over.node
 					}
 				};
-				app.addComponent(self.ctx.wiring.wire);
-				//bond components
-				self.ctx.it.bond(self.ctx.over.node, self.ctx.wiring.wire, 0);
+				app.addComponent(self.data.wire);
+				self.data.wire.bond(0, self.ctx.it, self.ctx.over.node);
 			}
 		}
 	});
 }
 
 function readJson(path: string): any {
-	//load default circuit library
 	var data = fs.readFileSync(path);
-	//console.log(data);
 	let
 		json = JSON.parse(data.toString().replace(/[\t\r\n]*/g, ""));
 	return json
@@ -845,10 +829,7 @@ window.addEventListener("DOMContentLoaded", () => {
 	//load DOM script HTML templates
 	templatesDOM("viewBox01|size01|point01|baseWin01|ctxWin01|ctxItem01|propWin01")
 		.then(async (templates: Object) => {
-
-			const d = await ipcRenderer.invoke('shared', 'app');
-			console.log("global.app =", d)
-
+			const d = await ipcRenderer.invoke('shared', 'app'); console.log("global.app =", d)
 			//load default circuit library
 			let
 				json = readJson('./dist/data/library-circuits.v2.json');
@@ -856,8 +837,7 @@ window.addEventListener("DOMContentLoaded", () => {
 			json.forEach((element: IComponentOptions) => {
 				Comp.register(element);
 			});
-			//read context menu data
-			json = readJson('./dist/data/context-menu.json');
+			json = readJson('./dist/data/context-menu.json');		//read context menu data
 
 			app = new MyApp(<IApplicationOptions>{
 				templates: templates,
@@ -877,39 +857,26 @@ window.addEventListener("DOMContentLoaded", () => {
 					cons_log: {
 						tag: "#cons-log",
 						onChange: function (value: boolean, where: number) {
-							app.state.log = value;
+							app.sm.log = value;
 						}
 					}
 				},
 				list: json
 			});
-
-			//set SVG viewBox values
-			updateViewBox(ipcRenderer.sendSync('get-win-size', ''));
-
-			//add HtmlWindow to board
-			app.board.appendChild(app.winProps.win);
-			//add right-click window
-			app.board.appendChild(app.rightClick.win);
-
-			//this's the top SVG element and all other are inserted before, so it's always ON TOP z-index max
-			//add text tooltip to SVG DOM
-			app.svgBoard.append(app.tooltip.g);
-
+			dash = new LinesAligner(app);
+			updateViewBox(ipcRenderer.sendSync('get-win-size', ''));	//set SVG viewBox values
+			app.board.appendChild(app.winProps.win);					//add HtmlWindow to board
+			app.board.appendChild(app.rightClick.win);					//add right-click window
+			app.svgBoard.append(app.tooltip.g);							//top z-index SVG 
 			app.svgBoard.append(dash.line0);
 			app.svgBoard.append(dash.line1);
-
 			hookEvents();
 			createStateMachine();
-
-			//enable state machine to accept commands
-			app.state.enabled = true;
-
+			app.sm.enabled = true;
 
 			//////////////////// TESTINGS /////////////////
-
 			//create default EC first
-			app.addComponent(createEC(<string>app.prop("comp_option").value));
+			//app.addComponent(createEC(<string>app.prop("comp_option").value));
 
 			//this's temporary, until create wire tool works
 			//wire.setPoints([{x:50,y:100}, {x:200,y:100}, {x:200, y:25}, {x:250,y:25}])
@@ -923,7 +890,6 @@ window.addEventListener("DOMContentLoaded", () => {
 					{ x: 250, y: 25 }]
 			})));
 			*/
-
 			//testings
 			//to debug faster
 			//(<any>window).win = app.winProps;
@@ -932,27 +898,22 @@ window.addEventListener("DOMContentLoaded", () => {
 			(<any>window).tooltip = app.tooltip;
 			(<any>window).rc = app.rightClick;
 			//(<any>window).compColor = app.prop("comp_color");
-
 			//(<any>window).Colors = Colors;
 			//(<any>window).Unit = Unit;
 			//var u = new Unit("2.5mV");	//console testings k = new unit.constructor("3mW");
 			//(<any>window).Prop = Prop;
 			//(<any>window).EcProp = EcProp;
 			//var p = new Prop({ tag: "#inp02", onChange : function(e) { console.log(e) } })
-
 			(<any>window).MyApp = app;
-
 			const replaceText = (selector: string, text: string) => {
 				const element = document.getElementById(selector);
 				if (element) {
 					element.innerText = text;
 				}
 			};
-
 			for (const type of ["chrome", "node", "electron"]) {
 				replaceText(`${type}-version`, (process.versions as any)[type]);
 			}
-
 			//////////////////// TESTINGS /////////////////
 
 		})
@@ -962,31 +923,22 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 
 function updateViewBox(arg: any) {
-	//set body height
-	qS("body").style.height = arg.height + "px";
-	//expand main content height
+	qS("body").style.height = arg.height + "px";	//set body height, expand main content height
 	let
 		mainHeight = qS("body").offsetHeight - qS("body>header").offsetHeight - qS("body>footer").offsetHeight;
 	qS("body>main").style.height = mainHeight + "px";
-	//update svg board height
-	app.board.style.height = mainHeight + "px";
-	//set app reference size
-	app.size = new Size(arg.width, arg.height);
-	app.contentHeight = mainHeight; //console.log(mainHeight);
-	//set SVG viewBox values
-	app.setViewBox(<any>undefined);
-	//console.log(event, arg)
+	app.board.style.height = mainHeight + "px";	//update svg board height
+	app.size = new Size(arg.width, arg.height);	//set app reference size
+	app.contentHeight = mainHeight;
+	app.setViewBox(<any>undefined);	//set SVG viewBox values
 }
 
 //this's a proof of concept of how to communicate with main process, the recommended NEW way...
 //	function updateViewBox(arg: any) built this way
-
 ipcRenderer.on("win-resize", (event, arg) => {
 	updateViewBox(arg)
 });
-
 console.log(ipcRenderer.sendSync('synchronous-message', 'ping')) // prints "pong"
-
 ipcRenderer.on('asynchronous-reply', (event, arg) => {
 	console.log(arg) // prints "pong"
 })

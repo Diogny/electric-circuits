@@ -54,7 +54,7 @@ var ActionType;
     ActionType[ActionType["ROTATE_90_CLOCKWISE"] = 204] = "ROTATE_90_CLOCKWISE";
     ActionType[ActionType["ROTATE_90_COUNTER_CLOCKWISE"] = 205] = "ROTATE_90_COUNTER_CLOCKWISE";
     ActionType[ActionType["UNBOND"] = 206] = "UNBOND";
-    ActionType[ActionType["CONNECTIONS"] = 207] = "CONNECTIONS";
+    ActionType[ActionType["RESUME_EDIT"] = 207] = "RESUME_EDIT";
 })(ActionType = exports.ActionType || (exports.ActionType = {}));
 /*
 

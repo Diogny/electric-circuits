@@ -13,7 +13,6 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-//ec.ts
 var dab_1 = require("./dab");
 var utils_1 = require("./utils");
 var types_1 = require("./types");
@@ -113,7 +112,7 @@ var EC = /** @class */ (function (_super) {
     EC.prototype.nodeRefresh = function (node) {
         var _this = this;
         var bond = this.nodeBonds(node), pos = this.getNode(node);
-        bond && bond.to.forEach(function (d) {
+        pos && bond && bond.to.forEach(function (d) {
             var ic = components_1.default.item(d.id), p = point_1.default.plus(_this.p, _this.rotation ? pos.rot : pos).round();
             ic && ic.setNode(d.ndx, p); //no transform
         });
@@ -132,6 +131,10 @@ var EC = /** @class */ (function (_super) {
         pin.rot = rotate(new point_1.default(pin.x, pin.y), this.rotation, this.origin);
         //
         return dab_1.obj(pin);
+    };
+    EC.prototype.getNodeRealXY = function (node) {
+        var pos = this.getNode(node);
+        return pos ? point_1.default.plus(this.p, this.rotation ? pos.rot : pos).round() : null;
     };
     EC.prototype.overNode = function (p, ln) {
         var px = (p.x - this.x) - 5, py = (p.y - this.y) - 5, rect = new rect_1.default(px, py, 10, 10);

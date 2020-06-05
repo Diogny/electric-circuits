@@ -9,10 +9,10 @@ var StateMachine = /** @class */ (function () {
         this.settings = dab_1.obj({
             id: options.id,
             initial: interfaces_1.StateType[options.initial],
-            value: options.initial,
+            state: options.initial,
             ctx: options.ctx || {},
             enabled: false,
-            states: new Map(),
+            stateList: new Map(),
             log: !!options.log || false
         });
         //all defined states
@@ -28,20 +28,25 @@ var StateMachine = /** @class */ (function () {
             _this.settings.commonActions.set(key, value);
         });
         this.sendCmd = "";
-        this.log && console.log("[" + interfaces_1.StateType[this.value] + "]");
+        this.log && console.log("[" + this.stateName + "]");
     }
     Object.defineProperty(StateMachine.prototype, "id", {
         get: function () { return this.settings.id; },
         enumerable: false,
         configurable: true
     });
-    Object.defineProperty(StateMachine.prototype, "value", {
-        get: function () { return this.settings.value; },
+    Object.defineProperty(StateMachine.prototype, "initial", {
+        get: function () { return this.settings.initial; },
         enumerable: false,
         configurable: true
     });
-    Object.defineProperty(StateMachine.prototype, "initial", {
-        get: function () { return this.settings.initial; },
+    Object.defineProperty(StateMachine.prototype, "state", {
+        get: function () { return this.settings.state; },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(StateMachine.prototype, "stateName", {
+        get: function () { return interfaces_1.StateType[this.state]; },
         enumerable: false,
         configurable: true
     });
@@ -57,27 +62,39 @@ var StateMachine = /** @class */ (function () {
         enumerable: false,
         configurable: true
     });
+    Object.defineProperty(StateMachine.prototype, "data", {
+        get: function () {
+            var state = this.getState(this.stateName);
+            return state ? state.data : undefined;
+        },
+        set: function (value) {
+            var state = this.getState(this.stateName);
+            state && (state.data = value);
+        },
+        enumerable: false,
+        configurable: true
+    });
     Object.defineProperty(StateMachine.prototype, "log", {
         //console logging
         get: function () { return this.settings.log; },
         set: function (value) {
             (this.settings.log = !!value)
-                && console.log("[" + interfaces_1.StateType[this.value] + "]"); // to visually track who got the action
+                && console.log("[" + this.stateName + "]"); // to visually track who got the action
         },
         enumerable: false,
         configurable: true
     });
-    StateMachine.prototype.state = function (name) {
-        return this.settings.states.get(name);
+    StateMachine.prototype.getState = function (name) {
+        return this.settings.stateList.get(name);
     };
     /**
      * @description executes and action on the current state
      * @param action action to be executed
      * @param data data to be sent
      */
-    StateMachine.prototype.send = function (action, data) {
-        var current = this.state(interfaces_1.StateType[this.value]);
-        if (!current)
+    StateMachine.prototype.send = function (action, newCtx) {
+        var current = this.getState(this.stateName);
+        if (!current || !this.enabled)
             return false;
         var actionName = interfaces_1.ActionType[action], fn, newSendCmd = "  ::" + actionName;
         //check action.OVER and overType
@@ -110,11 +127,11 @@ var StateMachine = /** @class */ (function () {
             var postSendCmd = "  ::" + actionName;
             //for ENTER show current state, to visually track who got the action
             (action == interfaces_1.ActionType.ENTER) &&
-                console.log("[" + interfaces_1.StateType[this.value] + "]");
+                console.log("[" + this.stateName + "]");
             console.log("" + (this.sendCmd = newSendCmd) + (newSendCmd != postSendCmd ? " -> " + postSendCmd : "") + (fn ? "" : " not found"));
         }
         //execute action if found
-        return fn === null || fn === void 0 ? void 0 : fn.call(this, data), !!fn;
+        return fn === null || fn === void 0 ? void 0 : fn.call(this, newCtx), !!fn;
     };
     /**
      * @description transition to a new state and executes and action on that new state
@@ -122,17 +139,22 @@ var StateMachine = /** @class */ (function () {
      * @param action action to be executed on the new state
      * @param data data to sent to new action
      */
-    StateMachine.prototype.transition = function (state, action, data) {
+    StateMachine.prototype.transition = function (state, action, newCtx, data) {
         var stateName = interfaces_1.StateType[state];
         //https://kentcdodds.com/blog/implementing-a-simple-state-machine-library-in-javascript
-        var newStateDef = this.state(stateName);
-        if (!newStateDef)
+        var newStateDef = this.getState(stateName);
+        if (!newStateDef || !this.enabled)
             return false;
-        this.log && console.log("[" + stateName + "]" + (this.value == state ? " same state" : ""));
+        this.log && console.log("[" + stateName + "]" + (this.state == state ? " same state" : ""));
         //save new state to receive SEND commands
-        this.settings.value = state;
-        //
-        return this.send(action, data);
+        this.settings.state = state;
+        //persists data between state transitions
+        if (data == undefined)
+            !newStateDef.persistData && (this.data != undefined) && (this.data = undefined);
+        else
+            //overrides state persistData
+            this.data = data;
+        return this.send(action, newCtx);
     };
     /**
      * @description register a new state
@@ -141,14 +163,17 @@ var StateMachine = /** @class */ (function () {
     StateMachine.prototype.register = function (state) {
         //find it by name
         var key = interfaces_1.StateType[state === null || state === void 0 ? void 0 : state.key];
-        if (!state || this.state(key))
+        if (!state || this.getState(key))
             return false;
-        //save state actions
-        this.settings.states.set(key, dab_1.obj({
+        //initial state value
+        !state.data && (state.data = undefined);
+        //save
+        this.settings.stateList.set(key, state);
+        /*this.settings.states.set(key, obj(<IMachineState>{
             key: state.key,
             overType: state.overType,
             actions: state.actions
-        }));
+        }));*/
         return true;
     };
     return StateMachine;
