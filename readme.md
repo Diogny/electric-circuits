@@ -8,8 +8,8 @@ Used in my testing website [Electric Circuits](http://diogny.com/tests/circuits.
 
 ### wiring
 	select wiring tool
-	Ctrl+click starts wiring
-	Ctrl over a bond, unbonds after drag
+	Ctrl+click starts wiring from EC node
+	Ctrl+click and drag to bond lose wire
 	Highlighted wire nodes can be dragged and aligned
 
 ![working example](dist/img/img01.png)
@@ -62,11 +62,11 @@ Used in my testing website [Electric Circuits](http://diogny.com/tests/circuits.
 
 ### git update
 	git status
-
+	git rm --cached dist/src/boardCircle.js
 	git add <file> ...	git add .
 	git add -u					stage the modified and deleted files
 	git add -A
 	git commit -m "update message"
-	git tag v1.0.16
+	git tag v1.1.0
 	git push origin master --tags
 

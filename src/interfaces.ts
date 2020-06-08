@@ -11,7 +11,6 @@ import StateMachine from "./stateMachine";
 import { ItemBoard } from "./itemsBoard";
 import { Application } from "./app";
 import EcProp from "./ecprop";
-import Wire from "./wire";
 
 export interface IExec {
 	result: any;
@@ -127,7 +126,7 @@ export interface IMouseState {
 	altKey: boolean;
 	it: ItemBoard;
 	//[obsolete] will be eliminated
-	disableOut: boolean;
+	//disableOut: boolean;
 }
 
 export interface ICompOverState {
@@ -268,6 +267,11 @@ export interface ITooltipSettings extends IItemBaseProperties {
 	borderRadius: number;
 }
 
+export interface IHighlighNodeSettings extends IItemBaseProperties {
+	radius: number;
+	node: number;
+}
+
 export interface IItemBoardProperties extends IItemBaseProperties {
 	base: Comp;
 	props: any;
@@ -370,7 +374,7 @@ export interface IContextMenuSettings extends IContextMenuOptions {
 export interface IStateMachineBaseOptions {
 	id: string;
 	initial: StateType;
-	ctx: IMouseState;		//this's the data held in every state
+	//ctx: IMouseState;		//this's the data held in every state
 }
 
 export interface IMachineActionCallback {
@@ -422,15 +426,11 @@ export enum StateType {
 	EC_NODE = 4,
 	EC_DRAG = 5,
 	EC_BODY = 6,
-	WIRE_LINE = 7,
-	WIRING = 8,						// WIRING
-	WIRING_WIRE_NODE = 9,
-	WIRING_WIRE_NODE_DRAG = 10,
-	WIRING_LINE_DRAG = 11,
-	WIRING_EC_BODY = 12,
-	WIRING_EC_BODY_DRAG = 13,
-	WIRING_WIRE_NEW = 14,
-	WIRING_EC_NODE = 15
+	WIRE_NODE = 7,
+	WIRE_NODE_DRAG = 8,
+	WIRE_LINE = 9,
+	WIRE_LINE_DRAG = 10,
+	NEW_WIRE_FROM_EC = 11,
 }
 
 export enum ActionType {
@@ -442,13 +442,12 @@ export enum ActionType {
 	UP = 6,
 	ENTER = 7,
 	LEAVE = 8,
-	START = 14,						//jump to leave space for basic actions
+	//jump to leave space for basic actions
+	START = 14,
 	RESUME = 15,
 	STOP = 16,
 	HIDE_NODE = 17,
-	SHOW_NODE_TOOLTIP = 18,
-	SHOW_BODY_TOOLTIP = 19,
-	FORWARD_OVER = 20,
+	FORWARD_OVER = 18,
 	KEY = 40,
 
 	//unified actions

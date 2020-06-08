@@ -11,8 +11,9 @@ var LinesAligner = /** @class */ (function () {
             x1: 0, y1: 0, x2: 0, y2: 0,
             "stroke-dasharray": "3, 3"
         }); };
-        this.line0 = create("line0");
-        this.line1 = create("line1");
+        this.g = utils_1.tag("g", "", {});
+        this.g.appendChild(this.line0 = create("line0"));
+        this.g.appendChild(this.line1 = create("line1"));
     }
     LinesAligner.prototype.hide = function () {
         dab_1.addClass(this.line0, "hide");

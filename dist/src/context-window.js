@@ -46,8 +46,7 @@ var ContextWindow = /** @class */ (function (_super) {
         //return false;
     };
     ContextWindow.prototype.onMouseLeave = function (e) {
-        //console.log('OUT of context window', e.eventPhase, (e.target as HTMLElement).id);
-        //return false;
+        this.app.sm.transition(interfaces_1.StateType.BOARD, interfaces_1.ActionType.RESUME);
     };
     ContextWindow.prototype.setVisible = function (value) {
         return (!_super.prototype.setVisible.call(this, value).visible && this.win.setAttribute("data-trigger", "")), this;
@@ -62,6 +61,7 @@ var ContextWindow = /** @class */ (function (_super) {
         var ctx;
         switch (type) {
             case "node":
+            case "node-x":
                 ctx = ((name == "wire") ? "wire-" : "ec-") + type;
                 break;
             case "board":

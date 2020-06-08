@@ -27,16 +27,16 @@ var stateMachine_1 = require("./stateMachine");
 var components_1 = require("./components");
 var context_window_1 = require("./context-window");
 var types_1 = require("./types");
+var linealign_1 = require("./linealign");
+var highlightNode_1 = require("./highlightNode");
 var MyApp = /** @class */ (function (_super) {
     __extends(MyApp, _super);
-    //temporary properties
-    //wire: Wire;
     function MyApp(options) {
         var _a;
         var _this = _super.call(this, options) || this;
         _this.tooltipFontSize = function () { return Math.max(10, 35 * _this.multiplier); };
         var that = _this, hideNodeTooltip = function (newCtx) {
-            newCtx.it && newCtx.it.hideNode();
+            that.highlight.hide();
             that.tooltip.setVisible(false);
         }, 
         //HTML
@@ -71,6 +71,7 @@ var MyApp = /** @class */ (function (_super) {
             //post actions
             switch (state.over.type) {
                 case "node":
+                case "node-x":
                     state.over.node = dab_1.attr(state.over.svg, state.over.type) | 0;
                     break;
                 case "line":
@@ -106,6 +107,8 @@ var MyApp = /** @class */ (function (_super) {
         _this.svgBoard = _this.board.children[0];
         _this.topBarLeft = utils_1.qS("#top-bar>div:nth-of-type(1)");
         _this.topBarRight = utils_1.qS("#top-bar>div:nth-of-type(2)");
+        _this.dash = new linealign_1.default(_this);
+        _this.highlight = new highlightNode_1.default({});
         //this'll hold the properties of the current selected component
         _this.winProps = new app_window_1.default({
             app: _this,
@@ -123,43 +126,25 @@ var MyApp = /** @class */ (function (_super) {
         //create state machine
         _this.sm = new stateMachine_1.default({
             id: "state-machine-01",
-            initial: interfaces_1.StateType.IDLE,
+            initial: interfaces_1.StateType.BOARD,
             states: {},
             log: (_a = _this.prop("cons_log")) === null || _a === void 0 ? void 0 : _a.value,
             ctx: {},
             commonActions: {
                 ENTER: function (newCtx) {
-                    that.sm.ctx = newCtx; //for now just copy data
+                    //that.sm.ctx = newCtx;		//for now just copy data
                 },
                 LEAVE: function (newCtx) {
                     //cannot save new context, erases wiring status
                     hideNodeTooltip(newCtx);
                     that.topBarLeft.innerHTML = "&nbsp;";
                 },
+                KEY: function (code) {
+                    console.log("KEY: " + code);
+                    //this's the default
+                    (code == "Delete") && that.execute(interfaces_1.ActionType.DELETE, "");
+                },
                 HIDE_NODE: hideNodeTooltip,
-                SHOW_BODY_TOOLTIP: function (newCtx) {
-                    var _a;
-                    var p = point_1.default.translateBy(newCtx.offset, 20);
-                    that.tooltip.setVisible(true)
-                        .move(p.x, p.y)
-                        .setFontSize(that.tooltipFontSize())
-                        .setText((_a = newCtx.it) === null || _a === void 0 ? void 0 : _a.id);
-                },
-                SHOW_NODE_TOOLTIP: function (newCtx) {
-                    var _a;
-                    //data has current state
-                    if (newCtx.it) {
-                        if (!newCtx.it.highlighted) {
-                            !newCtx.it.nodeBonds(newCtx.over.node)
-                                && newCtx.it.showNode(newCtx.over.node);
-                            var p = point_1.default.translateBy(newCtx.offset, 20), label = ((_a = newCtx.it.getNode(newCtx.over.node)) === null || _a === void 0 ? void 0 : _a.label) || "unknown";
-                            that.tooltip.setVisible(true)
-                                .move(p.x, p.y)
-                                .setFontSize(that.tooltipFontSize())
-                                .setText(newCtx.over.node + " -" + label);
-                        }
-                    }
-                },
                 FORWARD_OVER: function (newCtx) {
                     //accepts transitions to new state on mouse OVER
                     var prefix = !newCtx.it ? "" : newCtx.it.type == 1 ? "EC_" : "WIRE_", stateName = (prefix + newCtx.over.type).toUpperCase(), state = interfaces_1.StateType[stateName];
@@ -222,6 +207,8 @@ var MyApp = /** @class */ (function (_super) {
                 case 'ArrowRight':
                 case 'ArrowDown':
                 case 'Delete':
+                case 'ControlLeft':
+                case 'ControlRight':
                     that.sm.send(interfaces_1.ActionType.KEY, ev.code);
                     break;
             }
@@ -229,6 +216,11 @@ var MyApp = /** @class */ (function (_super) {
         };
         return _this;
     }
+    Object.defineProperty(MyApp.prototype, "tooltipOfs", {
+        get: function () { return 15; },
+        enumerable: false,
+        configurable: true
+    });
     Object.defineProperty(MyApp.prototype, "ec", {
         //has value if only one comp selected, none or multiple has undefined
         get: function () {
@@ -278,7 +270,9 @@ var MyApp = /** @class */ (function (_super) {
                 throw "duplicated component " + comp.id;
             this.compList.set(comp.id, comp);
             //add it to SVG DOM
-            this.svgBoard.insertBefore(comp.g, (comp.type == types_1.Type.WIRE) ? this.svgBoard.firstChild : this.tooltip.g);
+            (comp.type == types_1.Type.WIRE) ?
+                this.dash.g.insertAdjacentElement("afterend", comp.g) :
+                this.svgBoard.insertBefore(comp.g, this.tooltip.g);
             //do after DOM inserted work
             comp.afterDOMinserted();
         }
@@ -347,26 +341,42 @@ var MyApp = /** @class */ (function (_super) {
                 //temporary, for testings...
                 window.ec = void 0;
                 break;
+            case interfaces_1.ActionType.DELETE_SELECTED:
+                var selectedCount = this.selectedComponents.length, deletedCount_1 = 0;
+                this.selectedComponents = this.selectedComponents.filter(function (c) {
+                    if (_this.compList.delete(c.id)) {
+                        //disconnects and remove component from DOM
+                        c.disconnect();
+                        c.remove();
+                        deletedCount_1++;
+                        return false;
+                    }
+                    return true;
+                });
+                this.refreshRotation();
+                this.winProps.clear().setVisible(false);
+                this.tooltip.setVisible(false);
+                if (selectedCount != deletedCount_1) {
+                    console.log("[" + deletedCount_1 + "] components of [" + selectedCount + "]");
+                }
+                //temporary, for testings...
+                window.ec = void 0;
+                break;
             case interfaces_1.ActionType.DELETE:
+                //only comp if sent
                 if (!(compNull = !comp)) {
                     if (this.compList.delete(comp.id)) {
                         //disconnects and remove component from DOM
                         comp.disconnect();
                         comp.remove();
-                        this.selectedComponents = Array.from(this.compList.values()).filter(function (c) { return c.selected; });
                         this.refreshRotation();
-                        if (this.winProps.compId == comp.id)
-                            this.winProps.clear();
-                        else
-                            this.winProps.refresh();
+                        this.winProps.clear().setVisible(false);
                         this.tooltip.setVisible(false);
-                        //temporary, for testings...
-                        window.ec = void 0;
                         this.sm.send(interfaces_1.ActionType.AFTER_DELETE, comp.id);
                     }
-                    else
-                        console.log("component #" + comp.id + " could not be removed or it doesn't exists");
                 }
+                //temporary, for testings...
+                window.ec = void 0;
                 break;
             case interfaces_1.ActionType.SHOW_PROPERTIES:
                 !(compNull = !comp) && this.winProps.load(comp);

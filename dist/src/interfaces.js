@@ -9,15 +9,11 @@ var StateType;
     StateType[StateType["EC_NODE"] = 4] = "EC_NODE";
     StateType[StateType["EC_DRAG"] = 5] = "EC_DRAG";
     StateType[StateType["EC_BODY"] = 6] = "EC_BODY";
-    StateType[StateType["WIRE_LINE"] = 7] = "WIRE_LINE";
-    StateType[StateType["WIRING"] = 8] = "WIRING";
-    StateType[StateType["WIRING_WIRE_NODE"] = 9] = "WIRING_WIRE_NODE";
-    StateType[StateType["WIRING_WIRE_NODE_DRAG"] = 10] = "WIRING_WIRE_NODE_DRAG";
-    StateType[StateType["WIRING_LINE_DRAG"] = 11] = "WIRING_LINE_DRAG";
-    StateType[StateType["WIRING_EC_BODY"] = 12] = "WIRING_EC_BODY";
-    StateType[StateType["WIRING_EC_BODY_DRAG"] = 13] = "WIRING_EC_BODY_DRAG";
-    StateType[StateType["WIRING_WIRE_NEW"] = 14] = "WIRING_WIRE_NEW";
-    StateType[StateType["WIRING_EC_NODE"] = 15] = "WIRING_EC_NODE";
+    StateType[StateType["WIRE_NODE"] = 7] = "WIRE_NODE";
+    StateType[StateType["WIRE_NODE_DRAG"] = 8] = "WIRE_NODE_DRAG";
+    StateType[StateType["WIRE_LINE"] = 9] = "WIRE_LINE";
+    StateType[StateType["WIRE_LINE_DRAG"] = 10] = "WIRE_LINE_DRAG";
+    StateType[StateType["NEW_WIRE_FROM_EC"] = 11] = "NEW_WIRE_FROM_EC";
 })(StateType = exports.StateType || (exports.StateType = {}));
 var ActionType;
 (function (ActionType) {
@@ -29,13 +25,12 @@ var ActionType;
     ActionType[ActionType["UP"] = 6] = "UP";
     ActionType[ActionType["ENTER"] = 7] = "ENTER";
     ActionType[ActionType["LEAVE"] = 8] = "LEAVE";
+    //jump to leave space for basic actions
     ActionType[ActionType["START"] = 14] = "START";
     ActionType[ActionType["RESUME"] = 15] = "RESUME";
     ActionType[ActionType["STOP"] = 16] = "STOP";
     ActionType[ActionType["HIDE_NODE"] = 17] = "HIDE_NODE";
-    ActionType[ActionType["SHOW_NODE_TOOLTIP"] = 18] = "SHOW_NODE_TOOLTIP";
-    ActionType[ActionType["SHOW_BODY_TOOLTIP"] = 19] = "SHOW_BODY_TOOLTIP";
-    ActionType[ActionType["FORWARD_OVER"] = 20] = "FORWARD_OVER";
+    ActionType[ActionType["FORWARD_OVER"] = 18] = "FORWARD_OVER";
     ActionType[ActionType["KEY"] = 40] = "KEY";
     //unified actions
     ActionType[ActionType["SELECT"] = 100] = "SELECT";

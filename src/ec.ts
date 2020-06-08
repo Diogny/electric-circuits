@@ -1,5 +1,5 @@
-import { attr, obj, extend } from './dab';
-import { svg, each } from './utils';
+import { attr, obj, extend, aCld } from './dab';
+import { each, tag } from './utils';
 import { Type } from './types';
 import Comp from './components';
 import Bond from './bonds';
@@ -13,6 +13,8 @@ export default class EC extends ItemSolid {
 
 	labelSVG: Label;
 
+	get last(): number { return this.base.meta.nodes.list.length - 1 }
+
 	get type(): Type { return Type.EC }
 
 	get count(): number {
@@ -23,10 +25,30 @@ export default class EC extends ItemSolid {
 		super(options);
 		//this ensures all path, rect, circles are inserted before the highlight circle node
 		//_.svg is used because _.html doesn't work for SVG
-		[].slice.call(svg(`<g>${this.base.data}</g>`).children).forEach(
-			(n: any) => {
-				this.g.insertBefore(n, this.highlight.g);
-			});
+		this.g.innerHTML = this.base.data;
+		//add component label if available
+		let
+			createText = (attr: any, text: string) => {
+				let
+					svgText = tag("text", "", attr);
+				return svgText.innerHTML = text, svgText
+			}
+		//for labels in N555, 7408, Atmega168
+		if (this.base.meta.label) {
+			aCld(this.g, createText({
+				x: this.base.meta.label.x,
+				y: this.base.meta.label.y,
+				"class": this.base.meta.label.class
+			}, this.base.meta.label.text))
+		}
+		//add node labels for DIP packages
+		if (this.base.meta.nodes.createLabels) {
+			let
+				pins = (this as unknown as EC).count / 2;
+			for (let y = 55, x = 7, i = 0, factor = 20; y > 0; y -= 44, x += (factor = -factor))
+				for (let col = 0; col < pins; col++, i++, x += factor)
+					aCld(this.g, createText({ x: x, y: y }, i + ""));
+		}
 		//create label if defined
 		if (this.base.meta.labelId) {
 			this.labelSVG = new Label(<any>{
@@ -150,9 +172,28 @@ export default class EC extends ItemSolid {
 				pin.x = Math.round(pin.rot.x);
 				pin.y = Math.round(pin.rot.y);
 			}
-			if (rect.inside(new Point(pin.x, pin.y))) {
+			//radius 5 =>  5^2 = 25
+			if ((Math.pow((p.x - this.x) - pin.x, 2) + Math.pow((p.y - this.y) - pin.y, 2)) <= 25)
 				return i;
-			}
+		}
+		return -1;
+	}
+
+	public findNode(p: Point): number {
+		let
+			dx = p.x - this.x,
+			dy = p.y - this.y,
+			rotation = -this.rotation,
+			origin = this.origin;
+		for (let i = 0, list = this.base.meta.nodes.list, meta = list[i], len = list.length;
+			i < len; meta = list[++i]) {
+			let
+				nodePoint = this.rotation
+					? Point.prototype.rotateBy.call(meta, origin.x, origin.y, rotation)
+					: meta;
+			//radius 5 =>  5^2 = 25
+			if ((Math.pow(dx - nodePoint.x, 2) + Math.pow(dy - nodePoint.y, 2)) <= 25)
+				return i;
 		}
 		return -1;
 	}

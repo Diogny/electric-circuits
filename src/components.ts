@@ -1,9 +1,6 @@
-
 import { obj } from './dab';
 import { ItemBoard } from './itemsBoard';
-import {
-	IBaseComponent, IComponentOptions, IBaseStoreComponent, IComponentMetadata
-} from './interfaces';
+import { IBaseComponent, IComponentOptions, IBaseStoreComponent, IComponentMetadata } from './interfaces';
 
 const defaultIdTemplate = "{this.name}-{base.count}";
 const defaultComponent = (name: string): IBaseStoreComponent => (<any>{
@@ -75,6 +72,8 @@ export default class Comp {
 	////////////////////////////// STATIC ////////////////////////////////
 
 	public static each = (callbackfn: (value: ItemBoard, key: string, map: Map<string, ItemBoard>) => void) => Comp.boardItems.forEach(callbackfn);
+
+	public static get itemCollection(): ItemBoard[] { return Array.from(Comp.boardItems.values()) }
 
 	//it can be sent #id
 	public static item = (id: string): ItemBoard | undefined => Comp.boardItems.get((id).startsWith('#') ? id.slice(1) : id);

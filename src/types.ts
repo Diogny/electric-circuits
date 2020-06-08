@@ -6,7 +6,8 @@ export enum Type {
 	BOND = 3,
 	LABEL = 4,
 	WIN = 5,
-	TOOLTIP = 6
+	TOOLTIP = 6,
+	HIGHLIGHT = 7
 };
 
 export abstract class TypedClass {

@@ -74,7 +74,7 @@ var BaseWindow = /** @class */ (function (_super) {
         get: function () { return this.settings.size; },
         set: function (value) {
             if (!dab_1.pojo(value)) {
-                return; //value = this.propertyDefaults().size;
+                return;
             }
             this.settings.size = {
                 width: Math.max(BaseWindow.minWidth, value.width | 0),

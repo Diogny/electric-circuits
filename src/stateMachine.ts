@@ -1,13 +1,60 @@
 import {
 	IStateMachineSettings, IStateMachine, IStateMachineOptions, IMachineState, StateType, ActionType,
-	IMachineActionCallback, IMouseState
+	IMachineActionCallback
 } from "./interfaces";
 import { each } from "./utils";
 import { obj } from "./dab";
 
+function sendAction(action: ActionType, newCtx?: any): boolean {
+	let
+		current: IMachineState = (this as StateMachine).getState(this.stateName),
+		actionName = ActionType[action],
+		fn: Function | undefined,
+		newSendCmd = `  ::${actionName}`;
+
+	//check action.OVER and overType
+	if (action == ActionType.OVER) {
+		switch (current.overType) {
+			case "deny":
+				//do nothing ...
+				//deny transitions here, by not calling app.state.transition
+				//  so DEFAULT action is not called
+				//and on all others, accept, this way I can prevent stop dragging while OVER event
+				(this as StateMachine).log && console.log(`${newSendCmd} -> deny`);
+				return true;
+			case "forward":
+				//send action.FORWARD_OVER from common actions
+				//accepts transitions to new state on mouse OVER
+				fn = <any>(this as StateMachine).settings.commonActions.get(actionName = "FORWARD_OVER");
+				break;
+			case "function":
+				//call function if provided
+				fn = (<any>current.actions)[actionName];
+				break;
+		}
+	} else {
+		fn = (<any>current.actions)[actionName]					// first priority in state[action]
+			|| (this as StateMachine).settings.commonActions.get(actionName)		// second priority are common actions to all states
+			|| (<any>current.actions)[actionName = "DEFAULT"];	// third priority is stae.DEFAULT action
+	}
+
+	if ((this as StateMachine).log && newSendCmd != (this as StateMachine).sendCmd) {	// && actionName != "FORWARD_OVER"
+		let
+			postSendCmd = `  ::${actionName}`;
+		//for ENTER show current state, to visually track who got the action
+		(action == ActionType.ENTER) &&
+			console.log(`[${(this as StateMachine).stateName}]`);
+		console.log(`${(this as StateMachine).sendCmd = newSendCmd}${newSendCmd != postSendCmd ? " -> " + postSendCmd : ""}${fn ? "" : " not found"}`);
+	}
+
+	//execute action if found
+	return fn?.call(this, newCtx), !!fn;
+}
+
 export default class StateMachine implements IStateMachine {
 
-	private settings: IStateMachineSettings;
+	settings: IStateMachineSettings;
+	transitioning: boolean;
 
 	get id(): string { return this.settings.id }
 
@@ -15,9 +62,6 @@ export default class StateMachine implements IStateMachine {
 
 	get state(): StateType { return this.settings.state }
 	get stateName(): string { return StateType[this.state] }
-
-	get ctx(): IMouseState { return this.settings.ctx }
-	set ctx(value: IMouseState) { this.settings.ctx = value }
 
 	get enabled(): boolean { return this.settings.enabled }
 	set enabled(value: boolean) { this.settings.enabled = value }
@@ -39,7 +83,7 @@ export default class StateMachine implements IStateMachine {
 	}
 
 	//development
-	private sendCmd: string;
+	sendCmd: string;
 
 	public getState(name: string): IMachineState {
 		return <any>this.settings.stateList.get(name)
@@ -50,7 +94,7 @@ export default class StateMachine implements IStateMachine {
 			id: options.id,
 			initial: <StateType><unknown>StateType[options.initial],
 			state: options.initial,		//options.value is discarded
-			ctx: options.ctx || {},
+			//ctx: options.ctx || {},
 			enabled: false,
 			stateList: new Map(),
 			log: !!options.log || false
@@ -69,6 +113,7 @@ export default class StateMachine implements IStateMachine {
 		});
 		this.sendCmd = "";
 		this.log && console.log(`[${this.stateName}]`);
+		this.transitioning = false;
 	}
 
 	/**
@@ -77,51 +122,11 @@ export default class StateMachine implements IStateMachine {
 	 * @param data data to be sent
 	 */
 	public send(action: ActionType, newCtx?: any): boolean {
-		const current: IMachineState = this.getState(this.stateName);
-		if (!current || !this.enabled)
-			return false;
-		let
-			actionName = ActionType[action],
-			fn: Function | undefined,
-			newSendCmd = `  ::${actionName}`;
-
-		//check action.OVER and overType
-		if (action == ActionType.OVER) {
-			switch (current.overType) {
-				case "deny":
-					//do nothing ...
-					//deny transitions here, by not calling app.state.transition
-					//  so DEFAULT action is not called
-					//and on all others, accept, this way I can prevent stop dragging while OVER event
-					this.log && console.log(`${newSendCmd} -> deny`);
-					return true;
-				case "forward":
-					//send action.FORWARD_OVER from common actions
-					//accepts transitions to new state on mouse OVER
-					fn = <any>this.settings.commonActions.get(actionName = "FORWARD_OVER");
-					break;
-				case "function":
-					//call function if provided
-					fn = (<any>current.actions)[actionName];
-					break;
-			}
-		} else {
-			fn = (<any>current.actions)[actionName]					// first priority in state[action]
-				|| this.settings.commonActions.get(actionName)		// second priority are common actions to all states
-				|| (<any>current.actions)[actionName = "DEFAULT"];	// third priority is stae.DEFAULT action
+		if (this.transitioning) {
+			console.log(`action: ${ActionType[action]} discarded while transitioning to a new state`);
+			//return false;
 		}
-
-		if (this.log && newSendCmd != this.sendCmd) {
-			let
-				postSendCmd = `  ::${actionName}`;
-			//for ENTER show current state, to visually track who got the action
-			(action == ActionType.ENTER) &&
-				console.log(`[${this.stateName}]`);
-			console.log(`${this.sendCmd = newSendCmd}${newSendCmd != postSendCmd ? " -> " + postSendCmd : ""}${fn ? "" : " not found"}`);
-		}
-
-		//execute action if found
-		return fn?.call(this, newCtx), !!fn;
+		return sendAction.call(this, action, newCtx);
 	}
 
 	/**
@@ -131,13 +136,16 @@ export default class StateMachine implements IStateMachine {
 	 * @param data data to sent to new action
 	 */
 	public transition(state: StateType, action: ActionType, newCtx?: any, data?: any): boolean {
+		this.transitioning = true;
 		let
 			stateName = StateType[state];
 		//https://kentcdodds.com/blog/implementing-a-simple-state-machine-library-in-javascript
 		const newStateDef: IMachineState = this.getState(stateName);
 		if (!newStateDef || !this.enabled)
 			return false;
-		this.log && console.log(`[${stateName}]${this.state == state ? " same state" : ""}`);
+		this.log
+			//&& !(action == ActionType.FORWARD_OVER)
+			&& console.log(`[${stateName}]${this.state == state ? " same state" : ""}`);
 		//save new state to receive SEND commands
 		this.settings.state = state;
 		//persists data between state transitions
@@ -146,7 +154,11 @@ export default class StateMachine implements IStateMachine {
 		else
 			//overrides state persistData
 			this.data = data;
-		return this.send(action, newCtx);
+		let
+			result = <boolean>sendAction.call(this, action, newCtx);
+		//action executed already
+		this.transitioning = false;
+		return result;
 	}
 
 	/**

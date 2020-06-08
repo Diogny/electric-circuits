@@ -1,8 +1,8 @@
 {
 	"board": [
 		{
-			"text": "Remove All",
-			"name": "DELETE_ALL",
+			"text": "Delete Selected",
+			"name": "DELETE_SELECTED",
 			"enabled": [
 				"BOARD"
 			]
@@ -79,7 +79,26 @@
 			"name": "UNBOND",
 			"shortcut": "Ctrl-U",
 			"enabled": [
-				"WIRING_EC_NODE"
+				"EC_NODE"
+			]
+		},
+		{
+			"text": "Connections",
+			"name": "CONNECTIONS",
+			"shortcut": "Ctrl+P"
+		},
+		{
+			"text": "Select",
+			"name": "SELECT"
+		}
+	],
+	"ec-node-x": [
+		{
+			"text": "Unbond",
+			"name": "UNBOND",
+			"shortcut": "Ctrl-U",
+			"enabled": [
+				"EC_NODE"
 			]
 		},
 		{
@@ -116,10 +135,7 @@
 		{
 			"text": "Resume Edit",
 			"name": "RESUME_EDIT",
-			"shortcut": "Ctrl+P",
-			"enabled": [
-				"WIRING"
-			]
+			"shortcut": "Ctrl+P"
 		}
 	],
 	"wire-node": [
@@ -128,7 +144,26 @@
 			"name": "DELETE",
 			"shortcut": "Del",
 			"enabled": [
-				"WIRING_WIRE_NODE"
+				"WIRE_NODE"
+			]
+		},
+		{
+			"text": "Connections",
+			"name": "CONNECTIONS",
+			"shortcut": "Ctrl+P"
+		},
+		{
+			"text": "Select",
+			"name": "SELECT_ONE"
+		}
+	],
+	"wire-node-x": [
+		{
+			"text": "Delete",
+			"name": "DELETE",
+			"shortcut": "Del",
+			"enabled": [
+				"WIRE_NODE"
 			]
 		},
 		{

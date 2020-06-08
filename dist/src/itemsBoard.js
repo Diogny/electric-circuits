@@ -18,7 +18,6 @@ var dab_1 = require("./dab");
 var bonds_1 = require("./bonds");
 var itemsBase_1 = require("./itemsBase");
 var components_1 = require("./components");
-var boardCircle_1 = require("./boardCircle");
 var utils_1 = require("./utils");
 var point_1 = require("./point");
 //ItemBoard->Wire
@@ -32,7 +31,7 @@ var ItemBoard = /** @class */ (function (_super) {
         //save base data
         _this.settings.base = base.comp;
         //global component count incremented
-        _this.settings.id = _this.base.name + "-" + base.count++;
+        _this.settings.id = _this.base.name + "-" + base.count;
         //use template to create label according to defined strategy
         _this.label = base.comp.meta.nameTmpl.replace(regex, function (match, group) {
             var arr = group.split('.'), getRoot = function (name) {
@@ -51,6 +50,7 @@ var ItemBoard = /** @class */ (function (_super) {
             (rootName == "Comp") && dab_1.isNum(result) && (rootRef[prop] = result + 1);
             return result;
         });
+        base.count++;
         //deep copy component properties
         _this.settings.props = dab_1.obj(base.comp.props);
         //add properties to DOM
@@ -58,30 +58,6 @@ var ItemBoard = /** @class */ (function (_super) {
             id: _this.id,
             "svg-comp": _this.base.type,
         });
-        //create the highligh object
-        _this.highlight = new boardCircle_1.default(_this.settings.highlightNodeName);
-        //add it to component, this's the insertion point (insertBefore) for all inherited objects
-        dab_1.aCld(_this.g, _this.highlight.g);
-        //add component label if available
-        var createText = function (attr, text) {
-            var svgText = utils_1.tag("text", "", attr);
-            return svgText.innerHTML = text, svgText;
-        };
-        //for labels in N555, 7408, Atmega168
-        if (base.comp.meta.label) {
-            dab_1.aCld(_this.g, createText({
-                x: base.comp.meta.label.x,
-                y: base.comp.meta.label.y,
-                "class": base.comp.meta.label.class
-            }, base.comp.meta.label.text));
-        }
-        //add node labels for DIP packages
-        if (base.comp.meta.nodes.createLabels) {
-            var pins = _this.count / 2;
-            for (var y = 60, x = 7, i = 0, factor = 20; y > 0; y -= 44, x += (factor = -factor))
-                for (var col = 0; col < pins; col++, i++, x += factor)
-                    dab_1.aCld(_this.g, createText({ x: x, y: y }, i + ""));
-        }
         return _this;
         //this still doesn't work to get all overridable properties ¿?
         //properties still cannot access super value
@@ -113,8 +89,6 @@ var ItemBoard = /** @class */ (function (_super) {
             this.settings.selected = value;
             //add class if selected
             dab_1.condClass(this.g, "selected", this.selected);
-            //unselect any node if any
-            this.highlight.hide();
             //trigger property changed if applicable
             this.onProp && this.onProp({
                 id: "#" + this.id,
@@ -152,7 +126,6 @@ var ItemBoard = /** @class */ (function (_super) {
     };
     ItemBoard.prototype.setOnProp = function (value) {
         dab_1.isFn(value) && (this.settings.onProp = value);
-        //for object chaining
         return this;
     };
     //properties available to show up in property window
@@ -224,29 +197,6 @@ var ItemBoard = /** @class */ (function (_super) {
             });
         });
     };
-    //highligh short-cuts
-    ItemBoard.prototype.setNodeRadius = function (value) {
-        this.highlight.setRadius(value);
-        return this;
-    };
-    ItemBoard.prototype.showNode = function (node) {
-        var nodeData = this.getNode(node);
-        if (nodeData) {
-            this.highlight.move(nodeData.x, nodeData.y);
-            this.highlight.show(node);
-        }
-        //for object chaining
-        return this;
-    };
-    ItemBoard.prototype.hideNode = function () {
-        this.highlight.hide();
-        return this;
-    };
-    Object.defineProperty(ItemBoard.prototype, "highlighted", {
-        get: function () { return this.highlight.visible; },
-        enumerable: false,
-        configurable: true
-    });
     ItemBoard.prototype.propertyDefaults = function () {
         return dab_1.extend(_super.prototype.propertyDefaults.call(this), {
             selected: false,

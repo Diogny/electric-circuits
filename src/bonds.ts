@@ -1,4 +1,3 @@
-
 import { Type, TypedClass } from './types';
 import { obj } from './dab';
 import { ItemBoard } from './itemsBoard';

@@ -10,6 +10,7 @@ var Type;
     Type[Type["LABEL"] = 4] = "LABEL";
     Type[Type["WIN"] = 5] = "WIN";
     Type[Type["TOOLTIP"] = 6] = "TOOLTIP";
+    Type[Type["HIGHLIGHT"] = 7] = "HIGHLIGHT";
 })(Type = exports.Type || (exports.Type = {}));
 ;
 var TypedClass = /** @class */ (function () {

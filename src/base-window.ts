@@ -37,7 +37,7 @@ export default class BaseWindow extends Item {
 
 	set size(value: ISize) {
 		if (!pojo(value)) {
-			return; //value = this.propertyDefaults().size;
+			return;
 		}
 		this.settings.size = {
 			width: Math.max(BaseWindow.minWidth, value.width | 0),

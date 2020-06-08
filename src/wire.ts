@@ -1,4 +1,3 @@
-//wire.ts
 import { addClass, removeClass, attr, isArr, extend } from './dab';
 import { tag } from './utils';
 import { Type } from './types';
@@ -19,6 +18,8 @@ export default class Wire extends ItemBoard {
 	get last(): number { return this.settings.points.length - 1 }
 
 	get lastLine(): number { return this.editMode ? this.settings.lines.length : 0 }
+
+	get isOpen(): boolean { return !this.nodeBonds(0) || !this.nodeBonds(this.last) }
 
 	public rect(): Rect { return Rect.create(this.box) }
 
@@ -72,7 +73,7 @@ export default class Wire extends ItemBoard {
 			line: "0",
 			points: "",
 		});
-		this.g.insertBefore(this.settings.polyline, this.highlight.g);
+		this.g.append(this.settings.polyline);
 
 		//set new points in polyline
 		this.setPoints(options.points);
@@ -212,6 +213,27 @@ export default class Wire extends ItemBoard {
 			return isAround(this.settings.points[ln - 1], p.x, p.y) ?
 				ln - 1 :
 				(isAround(this.settings.points[endPoint], p.x, p.y) ? endPoint : -1);
+		}
+		return -1;
+	}
+
+	public findLineNode(p: Point, line: number): number {
+		let
+			fn = (np: Point) => (Math.pow(p.x - np.x, 2) + Math.pow(p.y - np.y, 2)) <= 25;
+		((line <= 0 || line >= this.last) && (line = this.findNode(p), 1))
+			|| fn(this.settings.points[line])
+			|| fn(this.settings.points[--line])
+			|| (line = -1);
+		return line;
+	}
+
+	//don't care if wire is in editMode or not
+	public findNode(p: Point): number {
+		for (let i = 0, thisP = this.settings.points[i], len = this.settings.points.length;
+			i < len; thisP = this.settings.points[++i]) {
+			//radius 5 =>  5^2 = 25
+			if ((Math.pow(p.x - thisP.x, 2) + Math.pow(p.y - thisP.y, 2)) <= 25)
+				return i;
 		}
 		return -1;
 	}

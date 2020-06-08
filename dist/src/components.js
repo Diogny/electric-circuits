@@ -71,6 +71,11 @@ var Comp = /** @class */ (function () {
         enumerable: false,
         configurable: true
     });
+    Object.defineProperty(Comp, "itemCollection", {
+        get: function () { return Array.from(Comp.boardItems.values()); },
+        enumerable: false,
+        configurable: true
+    });
     Object.defineProperty(Comp, "count", {
         get: function () { return Comp.boardItems.size; },
         enumerable: false,

@@ -1,5 +1,5 @@
 import { extend, removeClass, addClass, aEL, toggleClass, clamp } from "./dab";
-import { IAppWindowProperties, IAppWindowOptions } from "./interfaces";
+import { IAppWindowProperties, IAppWindowOptions, StateType, ActionType } from "./interfaces";
 import BaseWindow from "./base-window";
 import { html } from "./utils";
 import Point from "./point";
@@ -87,12 +87,13 @@ export default class AppWindow extends BaseWindow {
 	}
 
 	public onMouseLeave(e: MouseEvent) {
-		this.renderBar("")
+		this.renderBar("");
+		(this.app as MyApp).sm.transition(StateType.BOARD, ActionType.RESUME);
 		//console.log('OUT of app window', e.eventPhase, (e.target as HTMLElement).id);
 	}
 
 	public setVisible(value: boolean): AppWindow {
-		super.setVisible(value); //.visible ? addClass(this.win, "selected") : removeClass(this.win, "selected");
+		super.setVisible(value);
 		if (this.visible) {
 			//correct (x,y) in case of mainwindow resize moves it outside
 			let

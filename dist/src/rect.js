@@ -7,9 +7,22 @@ var Rect = /** @class */ (function () {
         this.width = width;
         this.height = height;
     }
+    Object.defineProperty(Rect.prototype, "empty", {
+        get: function () { return this.width < 0 || this.height < 0; },
+        enumerable: false,
+        configurable: true
+    });
     Rect.prototype.inside = function (p) {
         return p.x >= this.x && p.y >= this.y && p.x <= (this.x + this.width) && p.y <= (this.y + this.height);
         // Point.inside(Point.minus(p, this.location), this.size)
+    };
+    Rect.prototype.intersect = function (r) {
+        var nx = Math.max(this.x, r.x), ny = Math.max(this.y, r.y);
+        r.width = Math.min((this.x + this.width), (r.x + r.width)) - nx;
+        r.height = Math.min((this.y + this.height), (r.y + r.height)) - ny;
+        r.x = nx;
+        r.y = ny;
+        return !r.empty;
     };
     Rect.create = function (r) { return new Rect(r.x, r.y, r.width, r.height); };
     Rect.empty = function () { return new Rect(0, 0, 0, 0); };

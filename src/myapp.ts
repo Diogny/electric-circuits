@@ -16,6 +16,8 @@ import ContextWindow from "./context-window";
 import { ItemBoard } from "./itemsBoard";
 import EC from "./ec";
 import { Type } from "./types";
+import LinesAligner from "./linealign";
+import HighlightNode from "./highlightNode";
 
 export class MyApp extends Application implements IMyApp {
 
@@ -29,6 +31,9 @@ export class MyApp extends Application implements IMyApp {
 	readonly winProps: AppWindow;
 	readonly sm: StateMachine;
 	readonly rightClick: ContextWindow;
+	readonly dash: LinesAligner;
+
+	readonly highlight: HighlightNode;
 
 	viewBox: Rect;
 	baseViewBox: Size;
@@ -42,20 +47,19 @@ export class MyApp extends Application implements IMyApp {
 	compList: Map<string, ItemBoard>;
 	selectedComponents: ItemBoard[];
 
+	get tooltipOfs(): number { return 15 }
+
 	//has value if only one comp selected, none or multiple has undefined
 	get ec(): ItemBoard | undefined {
 		return this.selectedComponents.length == 1 ? this.selectedComponents[0] : void 0;
 	}
-
-	//temporary properties
-	//wire: Wire;
 
 	constructor(options: IApplicationOptions) {
 		super(options);
 		let
 			that: MyApp = this,
 			hideNodeTooltip = (newCtx: IMouseState) => {
-				newCtx.it && newCtx.it.hideNode();
+				that.highlight.hide();
 				that.tooltip.setVisible(false);
 			},
 			//HTML
@@ -94,6 +98,7 @@ export class MyApp extends Application implements IMyApp {
 				//post actions
 				switch (state.over.type) {
 					case "node":
+					case "node-x":
 						state.over.node = attr(state.over.svg, state.over.type) | 0;
 						break;
 					case "line":
@@ -129,6 +134,9 @@ export class MyApp extends Application implements IMyApp {
 		this.svgBoard = (<SVGElement>this.board.children[0]);
 		this.topBarLeft = qS("#top-bar>div:nth-of-type(1)");
 		this.topBarRight = qS("#top-bar>div:nth-of-type(2)");
+		this.dash = new LinesAligner(this);
+
+		this.highlight = new HighlightNode(<any>{});
 
 		//this'll hold the properties of the current selected component
 		this.winProps = new AppWindow(<IAppWindowOptions>{
@@ -147,44 +155,25 @@ export class MyApp extends Application implements IMyApp {
 		//create state machine
 		this.sm = new StateMachine(<IStateMachineOptions>{
 			id: "state-machine-01",
-			initial: StateType.IDLE,
+			initial: StateType.BOARD,
 			states: {},
 			log: this.prop("cons_log")?.value,
 			ctx: <IMouseState>{},
 			commonActions: {
 				ENTER: function (newCtx: IMouseState) {
-					that.sm.ctx = newCtx;		//for now just copy data
+					//that.sm.ctx = newCtx;		//for now just copy data
 				},
 				LEAVE: function (newCtx: IMouseState) {
 					//cannot save new context, erases wiring status
 					hideNodeTooltip(newCtx);
 					that.topBarLeft.innerHTML = "&nbsp;";
 				},
+				KEY: function (code: any) {
+					console.log(`KEY: ${code}`);
+					//this's the default
+					(code == "Delete") && that.execute(ActionType.DELETE, "");
+				},
 				HIDE_NODE: hideNodeTooltip,
-				SHOW_BODY_TOOLTIP: function (newCtx: IMouseState) {
-					let
-						p = Point.translateBy(newCtx.offset, 20);
-					that.tooltip.setVisible(true)
-						.move(p.x, p.y)
-						.setFontSize(that.tooltipFontSize())
-						.setText(<string>newCtx.it?.id);
-				},
-				SHOW_NODE_TOOLTIP: function (newCtx: IMouseState) {
-					//data has current state
-					if (newCtx.it) {
-						if (!newCtx.it.highlighted) {
-							!newCtx.it.nodeBonds(newCtx.over.node)
-								&& newCtx.it.showNode(newCtx.over.node);
-							let
-								p = Point.translateBy(newCtx.offset, 20),
-								label = newCtx.it.getNode(newCtx.over.node)?.label || "unknown";
-							that.tooltip.setVisible(true)
-								.move(p.x, p.y)
-								.setFontSize(that.tooltipFontSize())
-								.setText(`${newCtx.over.node} -${label}`);
-						}
-					}
-				},
 				FORWARD_OVER: function (newCtx: IMouseState) {
 					//accepts transitions to new state on mouse OVER
 					let
@@ -259,6 +248,8 @@ export class MyApp extends Application implements IMyApp {
 				case 'ArrowRight':
 				case 'ArrowDown':
 				case 'Delete':
+				case 'ControlLeft':
+				case 'ControlRight':
 					that.sm.send(ActionType.KEY, ev.code);
 					break;
 			}
@@ -318,7 +309,9 @@ export class MyApp extends Application implements IMyApp {
 			this.compList.set(comp.id, comp);
 
 			//add it to SVG DOM
-			this.svgBoard.insertBefore(comp.g, (comp.type == Type.WIRE) ? this.svgBoard.firstChild : this.tooltip.g);
+			(comp.type == Type.WIRE) ?
+				this.dash.g.insertAdjacentElement("afterend", comp.g) :
+				this.svgBoard.insertBefore(comp.g, this.tooltip.g);
 			//do after DOM inserted work
 			comp.afterDOMinserted();
 		}
@@ -401,26 +394,44 @@ export class MyApp extends Application implements IMyApp {
 				//temporary, for testings...
 				(<any>window).ec = void 0;
 				break;
+			case ActionType.DELETE_SELECTED:
+				let
+					selectedCount = this.selectedComponents.length,
+					deletedCount = 0;
+				this.selectedComponents = this.selectedComponents.filter((c) => {
+					if (this.compList.delete(c.id)) {
+						//disconnects and remove component from DOM
+						c.disconnect();
+						c.remove();
+						deletedCount++;
+						return false;
+					}
+					return true;
+				});
+				this.refreshRotation();
+				this.winProps.clear().setVisible(false);
+				this.tooltip.setVisible(false);
+				if (selectedCount != deletedCount) {
+					console.log(`[${deletedCount}] components of [${selectedCount}]`)
+				}
+				//temporary, for testings...
+				(<any>window).ec = void 0;
+				break;
 			case ActionType.DELETE:
+				//only comp if sent
 				if (!(compNull = !comp)) {
 					if (this.compList.delete(comp.id)) {
 						//disconnects and remove component from DOM
 						comp.disconnect();
 						comp.remove();
-						this.selectedComponents = Array.from(this.compList.values()).filter(c => c.selected);
 						this.refreshRotation();
-						if (this.winProps.compId == comp.id)
-							this.winProps.clear()
-						else
-							this.winProps.refresh();
+						this.winProps.clear().setVisible(false);
 						this.tooltip.setVisible(false);
-						//temporary, for testings...
-						(<any>window).ec = void 0;
 						this.sm.send(ActionType.AFTER_DELETE, comp.id);
 					}
-					else
-						console.log(`component #${comp.id} could not be removed or it doesn't exists`)
 				}
+				//temporary, for testings...
+				(<any>window).ec = void 0;
 				break;
 			case ActionType.SHOW_PROPERTIES:
 				!(compNull = !comp) && this.winProps.load(comp);

@@ -10,7 +10,7 @@
 		"nodes": {
 			"list" : [
 				{ "x": 0, "y": 30, "label": "Input A" },
-				{ "x": 90, "y": 30, "label": "Output Y" }
+				{ "x": 81, "y": 30, "label": "Output Y" }
 			]
 		},
 		"logic" : {
@@ -21,10 +21,7 @@
 			]
 		}
 	},
-	"data" : "<path svg-type='node' node='0' d='M 0,25 V35 H5 V25 Z'/>
-<path svg-type='node' node='1' d='M 85,25 H90 V35 H85 Z'/>
-<circle svg-type='body' cx='76' cy='30' r='10'/>
-<path svg-type='body' d='M 5,0 L 65,30 L 5,60 Z'//>"
+	"data" : "<path svg-type='body' d='M 0,0 L 60,30 L 0,60 Z'/><circle svg-type='body' cx='71' cy='30' r='10'/>"
 },
 {
 	"type" : "gate",
@@ -37,13 +34,11 @@
 		"nodes": {
 			"list" : [
 				{ "x": 0, "y": 30, "label": "Input A" },
-				{ "x": 70, "y": 30, "label": "Output Y" }
+				{ "x": 60, "y": 30, "label": "Output Y" }
 			]
 		}
 	},
-	"data" : "<path svg-type='node' node='0' d='M 0,25 V35 H5 V25 Z'></path>
-<path svg-type='node' node='1' d='M 55,28 H70 V32 H55 Z'></path>
-<path svg-type='body' d='M 5,0 L 65,30 L 5,60 Z'></path>"
+	"data" : "<path svg-type='body' d='M 0,0 L 60,30 L 0,60 Z'></path>"
 },
 {
 	"type" : "gate",
@@ -57,7 +52,7 @@
 			"list" : [
 				{ "x": 0, "y": 15, "label": "Input A" },
 				{ "x": 0, "y": 45, "label": "Input B" },
-				{ "x": 74, "y": 30, "label": "Output Y" }
+				{ "x": 65, "y": 30, "label": "Output Y" }
 			]
 		},
 		"logic" : {
@@ -70,10 +65,7 @@
 			]
 		}
 	},
-	"data" : "<path svg-type='node' node='0' d='M 0,10 H5 V20 H0 Z'/>
-<path svg-type='node' node='1' d='M 0,40 H5 V50 H0 Z'/>
-<path svg-type='node' node='2' d='M 68,25 H73 V35 H68 Z'/>
-<path svg-type='body' d='M 5,0 H 35 C 80,0 80,60 35,60 H 5 Z'/>"
+	"data" : "<path svg-type='body' d='M 0,0 H 30 C 75,0 75,60 30,60 H 0 Z'/>"
 },
 {
 	"type" : "gate",
@@ -87,7 +79,7 @@
 			"list" : [
 				{ "x": 0, "y": 15, "label": "Input A" },
 				{ "x": 0, "y": 45, "label": "Input B" },
-				{ "x": 93, "y": 30, "label": "Output Y" }
+				{ "x": 84, "y": 30, "label": "Output Y" }
 			]
 		},
 		"logic" : {
@@ -100,11 +92,8 @@
 			]
 		}
 	},
-	"data" : "<path svg-type='node' node='0' d='M 0,10 H5 V20 H0 Z'/>
-<path svg-type='node' node='1' d='M 0,40 H5 V50 H0 Z'/>
-<path svg-type='node' node='2' d='M 88,25 H93 V35 H88 Z'/>
-<circle svg-type='body' cx='79' cy='30' r='10'/>
-<path svg-type='body' d='M 5,0 H 35 C 80,0 80,60 35,60 H 5 Z'/>"
+	"data" : "<circle svg-type='body' cx='74' cy='30' r='10'/>
+<path svg-type='body' d='M 0,0 H 30 C 75,0 75,60 30,60 H 0 Z'/>"
 },
 {
 	"type" : "gate",
@@ -116,9 +105,9 @@
 		"class": "next",
 		"nodes": {
 			"list" : [
-				{ "x": 2, "y": 15, "label": "Input A" },
-				{ "x": 2, "y": 45, "label": "Input B" },
-				{ "x": 75, "y": 30, "label": "Output Y" }
+				{ "x": 6, "y": 15, "label": "Input A" },
+				{ "x": 6, "y": 45, "label": "Input B" },
+				{ "x": 70, "y": 30, "label": "Output Y" }
 			]
 		},
 		"logic" : {
@@ -131,10 +120,7 @@
 			]
 		}
 	},
-	"data" : "<path svg-type='node' node='0' d='M 2,10 V20 H10 V10 Z'/>
-<path svg-type='node' node='1' d='M 2,40 V50 H10 V40 Z'/>
-<path svg-type='node' node='2' d='M 65,25 H75 V35 H65 Z'/>
-<path svg-type='body' d='M 0,0 Q 50,0 70,30 Q 50,60 0,60 Q 20,30 0,0 Z'/>"
+	"data" : "<path svg-type='body' d='M 0,0 Q 50,0 70,30 Q 50,60 0,60 Q 20,30 0,0 Z'/>"
 },
 {
 	"type" : "gate",
@@ -146,9 +132,9 @@
 		"class": "next",
 		"nodes": {
 			"list" : [
-				{ "x": 2, "y": 15, "label": "Input A" },
-				{ "x": 2, "y": 45, "label": "Input B" },
-				{ "x": 95, "y": 30, "label": "Output Y" }
+				{ "x": 6, "y": 15, "label": "Input A" },
+				{ "x": 6, "y": 45, "label": "Input B" },
+				{ "x": 90, "y": 30, "label": "Output Y" }
 			]
 		},
 		"logic" : {
@@ -161,10 +147,7 @@
 			]
 		}
 	},
-	"data" : "<path svg-type='node' node='0' d='M 2,10 V20 H10 V10 Z'/>
-<path svg-type='node' node='1' d='M 2,40 V50 H10 V40 Z'/>
-<path svg-type='node' node='2' d='M 88,25 H95 V35 H88 Z'/>
-<circle svg-type='body' cx='80' cy='30' r='10'/>
+	"data" : "<circle svg-type='body' cx='80' cy='30' r='10'/>
 <path svg-type='body' d='M 0,0 Q 50,0 70,30 Q 50,60 0,60 Q 20,30 0,0 Z'/>"
 },
 {
@@ -177,9 +160,9 @@
 		"class": "next",
 		"nodes": {
 			"list" : [
-				{ "x": 2, "y": 15, "label": "Input A" },
-				{ "x": 2, "y": 45, "label": "Input B" },
-				{ "x": 85, "y": 30, "label": "Output Y" }
+				{ "x": 6, "y": 15, "label": "Input A" },
+				{ "x": 6, "y": 45, "label": "Input B" },
+				{ "x": 80, "y": 30, "label": "Output Y" }
 			]
 		},
 		"logic" : {
@@ -192,10 +175,7 @@
 			]
 		}
 	},
-	"data" : "<path svg-type='node' node='0' d='M 2,10 V20 H9 L 5,10 Z'/>
-<path svg-type='node' node='1' d='M 2,40 V50 H5 L 9,40 Z'/>
-<path svg-type='node' node='2' d='M 75,25 H85 V35 H75 Z'/>
-<path class='thick no-fill' d='M 0,60 Q 20,30 0,0'/>
+	"data" : "<path class='thick no-fill' d='M 0,60 Q 20,30 0,0'/>
 <path svg-type='body' d='M 10,0 Q 60,0 80,30 Q 60,60 10,60 Q 30,30 10,0 Z'/>"
 },
 {
@@ -208,9 +188,9 @@
 		"class": "next",
 		"nodes": {
 			"list" : [
-				{ "x": 2, "y": 15, "label": "Input A" },
-				{ "x": 2, "y": 45, "label": "Input B" },
-				{ "x": 105, "y": 30, "label": "Output Y" }
+				{ "x": 6, "y": 15, "label": "Input A" },
+				{ "x": 6, "y": 45, "label": "Input B" },
+				{ "x": 100, "y": 30, "label": "Output Y" }
 			]
 		},
 		"logic" : {
@@ -223,10 +203,7 @@
 			]
 		}
 	},
-	"data" : "<path svg-type='node' node='0' d='M 2,10 V20 H9 L 5,10 Z'/>
-<path svg-type='node' node='1' d='M 2,40 V50 H5 L 9,40 Z'/>
-<path svg-type='node' node='2' d='M 95,25 H105 V35 H95 Z'/>
-<circle svg-type='body' cx='90' cy='30' r='10'/>
+	"data" : "<circle svg-type='body' cx='90' cy='30' r='10'/>
 <path class='thick no-fill' d='M 0,60 Q 20,30 0,0'/>
 <path svg-type='body' d='M 10,0 Q 60,0 80,30 Q 60,60 10,60 Q 30,30 10,0 Z'/>"
 },
@@ -244,10 +221,9 @@
 			]
 		}
 	},
-	"data" : "<path svg-type='body' d='M 80,5 H0 V10 H80 Z'></path>
-<path svg-type='body' d='M 65,20 H15 V25 H65 Z'></path>
-<path svg-type='body' d='M 35,35 H45 V40 H35 Z'></path>
-<path svg-type='node' node='0' d='M 35,0 H45 V5 H35 Z'></path>"
+	"data" : "<path svg-type='body' d='M 80,0 H0 V5 H80 Z'></path>
+<path svg-type='body' d='M 65,15 H15 V20 H65 Z'></path>
+<path svg-type='body' d='M 35,30 H45 V35 H35 Z'></path>"
 },
 {
 	"type" : "power",
@@ -260,15 +236,13 @@
 		"nodes": {
 			"list" : [
 				{ "x": 0, "y": 40, "label": "GND" },
-				{ "x": 25, "y": 40, "label": "VCC" }
+				{ "x": 20, "y": 40, "label": "VCC" }
 			]
 		}
 	},
-	"data" : "<rect svg-type='body' x='5' y='20' width='7' height='40'/>
-<line x1='20' y1='0' x2='20' y2='80'/>
-<path class='vcc no-fill' d='M 25,20 L 35,20 L 30,20 V 15 V 25'/>
-<path svg-type='node' node='0' d='M 0,35 V45 H5 V35 Z'/>
-<path svg-type='node' node='1' d='M 20,35 V45 H25 V35 Z'/>"
+	"data" : "<rect svg-type='body' x='0' y='20' width='7' height='40'/>
+<line class='thick' x1='20' y1='0' x2='20' y2='80'/>
+<path class='vcc no-fill' d='M 25,20 L 35,20 L 30,20 V 15 V 25'/>"
 },
 {
 	"type" : "power",
@@ -281,19 +255,17 @@
 		"nodes": {
 			"list" : [
 				{ "x": 0, "y": 40, "label": "GND" },
-				{ "x": 73, "y": 40, "label": "VCC" }
+				{ "x": 63, "y": 40, "label": "VCC" }
 			]
 		}
 	},
-	"data" : "<rect svg-type='body' x='5' y='20' width='7' height='40'/>
-<line x1='20' y1='0' x2='20' y2='80'/>
-<rect svg-type='body' x='29' y='20' width='7' height='40'/>
-<line svg-type='body' x1='44.5' y1='0' x2='44.5' y2='80'/>
-<rect svg-type='body' x='53' y='20' width='7' height='40'/>
-<line svg-type='body' x1='68' y1='0' x2='68' y2='80'/>
-<path class='vcc no-fill' d='M 75,20 L 85,20 L 80,20 V 15 V 25'/>
-<path svg-type='node' node='0' d='M 0,35 V45 H5 V35 Z'/>
-<path svg-type='node' node='1' d='M 68,35 V45 H73 V35 Z'/>"
+	"data" : "<rect svg-type='body' x='0' y='20' width='7' height='40'/>
+<line class='thick' x1='15' y1='0' x2='15' y2='80'/>
+<rect svg-type='body' x='24' y='20' width='7' height='40'/>
+<line class='thick' x1='39.5' y1='0' x2='39.5' y2='80'/>
+<rect svg-type='body' x='48' y='20' width='7' height='40'/>
+<line class='thick' x1='63' y1='0' x2='63' y2='80'/>
+<path class='vcc no-fill' d='M 68,20 L 78,20 L 73,20 V 15 V 25'/>"
 },
 {
 	"type" : "power",
@@ -306,17 +278,15 @@
 		"nodes": {
 			"list" : [
 				{ "x": 0, "y": 40, "label": "GND" },
-				{ "x": 70, "y": 40, "label": "VCC" }
+				{ "x": 60, "y": 40, "label": "VCC" }
 			]
 		}
 	},
-	"data" : "<circle svg-type='body' cx='35' cy='40' r='30'/>
-<text x='20' y='58' class='big'>V</text>
+	"data" : "<circle svg-type='body' cx='30' cy='40' r='30'/>
+<text x='15' y='58' class='big'>V</text>
 <path class='gnd' d='M 0,10 H 10'/>
 <path class='vcc' d='M 70,10 H 60'/>
-<path class='vcc' d='M 65,5 V 15'/>
-<path svg-type='node' node='0' d='M 0,35 V45 H5 V35 Z'/>
-<path svg-type='node' node='1' d='M 65,35 V45 H70 V35 Z'/>"
+<path class='vcc' d='M 65,5 V 15'/>"
 },
 {
 	"type" : "power",
@@ -355,14 +325,12 @@
 		"nodes": {
 			"list" : [
 				{ "x": 0, "y": 30, "label": "Anode (+)" },
-				{ "x": 71, "y": 30, "label": "Catode (-)" }
+				{ "x": 61, "y": 30, "label": "Catode (-)" }
 			]
 		}
 	},
-	"data" : "<path svg-type='node' node='0' d='M 0,25 V35 H5 V25 Z'/>
-<path svg-type='node' node='1' d='M 66,25 V35 H71 V25 Z'/>
-<path svg-type='body' d='M 5,0 L 65,30 L 5,60 Z'/>
-<line x1='66' y1='0' x2='66' y2='60'/>"
+	"data" : "<path svg-type='body' d='M 0,0 L 60,30 L 0,60 Z'/>
+<line class='thick' x1='61' y1='0' x2='61' y2='60'/>"
 },
 {
 	"type" : "diode",
@@ -388,16 +356,14 @@
 		"nodes": {
 			"list" : [
 				{ "x": 0, "y": 40, "label": "Anode (+)" },
-				{ "x": 71, "y": 40, "label": "Catode (-)" }
+				{ "x": 61, "y": 40, "label": "Catode (-)" }
 			]
 		}
 	},
-	"data" : "<path svg-type='body' d='M 5,10 L 65,40 L 5,70 Z'/>
-<line x1='66' y1='10' x2='66' y2='65'/>
+	"data" : "<path svg-type='body' d='M 0,10 L 60,40 L 0,70 Z'/>
+<line class='thick' x1='61' y1='10' x2='61' y2='65'/>
 <path svg-type='body' class='color' d='M 30,15 L 36.8,4.6 L 33,2 L 40,0 L 40,7.2 L 36.8,4.6'/>
-<path svg-type='body' class='color' d='M 43,23 L 49,13 L 45,10.2 L 52,8  L 52.9,15.5 L 49,13'/>
-<path svg-type='node' node='0' d='M 0,35 V45 H5 V35 Z'/>
-<path svg-type='node' node='1' d='M 66,35 V45 H71 V35 Z'/>"
+<path svg-type='body' class='color' d='M 43,23 L 49,13 L 45,10.2 L 52,8  L 52.9,15.5 L 49,13'/>"
 },
 {
 	"type" : "diode",
@@ -410,16 +376,14 @@
 		"nodes": {
 			"list" : [
 				{ "x": 0, "y": 40, "label": "Anode (+)" },
-				{ "x": 71, "y": 40, "label": "Catode (-)" }
+				{ "x": 61, "y": 40, "label": "Catode (-)" }
 			]
 		}
 	},
-	"data" : "<path svg-type='body' d='M 5,10 L 65,40 L 5,70 Z'/>
-<line x1='66' y1='10' x2='66' y2='65'/>
+	"data" : "<path svg-type='body' d='M 0,10 L 60,40 L 0,70 Z'/>
+<line class='thick' x1='61' y1='10' x2='61' y2='65'/>
 <path svg-type='body' d='M 40,0 L 33.3,10.1 L 29.4,7.6 L 30,15 L 37.4,12.8 L 33.3,10.1'/>
-<path svg-type='body' d='M 52,8 L 45.4,18.1 L 41.6,15.6 L 42,23 L 49.5,20.9 L 45.4,18.1'/>
-<path svg-type='node' node='0' d='M 0,35 V45 H5 V35 Z'/>
-<path svg-type='node' node='1' d='M 66,35 V45 H71 V35 Z'/>"
+<path svg-type='body' d='M 52,8 L 45.4,18.1 L 41.6,15.6 L 42,23 L 49.5,20.9 L 45.4,18.1'/>"
 },
 {
 	"type" : "diode",
@@ -432,14 +396,12 @@
 		"nodes": {
 			"list" : [
 				{ "x": 0, "y": 30, "label": "Anode (+)" },
-				{ "x": 71, "y": 30, "label": "Catode (-)" }
+				{ "x": 61, "y": 30, "label": "Catode (-)" }
 			]
 		}
 	},
-	"data" : "<path svg-type='body' d='M 5,0 L 65,30 L 5,60 Z'/>
-<path class='no-fill' d='M 51,47 L 51,60 L 66,60 L 66,0 L 81,0 L 81,13'/>
-<path svg-type='node' node='0' d='M 0,25 V35 H5 V25 Z'/>
-<path svg-type='node' node='1' d='M 66,25 V35 H71 V25 Z'/>"
+	"data" : "<path svg-type='body' d='M 0,0 L 60,30 L 0,60 Z'/>
+<path class='thick no-fill' d='M 46,47 L 46,60 L 61,60 L 61,0 L 76,0 L 76,13'/>"
 },
 {
 	"type" : "diode",
@@ -452,14 +414,12 @@
 		"nodes": {
 			"list" : [
 				{ "x": 0, "y": 30, "label": "Anode (+)" },
-				{ "x": 71, "y": 30, "label": "Catode (-)" }
+				{ "x": 61, "y": 30, "label": "Catode (-)" }
 			]
 		}
 	},
-	"data" : "<path svg-type='body' d='M 5,0 L 65,30 L 5,60 Z'/>
-<path class='no-fill' d='M 56,60 L 66,60 L 66,0 L 56,0'/>
-<path svg-type='node' node='0' d='M 0,25 V35 H5 V25 Z'/>
-<path svg-type='node' node='1' d='M 66,25 V35 H71 V25 Z'/>"
+	"data" : "<path svg-type='body' d='M 0,0 L 60,30 L 0,60 Z'/>
+<path class='thick no-fill' d='M 51,60 L 61,60 L 61,0 L 51,0'/>"
 },
 {
 	"type" : "diode",
@@ -472,15 +432,13 @@
 		"nodes": {
 			"list" : [
 				{ "x": 0, "y": 30, "label": "Anode (+)" },
-				{ "x": 80, "y": 30, "label": "Catode (-)" }
+				{ "x": 70, "y": 30, "label": "Catode (-)" }
 			]
 		}
 	},
-	"data" : "<path svg-type='body' d='M 5,0 L 65,30 L 5,60 Z'/>
-<path svg-type='body' d='M 66,0 V 60 Z'/>
-<path svg-type='body' d='M 75,0 V 60 Z'/>
-<path svg-type='node' node='0' d='M 0,25 V35 H5 V25 Z'/>
-<path svg-type='node' node='1' d='M 75,25 V35 H80 V25 Z'/>"
+	"data" : "<path svg-type='body' d='M 0,0 L 60,30 L 0,60 Z'/>
+<line class='thick' x1='61' y1='0' x2='61' y2='60'/>
+<line class='thick' x1='70' y1='0' x2='70' y2='60'/>"
 },
 {
 	"type" : "diode",
@@ -493,14 +451,12 @@
 		"nodes": {
 			"list" : [
 				{ "x": 0, "y": 30, "label": "Anode (+)" },
-				{ "x": 71, "y": 30, "label": "Catode (-)" }
+				{ "x": 61, "y": 30, "label": "Catode (-)" }
 			]
 		}
 	},
-	"data" : "<path svg-type='body' d='M 5,0 L 65,30 L 5,60 Z'/>
-<path class='no-fill' d='M 56,60 L 66,60 L 66,0 L 76,0'/>
-<path svg-type='node' node='0' d='M 0,25 V35 H5 V25 Z'/>
-<path svg-type='node' node='1' d='M 66,25 V35 H71 V25 Z'/>"
+	"data" : "<path svg-type='body' d='M 0,0 L 60,30 L 0,60 Z'/>
+<path class='thick no-fill' d='M 51,60 L 61,60 L 61,0 L 71,0'/>"
 },
 {
 	"type" : "transistor",
@@ -513,16 +469,13 @@
 		"nodes": {
 			"list" : [
 				{ "x": 0, "y": 30, "label": "Base" },
-				{ "x": 58, "y": 4, "label": "Collector" },
-				{ "x": 58, "y": 56, "label": "Emitter" }
+				{ "x": 50, "y": 8, "label": "Collector" },
+				{ "x": 50, "y": 52, "label": "Emitter" }
 			]
 		}
 	},
-	"data" : "<path svg-type='node' node='0' d='M 0,25 V35 H5 V25 Z'/>
-<path svg-type='node' node='1' d='M 51,4.5 L 55,0.5 L 61.5,6.8 L 58,11 Z'/>
-<path svg-type='node' node='2' d='M 58,49 61.5,53.2 L 55,59.5 L51,55.5'/>
-<circle svg-type='body' cx='35' cy='30' r='30'/>
-<path class='thick no-fill' d='M 5,30 H28 V10 V20 L 55,8 M 28,30 V50 M 28,40 L 55,52 L 45,52 M 55,52 L 48,44.5'/>"
+	"data" : "<circle svg-type='body' cx='30' cy='30' r='30'/>
+<path class='thick no-fill' d='M 0,30 H23 V10 V20 L 50,8 M 23,30 V50 M 23,40 L 50,52 L 40,52 M 50,52 L 43, 44.5'/>"
 },
 {
 	"type" : "transistor",
@@ -535,16 +488,13 @@
 		"nodes": {
 			"list" : [
 				{ "x": 0, "y": 30, "label": "Base" },
-				{ "x": 58, "y": 4, "label": "Collector" },
-				{ "x": 58, "y": 56, "label": "Emitter" }
+				{ "x": 50, "y": 8, "label": "Collector" },
+				{ "x": 50, "y": 52, "label": "Emitter" }
 			]
 		}
 	},
-	"data" : "<path svg-type='node' node='0' d='M 0,25 V35 H5 V25 Z'/>
-<path svg-type='node' node='1' d='M 51,4.5 L 55,0.5 L 61.5,6.8 L 58,11 Z'/>
-<path svg-type='node' node='2' d='M 58,49 61.5,53.2 L 55,59.5 L51,55.5'/>
-<circle svg-type='body' cx='35' cy='30' r='30'/>
-<path class='thick no-fill' d='M 5,30 H28 V10 V20 L 55,8 L 45,8 M 55,8 L 48,15.5 M 28,30 V50 M 28,40 L 55,52'/>"
+	"data" : "<circle svg-type='body' cx='30' cy='30' r='30'/>
+<path class='thick no-fill' d='M 0,30 H23 V10 V20 L 50,8 L 40,8 M 50,8 L 43,15.5 M 23,30 V50 M 23,40 L 50,52'/>"
 },
 {
 	"type" : "dip",
@@ -557,19 +507,15 @@
 		"nodes": {
 			"createLabels" : true,
 			"list" : [
-				{ "x": 10, "y": 70, "label": "GND" },
-				{ "x": 30, "y": 70, "label": "Output 1" },
+				{ "x": 10, "y": 60, "label": "GND" },
+				{ "x": 30, "y": 60, "label": "Output 1" },
 				{ "x": 30, "y": 0, "label": "Data 0" },
 				{ "x": 10, "y": 0, "label": "VCC" }	
 			]
 		}
 	},
-	"data" :"<path svg-type='body' d='M 0,5 H40 V65 H0 Z'></path>
-<path class='no-fill' d='M 0,25 H5 V45 H0'></path>
-<path svg-type='node' node='0' d='M 5,65 V70 H15 V65 Z'/>
-<path svg-type='node' node='1' d='M 25,65 V70 H35 V65 Z'/>
-<path svg-type='node' node='2' d='M 25,0 V5 H35 V0 Z'/>
-<path svg-type='node' node='3' d='M 5,0 V5 H15 V0 Z'/>"
+	"data" :"<rect svg-type='body' x='0' y='0' width='40' height='60'/>
+<path class='no-fill' d='M 0,20 H5 V40 H0'></path>"
 },
 {
 	"type" : "dip",
@@ -582,23 +528,17 @@
 		"nodes": {
 			"createLabels" : true,
 			"list" : [
-				{ "x": 10, "y": 70, "label": "GND" },
-				{ "x": 30, "y": 70, "label": "Output 1" },
-				{ "x": 50, "y": 70, "label": "Output 0" },
+				{ "x": 10, "y": 60, "label": "GND" },
+				{ "x": 30, "y": 60, "label": "Output 1" },
+				{ "x": 50, "y": 60, "label": "Output 0" },
 				{ "x": 50, "y": 0, "label": "Data 1" },
 				{ "x": 30, "y": 0, "label": "Data 0" },
 				{ "x": 10, "y": 0, "label": "VCC" }	
 			]
 		}
 	},
-	"data" :"<path svg-type='body' d='M 0,5 H60 V65 H0 Z'/>
-<path class='no-fill' d='M 0,25 H5 V45 H0'/>
-<path svg-type='node' node='0' d='M 5,65 V70 H15 V65 Z'/>
-<path svg-type='node' node='1' d='M 25,65 V70 H35 V65 Z'/>
-<path svg-type='node' node='2' d='M 45,65 V70 H55 V65 Z'/>
-<path svg-type='node' node='3' d='M 45,0 V5 H55 V0 Z'/>
-<path svg-type='node' node='4' d='M 25,0 V5 H35 V0 Z'/>
-<path svg-type='node' node='5' d='M 5,0 V5 H15 V0 Z'/>"
+	"data" :"<rect svg-type='body' x='0' y='0' width='60' height='60'/>
+<path class='no-fill' d='M 0,25 H5 V45 H0'/>"
 },
 {
 	"type" : "dip",
@@ -611,10 +551,10 @@
 		"nodes": {
 			"createLabels" : true,
 			"list" : [
-				{ "x": 10, "y": 70, "label": "GND" },
-				{ "x": 30, "y": 70, "label": "Output 1" },
-				{ "x": 50, "y": 70, "label": "Output 0" },
-				{ "x": 70, "y": 70, "label": "Data 3" },
+				{ "x": 10, "y": 60, "label": "GND" },
+				{ "x": 30, "y": 60, "label": "Output 1" },
+				{ "x": 50, "y": 60, "label": "Output 0" },
+				{ "x": 70, "y": 60, "label": "Data 3" },
 				{ "x": 70, "y": 0, "label": "Data 2" },
 				{ "x": 50, "y": 0, "label": "Data 1" },
 				{ "x": 30, "y": 0, "label": "Data 0" },
@@ -622,16 +562,8 @@
 			]
 		}
 	},
-	"data" : "<path svg-type='body' d='M 0,5 H80 V65 H0 Z'></path>
-<path class='no-fill' d='M 0,25 H5 V45 H0'></path>
-<path svg-type='node' node='0' d='M 5,65 V70 H15 V65 Z'/>
-<path svg-type='node' node='1' d='M 25,65 V70 H35 V65 Z'/>
-<path svg-type='node' node='2' d='M 45,65 V70 H55 V65 Z'/>
-<path svg-type='node' node='3' d='M 65,65 V70 H75 V65 Z'/>
-<path svg-type='node' node='4' d='M 65,0 V5 H75 V0 Z'/>
-<path svg-type='node' node='5' d='M 45,0 V5 H55 V0 Z'/>
-<path svg-type='node' node='6' d='M 25,0 V5 H35 V0 Z'/>
-<path svg-type='node' node='7' d='M 5,0 V5 H15 V0 Z'/>"
+	"data" : "<rect svg-type='body' x='0' y='0' width='80' height='60'/>
+<path class='no-fill' d='M 0,25 H5 V45 H0'></path>"
 },
 {
 	"type" : "dip",
@@ -646,7 +578,7 @@
 		"name" : "dip8",
 		"label" : {
 			"x" : 15,
-			"y" : 40,
+			"y" : 35,
 			"class" : "title",
 			"text" : "N555"
 		},
@@ -664,11 +596,11 @@
 		"nodes": {
 			"createLabels" : true,
 			"list" : [
-				{ "x": 10, "y": 70, "label": "GND" },
-				{ "x": 30, "y": 70, "label": "Output 3" },
-				{ "x": 50, "y": 70, "label": "Output 2" },
-				{ "x": 70, "y": 70, "label": "Output 1" },
-				{ "x": 90, "y": 70, "label": "Output 0" },
+				{ "x": 10, "y": 60, "label": "GND" },
+				{ "x": 30, "y": 60, "label": "Output 3" },
+				{ "x": 50, "y": 60, "label": "Output 2" },
+				{ "x": 70, "y": 60, "label": "Output 1" },
+				{ "x": 90, "y": 60, "label": "Output 0" },
 				{ "x": 90, "y": 0, "label": "Data 3" },
 				{ "x": 70, "y": 0, "label": "Data 2" },
 				{ "x": 50, "y": 0, "label": "Data 1" },
@@ -677,18 +609,8 @@
 			]
 		}
 	},
-	"data": "<path svg-type='body' d='M 0,5 H100 V65 H0 Z'></path>
-<path class='no-fill' d='M 0,25 H5 V45 H0'></path>
-<path svg-type='node' node='0' d='M 5,65 V70 H15 V65 Z'/>
-<path svg-type='node' node='1' d='M 25,65 V70 H35 V65 Z'/>
-<path svg-type='node' node='2' d='M 45,65 V70 H55 V65 Z'/>
-<path svg-type='node' node='3' d='M 65,65 V70 H75 V65 Z'/>
-<path svg-type='node' node='4' d='M 85,65 V70 H95 V65 Z'/>
-<path svg-type='node' node='5' d='M 85,0 V5 H95 V0 Z'/>
-<path svg-type='node' node='6' d='M 65,0 V5 H75 V0 Z'/>
-<path svg-type='node' node='7' d='M 45,0 V5 H55 V0 Z'/>
-<path svg-type='node' node='8' d='M 25,0 V5 H35 V0 Z'/>
-<path svg-type='node' node='9' d='M 5,0 V5 H15 V0 Z'/>"
+	"data": "<rect svg-type='body' x='0' y='0' width='100' height='60'/>
+<path class='no-fill' d='M 0,25 H5 V45 H0'></path>"
 },
 {
 	"type" : "dip",
@@ -701,12 +623,12 @@
 		"nodes": {
 			"createLabels" : true,
 			"list" : [
-				{ "x": 10, "y": 70, "label": "GND" },
-				{ "x": 30, "y": 70, "label": "Output 4" },
-				{ "x": 50, "y": 70, "label": "Output 3" },
-				{ "x": 70, "y": 70, "label": "Output 2" },
-				{ "x": 90, "y": 70, "label": "Output 1" },
-				{ "x": 110, "y": 70, "label": "Output 0" },
+				{ "x": 10, "y": 60, "label": "GND" },
+				{ "x": 30, "y": 60, "label": "Output 4" },
+				{ "x": 50, "y": 60, "label": "Output 3" },
+				{ "x": 70, "y": 60, "label": "Output 2" },
+				{ "x": 90, "y": 60, "label": "Output 1" },
+				{ "x": 110, "y": 60, "label": "Output 0" },
 				{ "x": 110, "y": 0, "label": "Data 4" },
 				{ "x": 90, "y": 0, "label": "Data 3" },
 				{ "x": 70, "y": 0, "label": "Data 2" },
@@ -716,20 +638,8 @@
 			]
 		}
 	},
-	"data" : "<path svg-type='body' d='M 0,5 H120 V65 H0 Z'></path>
-<path class='no-fill' d='M 0,25 H5 V45 H0'></path>
-<path svg-type='node' node='0' d='M 5,65 V70 H15 V65 Z'/>
-<path svg-type='node' node='1' d='M 25,65 V70 H35 V65 Z'/>
-<path svg-type='node' node='2' d='M 45,65 V70 H55 V65 Z'/>
-<path svg-type='node' node='3' d='M 65,65 V70 H75 V65 Z'/>
-<path svg-type='node' node='4' d='M 85,65 V70 H95 V65 Z'/>
-<path svg-type='node' node='5' d='M 105,65 V70 H115 V65 Z'/>
-<path svg-type='node' node='6' d='M 105,0 V5 H115 V0 Z'/>
-<path svg-type='node' node='7' d='M 85,0 V5 H95 V0 Z'/>
-<path svg-type='node' node='8' d='M 65,0 V5 H75 V0 Z'/>
-<path svg-type='node' node='9' d='M 45,0 V5 H55 V0 Z'/>
-<path svg-type='node' node='10' d='M 25,0 V5 H35 V0 Z'/>
-<path svg-type='node' node='11' d='M 5,0 V5 H15 V0 Z'/>"
+	"data" : "<rect svg-type='body' x='0' y='0' width='120' height='60'/>
+<path class='no-fill' d='M 0,25 H5 V45 H0'></path>"
 },
 {
 	"type" : "dip",
@@ -742,13 +652,13 @@
 		"nodes": {
 			"createLabels" : true,
 			"list" : [
-				{ "x": 10, "y": 70, "label": "GND" },
-				{ "x": 30, "y": 70, "label": "Output 5" },
-				{ "x": 50, "y": 70, "label": "Output 4" },
-				{ "x": 70, "y": 70, "label": "Output 3" },
-				{ "x": 90, "y": 70, "label": "Output 2" },
-				{ "x": 110, "y": 70, "label": "Output 1" },
-				{ "x": 130, "y": 70, "label": "Output 0" },
+				{ "x": 10, "y": 60, "label": "GND" },
+				{ "x": 30, "y": 60, "label": "Output 5" },
+				{ "x": 50, "y": 60, "label": "Output 4" },
+				{ "x": 70, "y": 60, "label": "Output 3" },
+				{ "x": 90, "y": 60, "label": "Output 2" },
+				{ "x": 110, "y": 60, "label": "Output 1" },
+				{ "x": 130, "y": 60, "label": "Output 0" },
 				{ "x": 130, "y": 0, "label": "Data 5" },
 				{ "x": 110, "y": 0, "label": "Data 4" },
 				{ "x": 90, "y": 0, "label": "Data 3" },
@@ -759,22 +669,8 @@
 			]
 		}
 	},
-	"data" : "<path svg-type='body' d='M 0,5 H140 V65 H0 Z'></path>
-<path class='no-fill' d='M 0,25 H5 V45 H0'></path>
-<path svg-type='node' node='0' d='M 5,65 V70 H15 V65 Z'/>
-<path svg-type='node' node='1' d='M 25,65 V70 H35 V65 Z'/>
-<path svg-type='node' node='2' d='M 45,65 V70 H55 V65 Z'/>
-<path svg-type='node' node='3' d='M 65,65 V70 H75 V65 Z'/>
-<path svg-type='node' node='4' d='M 85,65 V70 H95 V65 Z'/>
-<path svg-type='node' node='5' d='M 105,65 V70 H115 V65 Z'/>
-<path svg-type='node' node='6' d='M 125,65 V70 H135 V65 Z'/>
-<path svg-type='node' node='7' d='M 125,0 V5 H135 V0 Z'/>
-<path svg-type='node' node='8' d='M 105,0 V5 H115 V0 Z'/>
-<path svg-type='node' node='9' d='M 85,0 V5 H95 V0 Z'/>
-<path svg-type='node' node='10' d='M 65,0 V5 H75 V0 Z'/>
-<path svg-type='node' node='11' d='M 45,0 V5 H55 V0 Z'/>
-<path svg-type='node' node='12' d='M 25,0 V5 H35 V0 Z'/>
-<path svg-type='node' node='13' d='M 5,0 V5 H15 V0 Z'/>"
+	"data" : "<rect svg-type='body' x='0' y='0' width='140' height='60'/>
+<path class='no-fill' d='M 0,25 H5 V45 H0'></path>"
 },
 {
 	"type" : "ic",
@@ -789,7 +685,7 @@
 		"name" : "dip14",
 		"label" : {
 			"x" : 15,
-			"y" : 40,
+			"y" : 35,
 			"class" : "title",
 			"text" : "7408"
 		},
@@ -810,14 +706,14 @@
 		"nodes": {
 			"createLabels" : true,
 			"list" : [
-				{ "x": 10, "y": 70, "label": "GND" },
-				{ "x": 30, "y": 70, "label": "Output 6" },
-				{ "x": 50, "y": 70, "label": "Output 5" },
-				{ "x": 70, "y": 70, "label": "Output 4" },
-				{ "x": 90, "y": 70, "label": "Output 3" },
-				{ "x": 110, "y": 70, "label": "Output 2" },
-				{ "x": 130, "y": 70, "label": "Output 1" },
-				{ "x": 150, "y": 70, "label": "Output 0" },
+				{ "x": 10, "y": 60, "label": "GND" },
+				{ "x": 30, "y": 60, "label": "Output 6" },
+				{ "x": 50, "y": 60, "label": "Output 5" },
+				{ "x": 70, "y": 60, "label": "Output 4" },
+				{ "x": 90, "y": 60, "label": "Output 3" },
+				{ "x": 110, "y": 60, "label": "Output 2" },
+				{ "x": 130, "y": 60, "label": "Output 1" },
+				{ "x": 150, "y": 60, "label": "Output 0" },
 				{ "x": 150, "y": 0, "label": "Data 6" },
 				{ "x": 130, "y": 0, "label": "Data 5" },
 				{ "x": 110, "y": 0, "label": "Data 4" },
@@ -829,24 +725,8 @@
 			]
 		}
 	},
-	"data" : "<path svg-type='body' d='M 0,5 H160 V65 H0 Z'></path>
-<path class='no-fill' d='M 0,25 H5 V45 H0'></path>
-<path svg-type='node' node='0' d='M 5,65 V70 H15 V65 Z'/>
-<path svg-type='node' node='1' d='M 25,65 V70 H35 V65 Z'/>
-<path svg-type='node' node='2' d='M 45,65 V70 H55 V65 Z'/>
-<path svg-type='node' node='3' d='M 65,65 V70 H75 V65 Z'/>
-<path svg-type='node' node='4' d='M 85,65 V70 H95 V65 Z'/>
-<path svg-type='node' node='5' d='M 105,65 V70 H115 V65 Z'/>
-<path svg-type='node' node='6' d='M 125,65 V70 H135 V65 Z'/>
-<path svg-type='node' node='7' d='M 145,65 V70 H155 V65 Z'/>
-<path svg-type='node' node='8' d='M 145,0 V5 H155 V0 Z'/>
-<path svg-type='node' node='9' d='M 125,0 V5 H135 V0 Z'/>
-<path svg-type='node' node='10' d='M 105,0 V5 H115 V0 Z'/>
-<path svg-type='node' node='11' d='M 85,0 V5 H95 V0 Z'/>
-<path svg-type='node' node='12' d='M 65,0 V5 H75 V0 Z'/>
-<path svg-type='node' node='13' d='M 45,0 V5 H55 V0 Z'/>
-<path svg-type='node' node='14' d='M 25,0 V5 H35 V0 Z'/>
-<path svg-type='node' node='15' d='M 5,0 V5 H15 V0 Z'/>"
+	"data" : "<rect svg-type='body' x='0' y='0' width='160' height='60'/>
+<path class='no-fill' d='M 0,25 H5 V45 H0'></path>"
 },
 {
 	"type": "dip",
@@ -858,27 +738,27 @@
 		"class": "next",
 		"label" : {
 			"x" : 15,
-			"y" : 40,
+			"y" : 35,
 			"class" : "title",
 			"text" : "Atmega168"
 		},
 		"nodes": {
 			"createLabels" : true,
 			"list": [
-				{ "x": 10, "y": 70, "label": "PC6 PCINT14/RESET" },
-				{ "x": 30, "y": 70, "label": "PD0 PCINT16/RXD" },
-				{ "x": 50, "y": 70, "label": "PD1 PCINT17/TXD" },
-				{ "x": 70, "y": 70, "label": "PD2 PCINT18/INTO" },
-				{ "x": 90, "y": 70, "label": "PD3 PCINT19/OC2B/INT1 PWM" },
-				{ "x": 110, "y": 70, "label": "PD4 PCINT20/XCK/T0" },
-				{ "x": 130, "y": 70, "label": "VCC" },
-				{ "x": 150, "y": 70, "label": "GND" },
-				{ "x": 170, "y": 70, "label": "PB6 PCINT6/XTAL1/TOSC1" },
-				{ "x": 190, "y": 70, "label": "PB7 PCINT7/XTAL2/TOSC2" },
-				{ "x": 210, "y": 70, "label": "PD5 PCINT21/OC0B/T1 PWM" },
-				{ "x": 230, "y": 70, "label": "PD6 PCINT22/OC0A/AIN0 PWM" },
-				{ "x": 250, "y": 70, "label": "PD7 PCINT23/AIN1" },
-				{ "x": 270, "y": 70, "label": "PB8 PCINT0/CLK0/ICP1" },
+				{ "x": 10, "y": 60, "label": "PC6 PCINT14/RESET" },
+				{ "x": 30, "y": 60, "label": "PD0 PCINT16/RXD" },
+				{ "x": 50, "y": 60, "label": "PD1 PCINT17/TXD" },
+				{ "x": 70, "y": 60, "label": "PD2 PCINT18/INTO" },
+				{ "x": 90, "y": 60, "label": "PD3 PCINT19/OC2B/INT1 PWM" },
+				{ "x": 110, "y": 60, "label": "PD4 PCINT20/XCK/T0" },
+				{ "x": 130, "y": 60, "label": "VCC" },
+				{ "x": 150, "y": 60, "label": "GND" },
+				{ "x": 170, "y": 60, "label": "PB6 PCINT6/XTAL1/TOSC1" },
+				{ "x": 190, "y": 60, "label": "PB7 PCINT7/XTAL2/TOSC2" },
+				{ "x": 210, "y": 60, "label": "PD5 PCINT21/OC0B/T1 PWM" },
+				{ "x": 230, "y": 60, "label": "PD6 PCINT22/OC0A/AIN0 PWM" },
+				{ "x": 250, "y": 60, "label": "PD7 PCINT23/AIN1" },
+				{ "x": 270, "y": 60, "label": "PB8 PCINT0/CLK0/ICP1" },
 				{ "x": 270, "y": 0, "label": "PB1 OC1A/PCINT1 PWM" },
 				{ "x": 250, "y": 0, "label": "PB2 SS/OC1B/PCINT2 PWM" },
 				{ "x": 230, "y": 0, "label": "PB3 MOSI/OC2A/PCINT3 PWM" },
@@ -896,36 +776,8 @@
 			]
 		}
 	},
-	"data": "<path svg-type='body' d='M 0,5 H280 V65 H0 Z'></path>
-<path class='no-fill' d='M 0,25 H5 V45 H0'></path>
-<path svg-type='node' node='0' d='M 5,65 V70 H15 V65 Z'/>
-<path svg-type='node' node='1' d='M 25,65 V70 H35 V65 Z'/>
-<path svg-type='node' node='2' d='M 45,65 V70 H55 V65 Z'/>
-<path svg-type='node' node='3' d='M 65,65 V70 H75 V65 Z'/>
-<path svg-type='node' node='4' d='M 85,65 V70 H95 V65 Z'/>
-<path svg-type='node' node='5' d='M 105,65 V70 H115 V65 Z'/>
-<path svg-type='node' node='6' d='M 125,65 V70 H135 V65 Z'/>
-<path svg-type='node' node='7' d='M 145,65 V70 H155 V65 Z'/>
-<path svg-type='node' node='8' d='M 165,65 V70 H175 V65 Z'/>
-<path svg-type='node' node='9' d='M 185,65 V70 H195 V65 Z'/>
-<path svg-type='node' node='10' d='M 205,65 V70 H215 V65 Z'/>
-<path svg-type='node' node='11' d='M 225,65 V70 H235 V65 Z'/>
-<path svg-type='node' node='12' d='M 245,65 V70 H255 V65 Z'/>
-<path svg-type='node' node='13' d='M 265,65 V70 H275 V65 Z'/>
-<path svg-type='node' node='14' d='M 265,0 V5 H275 V0 Z'/>
-<path svg-type='node' node='15' d='M 245,0 V5 H255 V0 Z'/>
-<path svg-type='node' node='16' d='M 225,0 V5 H235 V0 Z'/>
-<path svg-type='node' node='17' d='M 205,0 V5 H215 V0 Z'/>
-<path svg-type='node' node='18' d='M 185,0 V5 H195 V0 Z'/>
-<path svg-type='node' node='19' d='M 165,0 V5 H175 V0 Z'/>
-<path svg-type='node' node='20' d='M 145,0 V5 H155 V0 Z'/>
-<path svg-type='node' node='21' d='M 125,0 V5 H135 V0 Z'/>
-<path svg-type='node' node='22' d='M 105,0 V5 H115 V0 Z'/>
-<path svg-type='node' node='23' d='M 85,0 V5 H95 V0 Z'/>
-<path svg-type='node' node='24' d='M 65,0 V5 H75 V0 Z'/>
-<path svg-type='node' node='25' d='M 45,0 V5 H55 V0 Z'/>
-<path svg-type='node' node='26' d='M 25,0 V5 H35 V0 Z'/>
-<path svg-type='node' node='27' d='M 5,0 V5 H15 V0 Z'/>"
+	"data": "<rect svg-type='body' x='0' y='0' width='280' height='60'/>
+<path class='no-fill' d='M 0,25 H5 V45 H0'></path>"
 },
 {
 	"type" : "capacitor",
@@ -945,20 +797,18 @@
 		"countStart": 1,
 		"nameTmpl": "C{Comp.capacitorCount}",
 		"labelId": {
-			"x": 5,
+			"x": 0,
 			"y": -5
 		},
 		"nodes": {
 			"list" : [
 				{ "x": 0, "y": 30, "label": "node 0" },
-				{ "x": 32, "y": 30, "label": "node 1" }
+				{ "x": 22, "y": 30, "label": "node 1" }
 			]
 		}
 	},
-	"data" : "<rect svg-type='body' x='5' y='0' width='7' height='60'/>
-<rect svg-type='body' x='20' y='0' width='7' height='60'/>
-<path svg-type='node' node='0' d='M 0,25 V35 H5 V25 Z'/>
-<path svg-type='node' node='1' d='M 27,25 V35 H32 V25 Z'/>"
+	"data" : "<rect svg-type='body' x='0' y='0' width='7' height='60'/>
+<rect svg-type='body' x='15' y='0' width='7' height='60'/>"
 },
 {
 	"type" : "capacitor",
@@ -971,21 +821,19 @@
 		"countStart": 1,
 		"nameTmpl": "C{Comp.capacitorCount}",
 		"labelId": {
-			"x": 10,
+			"x": 5,
 			"y": -5
 		},
 		"nodes": {
 			"list" : [
-				{ "x": 5, "y": 30, "label": "node (-)" },
-				{ "x": 30, "y": 30, "label": "node (+)" }
+				{ "x": 10, "y": 30, "label": "node (-)" },
+				{ "x": 25, "y": 30, "label": "node (+)" }
 			]
 		}
 	},
-	"data" : "<path class='no-fill' d='M 0,60 Q 20,30 0,0'/>
+	"data" : "<path class='thick no-fill' d='M 0,60 Q 20,30 0,0'/>
 <path class='no-fill' d='M 28,12 L 42,12 L 35,12 V 5 V 20 '/>
-<rect svg-type='body' x='20' y='0' width='5' height='60'/>
-<path svg-type='node' node='0' d='M 5,25 V35 H9.5 V25 Z'/>
-<path svg-type='node' node='1' d='M 25,25 V35 H30 V25 Z'/>"
+<rect svg-type='body' x='20' y='0' width='5' height='60'/>"
 },
 {
 	"type" : "capacitor",
@@ -1003,16 +851,14 @@
 		},
 		"nodes": {
 			"list" : [
-				{ "x": 15, "y": 30, "label": "node 0" },
-				{ "x": 54, "y": 30, "label": "node 1" }
+				{ "x": 20, "y": 30, "label": "node 0" },
+				{ "x": 49, "y": 30, "label": "node 1" }
 			]
 		}
 	},
 	"data" : "<rect svg-type='body' x='20' y='0' width='7' height='60'/>
 <rect svg-type='body' x='42' y='0' width='7' height='60'/>
-<path svg-type='body' style='stroke-width: 2px;' d='M 5,60 L 59,6 L 54,1 L 65,0 L 64,10.3 L 59,6'/>
-<path svg-type='node' node='0' d='M 15,25 V35 H20 V25 Z'/>
-<path svg-type='node' node='1' d='M 49,25 V35 H54 V25 Z'/>"
+<path svg-type='body' style='stroke-width: 2px;' d='M 5,60 L 59,6 L 54,1 L 65,0 L 64,10.3 L 59,6'/>"
 },
 {
 	"type" : "motor",
@@ -1025,14 +871,12 @@
 		"nodes": {
 			"list" : [
 				{ "x": 30, "y": 0, "label": "node (-)" },
-				{ "x": 30, "y": 70, "label": "node (+)" }
+				{ "x": 30, "y": 60, "label": "node (+)" }
 			]
 		}
 	},
-	"data" : "<circle svg-type='body' cx='30' cy='35' r='30'/>
-<text x='15' y='50' class='big'>M</text>
-<path svg-type='node' node='0' d='M 25,0 H35 V5 H25 Z'/>
-<path svg-type='node' node='1' d='M 25,70 H35 V65 H25 Z'/>"
+	"data" : "<circle svg-type='body' cx='30' cy='30' r='30'/>
+<text x='15' y='45' class='big'>M</text>"
 },
 {
 	"type" : "resistor",
@@ -1051,19 +895,17 @@
 		"countStart": 1,
 		"nameTmpl": "R{Comp.resistorCount}",
 		"labelId": {
-			"x": 15,
+			"x": 10,
 			"y": -5
 		},
 		"nodes": {
 			"list" : [
 				{ "x": 0, "y": 10, "label": "node 0" },
-				{ "x": 50, "y": 10, "label": "node 1" }
+				{ "x": 40, "y": 10, "label": "node 1" }
 			]
 		}
 	},
-	"data" : "<rect svg-type='body' x='5' y='0' width='40' height='20'/>
-<path svg-type='node' node='0' d='M 0,5 V15 H5 V5 Z'/>
-<path svg-type='node' node='1' d='M 45,5 V15 H50 V5 Z'/>"
+	"data" : "<rect svg-type='body' x='0' y='0' width='40' height='20'/>"
 },
 {
 	"type" : "resistor",
@@ -1088,14 +930,12 @@
 		"nodes": {
 			"list" : [
 				{ "x": 0, "y": 20, "label": "node 0" },
-				{ "x": 50, "y": 20, "label": "node 1" }
+				{ "x": 40, "y": 20, "label": "node 1" }
 			]
 		}
 	},
-	"data" : "<rect svg-type='body' x='5' y='10' width='40' height='20'/>
-<path class='thick no-fill' d='M 5,40 L 46,4.5 L 42,0 H50 V8 L 46,4.5'/>
-<path svg-type='node' node='0' d='M 0,15 V25 H5 V15 Z'/>
-<path svg-type='node' node='1' d='M 45,15 V25 H50 V15 Z'/>"
+	"data" : "<rect svg-type='body' x='0' y='10' width='40' height='20'/>
+<path class='thick no-fill' d='M 0,40 L 41,4.5 L 37,0 H45 V8 L 41,4.5'/>"
 },
 {
 	"type" : "potentiometer",
@@ -1115,16 +955,13 @@
 		"nodes": {
 			"list" : [
 				{ "x": 10, "y": 0, "label": "node 0" },
-				{ "x": 10, "y": 50, "label": "node 1" },
-				{ "x": 40, "y": 25, "label": "variable input" }
+				{ "x": 10, "y": 40, "label": "node 1" },
+				{ "x": 40, "y": 20, "label": "variable input" }
 			]
 		}
 	},
-	"data" : "<rect svg-type='body' x='0' y='5' width='20' height='40'/>
-<path class='thick no-fill' d='M 20,25 L 30,20 V30 L 20,25 M 30,25 H40'/>
-<path svg-type='node' node='0' d='M 5,0 H15 V5 H5 Z'/>
-<path svg-type='node' node='1' d='M 5,45 H15 V50 H5 Z'/>
-<circle svg-type='node' node='2' r='3' cx='40' cy='25'/>"
+	"data" : "<rect svg-type='body' x='0' y='0' width='20' height='40'/>
+<path class='thick no-fill' d='M 20,20 L 30,15 V25 L 20,20 M 30,20 H40'/>"
 },
 {
 	"type" : "switch",
@@ -1136,18 +973,16 @@
 		"class": "next",
 		"nodes": {
 			"list" : [
-				{ "x": 0, "y": 40, "label": "node 0" },
-				{ "x": 71, "y": 40, "label": "node 1" }
+				{ "x": 6, "y": 40, "label": "node 0" },
+				{ "x": 45, "y": 40, "label": "node 1" }
 			]
 		}
 	},
-	"data" : "<rect svg-type='body' x='25' y='0' width='20' height='4'/>
-<rect svg-type='body' x='33' y='4' width='4' height='11'/>
-<rect svg-type='body' x='10' y='15' width='50' height='10'/>
-<path svg-type='node' node='0' d='M 0,35 V 45 H11 V35 Z'/>
-<path svg-type='node' node='1' d='M 60,35 V45 H71 V35 Z'/>
-<circle svg-type='body' cx='16' cy='40' r='7'/>
-<circle svg-type='body' cx='55' cy='40' r='7'/>"
+	"data" : "<rect svg-type='body' x='15' y='0' width='20' height='4'/>
+<rect svg-type='body' x='23' y='4' width='4' height='11'/>
+<rect svg-type='body' x='0' y='15' width='50' height='10'/>
+<circle svg-type='body' cx='6' cy='40' r='5'/>
+<circle svg-type='body' cx='45' cy='40' r='5'/>"
 },
 {
 	"type" : "switch",
@@ -1159,16 +994,14 @@
 		"class": "next",
 		"nodes": {
 			"list" : [
-				{ "x": 0, "y": 25, "label": "node 0" },
-				{ "x": 71, "y": 25, "label": "node 1" }
+				{ "x": 6, "y": 25, "label": "node 0" },
+				{ "x": 45, "y": 25, "label": "node 1" }
 			]
 		}
 	},
-	"data" : "<path svg-type='body' d='M 21,19 L 54,2 L57,8 L 23,25 Z'/>
-<path svg-type='node' node='0' d='M 0,20 V30 H11 V20 Z'/>
-<path svg-type='node' node='1' d='M 60,20 V30 H71 V20 Z'/>
-<circle svg-type='body' r='7' cx='16' cy='25'/>
-<circle svg-type='body' r='7' cx='55' cy='25'/>"
+	"data" : "<path svg-type='body' d='M 8,20 L 41,2 L 44,8 L 10,26 Z'/>
+<circle svg-type='body' r='5' cx='6' cy='25'/>
+<circle svg-type='body' r='5' cx='45' cy='25'/>"
 },
 {
 	"type" : "switch",
@@ -1186,10 +1019,10 @@
 			]
 		}
 	},
-	"data" : "<path svg-type='body' d='M 10,22 H25 L 54,6 L 57,11 L 25,28 H10 Z'/>
-<circle svg-type='node' node='0' r='3' cx='7' cy='25'/>
-<circle svg-type='node' node='1' r='3' cx='58' cy='7'/>
-<circle svg-type='node' node='2' r='3' cx='58' cy='43'/>"
+	"data" : "<path svg-type='body' d='M 8,22 H24 L 56,5 L 59,10 L 25,28 H8 Z'/>
+<circle svg-type='body' r='3' cx='7' cy='25'/>
+<circle svg-type='body' r='3' cx='58' cy='7'/>
+<circle svg-type='body' r='3' cx='58' cy='43'/>"
 },
 {
 	"type" : "inductor",
@@ -1201,14 +1034,12 @@
 		"class": "next",
 		"nodes": {
 			"list" : [
-				{ "x": 0, "y": 25, "label": "node 0" },
-				{ "x": 100, "y": 25, "label": "node 1" }
+				{ "x": 2, "y": 35, "label": "node 0" },
+				{ "x": 78, "y": 35, "label": "node 1" }
 			]
 		}
 	},
-	"data" : "<path svg-type='body' d='M 5,20 Q 20,0 35,26 Q 50,0 65,26 Q 80,0 95,20 V36 H90 Q 85,5 68,36 H62 Q 50,7 38,36 H32 Q 16,6 10,36 H5 Z'/>
-<path svg-type='node' node='0' d='M 0,20 V30 H5 V20 Z'/>
-<path svg-type='node' node='1' d='M 95,20 V30 H100 V20 Z'/>"
+	"data" : "<path svg-type='body' style='stroke-linejoin: round' d='M 0,32 Q 10,0 25,30 Q 40,2 55,30 Q 70,0 80,32 Q 78,38 75,32 Q 69,8 58,32 Q 55,38 52,32 Q 40,8 28,32 Q 25,38 22,32 Q 11,8 5,32 Q 2,38 0,32 Z'/>"
 },
 {
 	"type" : "relay",
@@ -1220,28 +1051,23 @@
 		"class": "next",
 		"nodes": {
 			"list" : [
-				{ "x": 0, "y": 15, "label": "Coil 0" },
-				{ "x": 0, "y": 75, "label": "Coil 1" },
-				{ "x": 80, "y": 45, "label": "Common" },
-				{ "x": 50, "y": 0, "label": "N/C" },
-				{ "x": 50, "y": 90, "label": "N/O" }
+				{ "x": 0, "y": 10, "label": "Coil 0" },
+				{ "x": 0, "y": 70, "label": "Coil 1" },
+				{ "x": 70, "y": 40, "label": "Common" },
+				{ "x": 45, "y": 0, "label": "N/C" },
+				{ "x": 45, "y": 80, "label": "N/O" }
 			]
 		}
 	},
-	"data" : "<rect svg-type='body' x='5' y='5' width='70' height='80'/>
-<path class='thick3 no-fill' d='M 75,45 H65 L 50,20'/>
-<line class='thick3' x1='50' y1='5' x2='50' y2='15'/>
-<circle class='white' cx='50' cy='20' r='5'/>
-<line class='thick3' x1='50' y1='75' x2='50' y2='85'/>
-<circle class='white' cx='50' cy='70' r='5'/>
-<path class='thick3 no-fill' d='M 5,15 H15 V20 Q 25,25 15,30 Q 25,35 15,40 Q 25,45 15,50 Q 25,55 15,60 Q 25,65 15,70 V75 H5'/>
-<line class='thick' x1='25' y1='15' x2='25' y2='75'/>
-<line class='thick' x1='30' y1='15' x2='30' y2='75'/>
-<path svg-type='node' node='0' d='M 0,10 V20 H5 V10 Z'/>
-<path svg-type='node' node='1' d='M 0,70 V80 H5 V70 Z'/>
-<path svg-type='node' node='2' d='M 75,40 V50 H80 V40 Z'/>
-<path svg-type='node' node='3' d='M 45,0 H55 V5 H45 Z'/>
-<path svg-type='node' node='4' d='M 45,90 H55 V85 H45 Z'/>"
+	"data" : "<rect svg-type='body' x='0' y='0' width='70' height='80'/>
+<path class='thick3 no-fill' d='M 70,40 H60 L 45,15'/>
+<line class='thick3' x1='45' y1='0' x2='45' y2='10'/>
+<circle class='white' cx='45' cy='15' r='5'/>
+<line class='thick3' x1='45' y1='65' x2='45' y2='80'/>
+<circle class='white' cx='45' cy='65' r='5'/>
+<path class='thick3 no-fill' d='M 0,10 H10 V15 Q 20,20 10,25 Q 20,30 10,35 Q 20,40 10,45 Q 20,50 10,55 Q 20,60 10,65 V70 H0'/>
+<line class='thick' x1='20' y1='10' x2='20' y2='70'/>
+<line class='thick' x1='25' y1='10' x2='25' y2='70'/>"
 },
 {
 	"type" : "transformer",
@@ -1255,19 +1081,15 @@
 			"list" : [
 				{ "x": 0, "y": 10, "label": "input 0" },
 				{ "x": 0, "y": 70, "label": "input 1" },
-				{ "x": 70, "y": 10, "label": "output 0" },
-				{ "x": 70, "y": 70, "label": "output 1" }
+				{ "x": 60, "y": 10, "label": "output 0" },
+				{ "x": 60, "y": 70, "label": "output 1" }
 			]
 		}
 	},
-	"data" : "<rect svg-type='body' x='5' y='0' width='60' height='80'/>
-<path class='thick3 no-fill' d='M 5,10 H20 V15 Q 30,20 20,25 Q 30,30 20,35 Q 30,40 20,45 Q 30,50 20,55 Q 30,60 20,65 V70 H5'/>
+	"data" : "<rect svg-type='body' x='0' y='0' width='60' height='80'/>
+<path class='thick3 no-fill' d='M 0,10 H15 V15 Q 25,20 15,25 Q 25,30 15,35 Q 25,40 15,45 Q 25,50 15,55 Q 25,60 15,65 V70 H0'/>
+<line class='thick' x1='27.5' y1='10' x2='27.5' y2='70'/>
 <line class='thick' x1='32.5' y1='10' x2='32.5' y2='70'/>
-<line class='thick' x1='37.5' y1='10' x2='37.5' y2='70'/>
-<path class='thick3 no-fill' d='M 65,10 H50 V15 Q 40,20 50,25 Q 40,30 50,35 Q 40,40 50,45 Q 40,50 50,55 Q 40,60 50,65 V70 H65'/>
-<path svg-type='node' node='0' d='M 0,5 V15 H5 V5 Z'/>
-<path svg-type='node' node='1' d='M 0,65 V75 H5 V65 Z'/>
-<path svg-type='node' node='2' d='M 65,5 V15 H70 V5 Z'/>
-<path svg-type='node' node='3' d='M 65,65 V75 H70 V65 Z'/>"
+<path class='thick3 no-fill' d='M 60,10 H45 V15 Q 35,20 45,25 Q 35,30 45,35 Q 35,40 45,45 Q 35,50 45,55 Q 35,60 45,65 V70 H60'/>"
 }
 ]

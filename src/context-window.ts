@@ -1,5 +1,7 @@
 import BaseWindow from "./base-window";
-import { IContextMenuOptions, IContextMenuItem, IContextMenuSettings, ActionType, IBaseWindowOptions, StateType } from "./interfaces";
+import {
+	IContextMenuOptions, IContextMenuItem, IContextMenuSettings, ActionType, IBaseWindowOptions, StateType
+} from "./interfaces";
 import { each } from "./utils";
 import { nano, aEL, getParentAttr, attr, extend } from "./dab";
 import { MyApp } from "./myapp";
@@ -42,8 +44,7 @@ export default class ContextWindow extends BaseWindow {
 	}
 
 	public onMouseLeave(e: MouseEvent) {
-		//console.log('OUT of context window', e.eventPhase, (e.target as HTMLElement).id);
-		//return false;
+		(this.app as MyApp).sm.transition(StateType.BOARD, ActionType.RESUME);
 	}
 
 	public setVisible(value: boolean): ContextWindow {
@@ -61,6 +62,7 @@ export default class ContextWindow extends BaseWindow {
 			ctx;
 		switch (type) {
 			case "node":
+			case "node-x":
 				ctx = ((name == "wire") ? "wire-" : "ec-") + type;
 				break;
 			case "board":

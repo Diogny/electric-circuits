@@ -1,22 +1,19 @@
 
-import { aCld, condClass, obj, attr, extend, isFn, isNum } from './dab';
+import { condClass, obj, attr, extend, isFn, isNum } from './dab';
 import Bond from './bonds';
 import ItemBase from './itemsBase';
 import Comp from './components';
 import {
-	IHighlightable, IPoint, IItemNode, IItemBoardOptions, IBondItem, IItemBoardProperties,
+	IPoint, IItemNode, IItemBoardOptions, IBondItem, IItemBoardProperties,
 	ComponentPropertyType, IComponentProperty
 } from './interfaces';
-import BoardCircle from './boardCircle';
-import { map, tag } from './utils';
-import EC from './ec';
+import { map } from './utils';
 import Point from './point';
 
 //ItemBoard->Wire
 export abstract class ItemBoard extends ItemBase {
 
 	protected settings: IItemBoardProperties;
-	public highlight: IHighlightable;
 
 	get base(): Comp { return this.settings.base }
 	get onProp(): Function { return this.settings.onProp }
@@ -37,7 +34,7 @@ export abstract class ItemBoard extends ItemBase {
 		//save base data
 		this.settings.base = base.comp;
 		//global component count incremented
-		this.settings.id = `${this.base.name}-${base.count++}`;
+		this.settings.id = `${this.base.name}-${base.count}`;
 		//use template to create label according to defined strategy
 		this.label = base.comp.meta.nameTmpl.replace(regex,
 			function (match: string, group: string): string { //, offset: number, str: string
@@ -63,41 +60,14 @@ export abstract class ItemBoard extends ItemBase {
 				(rootName == "Comp") && isNum(result) && (rootRef[<any>prop] = result + 1)
 				return result;
 			});
+		base.count++
 		//deep copy component properties
 		this.settings.props = obj(base.comp.props);
 		//add properties to DOM
 		attr(this.g, {
 			id: this.id,
 			"svg-comp": this.base.type,
-		});
-		//create the highligh object
-		this.highlight = new BoardCircle(this.settings.highlightNodeName);
-		//add it to component, this's the insertion point (insertBefore) for all inherited objects
-		aCld(this.g, this.highlight.g);
-		//add component label if available
-		let
-			createText = (attr: any, text: string) => {
-				let
-					svgText = tag("text", "", attr);
-				return svgText.innerHTML = text, svgText
-			}
-		//for labels in N555, 7408, Atmega168
-		if (base.comp.meta.label) {
-			aCld(this.g, createText({
-				x: base.comp.meta.label.x,
-				y: base.comp.meta.label.y,
-				"class": base.comp.meta.label.class
-			}, base.comp.meta.label.text))
-		}
-		//add node labels for DIP packages
-		if (base.comp.meta.nodes.createLabels) {
-			let
-				pins = (this as unknown as EC).count / 2;
-			for (let y = 60, x = 7, i = 0, factor = 20; y > 0; y -= 44, x += (factor = -factor))
-				for (let col = 0; col < pins; col++, i++, x += factor)
-					aCld(this.g, createText({ x: x, y: y }, i + ""));
-		}
-
+		})
 		//this still doesn't work to get all overridable properties ¿?
 		//properties still cannot access super value
 		//(<any>this.settings).__selected = dab.propDescriptor(this, "selected");
@@ -109,8 +79,6 @@ export abstract class ItemBoard extends ItemBase {
 			this.settings.selected = value;
 			//add class if selected
 			condClass(this.g, "selected", this.selected);
-			//unselect any node if any
-			this.highlight.hide();
 			//trigger property changed if applicable
 			this.onProp && this.onProp({
 				id: `#${this.id}`,
@@ -151,7 +119,6 @@ export abstract class ItemBoard extends ItemBase {
 
 	public setOnProp(value: Function): ItemBoard {
 		isFn(value) && (this.settings.onProp = value);
-		//for object chaining
 		return this;
 	}
 
@@ -240,37 +207,17 @@ export abstract class ItemBoard extends ItemBase {
 	}
 
 	abstract valid(node: number): boolean;
+	abstract get last(): number;
 	abstract refresh(): ItemBoard;	//full refresh
 	abstract nodeRefresh(node: number): ItemBoard;	//node refresh
 	abstract getNode(node: number): IItemNode;
 	abstract setNode(node: number, p: IPoint): ItemBoard;
 	abstract overNode(p: IPoint, ln: number): number;
+	//finds a matching point, faster
+	abstract findNode(p: Point): number;
+
 	//this returns true for an EC, and any Wire node and that it is not a start|end bonded node
 	abstract nodeHighlightable(node: number): boolean;
-
-	//highligh short-cuts
-	public setNodeRadius(value: number): ItemBoard {
-		this.highlight.setRadius(value);
-		return this
-	}
-
-	public showNode(node: number): ItemBoard {
-		let
-			nodeData = this.getNode(node);
-		if (nodeData) {
-			this.highlight.move(nodeData.x, nodeData.y);
-			this.highlight.show(node);
-		}
-		//for object chaining
-		return this;
-	}
-
-	public hideNode(): ItemBoard {
-		this.highlight.hide();
-		return this
-	}
-
-	get highlighted(): boolean { return this.highlight.visible }
 
 	public propertyDefaults(): IItemBoardProperties {
 		return extend(super.propertyDefaults(), {

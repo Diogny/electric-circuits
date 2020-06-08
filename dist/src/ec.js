@@ -27,9 +27,27 @@ var EC = /** @class */ (function (_super) {
         var _this = _super.call(this, options) || this;
         //this ensures all path, rect, circles are inserted before the highlight circle node
         //_.svg is used because _.html doesn't work for SVG
-        [].slice.call(utils_1.svg("<g>" + _this.base.data + "</g>").children).forEach(function (n) {
-            _this.g.insertBefore(n, _this.highlight.g);
-        });
+        _this.g.innerHTML = _this.base.data;
+        //add component label if available
+        var createText = function (attr, text) {
+            var svgText = utils_1.tag("text", "", attr);
+            return svgText.innerHTML = text, svgText;
+        };
+        //for labels in N555, 7408, Atmega168
+        if (_this.base.meta.label) {
+            dab_1.aCld(_this.g, createText({
+                x: _this.base.meta.label.x,
+                y: _this.base.meta.label.y,
+                "class": _this.base.meta.label.class
+            }, _this.base.meta.label.text));
+        }
+        //add node labels for DIP packages
+        if (_this.base.meta.nodes.createLabels) {
+            var pins = _this.count / 2;
+            for (var y = 55, x = 7, i = 0, factor = 20; y > 0; y -= 44, x += (factor = -factor))
+                for (var col = 0; col < pins; col++, i++, x += factor)
+                    dab_1.aCld(_this.g, createText({ x: x, y: y }, i + ""));
+        }
         //create label if defined
         if (_this.base.meta.labelId) {
             _this.labelSVG = new label_1.Label({
@@ -59,6 +77,11 @@ var EC = /** @class */ (function (_super) {
         components_1.default.save(_this);
         return _this;
     }
+    Object.defineProperty(EC.prototype, "last", {
+        get: function () { return this.base.meta.nodes.list.length - 1; },
+        enumerable: false,
+        configurable: true
+    });
     Object.defineProperty(EC.prototype, "type", {
         get: function () { return types_1.Type.EC; },
         enumerable: false,
@@ -144,9 +167,21 @@ var EC = /** @class */ (function (_super) {
                 pin.x = Math.round(pin.rot.x);
                 pin.y = Math.round(pin.rot.y);
             }
-            if (rect.inside(new point_1.default(pin.x, pin.y))) {
+            //radius 5 =>  5^2 = 25
+            if ((Math.pow((p.x - this.x) - pin.x, 2) + Math.pow((p.y - this.y) - pin.y, 2)) <= 25)
                 return i;
-            }
+        }
+        return -1;
+    };
+    EC.prototype.findNode = function (p) {
+        var dx = p.x - this.x, dy = p.y - this.y, rotation = -this.rotation, origin = this.origin;
+        for (var i = 0, list = this.base.meta.nodes.list, meta = list[i], len = list.length; i < len; meta = list[++i]) {
+            var nodePoint = this.rotation
+                ? point_1.default.prototype.rotateBy.call(meta, origin.x, origin.y, rotation)
+                : meta;
+            //radius 5 =>  5^2 = 25
+            if ((Math.pow(dx - nodePoint.x, 2) + Math.pow(dy - nodePoint.y, 2)) <= 25)
+                return i;
         }
         return -1;
     };

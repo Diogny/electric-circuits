@@ -1,4 +1,3 @@
-
 import { obj, addClass, removeClass, isStr } from './dab';
 import { tag } from './utils';
 import { Color } from './colors';
@@ -30,7 +29,7 @@ export default abstract class ItemBase extends Item {
 	}
 
 	public rect(): Rect {
-		return new Rect(this.p.x, this.p.y, this.box.width, this.box.height)	//return new Rect(this.p, Size.create(this.box))
+		return new Rect(this.p.x, this.p.y, this.box.width, this.box.height)
 	}
 
 	public setVisible(value: boolean): ItemBase {

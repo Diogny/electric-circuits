@@ -7,8 +7,9 @@ import { MyApp } from "./myapp";
 
 export default class LinesAligner {
 
-	line0: SVGLineElement;
-	line1: SVGLineElement;
+	g: SVGSVGElement;
+	private line0: SVGLineElement;
+	private line1: SVGLineElement;
 	wire: Wire;
 	node: number;
 	p: Point;
@@ -20,9 +21,10 @@ export default class LinesAligner {
 				class: "dash hide",
 				x1: 0, y1: 0, x2: 0, y2: 0,
 				"stroke-dasharray": "3, 3"
-			})
-		this.line0 = create("line0");
-		this.line1 = create("line1");
+			});
+		this.g = <SVGSVGElement>tag("g", "", {});
+		this.g.appendChild(this.line0 = create("line0"));
+		this.g.appendChild(this.line1 = create("line1"));
 	}
 
 	public hide() {

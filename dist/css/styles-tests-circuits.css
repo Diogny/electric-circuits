@@ -143,7 +143,8 @@ g[svg-comp] text.big {
   font-size: 50px;
 }
 
-g[svg-comp] > circle[svg-type="node"] {
+g[svg-comp] > circle[svg-type="node"],
+g[svg-comp] > circle[svg-type="node-x"] {
   fill: #bcdcfb;
   stroke-width: 2px;
   stroke: red;
@@ -294,10 +295,15 @@ g.tooltip > text {
 .wire > polyline:hover,
 .wire.selected > line {
   /*stroke: black;
-					  filter: brightness(60%) sepia(100%);
-		  stroke-dasharray: 10 10;*/
+	filter: brightness(60%) sepia(100%);
+	stroke-dasharray: 10 10;*/
   opacity: 0.9;
   stroke-width: 7px; /*12px;*/
+}
+
+.wire.wiring > line:hover,
+.wire.wiring > polyline:hover {
+  stroke-width: initial !important;
 }
 
 /*.wire.wiring > line:hover,
@@ -633,9 +639,9 @@ div.win.ctx > div[disabled] {
 div.win.ctx > div[disabled] > span {
   color: #c7c3c3;
 }
-div.win.ctx > div[disabled]:hover {
+/*div.win.ctx > div[disabled]:hover {
   cursor: not-allowed;
-}
+}*/
 
 /*   */
 .expandable {

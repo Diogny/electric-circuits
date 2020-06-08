@@ -3,6 +3,44 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var interfaces_1 = require("./interfaces");
 var utils_1 = require("./utils");
 var dab_1 = require("./dab");
+function sendAction(action, newCtx) {
+    var current = this.getState(this.stateName), actionName = interfaces_1.ActionType[action], fn, newSendCmd = "  ::" + actionName;
+    //check action.OVER and overType
+    if (action == interfaces_1.ActionType.OVER) {
+        switch (current.overType) {
+            case "deny":
+                //do nothing ...
+                //deny transitions here, by not calling app.state.transition
+                //  so DEFAULT action is not called
+                //and on all others, accept, this way I can prevent stop dragging while OVER event
+                this.log && console.log(newSendCmd + " -> deny");
+                return true;
+            case "forward":
+                //send action.FORWARD_OVER from common actions
+                //accepts transitions to new state on mouse OVER
+                fn = this.settings.commonActions.get(actionName = "FORWARD_OVER");
+                break;
+            case "function":
+                //call function if provided
+                fn = current.actions[actionName];
+                break;
+        }
+    }
+    else {
+        fn = current.actions[actionName] // first priority in state[action]
+            || this.settings.commonActions.get(actionName) // second priority are common actions to all states
+            || current.actions[actionName = "DEFAULT"]; // third priority is stae.DEFAULT action
+    }
+    if (this.log && newSendCmd != this.sendCmd) { // && actionName != "FORWARD_OVER"
+        var postSendCmd = "  ::" + actionName;
+        //for ENTER show current state, to visually track who got the action
+        (action == interfaces_1.ActionType.ENTER) &&
+            console.log("[" + this.stateName + "]");
+        console.log("" + (this.sendCmd = newSendCmd) + (newSendCmd != postSendCmd ? " -> " + postSendCmd : "") + (fn ? "" : " not found"));
+    }
+    //execute action if found
+    return fn === null || fn === void 0 ? void 0 : fn.call(this, newCtx), !!fn;
+}
 var StateMachine = /** @class */ (function () {
     function StateMachine(options) {
         var _this = this;
@@ -10,7 +48,7 @@ var StateMachine = /** @class */ (function () {
             id: options.id,
             initial: interfaces_1.StateType[options.initial],
             state: options.initial,
-            ctx: options.ctx || {},
+            //ctx: options.ctx || {},
             enabled: false,
             stateList: new Map(),
             log: !!options.log || false
@@ -29,6 +67,7 @@ var StateMachine = /** @class */ (function () {
         });
         this.sendCmd = "";
         this.log && console.log("[" + this.stateName + "]");
+        this.transitioning = false;
     }
     Object.defineProperty(StateMachine.prototype, "id", {
         get: function () { return this.settings.id; },
@@ -47,12 +86,6 @@ var StateMachine = /** @class */ (function () {
     });
     Object.defineProperty(StateMachine.prototype, "stateName", {
         get: function () { return interfaces_1.StateType[this.state]; },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(StateMachine.prototype, "ctx", {
-        get: function () { return this.settings.ctx; },
-        set: function (value) { this.settings.ctx = value; },
         enumerable: false,
         configurable: true
     });
@@ -93,45 +126,11 @@ var StateMachine = /** @class */ (function () {
      * @param data data to be sent
      */
     StateMachine.prototype.send = function (action, newCtx) {
-        var current = this.getState(this.stateName);
-        if (!current || !this.enabled)
-            return false;
-        var actionName = interfaces_1.ActionType[action], fn, newSendCmd = "  ::" + actionName;
-        //check action.OVER and overType
-        if (action == interfaces_1.ActionType.OVER) {
-            switch (current.overType) {
-                case "deny":
-                    //do nothing ...
-                    //deny transitions here, by not calling app.state.transition
-                    //  so DEFAULT action is not called
-                    //and on all others, accept, this way I can prevent stop dragging while OVER event
-                    this.log && console.log(newSendCmd + " -> deny");
-                    return true;
-                case "forward":
-                    //send action.FORWARD_OVER from common actions
-                    //accepts transitions to new state on mouse OVER
-                    fn = this.settings.commonActions.get(actionName = "FORWARD_OVER");
-                    break;
-                case "function":
-                    //call function if provided
-                    fn = current.actions[actionName];
-                    break;
-            }
+        if (this.transitioning) {
+            console.log("action: " + interfaces_1.ActionType[action] + " discarded while transitioning to a new state");
+            //return false;
         }
-        else {
-            fn = current.actions[actionName] // first priority in state[action]
-                || this.settings.commonActions.get(actionName) // second priority are common actions to all states
-                || current.actions[actionName = "DEFAULT"]; // third priority is stae.DEFAULT action
-        }
-        if (this.log && newSendCmd != this.sendCmd) {
-            var postSendCmd = "  ::" + actionName;
-            //for ENTER show current state, to visually track who got the action
-            (action == interfaces_1.ActionType.ENTER) &&
-                console.log("[" + this.stateName + "]");
-            console.log("" + (this.sendCmd = newSendCmd) + (newSendCmd != postSendCmd ? " -> " + postSendCmd : "") + (fn ? "" : " not found"));
-        }
-        //execute action if found
-        return fn === null || fn === void 0 ? void 0 : fn.call(this, newCtx), !!fn;
+        return sendAction.call(this, action, newCtx);
     };
     /**
      * @description transition to a new state and executes and action on that new state
@@ -140,12 +139,15 @@ var StateMachine = /** @class */ (function () {
      * @param data data to sent to new action
      */
     StateMachine.prototype.transition = function (state, action, newCtx, data) {
+        this.transitioning = true;
         var stateName = interfaces_1.StateType[state];
         //https://kentcdodds.com/blog/implementing-a-simple-state-machine-library-in-javascript
         var newStateDef = this.getState(stateName);
         if (!newStateDef || !this.enabled)
             return false;
-        this.log && console.log("[" + stateName + "]" + (this.state == state ? " same state" : ""));
+        this.log
+            //&& !(action == ActionType.FORWARD_OVER)
+            && console.log("[" + stateName + "]" + (this.state == state ? " same state" : ""));
         //save new state to receive SEND commands
         this.settings.state = state;
         //persists data between state transitions
@@ -154,7 +156,10 @@ var StateMachine = /** @class */ (function () {
         else
             //overrides state persistData
             this.data = data;
-        return this.send(action, newCtx);
+        var result = sendAction.call(this, action, newCtx);
+        //action executed already
+        this.transitioning = false;
+        return result;
     };
     /**
      * @description register a new state

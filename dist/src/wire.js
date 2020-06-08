@@ -13,7 +13,6 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-//wire.ts
 var dab_1 = require("./dab");
 var utils_1 = require("./utils");
 var types_1 = require("./types");
@@ -30,7 +29,7 @@ var Wire = /** @class */ (function (_super) {
             line: "0",
             points: "",
         });
-        _this.g.insertBefore(_this.settings.polyline, _this.highlight.g);
+        _this.g.append(_this.settings.polyline);
         //set new points in polyline
         _this.setPoints(options.points);
         //bond wire ends if any
@@ -77,6 +76,11 @@ var Wire = /** @class */ (function (_super) {
     });
     Object.defineProperty(Wire.prototype, "lastLine", {
         get: function () { return this.editMode ? this.settings.lines.length : 0; },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(Wire.prototype, "isOpen", {
+        get: function () { return !this.nodeBonds(0) || !this.nodeBonds(this.last); },
         enumerable: false,
         configurable: true
     });
@@ -216,6 +220,23 @@ var Wire = /** @class */ (function (_super) {
             return isAround(this.settings.points[ln - 1], p.x, p.y) ?
                 ln - 1 :
                 (isAround(this.settings.points[endPoint], p.x, p.y) ? endPoint : -1);
+        }
+        return -1;
+    };
+    Wire.prototype.findLineNode = function (p, line) {
+        var fn = function (np) { return (Math.pow(p.x - np.x, 2) + Math.pow(p.y - np.y, 2)) <= 25; };
+        ((line <= 0 || line >= this.last) && (line = this.findNode(p), 1))
+            || fn(this.settings.points[line])
+            || fn(this.settings.points[--line])
+            || (line = -1);
+        return line;
+    };
+    //don't care if wire is in editMode or not
+    Wire.prototype.findNode = function (p) {
+        for (var i = 0, thisP = this.settings.points[i], len = this.settings.points.length; i < len; thisP = this.settings.points[++i]) {
+            //radius 5 =>  5^2 = 25
+            if ((Math.pow(p.x - thisP.x, 2) + Math.pow(p.y - thisP.y, 2)) <= 25)
+                return i;
         }
         return -1;
     };

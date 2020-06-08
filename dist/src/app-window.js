@@ -14,6 +14,7 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 var dab_1 = require("./dab");
+var interfaces_1 = require("./interfaces");
 var base_window_1 = require("./base-window");
 var utils_1 = require("./utils");
 var point_1 = require("./point");
@@ -96,10 +97,11 @@ var AppWindow = /** @class */ (function (_super) {
     };
     AppWindow.prototype.onMouseLeave = function (e) {
         this.renderBar("");
+        this.app.sm.transition(interfaces_1.StateType.BOARD, interfaces_1.ActionType.RESUME);
         //console.log('OUT of app window', e.eventPhase, (e.target as HTMLElement).id);
     };
     AppWindow.prototype.setVisible = function (value) {
-        _super.prototype.setVisible.call(this, value); //.visible ? addClass(this.win, "selected") : removeClass(this.win, "selected");
+        _super.prototype.setVisible.call(this, value);
         if (this.visible) {
             //correct (x,y) in case of mainwindow resize moves it outside
             var _a = checkPosition(this, this.x, this.y), x = _a.x, y = _a.y;

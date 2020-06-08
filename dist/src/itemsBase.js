@@ -63,7 +63,7 @@ var ItemBase = /** @class */ (function (_super) {
         configurable: true
     });
     ItemBase.prototype.rect = function () {
-        return new rect_1.default(this.p.x, this.p.y, this.box.width, this.box.height); //return new Rect(this.p, Size.create(this.box))
+        return new rect_1.default(this.p.x, this.p.y, this.box.width, this.box.height);
     };
     ItemBase.prototype.setVisible = function (value) {
         _super.prototype.setVisible.call(this, value);
