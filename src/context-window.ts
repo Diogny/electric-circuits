@@ -5,10 +5,13 @@ import {
 import { each } from "./utils";
 import { nano, aEL, getParentAttr, attr, extend } from "./dab";
 import { MyApp } from "./myapp";
+import Point from "./point";
 
 export default class ContextWindow extends BaseWindow {
 
 	protected settings: IContextMenuSettings;
+	//client x,y where mouse right-click
+	get offset(): Point { return this.settings.offset }
 
 	constructor(options: IContextMenuOptions) {
 		super(options);
@@ -22,6 +25,7 @@ export default class ContextWindow extends BaseWindow {
 			this.settings.list.set(key, block);
 		});
 		this.settings.current = "board";
+		this.settings.offset = Point.origin;
 		let
 			that = this;
 		//register global click event
@@ -57,12 +61,13 @@ export default class ContextWindow extends BaseWindow {
 	 * @param type component child type
 	 * @returns {string} context key
 	 */
-	public setTrigger(id: string, name: string, type: string, nodeOrLine: string): string {
+	public setTrigger(id: string, name: string, type: string, nodeOrLine: number): string {
 		let
 			ctx;
 		switch (type) {
 			case "node":
-			case "node-x":
+				//case "node-x":
+				//name: "h-node", it can be a Wire-node or an EC-node
 				ctx = ((name == "wire") ? "wire-" : "ec-") + type;
 				break;
 			case "board":
@@ -85,7 +90,7 @@ export default class ContextWindow extends BaseWindow {
 		return this.win.setAttribute("data-trigger", `${[id, name, type, nodeOrLine].join('::')}`), ctx
 	}
 
-	public build(key: string, state: StateType): ContextWindow {
+	public build(key: string, state: StateType, offset: Point): ContextWindow {
 		let
 			entry = this.settings.list.get(key);
 		if (entry) {
@@ -100,7 +105,9 @@ export default class ContextWindow extends BaseWindow {
 				}
 				).join('');
 			this.win.innerHTML = html;
-		}
+			this.settings.offset = offset;
+		} else
+			this.settings.offset = Point.origin;
 		return this;
 	}
 

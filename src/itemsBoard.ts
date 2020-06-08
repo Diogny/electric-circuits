@@ -196,14 +196,19 @@ export abstract class ItemBoard extends ItemBase {
 		}
 	}
 
+	public unbondNode(node: number): void {
+		let
+			bond = this.nodeBonds(node);
+		bond
+			&& (bond.to.forEach((link: IBondItem) => {
+				Comp.item(link.id)?.unbond(link.ndx, bond.from.id)
+			}),
+				delete (<any>this.settings.bonds)[node])
+	}
+
 	public disconnect() {
-		this.bonds.forEach((b: Bond) => {
-			b.to.forEach((link: IBondItem) => {
-				let
-					toIc = Comp.item(link.id);
-				toIc?.unbond(link.ndx, b.from.id)
-			})
-		});
+		for (let node = 0; node < this.count; node++)
+			this.unbondNode(node);
 	}
 
 	abstract valid(node: number): boolean;

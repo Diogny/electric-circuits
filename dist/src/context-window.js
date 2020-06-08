@@ -17,6 +17,7 @@ var base_window_1 = require("./base-window");
 var interfaces_1 = require("./interfaces");
 var utils_1 = require("./utils");
 var dab_1 = require("./dab");
+var point_1 = require("./point");
 var ContextWindow = /** @class */ (function (_super) {
     __extends(ContextWindow, _super);
     function ContextWindow(options) {
@@ -31,6 +32,7 @@ var ContextWindow = /** @class */ (function (_super) {
             _this.settings.list.set(key, block);
         });
         _this.settings.current = "board";
+        _this.settings.offset = point_1.default.origin;
         var that = _this;
         //register global click event
         dab_1.aEL(_this.win, "click", function (e) {
@@ -41,6 +43,12 @@ var ContextWindow = /** @class */ (function (_super) {
         }, false);
         return _this;
     }
+    Object.defineProperty(ContextWindow.prototype, "offset", {
+        //client x,y where mouse right-click
+        get: function () { return this.settings.offset; },
+        enumerable: false,
+        configurable: true
+    });
     ContextWindow.prototype.onMouseEnter = function (e) {
         //console.log('IN context window', e.eventPhase, (e.target as HTMLElement).id);
         //return false;
@@ -61,7 +69,8 @@ var ContextWindow = /** @class */ (function (_super) {
         var ctx;
         switch (type) {
             case "node":
-            case "node-x":
+                //case "node-x":
+                //name: "h-node", it can be a Wire-node or an EC-node
                 ctx = ((name == "wire") ? "wire-" : "ec-") + type;
                 break;
             case "board":
@@ -84,7 +93,7 @@ var ContextWindow = /** @class */ (function (_super) {
         //let a = [id, name, type, nodeOrLine];//.filter(v => v != null);
         return this.win.setAttribute("data-trigger", "" + [id, name, type, nodeOrLine].join('::')), ctx;
     };
-    ContextWindow.prototype.build = function (key, state) {
+    ContextWindow.prototype.build = function (key, state, offset) {
         var _this = this;
         var entry = this.settings.list.get(key);
         if (entry) {
@@ -96,7 +105,10 @@ var ContextWindow = /** @class */ (function (_super) {
                 return dab_1.nano(_this.app.templates.ctxItem01, o);
             }).join('');
             this.win.innerHTML = html;
+            this.settings.offset = offset;
         }
+        else
+            this.settings.offset = point_1.default.origin;
         return this;
     };
     ContextWindow.prototype.propertyDefaults = function () {

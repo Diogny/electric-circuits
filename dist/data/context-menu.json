@@ -83,28 +83,12 @@
 			]
 		},
 		{
-			"text": "Connections",
-			"name": "CONNECTIONS",
-			"shortcut": "Ctrl+P"
-		},
-		{
-			"text": "Select",
-			"name": "SELECT"
-		}
-	],
-	"ec-node-x": [
-		{
-			"text": "Unbond",
-			"name": "UNBOND",
-			"shortcut": "Ctrl-U",
+			"text": "Properties",
+			"name": "SHOW_PROPERTIES",
+			"shortcut": "Ctrl+P",
 			"enabled": [
 				"EC_NODE"
 			]
-		},
-		{
-			"text": "Connections",
-			"name": "CONNECTIONS",
-			"shortcut": "Ctrl+P"
 		},
 		{
 			"text": "Select",
@@ -121,9 +105,17 @@
 			]
 		},
 		{
+			"text": "Split Segment",
+			"name": "SPLIT_THIS_LINE"
+		},
+		{
 			"text": "Delete",
 			"name": "DELETE",
 			"shortcut": "Del"
+		},
+		{
+			"text": "Delete Segment",
+			"name": "DELETE_THIS_LINE"
 		},
 		{
 			"text": "Select",
@@ -140,40 +132,32 @@
 	],
 	"wire-node": [
 		{
-			"text": "Delete",
-			"name": "DELETE",
-			"shortcut": "Del",
+			"text": "Unbond",
+			"name": "UNBOND",
+			"shortcut": "Ctrl-U",
 			"enabled": [
-				"WIRE_NODE"
+				"WIRE_LINE"
 			]
 		},
 		{
-			"text": "Connections",
-			"name": "CONNECTIONS",
-			"shortcut": "Ctrl+P"
-		},
-		{
-			"text": "Select",
-			"name": "SELECT_ONE"
-		}
-	],
-	"wire-node-x": [
-		{
-			"text": "Delete",
-			"name": "DELETE",
+			"text": "Delete Node",
+			"name": "DELETE_WIRE_NODE",
 			"shortcut": "Del",
 			"enabled": [
-				"WIRE_NODE"
+				"WIRE_LINE"
 			]
 		},
 		{
-			"text": "Connections",
-			"name": "CONNECTIONS",
-			"shortcut": "Ctrl+P"
+			"text": "Properties",
+			"name": "SHOW_PROPERTIES",
+			"shortcut": "Ctrl+P",
+			"enabled": [
+				"WIRE_LINE"
+			]
 		},
 		{
 			"text": "Select",
-			"name": "SELECT_ONE"
+			"name": "SELECT"
 		}
 	]
 }

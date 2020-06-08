@@ -38,7 +38,8 @@ function sendAction(action: ActionType, newCtx?: any): boolean {
 			|| (<any>current.actions)[actionName = "DEFAULT"];	// third priority is stae.DEFAULT action
 	}
 
-	if ((this as StateMachine).log && newSendCmd != (this as StateMachine).sendCmd) {	// && actionName != "FORWARD_OVER"
+	if ((this as StateMachine).log
+		&& newSendCmd != (this as StateMachine).sendCmd) {	// && actionName != "FORWARD_OVER"
 		let
 			postSendCmd = `  ::${actionName}`;
 		//for ENTER show current state, to visually track who got the action
@@ -138,14 +139,17 @@ export default class StateMachine implements IStateMachine {
 	public transition(state: StateType, action: ActionType, newCtx?: any, data?: any): boolean {
 		this.transitioning = true;
 		let
-			stateName = StateType[state];
+			stateName = StateType[state],
+			newStateDef: IMachineState = this.getState(stateName);
 		//https://kentcdodds.com/blog/implementing-a-simple-state-machine-library-in-javascript
-		const newStateDef: IMachineState = this.getState(stateName);
-		if (!newStateDef || !this.enabled)
-			return false;
+
 		this.log
 			//&& !(action == ActionType.FORWARD_OVER)
-			&& console.log(`[${stateName}]${this.state == state ? " same state" : ""}`);
+			&& console.log(`[${stateName}]${newStateDef ? "" : " not found!"}${this.state == state ? " same state" : ""}`);
+
+		if (!newStateDef || !this.enabled)
+			return false;
+
 		//save new state to receive SEND commands
 		this.settings.state = state;
 		//persists data between state transitions

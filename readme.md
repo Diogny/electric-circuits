@@ -26,7 +26,7 @@ Used in my testing website [Electric Circuits](http://diogny.com/tests/circuits.
 
 
 ### Last compilation:
-	We are using Node.js 12.14.1, Chromium 83.0.4103.64, and Electron 9.0.0.
+	We are using Node.js 12.14.1, Chromium 83.0.4103.94, and Electron 9.0.2.
 
 ### install development packajes
 	pnpm install --save-dev tsconfig-paths-webpack-plugin
@@ -67,6 +67,6 @@ Used in my testing website [Electric Circuits](http://diogny.com/tests/circuits.
 	git add -u					stage the modified and deleted files
 	git add -A
 	git commit -m "update message"
-	git tag v1.1.0
+	git tag v1.1.1
 	git push origin master --tags
 

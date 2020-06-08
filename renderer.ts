@@ -292,7 +292,7 @@ function registerStates() {
 					itemNode = it.getNode(node),
 					label = itemNode.label,
 					p = Point.plus(it.p, it.rotation ? itemNode.rot : itemNode).round();
-				app.highlight.show(p.x, p.y, node)
+				app.highlight.show(p.x, p.y, it.id, node)
 				showBodyAndTooltip(newCtx.offset, `${node} -${label}`);
 			},
 		}
@@ -326,7 +326,7 @@ function registerStates() {
 				}
 			},
 			OUT: function (newCtx: IMouseState) {
-				if (newCtx.over.type == "node-x") {
+				if (newCtx.over.type == "node") {	//"node-x"
 					app.sm.data.selectedItem?.it.select(false);
 					app.sm.data.selectedItem = undefined;
 					app.highlight.hide();
@@ -353,7 +353,7 @@ function registerStates() {
 						it: newCtx.it,
 						node: node
 					}).it.select(true);
-					app.highlight.show(pos.x, pos.y, node);
+					app.highlight.show(pos.x, pos.y, newCtx.it.id, node);
 				}
 			},
 			MOVE: function (newCtx: IMouseState) {
@@ -398,7 +398,7 @@ function registerStates() {
 		overType: "deny",
 		actions: {
 			OUT: function (newCtx: IMouseState) {
-				if (!newCtx.it || app.sm.data.node == -1) {	
+				if (!newCtx.it || app.sm.data.node == -1) {
 					app.highlight.hide();
 					app.sm.transition(State.BOARD, Action.RESUME);
 				}
@@ -437,7 +437,7 @@ function registerStates() {
 					(node == wire.last && wire.nodeBonds(wire.last))
 				)) {
 					app.sm.data.node = node;
-					app.highlight.show(pos.x, pos.y, node);
+					app.highlight.show(pos.x, pos.y, wire.id, node);
 				}
 			},
 			DOWN: function (newCtx: IMouseState) {
@@ -446,7 +446,8 @@ function registerStates() {
 			},
 			UP: function () {
 				app.sm.data.mouseDown = false;
-				app.execute(Action.SELECT, [app.sm.data.it.id, app.sm.data.it.name, "body"].join('::'));
+				(app.sm.data.button == 0)
+					&& app.execute(Action.SELECT, [app.sm.data.it.id, app.sm.data.it.name, "body"].join('::'));
 			},
 			//transitions
 			START: function (newCtx: IMouseState) {
@@ -465,8 +466,7 @@ function registerStates() {
 			},
 			MOVE: function (newCtx: IMouseState) {
 				app.sm.data.it.setNode(app.sm.data.node, newCtx.offset);
-				app.highlight.show(newCtx.offset.x, newCtx.offset.y, app.sm.data.node)
-					;
+				app.highlight.show(newCtx.offset.x, newCtx.offset.y, app.sm.data.it.id, app.sm.data.node);
 				let
 					wire = app.sm.data.it as Wire,
 					wireNode = app.sm.data.node;
@@ -560,6 +560,7 @@ function registerStates() {
 					let
 						line = app.sm.data.line,
 						vector = Point.minus(app.dash.p, app.dash.wire.getNode(app.dash.node));
+					//there's a rare exceptio here
 					app.dash.wire.setNode(line - 1, Point.plus(app.dash.wire.getNode(line - 1), vector));
 					app.dash.wire.setNode(line, Point.plus(app.dash.wire.getNode(line), vector));
 				}

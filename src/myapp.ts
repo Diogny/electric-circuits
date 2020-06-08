@@ -18,6 +18,7 @@ import EC from "./ec";
 import { Type } from "./types";
 import LinesAligner from "./linealign";
 import HighlightNode from "./highlightNode";
+import Wire from "./wire";
 
 export class MyApp extends Application implements IMyApp {
 
@@ -66,7 +67,7 @@ export class MyApp extends Application implements IMyApp {
 			getClientXY = (ev: MouseEvent) =>
 				new Point(ev.clientX - that.board.offsetLeft, ev.clientY - that.board.offsetTop),
 			//SVG
-			getOffset = (clientXY: Point, ev: MouseEvent) =>
+			getOffset = (clientXY: Point) =>
 				Point.times(clientXY, that.ratioX, that.ratioY).round(),
 			handleMouseEvent = function (ev: MouseEvent): IMouseState {
 				//this is MyApp
@@ -83,7 +84,7 @@ export class MyApp extends Application implements IMyApp {
 						button: ev.button,	//https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
 						//parent: parent,
 						client: clientXY,
-						offset: getOffset(clientXY, ev),
+						offset: getOffset(clientXY),
 						event: ev.type.replace('mouse', ''),
 						//timeStamp: ev.timeStamp,
 						over: {
@@ -98,7 +99,7 @@ export class MyApp extends Application implements IMyApp {
 				//post actions
 				switch (state.over.type) {
 					case "node":
-					case "node-x":
+						//case "node-x":
 						state.over.node = attr(state.over.svg, state.over.type) | 0;
 						break;
 					case "line":
@@ -226,16 +227,31 @@ export class MyApp extends Application implements IMyApp {
 			let
 				target = ev.target as Element,
 				parent = target.parentNode,
+				id = attr(parent, "id"),
+				compName = attr(parent, "svg-comp"),
 				type = attr(target, "svg-type"),
-				key = that.rightClick.setTrigger(
-					attr(parent, "id"),
-					attr(parent, "svg-comp"),
-					type,
-					type && attr(target, type));
+				nodeOrLine: number = parseInt(attr(target, type)),
+				key: string = <any>void 0,
+				clientXY = getClientXY(ev),
+				comp: ItemBoard = <any>void 0;
+
+			//test for highlightNode
+			(compName == "h-node") &&
+				(id = that.highlight.selectedId,
+					comp = <ItemBoard>Comp.item(id),
+					compName = comp.type == Type.WIRE ? "wire" : "ec",
+					(nodeOrLine != that.highlight.selectedNode && console.log(`node: ${nodeOrLine} <> ${that.highlight.selectedNode}`)));
+
+			key = that.rightClick.setTrigger(
+				id,
+				compName,
+				type,
+				isNaN(nodeOrLine) ? <any>undefined : nodeOrLine);
+
 			key &&
 				that.rightClick
-					.build(key, that.sm.state)
-					.movePoint(getClientXY(ev))
+					.build(key, that.sm.state, getOffset(clientXY))
+					.movePoint(clientXY)
 					.setVisible(true);
 		}, false);
 		document.onkeydown = function (ev: KeyboardEvent) {
@@ -346,7 +362,7 @@ export class MyApp extends Application implements IMyApp {
 			comp = Comp.item(<string>arr.shift()),
 			name = arr.shift(),
 			type = arr.shift(),
-			nodeOrLine = arr.shift(),
+			nodeOrLine = parseInt(<any>arr.shift()),
 			data = arr.shift(),
 			compNull = false,
 			selectAll = (value: boolean): ItemBoard[] => {
@@ -432,6 +448,27 @@ export class MyApp extends Application implements IMyApp {
 				}
 				//temporary, for testings...
 				(<any>window).ec = void 0;
+				break;
+			case ActionType.DELETE_THIS_LINE:
+				console.log(`delete line segment: `, trigger);
+				if (!(compNull = !comp)) {
+					(comp as Wire).deleteLine(nodeOrLine);
+					this.winProps.refresh();
+				}
+				break;
+			case ActionType.DELETE_WIRE_NODE:
+				console.log(`delete wire node: `, trigger);
+				if (!(compNull = !comp)) {
+					(comp as Wire).deleteNode(nodeOrLine);
+					this.winProps.refresh();
+				}
+				break;
+			case ActionType.SPLIT_THIS_LINE:
+				console.log(`split line segment: `, trigger, this.rightClick.offset);
+				if (!(compNull = !comp)) {
+					(comp as Wire).insertNode(nodeOrLine, this.rightClick.offset);
+					this.winProps.refresh();
+				}
 				break;
 			case ActionType.SHOW_PROPERTIES:
 				!(compNull = !comp) && this.winProps.load(comp);

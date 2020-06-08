@@ -238,6 +238,45 @@ export default class Wire extends ItemBoard {
 		return -1;
 	}
 
+	public deleteLine(line: number): boolean {
+		//cannot delete fir or last line
+		if (line <= 1 || line >= this.last)
+			return false;
+		let
+			savedEditMode = this.editMode;
+		this.editMode = false;
+		deleteWireNode.call(this, line);
+		deleteWireNode.call(this, line - 1);
+		this.editMode = savedEditMode;
+		return true;
+	}
+
+	public deleteNode(node: number): Point | undefined {
+		let
+			savedEditMode = this.editMode,
+			p;
+		this.editMode = false;
+		p = deleteWireNode.call(this, node);
+		this.editMode = savedEditMode;
+		return p;
+	}
+
+	public insertNode(node: number, p: Point): boolean {
+		//cannot insert node in first or after last position
+		if (node <= 0 || node > this.last || isNaN(node))
+			return false;
+		let
+			savedEditMode = this.editMode;
+		this.editMode = false;
+		//fix all bonds link indexes from last to this node
+		for (let n = this.last; n >= node; n--) {
+			fixBondIndexes.call(this, n, n + 1);
+		}
+		this.settings.points.splice(node, 0, p);
+		this.editMode = savedEditMode;
+		return true;
+	}
+
 	/**
 	 * @description standarizes a wire node number to 0..points.length
 	 * @param {number} node 0-based can be -1:last 0..points.length-1
@@ -269,4 +308,39 @@ export default class Wire extends ItemBoard {
 		})
 	}
 
+}
+
+function deleteWireNode(node: number): Point | undefined {
+	let
+		last = (this as Wire).last;
+	//first or last node cannot be deleted, only middle nodes
+	if (node <= 0 || node >= last || isNaN(node))
+		return;
+	(this as Wire).unbondNode(node);
+	fixBondIndexes.call(this, last, last - 1);
+	return this.settings.points.splice(node, 1)[0];
+}
+
+function fixBondIndexes(node: number, newIndex: number): boolean {
+	let
+		lastBond = (this as Wire).nodeBonds(node);
+	if (!lastBond)
+		return false;
+	//fix this from index
+	lastBond.from.ndx = newIndex;
+	//because it's a wire last node, it has only one destination, so fix all incoming indexes
+	lastBond.to.forEach(bond => {
+		let
+			compTo = Comp.item(bond.id),
+			compToBonds = compTo?.nodeBonds(bond.ndx);
+		compToBonds?.to
+			.filter(b => b.id == (this as Wire).id)
+			.forEach(b => {
+				b.ndx = newIndex;
+			})
+	})
+	//move last bond entry
+	delete this.settings.bonds[node];
+	this.settings.bonds[newIndex] = lastBond;
+	return true
 }

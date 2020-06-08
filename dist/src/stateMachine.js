@@ -31,7 +31,8 @@ function sendAction(action, newCtx) {
             || this.settings.commonActions.get(actionName) // second priority are common actions to all states
             || current.actions[actionName = "DEFAULT"]; // third priority is stae.DEFAULT action
     }
-    if (this.log && newSendCmd != this.sendCmd) { // && actionName != "FORWARD_OVER"
+    if (this.log
+        && newSendCmd != this.sendCmd) { // && actionName != "FORWARD_OVER"
         var postSendCmd = "  ::" + actionName;
         //for ENTER show current state, to visually track who got the action
         (action == interfaces_1.ActionType.ENTER) &&
@@ -140,14 +141,13 @@ var StateMachine = /** @class */ (function () {
      */
     StateMachine.prototype.transition = function (state, action, newCtx, data) {
         this.transitioning = true;
-        var stateName = interfaces_1.StateType[state];
+        var stateName = interfaces_1.StateType[state], newStateDef = this.getState(stateName);
         //https://kentcdodds.com/blog/implementing-a-simple-state-machine-library-in-javascript
-        var newStateDef = this.getState(stateName);
-        if (!newStateDef || !this.enabled)
-            return false;
         this.log
             //&& !(action == ActionType.FORWARD_OVER)
-            && console.log("[" + stateName + "]" + (this.state == state ? " same state" : ""));
+            && console.log("[" + stateName + "]" + (newStateDef ? "" : " not found!") + (this.state == state ? " same state" : ""));
+        if (!newStateDef || !this.enabled)
+            return false;
         //save new state to receive SEND commands
         this.settings.state = state;
         //persists data between state transitions

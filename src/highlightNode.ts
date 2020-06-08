@@ -12,16 +12,20 @@ export default class HighlightNode extends ItemBase {
 	get type(): Type { return Type.HIGHLIGHT }
 	get radius(): number { return this.settings.radius }
 
+	get selectedId(): string { return this.settings.selectedId }
+	get selectedNode(): number { return this.settings.selectedNode }
+
 	constructor(options: IHighlighNodeSettings) {
 		//override
-		options.node = -1;
+		options.selectedNode = -1;
+		options.selectedId = "";
 		options.id = "highlighNode";
 		super(options);
 		this.g.setAttribute("svg-comp", "h-node");
 		//remove color class, not needed yet
 		this.g.classList.remove(this.color);
 		this.circle = <SVGCircleElement>tag("circle", "", {
-			"svg-type": "node-x",
+			"svg-type": "node",	// "node-x",
 			r: this.radius
 		});
 		this.g.append(this.circle);
@@ -37,13 +41,15 @@ export default class HighlightNode extends ItemBase {
 		return this;
 	}
 
-	public show(x: number, y: number, node: number): HighlightNode {
+	public show(x: number, y: number, id: string, node: number): HighlightNode {
 		this.move(x, y);
 		attr(this.circle, {
 			cx: this.x,
 			cy: this.y,
-			"node-x": <any>node
+			//"node-x": <any>node,
+			"node": <any>(this.settings.selectedNode = node)
 		});
+		this.settings.selectedId = id;
 		this.g.classList.remove("hide");
 		return this;
 	}

@@ -240,6 +240,38 @@ var Wire = /** @class */ (function (_super) {
         }
         return -1;
     };
+    Wire.prototype.deleteLine = function (line) {
+        //cannot delete fir or last line
+        if (line <= 1 || line >= this.last)
+            return false;
+        var savedEditMode = this.editMode;
+        this.editMode = false;
+        deleteWireNode.call(this, line);
+        deleteWireNode.call(this, line - 1);
+        this.editMode = savedEditMode;
+        return true;
+    };
+    Wire.prototype.deleteNode = function (node) {
+        var savedEditMode = this.editMode, p;
+        this.editMode = false;
+        p = deleteWireNode.call(this, node);
+        this.editMode = savedEditMode;
+        return p;
+    };
+    Wire.prototype.insertNode = function (node, p) {
+        //cannot insert node in first or after last position
+        if (node <= 0 || node > this.last || isNaN(node))
+            return false;
+        var savedEditMode = this.editMode;
+        this.editMode = false;
+        //fix all bonds link indexes from last to this node
+        for (var n = this.last; n >= node; n--) {
+            fixBondIndexes.call(this, n, n + 1);
+        }
+        this.settings.points.splice(node, 0, p);
+        this.editMode = savedEditMode;
+        return true;
+    };
     /**
      * @description standarizes a wire node number to 0..points.length
      * @param {number} node 0-based can be -1:last 0..points.length-1
@@ -270,4 +302,32 @@ var Wire = /** @class */ (function (_super) {
     return Wire;
 }(itemsBoard_1.ItemBoard));
 exports.default = Wire;
+function deleteWireNode(node) {
+    var last = this.last;
+    //first or last node cannot be deleted, only middle nodes
+    if (node <= 0 || node >= last || isNaN(node))
+        return;
+    this.unbondNode(node);
+    fixBondIndexes.call(this, last, last - 1);
+    return this.settings.points.splice(node, 1)[0];
+}
+function fixBondIndexes(node, newIndex) {
+    var _this = this;
+    var lastBond = this.nodeBonds(node);
+    if (!lastBond)
+        return false;
+    //fix this from index
+    lastBond.from.ndx = newIndex;
+    //because it's a wire last node, it has only one destination, so fix all incoming indexes
+    lastBond.to.forEach(function (bond) {
+        var compTo = components_1.default.item(bond.id), compToBonds = compTo === null || compTo === void 0 ? void 0 : compTo.nodeBonds(bond.ndx);
+        compToBonds === null || compToBonds === void 0 ? void 0 : compToBonds.to.filter(function (b) { return b.id == _this.id; }).forEach(function (b) {
+            b.ndx = newIndex;
+        });
+    });
+    //move last bond entry
+    delete this.settings.bonds[node];
+    this.settings.bonds[newIndex] = lastBond;
+    return true;
+}
 //# sourceMappingURL=wire.js.map

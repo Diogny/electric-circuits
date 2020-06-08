@@ -189,13 +189,18 @@ var ItemBoard = /** @class */ (function (_super) {
             ic && ic.unbond(b.ndx, this.id);
         }
     };
+    ItemBoard.prototype.unbondNode = function (node) {
+        var bond = this.nodeBonds(node);
+        bond
+            && (bond.to.forEach(function (link) {
+                var _a;
+                (_a = components_1.default.item(link.id)) === null || _a === void 0 ? void 0 : _a.unbond(link.ndx, bond.from.id);
+            }),
+                delete this.settings.bonds[node]);
+    };
     ItemBoard.prototype.disconnect = function () {
-        this.bonds.forEach(function (b) {
-            b.to.forEach(function (link) {
-                var toIc = components_1.default.item(link.id);
-                toIc === null || toIc === void 0 ? void 0 : toIc.unbond(link.ndx, b.from.id);
-            });
-        });
+        for (var node = 0; node < this.count; node++)
+            this.unbondNode(node);
     };
     ItemBoard.prototype.propertyDefaults = function () {
         return dab_1.extend(_super.prototype.propertyDefaults.call(this), {

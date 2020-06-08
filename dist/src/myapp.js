@@ -44,7 +44,7 @@ var MyApp = /** @class */ (function (_super) {
             return new point_1.default(ev.clientX - that.board.offsetLeft, ev.clientY - that.board.offsetTop);
         }, 
         //SVG
-        getOffset = function (clientXY, ev) {
+        getOffset = function (clientXY) {
             return point_1.default.times(clientXY, that.ratioX, that.ratioY).round();
         }, handleMouseEvent = function (ev) {
             //this is MyApp
@@ -56,7 +56,7 @@ var MyApp = /** @class */ (function (_super) {
                 button: ev.button,
                 //parent: parent,
                 client: clientXY,
-                offset: getOffset(clientXY, ev),
+                offset: getOffset(clientXY),
                 event: ev.type.replace('mouse', ''),
                 //timeStamp: ev.timeStamp,
                 over: {
@@ -71,7 +71,7 @@ var MyApp = /** @class */ (function (_super) {
             //post actions
             switch (state.over.type) {
                 case "node":
-                case "node-x":
+                    //case "node-x":
                     state.over.node = dab_1.attr(state.over.svg, state.over.type) | 0;
                     break;
                 case "line":
@@ -190,11 +190,18 @@ var MyApp = /** @class */ (function (_super) {
         //right click on board
         dab_1.aEL(_this.svgBoard, "contextmenu", function (ev) {
             ev.stopPropagation();
-            var target = ev.target, parent = target.parentNode, type = dab_1.attr(target, "svg-type"), key = that.rightClick.setTrigger(dab_1.attr(parent, "id"), dab_1.attr(parent, "svg-comp"), type, type && dab_1.attr(target, type));
+            var target = ev.target, parent = target.parentNode, id = dab_1.attr(parent, "id"), compName = dab_1.attr(parent, "svg-comp"), type = dab_1.attr(target, "svg-type"), nodeOrLine = parseInt(dab_1.attr(target, type)), key = void 0, clientXY = getClientXY(ev), comp = void 0;
+            //test for highlightNode
+            (compName == "h-node") &&
+                (id = that.highlight.selectedId,
+                    comp = components_1.default.item(id),
+                    compName = comp.type == types_1.Type.WIRE ? "wire" : "ec",
+                    (nodeOrLine != that.highlight.selectedNode && console.log("node: " + nodeOrLine + " <> " + that.highlight.selectedNode)));
+            key = that.rightClick.setTrigger(id, compName, type, isNaN(nodeOrLine) ? undefined : nodeOrLine);
             key &&
                 that.rightClick
-                    .build(key, that.sm.state)
-                    .movePoint(getClientXY(ev))
+                    .build(key, that.sm.state, getOffset(clientXY))
+                    .movePoint(clientXY)
                     .setVisible(true);
         }, false);
         document.onkeydown = function (ev) {
@@ -297,7 +304,7 @@ var MyApp = /** @class */ (function (_super) {
     //public execute({ action, trigger, data }: { action: ActionType; trigger: string; data?: any; }) {
     MyApp.prototype.execute = function (action, trigger) {
         var _this = this;
-        var arr = trigger.split('::'), comp = components_1.default.item(arr.shift()), name = arr.shift(), type = arr.shift(), nodeOrLine = arr.shift(), data = arr.shift(), compNull = false, selectAll = function (value) {
+        var arr = trigger.split('::'), comp = components_1.default.item(arr.shift()), name = arr.shift(), type = arr.shift(), nodeOrLine = parseInt(arr.shift()), data = arr.shift(), compNull = false, selectAll = function (value) {
             var arr = Array.from(_this.compList.values());
             arr.forEach(function (comp) { return comp.select(value); });
             return arr;
@@ -377,6 +384,27 @@ var MyApp = /** @class */ (function (_super) {
                 }
                 //temporary, for testings...
                 window.ec = void 0;
+                break;
+            case interfaces_1.ActionType.DELETE_THIS_LINE:
+                console.log("delete line segment: ", trigger);
+                if (!(compNull = !comp)) {
+                    comp.deleteLine(nodeOrLine);
+                    this.winProps.refresh();
+                }
+                break;
+            case interfaces_1.ActionType.DELETE_WIRE_NODE:
+                console.log("delete wire node: ", trigger);
+                if (!(compNull = !comp)) {
+                    comp.deleteNode(nodeOrLine);
+                    this.winProps.refresh();
+                }
+                break;
+            case interfaces_1.ActionType.SPLIT_THIS_LINE:
+                console.log("split line segment: ", trigger, this.rightClick.offset);
+                if (!(compNull = !comp)) {
+                    comp.insertNode(nodeOrLine, this.rightClick.offset);
+                    this.winProps.refresh();
+                }
                 break;
             case interfaces_1.ActionType.SHOW_PROPERTIES:
                 !(compNull = !comp) && this.winProps.load(comp);

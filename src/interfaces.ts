@@ -269,7 +269,9 @@ export interface ITooltipSettings extends IItemBaseProperties {
 
 export interface IHighlighNodeSettings extends IItemBaseProperties {
 	radius: number;
-	node: number;
+	//these're the current selected node properties
+	selectedId: string;
+	selectedNode: number;
 }
 
 export interface IItemBoardProperties extends IItemBaseProperties {
@@ -368,6 +370,8 @@ export interface IContextMenuOptions extends IBaseWindowOptions {
 export interface IContextMenuSettings extends IContextMenuOptions {
 	win: HTMLElement;
 	current: string;
+	//client x,y where mouse right-click
+	offset: Point;
 }
 
 //***************************************** State Machine ************************************//
@@ -459,7 +463,12 @@ export enum ActionType {
 	DELETE = 110,						//"Delete"						10
 	DELETE_SELECTED = 111,				//
 	DELETE_ALL = 112,					//"Remove All"
-	AFTER_DELETE = 113,
+	DELETE_WIRE_NODE = 113,
+	DELETE_THIS_LINE = 114,
+	AFTER_DELETE = 115,
+
+	SPLIT_THIS_LINE = 120,
+
 	SHOW_PROPERTIES = 200,				//"Properties"					11
 	BRING_TO_FRONT = 201,				//"Bring to Front"				3
 	ROTATE_45_CLOCKWISE = 202,			//"Rotate 45 clockwise"			20
