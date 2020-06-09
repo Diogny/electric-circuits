@@ -27,6 +27,12 @@ export default class Point implements IPoint {
 		return this
 	}
 
+	public add(x: number, y: number): Point {
+		this.x += Math.round(x);
+		this.y += Math.round(y);
+		return this
+	}
+
 	public toString(options?: number): string {
 		let
 			noVars: boolean = ((options = <any>options | 0) & 4) != 0,

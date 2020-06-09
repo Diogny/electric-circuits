@@ -45,7 +45,8 @@ var MyApp = /** @class */ (function (_super) {
         }, 
         //SVG
         getOffset = function (clientXY) {
-            return point_1.default.times(clientXY, that.ratioX, that.ratioY).round();
+            return point_1.default.plus(new point_1.default(_this.viewBox.x, _this.viewBox.y), point_1.default.times(clientXY, that.ratioX, that.ratioY)
+                .round());
         }, handleMouseEvent = function (ev) {
             //this is MyApp
             ev.preventDefault();
@@ -121,7 +122,7 @@ var MyApp = /** @class */ (function (_super) {
             },
             title: "Properties",
             bar: "...",
-            content: "Aaaaa...!  kjsdhj sjh sj d sj sd sdjs djsdj kkisaujn ak asd asdn askd askd aksdn aksd  ia hsdoia oa sdoas "
+            content: "Aaaaa...!  lorep itsum.... whatever"
         });
         //create state machine
         _this.sm = new stateMachine_1.default({
@@ -132,7 +133,7 @@ var MyApp = /** @class */ (function (_super) {
             ctx: {},
             commonActions: {
                 ENTER: function (newCtx) {
-                    //that.sm.ctx = newCtx;		//for now just copy data
+                    //that.sm.ctx = newCtx;		//save data
                 },
                 LEAVE: function (newCtx) {
                     //cannot save new context, erases wiring status
@@ -140,7 +141,7 @@ var MyApp = /** @class */ (function (_super) {
                     that.topBarLeft.innerHTML = "&nbsp;";
                 },
                 KEY: function (code) {
-                    console.log("KEY: " + code);
+                    //console.log(`KEY: ${code}`);
                     //this's the default
                     (code == "Delete") && that.execute(interfaces_1.ActionType.DELETE, "");
                 },
@@ -165,28 +166,14 @@ var MyApp = /** @class */ (function (_super) {
             class: "no-select",
             list: options.list
         });
-        dab_1.aEL(_this.svgBoard, "mouseenter", function (ev) {
-            that.sm.send(interfaces_1.ActionType.ENTER, handleMouseEvent.call(that, ev));
-        }, false);
-        dab_1.aEL(_this.svgBoard, "mouseleave", function (ev) {
-            that.sm.send(interfaces_1.ActionType.LEAVE, handleMouseEvent.call(that, ev));
-        }, false);
-        dab_1.aEL(_this.svgBoard, "mouseover", function (ev) {
-            that.sm.send(interfaces_1.ActionType.OVER, handleMouseEvent.call(that, ev));
-        }, false);
-        dab_1.aEL(_this.svgBoard, "mousemove", function (ev) {
-            that.sm.send(interfaces_1.ActionType.MOVE, handleMouseEvent.call(that, ev));
-        }, false);
-        dab_1.aEL(_this.svgBoard, "mouseout", function (ev) {
-            that.sm.send(interfaces_1.ActionType.OUT, handleMouseEvent.call(that, ev));
-        }, false);
+        dab_1.aEL(_this.svgBoard, "mouseenter", function (ev) { return that.sm.send(interfaces_1.ActionType.ENTER, handleMouseEvent.call(that, ev)); }, false);
+        dab_1.aEL(_this.svgBoard, "mouseleave", function (ev) { return that.sm.send(interfaces_1.ActionType.LEAVE, handleMouseEvent.call(that, ev)); }, false);
+        dab_1.aEL(_this.svgBoard, "mouseover", function (ev) { return that.sm.send(interfaces_1.ActionType.OVER, handleMouseEvent.call(that, ev)); }, false);
+        dab_1.aEL(_this.svgBoard, "mousemove", function (ev) { return that.sm.send(interfaces_1.ActionType.MOVE, handleMouseEvent.call(that, ev)); }, false);
+        dab_1.aEL(_this.svgBoard, "mouseout", function (ev) { return that.sm.send(interfaces_1.ActionType.OUT, handleMouseEvent.call(that, ev)); }, false);
         //
-        dab_1.aEL(_this.svgBoard, "mousedown", function (ev) {
-            that.sm.send(interfaces_1.ActionType.DOWN, handleMouseEvent.call(that, ev));
-        }, false);
-        dab_1.aEL(_this.svgBoard, "mouseup", function (ev) {
-            that.sm.send(interfaces_1.ActionType.UP, handleMouseEvent.call(that, ev));
-        }, false);
+        dab_1.aEL(_this.svgBoard, "mousedown", function (ev) { return that.sm.send(interfaces_1.ActionType.DOWN, handleMouseEvent.call(that, ev)); }, false);
+        dab_1.aEL(_this.svgBoard, "mouseup", function (ev) { return that.sm.send(interfaces_1.ActionType.UP, handleMouseEvent.call(that, ev)); }, false);
         //right click on board
         dab_1.aEL(_this.svgBoard, "contextmenu", function (ev) {
             ev.stopPropagation();
@@ -242,8 +229,7 @@ var MyApp = /** @class */ (function (_super) {
     };
     MyApp.prototype.setViewBox = function (m) {
         if (!m) {
-            var zoom_item = utils_1.qS('.bar-item[data-scale].selected'), //get default from DOM
-            o = dab_1.attr(zoom_item, "data-scale");
+            var zoom_item = utils_1.qS('.bar-item[data-scale].selected'), o = dab_1.attr(zoom_item, "data-scale");
             m = parseFloat(o);
         }
         this.multiplier = m;
@@ -251,17 +237,9 @@ var MyApp = /** @class */ (function (_super) {
         //calculate size
         this.viewBox.width = this.baseViewBox.width * this.multiplier | 0;
         this.viewBox.height = this.baseViewBox.height * this.multiplier | 0;
-        //this.viewBox.size = new Size(
-        //	this.baseViewBox.width * this.multiplier | 0,
-        //	this.baseViewBox.height * this.multiplier | 0);
-        //set SVG DOM viewBox attribute
-        dab_1.attr(this.svgBoard, { "viewBox": this.viewBox.x + " " + this.viewBox.y + " " + this.viewBox.width + " " + this.viewBox.height });
-        //calculate ratio
-        this.ratioX = this.viewBox.width / this.svgBoard.clientWidth;
-        this.ratioY = this.viewBox.height / this.svgBoard.clientHeight;
-        this.center = new point_1.default(this.viewBox.width / 2, this.viewBox.height / 2);
-        this.refreshTopBarRight();
+        calculateAndUpdateViewBoxData.call(this);
     };
+    MyApp.prototype.updateViewBox = function () { calculateAndUpdateViewBoxData.call(this); };
     MyApp.prototype.refreshTopBarRight = function () {
         this.topBarRight.innerHTML = dab_1.nano(this.templates.viewBox01, this.viewBox) + "&nbsp; " +
             dab_1.nano(this.templates.size01, this.size);
@@ -291,9 +269,8 @@ var MyApp = /** @class */ (function (_super) {
     MyApp.prototype.rotateComponentBy = function (angle, comp) {
         if (!comp || comp.type != types_1.Type.EC)
             return;
-        var ec = comp;
-        ec && ec.rotate(ec.rotation + angle);
-        this.refreshRotation(ec);
+        comp.rotate(comp.rotation + angle);
+        this.refreshRotation(comp);
     };
     MyApp.prototype.refreshRotation = function (ec) {
         var _a;
@@ -386,21 +363,21 @@ var MyApp = /** @class */ (function (_super) {
                 window.ec = void 0;
                 break;
             case interfaces_1.ActionType.DELETE_THIS_LINE:
-                console.log("delete line segment: ", trigger);
+                //console.log(`delete line segment: `, trigger);
                 if (!(compNull = !comp)) {
                     comp.deleteLine(nodeOrLine);
                     this.winProps.refresh();
                 }
                 break;
             case interfaces_1.ActionType.DELETE_WIRE_NODE:
-                console.log("delete wire node: ", trigger);
+                //console.log(`delete wire node: `, trigger);
                 if (!(compNull = !comp)) {
                     comp.deleteNode(nodeOrLine);
                     this.winProps.refresh();
                 }
                 break;
             case interfaces_1.ActionType.SPLIT_THIS_LINE:
-                console.log("split line segment: ", trigger, this.rightClick.offset);
+                //console.log(`split line segment: `, trigger, this.rightClick.offset);
                 if (!(compNull = !comp)) {
                     comp.insertNode(nodeOrLine, this.rightClick.offset);
                     this.winProps.refresh();
@@ -427,4 +404,14 @@ var MyApp = /** @class */ (function (_super) {
     return MyApp;
 }(app_1.Application));
 exports.MyApp = MyApp;
+function calculateAndUpdateViewBoxData() {
+    var self = this;
+    //set SVG DOM viewBox attribute
+    dab_1.attr(self.svgBoard, { "viewBox": self.viewBox.x + " " + self.viewBox.y + " " + self.viewBox.width + " " + self.viewBox.height });
+    //calculate ratio
+    self.ratioX = self.viewBox.width / self.svgBoard.clientWidth;
+    self.ratioY = self.viewBox.height / self.svgBoard.clientHeight;
+    self.center = new point_1.default(Math.round(self.viewBox.x + self.viewBox.width / 2), Math.round(self.viewBox.y + self.viewBox.height / 2));
+    self.refreshTopBarRight();
+}
 //# sourceMappingURL=myapp.js.map

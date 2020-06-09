@@ -33,7 +33,6 @@ export class MyApp extends Application implements IMyApp {
 	readonly sm: StateMachine;
 	readonly rightClick: ContextWindow;
 	readonly dash: LinesAligner;
-
 	readonly highlight: HighlightNode;
 
 	viewBox: Rect;
@@ -65,10 +64,14 @@ export class MyApp extends Application implements IMyApp {
 			},
 			//HTML
 			getClientXY = (ev: MouseEvent) =>
-				new Point(ev.clientX - that.board.offsetLeft, ev.clientY - that.board.offsetTop),
+				new Point(ev.clientX - that.board.offsetLeft,
+					ev.clientY - that.board.offsetTop),
 			//SVG
 			getOffset = (clientXY: Point) =>
-				Point.times(clientXY, that.ratioX, that.ratioY).round(),
+				Point.plus(new Point(this.viewBox.x, this.viewBox.y),
+					Point.times(clientXY, that.ratioX, that.ratioY)
+						.round()
+				),
 			handleMouseEvent = function (ev: MouseEvent): IMouseState {
 				//this is MyApp
 				ev.preventDefault();
@@ -136,7 +139,6 @@ export class MyApp extends Application implements IMyApp {
 		this.topBarLeft = qS("#top-bar>div:nth-of-type(1)");
 		this.topBarRight = qS("#top-bar>div:nth-of-type(2)");
 		this.dash = new LinesAligner(this);
-
 		this.highlight = new HighlightNode(<any>{});
 
 		//this'll hold the properties of the current selected component
@@ -151,7 +153,7 @@ export class MyApp extends Application implements IMyApp {
 			},
 			title: "Properties",
 			bar: "...",
-			content: "Aaaaa...!  kjsdhj sjh sj d sj sd sdjs djsdj kkisaujn ak asd asdn askd askd aksdn aksd  ia hsdoia oa sdoas "
+			content: "Aaaaa...!  lorep itsum.... whatever"
 		});
 		//create state machine
 		this.sm = new StateMachine(<IStateMachineOptions>{
@@ -162,7 +164,7 @@ export class MyApp extends Application implements IMyApp {
 			ctx: <IMouseState>{},
 			commonActions: {
 				ENTER: function (newCtx: IMouseState) {
-					//that.sm.ctx = newCtx;		//for now just copy data
+					//that.sm.ctx = newCtx;		//save data
 				},
 				LEAVE: function (newCtx: IMouseState) {
 					//cannot save new context, erases wiring status
@@ -170,7 +172,7 @@ export class MyApp extends Application implements IMyApp {
 					that.topBarLeft.innerHTML = "&nbsp;";
 				},
 				KEY: function (code: any) {
-					console.log(`KEY: ${code}`);
+					//console.log(`KEY: ${code}`);
 					//this's the default
 					(code == "Delete") && that.execute(ActionType.DELETE, "");
 				},
@@ -199,28 +201,25 @@ export class MyApp extends Application implements IMyApp {
 			list: options.list
 		});
 
-		aEL(<any>this.svgBoard, "mouseenter", function (ev: MouseEvent) {
-			that.sm.send(ActionType.ENTER, handleMouseEvent.call(that, ev));
-		}, false);
-		aEL(<any>this.svgBoard, "mouseleave", function (ev: MouseEvent) {
-			that.sm.send(ActionType.LEAVE, handleMouseEvent.call(that, ev));
-		}, false);
-		aEL(<any>this.svgBoard, "mouseover", function (ev: MouseEvent) {
-			that.sm.send(ActionType.OVER, handleMouseEvent.call(that, ev));
-		}, false);
-		aEL(<any>this.svgBoard, "mousemove", function (ev: MouseEvent) {
-			that.sm.send(ActionType.MOVE, handleMouseEvent.call(that, ev));
-		}, false);
-		aEL(<any>this.svgBoard, "mouseout", function (ev: MouseEvent) {
-			that.sm.send(ActionType.OUT, handleMouseEvent.call(that, ev));
-		}, false);
+		aEL(<any>this.svgBoard, "mouseenter",
+			(ev: MouseEvent) => that.sm.send(ActionType.ENTER, handleMouseEvent.call(that, ev)), false);
+
+		aEL(<any>this.svgBoard, "mouseleave",
+			(ev: MouseEvent) => that.sm.send(ActionType.LEAVE, handleMouseEvent.call(that, ev)), false);
+
+		aEL(<any>this.svgBoard, "mouseover",
+			(ev: MouseEvent) => that.sm.send(ActionType.OVER, handleMouseEvent.call(that, ev)), false);
+
+		aEL(<any>this.svgBoard, "mousemove",
+			(ev: MouseEvent) => that.sm.send(ActionType.MOVE, handleMouseEvent.call(that, ev)), false);
+
+		aEL(<any>this.svgBoard, "mouseout",
+			(ev: MouseEvent) => that.sm.send(ActionType.OUT, handleMouseEvent.call(that, ev)), false);
 		//
-		aEL(<any>this.svgBoard, "mousedown", function (ev: MouseEvent) {
-			that.sm.send(ActionType.DOWN, handleMouseEvent.call(that, ev));
-		}, false);
-		aEL(<any>this.svgBoard, "mouseup", function (ev: MouseEvent) {
-			that.sm.send(ActionType.UP, handleMouseEvent.call(that, ev));
-		}, false);
+		aEL(<any>this.svgBoard, "mousedown",
+			(ev: MouseEvent) => that.sm.send(ActionType.DOWN, handleMouseEvent.call(that, ev)), false);
+		aEL(<any>this.svgBoard, "mouseup",
+			(ev: MouseEvent) => that.sm.send(ActionType.UP, handleMouseEvent.call(that, ev)), false);
 		//right click on board
 		aEL(<any>this.svgBoard, "contextmenu", function (ev: MouseEvent) {
 			ev.stopPropagation();
@@ -281,7 +280,7 @@ export class MyApp extends Application implements IMyApp {
 	public setViewBox(m: number) {
 		if (!m) {
 			let
-				zoom_item = qS('.bar-item[data-scale].selected'),	//get default from DOM
+				zoom_item = qS('.bar-item[data-scale].selected'),
 				o = attr(zoom_item, "data-scale");
 			m = parseFloat(o);
 		}
@@ -290,18 +289,10 @@ export class MyApp extends Application implements IMyApp {
 		//calculate size
 		this.viewBox.width = this.baseViewBox.width * this.multiplier | 0;
 		this.viewBox.height = this.baseViewBox.height * this.multiplier | 0;
-		//this.viewBox.size = new Size(
-		//	this.baseViewBox.width * this.multiplier | 0,
-		//	this.baseViewBox.height * this.multiplier | 0);
-
-		//set SVG DOM viewBox attribute
-		attr(this.svgBoard, { "viewBox": `${this.viewBox.x} ${this.viewBox.y} ${this.viewBox.width} ${this.viewBox.height}` });
-		//calculate ratio
-		this.ratioX = this.viewBox.width / this.svgBoard.clientWidth;
-		this.ratioY = this.viewBox.height / this.svgBoard.clientHeight;
-		this.center = new Point(this.viewBox.width / 2, this.viewBox.height / 2);
-		this.refreshTopBarRight();
+		calculateAndUpdateViewBoxData.call(this);
 	}
+
+	public updateViewBox() { calculateAndUpdateViewBoxData.call(this); }
 
 	public refreshTopBarRight() {
 		this.topBarRight.innerHTML = nano(this.templates.viewBox01, this.viewBox) + "&nbsp; " +
@@ -341,10 +332,8 @@ export class MyApp extends Application implements IMyApp {
 	public rotateComponentBy(angle: number, comp?: ItemBoard) {
 		if (!comp || comp.type != Type.EC)
 			return;
-		let
-			ec = (comp as EC);
-		ec && ec.rotate(ec.rotation + angle);
-		this.refreshRotation(ec);
+		(comp as EC).rotate((comp as EC).rotation + angle);
+		this.refreshRotation(comp);
 	}
 
 	public refreshRotation(ec?: ItemBoard) {
@@ -450,21 +439,21 @@ export class MyApp extends Application implements IMyApp {
 				(<any>window).ec = void 0;
 				break;
 			case ActionType.DELETE_THIS_LINE:
-				console.log(`delete line segment: `, trigger);
+				//console.log(`delete line segment: `, trigger);
 				if (!(compNull = !comp)) {
 					(comp as Wire).deleteLine(nodeOrLine);
 					this.winProps.refresh();
 				}
 				break;
 			case ActionType.DELETE_WIRE_NODE:
-				console.log(`delete wire node: `, trigger);
+				//console.log(`delete wire node: `, trigger);
 				if (!(compNull = !comp)) {
 					(comp as Wire).deleteNode(nodeOrLine);
 					this.winProps.refresh();
 				}
 				break;
 			case ActionType.SPLIT_THIS_LINE:
-				console.log(`split line segment: `, trigger, this.rightClick.offset);
+				//console.log(`split line segment: `, trigger, this.rightClick.offset);
 				if (!(compNull = !comp)) {
 					(comp as Wire).insertNode(nodeOrLine, this.rightClick.offset);
 					this.winProps.refresh();
@@ -487,4 +476,17 @@ export class MyApp extends Application implements IMyApp {
 			//console.log(`action: ${action}, id: ${comp?.id}, name: ${name}, type: ${type}, trigger: ${trigger}`);
 		}
 	}
+}
+
+function calculateAndUpdateViewBoxData() {
+	let
+		self = this as MyApp;
+	//set SVG DOM viewBox attribute
+	attr(self.svgBoard, { "viewBox": `${self.viewBox.x} ${self.viewBox.y} ${self.viewBox.width} ${self.viewBox.height}` });
+	//calculate ratio
+	self.ratioX = self.viewBox.width / self.svgBoard.clientWidth;
+	self.ratioY = self.viewBox.height / self.svgBoard.clientHeight;
+	self.center = new Point(Math.round(self.viewBox.x + self.viewBox.width / 2),
+		Math.round(self.viewBox.y + self.viewBox.height / 2));
+	self.refreshTopBarRight();
 }

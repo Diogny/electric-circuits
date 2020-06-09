@@ -57,8 +57,8 @@ function createMainWindow(opt: any) {
 	window.loadFile(url);
 
 	if (isDevelopment) {
-		window.webContents.openDevTools()
-		//it's in the menu now, but for release it'd be removed and use this.
+		//uncomment for dev
+		//window.webContents.openDevTools()
 	}
 
 	// Emitted when the window is closed.

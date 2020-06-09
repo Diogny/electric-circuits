@@ -6,11 +6,12 @@ Used in my testing website [Electric Circuits](http://diogny.com/tests/circuits.
 ### Issues
 	have to use "@types/node": "12.12.21" because of a compatibility bug with Typescript
 
-### wiring
-	select wiring tool
-	Ctrl+click starts wiring from EC node
-	Ctrl+click and drag to bond lose wire
+### Functionality and Wiring
+	Start new Wire: Ctrl+click over EC node
+	Escape stops wiring
+	Bond lose wire: Ctrl+click, drag and drop over EC node or Wire node
 	Highlighted wire nodes can be dragged and aligned
+	Board panning: Alt+click drag
 
 ![working example](dist/img/img01.png)
 
@@ -67,6 +68,6 @@ Used in my testing website [Electric Circuits](http://diogny.com/tests/circuits.
 	git add -u					stage the modified and deleted files
 	git add -A
 	git commit -m "update message"
-	git tag v1.1.1
+	git tag v1.1.2
 	git push origin master --tags
 

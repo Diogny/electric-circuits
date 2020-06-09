@@ -19,6 +19,11 @@ var Point = /** @class */ (function () {
         this.y = Math.round(this.y);
         return this;
     };
+    Point.prototype.add = function (x, y) {
+        this.x += Math.round(x);
+        this.y += Math.round(y);
+        return this;
+    };
     Point.prototype.toString = function (options) {
         var noVars = ((options = options | 0) & 4) != 0, noPars = (options & 2) != 0;
         return "" + (noPars ? "" : "(") + (noVars ? "" : "x: ") + dab_1.round(this.x, 1) + ", " + (noVars ? "" : "y: ") + dab_1.round(this.y, 1) + (noPars ? "" : ")");

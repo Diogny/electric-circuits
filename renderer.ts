@@ -57,6 +57,14 @@ function hookEvents() {
 	//add component
 	aEL(qS('.bar-item[action="comp-create"]'), "click", () =>
 		app.addComponent(createEC(<string>app.prop("comp_option").value)), false);
+	//ViewBox Reset
+	aEL(qS('.bar-item[tool="vb-focus"]'), "click", () => setViewBoxOrigin(Point.origin), false);
+}
+
+function setViewBoxOrigin(p: Point) {
+	app.viewBox.x = p.x;
+	app.viewBox.y = p.y;
+	app.updateViewBox();
 }
 
 function registerStates() {
@@ -77,24 +85,26 @@ function registerStates() {
 	app.sm.register(<IMachineState>{
 		key: State.BOARD,
 		overType: "function",	//forward
-		//persistData: true,
+		persistData: true,
 		data: {
 		},
 		actions: {
 			ENTER: function (newCtx: IMouseState) {
 				//console.log('BOARD.ENTER')
+				app.sm.data.panningVector = void 0;
+				removeClass(app.svgBoard, "dragging");
 			},
 			LEAVE: function (newCtx: IMouseState) {
 				app.topBarLeft.innerHTML = "&nbsp;";
+				//console.log('BOARD.LEAVE', newCtx)
 			},
 			OUT: function (newCtx: IMouseState) {
+				//out of any component in the board
 				//console.log('BOARD.OUT', newCtx)
 			},
 			OVER: function (newCtx: IMouseState) {
-				if (!newCtx.it) {
-					//console.log('BOARD.OVER');
-					return
-				}
+				if (app.sm.data.panningVector || !newCtx.it)
+					return;
 				switch (newCtx.over.type) {
 					case "node":
 						app.sm.transition(State.EC_NODE, Action.START, newCtx, {
@@ -103,7 +113,7 @@ function registerStates() {
 						})
 						break;
 					case "line":
-						(newCtx.it as Wire).editMode = true;			//not in editMode
+						(newCtx.it as Wire).editMode = true;
 						app.sm.transition(State.WIRE_LINE, Action.START, newCtx, {
 							it: newCtx.it,
 							line: newCtx.over.line
@@ -115,10 +125,21 @@ function registerStates() {
 						})
 						break;
 					default:
+						//console.log('BOARD.OVER');
 						break;
 				}
 			},
 			MOVE: function (newCtx: IMouseState) {
+				if (newCtx.altKey) {
+					if (app.sm.data.panningVector) {
+						setViewBoxOrigin(new Point(
+							newCtx.client.x - app.sm.data.panningVector.x,
+							newCtx.client.y - app.sm.data.panningVector.y
+						))
+					}
+					return;
+				} else
+					app.sm.data.panningVector = void 0;
 				if (!newCtx.it)
 					return;
 				switch (newCtx.over.type) {
@@ -141,20 +162,30 @@ function registerStates() {
 						})
 						break;
 					default:
+						//should be a board
 						break;
 				}
 			},
+			DOWN: function (newCtx: IMouseState) {
+				newCtx.altKey && (
+					addClass(app.svgBoard, "dragging"),
+					app.sm.data.panningVector = new Point(newCtx.client.x - app.viewBox.x, newCtx.client.y - app.viewBox.y));
+			},
 			UP: function (newCtx: IMouseState) {
 				if (newCtx.button == 0)
-					app.execute(Action.UNSELECT_ALL, 'board::board::board');
+					app.execute(Action.UNSELECT_ALL, "");
 				app.rightClick.setVisible(false);
+				app.sm.data.panningVector && (
+					app.sm.data.panningVector = void 0,
+					removeClass(app.svgBoard, "dragging")
+				)
 			},
 			//transitions
 			START: function () {
-				throw 'BOARD.START ILLEGAL'
+				throw 'BOARD.START ILLEGAL, to catch lose code'
 			},
 			RESUME: function () {
-				app.sm.data = {};
+				app.sm.data.panningVector = void 0;
 				app.highlight.hide();
 			}
 		}
@@ -174,10 +205,7 @@ function registerStates() {
 					let
 						ec = (app.sm.data.it as EC),
 						node = ec.overNode(newCtx.offset, 0);
-					if (node != -1
-						//&& !ec.nodeBonds(node)
-					) {
-						//console.log('over node:' + node);
+					if (node != -1) {
 						app.tooltip.setVisible(false);
 						app.sm.transition(State.EC_NODE, Action.START, newCtx, {
 							it: ec,
@@ -382,7 +410,6 @@ function registerStates() {
 				app.highlight.hide();
 				p = Point.plus(p, ec.p);
 				app.sm.data.wire = new Wire(<IItemWireOptions>{
-					//class: "wiring",
 					points: <IPoint[]>[p, p]
 				});
 				app.addComponent(app.sm.data.wire);
@@ -596,15 +623,12 @@ window.addEventListener("DOMContentLoaded", () => {
 	templatesDOM("viewBox01|size01|point01|baseWin01|ctxWin01|ctxItem01|propWin01")
 		.then(async (templates: Object) => {
 			const d = await ipcRenderer.invoke('shared', 'app'); console.log("global.app =", d)
-			//load default circuit library
 			let
 				json = readJson('./dist/data/library-circuits.v2.json');
-			//register components
 			json.forEach((element: IComponentOptions) => {
 				Comp.register(element);
 			});
-			json = readJson('./dist/data/context-menu.json');		//read context menu data
-
+			json = readJson('./dist/data/context-menu.json');
 			app = new MyApp(<IApplicationOptions>{
 				templates: templates,
 				includePropsInThis: true,
@@ -690,14 +714,14 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 
 function updateViewBox(arg: any) {
-	qS("body").style.height = arg.height + "px";	//set body height, expand main content height
+	qS("body").style.height = arg.height + "px";
 	let
 		mainHeight = qS("body").offsetHeight - qS("body>header").offsetHeight - qS("body>footer").offsetHeight;
 	qS("body>main").style.height = mainHeight + "px";
-	app.board.style.height = mainHeight + "px";	//update svg board height
-	app.size = new Size(arg.width, arg.height);	//set app reference size
+	app.board.style.height = mainHeight + "px";
+	app.size = new Size(arg.width, arg.height);
 	app.contentHeight = mainHeight;
-	app.setViewBox(<any>undefined);	//set SVG viewBox values
+	app.setViewBox(<any>undefined);
 }
 
 //this's a proof of concept of how to communicate with main process, the recommended NEW way...
