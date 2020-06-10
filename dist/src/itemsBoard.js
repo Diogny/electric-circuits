@@ -161,8 +161,8 @@ var ItemBoard = /** @class */ (function (_super) {
         if (!entry) {
             this.settings.bonds[thisNode] = entry = new bonds_1.default(this, ic, icNode, thisNode);
         }
-        else {
-            entry.add(ic, icNode);
+        else if (!entry.add(ic, icNode)) {
+            console.log('Oooopsie!');
         }
         //refresh this node
         this.nodeRefresh(thisNode);
@@ -190,13 +190,16 @@ var ItemBoard = /** @class */ (function (_super) {
         }
     };
     ItemBoard.prototype.unbondNode = function (node) {
-        var bond = this.nodeBonds(node);
-        bond
-            && (bond.to.forEach(function (link) {
-                var _a;
-                (_a = components_1.default.item(link.id)) === null || _a === void 0 ? void 0 : _a.unbond(link.ndx, bond.from.id);
-            }),
-                delete this.settings.bonds[node]);
+        var _a;
+        var bond = this.nodeBonds(node), link = void 0;
+        if (!bond)
+            return;
+        //try later to use bond.to.forEach, it was giving an error with wire node selection, think it's fixed
+        for (var i = 0, len = bond.to.length; i < len; i++) {
+            link = bond.to[i];
+            (_a = components_1.default.item(link.id)) === null || _a === void 0 ? void 0 : _a.unbond(link.ndx, bond.from.id);
+        }
+        delete this.settings.bonds[node];
     };
     ItemBoard.prototype.disconnect = function () {
         for (var node = 0; node < this.count; node++)
@@ -250,7 +253,7 @@ var PointInjector = /** @class */ (function (_super) {
         configurable: true
     });
     Object.defineProperty(PointInjector.prototype, "value", {
-        get: function () { return this.ec[this.name].toString(0x06); } //no vars and no parenthesis
+        get: function () { return this.ec[this.name].toString(0x06); } //no props and no parenthesis
         ,
         enumerable: false,
         configurable: true

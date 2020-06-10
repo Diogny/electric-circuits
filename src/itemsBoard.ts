@@ -9,6 +9,7 @@ import {
 } from './interfaces';
 import { map } from './utils';
 import Point from './point';
+import { Type } from './types';
 
 //ItemBoard->Wire
 export abstract class ItemBoard extends ItemBase {
@@ -160,8 +161,8 @@ export abstract class ItemBoard extends ItemBase {
 		//make bond if first, or append new one
 		if (!entry) {
 			(<any>this.settings.bonds)[thisNode] = entry = new Bond(this, ic, icNode, thisNode);
-		} else {
-			entry.add(ic, icNode);
+		} else if (!entry.add(ic, icNode)) {
+			console.log('Oooopsie!')
 		}
 		//refresh this node
 		this.nodeRefresh(thisNode);
@@ -198,12 +199,16 @@ export abstract class ItemBoard extends ItemBase {
 
 	public unbondNode(node: number): void {
 		let
-			bond = this.nodeBonds(node);
-		bond
-			&& (bond.to.forEach((link: IBondItem) => {
-				Comp.item(link.id)?.unbond(link.ndx, bond.from.id)
-			}),
-				delete (<any>this.settings.bonds)[node])
+			bond = this.nodeBonds(node),
+			link: IBondItem = <any>void 0;
+		if (!bond)
+			return;
+		//try later to use bond.to.forEach, it was giving an error with wire node selection, think it's fixed
+		for (let i = 0, len = bond.to.length; i < len; i++) {
+			link = bond.to[i];
+			Comp.item(link.id)?.unbond(link.ndx, bond.from.id);
+		}
+		delete (<any>this.settings.bonds)[node]
 	}
 
 	public disconnect() {
@@ -214,7 +219,7 @@ export abstract class ItemBoard extends ItemBase {
 	abstract valid(node: number): boolean;
 	abstract get last(): number;
 	abstract refresh(): ItemBoard;	//full refresh
-	abstract nodeRefresh(node: number): ItemBoard;	//node refresh
+	abstract nodeRefresh(node: number): ItemBoard;
 	abstract getNode(node: number): IItemNode;
 	abstract setNode(node: number, p: IPoint): ItemBoard;
 	abstract overNode(p: IPoint, ln: number): number;
@@ -259,7 +264,7 @@ export abstract class PointInjector extends PropertyInjector {
 
 	get type(): string { return "point" }
 
-	get value(): string { return this.ec[this.name].toString(0x06) }	//no vars and no parenthesis
+	get value(): string { return this.ec[this.name].toString(0x06) }	//no props and no parenthesis
 }
 
 export class PositionInjector extends PointInjector {

@@ -13,16 +13,20 @@
 		"outDir": "./dist",
 		"baseUrl": ".",
 		"paths": {
-			"src/*" : ["src/*"],
+			"src/*": [
+				"src/*"
+			],
 			"*": [
 				"node_modules/*"
 			]
-		}
+		},
+		"types": [
+			"node"
+		],
 	},
 	"include": [
 		"src/**/*",
 		"index.ts",
-		"renderer.ts",
-		"preload.ts"
+		"renderer.ts"
 	]
 }

@@ -56,9 +56,14 @@
   pointer-events: none;
 }
 
-line[class="dash"] {
+line.dash,
+rect.dash {
   stroke: rgb(0, 0, 0);
   stroke-width: 2;
+}
+
+rect.dash {
+  fill: none;
 }
 
 /************************ EC ************************/

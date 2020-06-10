@@ -6,7 +6,7 @@ import {
 	IMachineState, IMouseState, IItemWireOptions, IPoint, IItemSolidOptions
 } from "./src/interfaces";
 import Comp from "./src/components";
-import { MyApp } from "./src/myapp";
+import { MyApp, SelectionRect } from "./src/myapp";
 import { attr, aEL, removeClass, toggleClass, addClass, getParentAttr } from "./src/dab";
 import Point from "./src/point";
 import Wire from "./src/wire";
@@ -92,6 +92,9 @@ function registerStates() {
 			ENTER: function (newCtx: IMouseState) {
 				//console.log('BOARD.ENTER')
 				app.sm.data.panningVector = void 0;
+				app.sm.data.selection = false;
+				app.selection.hide();
+				app.sm.data.mouseDown = false;
 				removeClass(app.svgBoard, "dragging");
 			},
 			LEAVE: function (newCtx: IMouseState) {
@@ -103,8 +106,9 @@ function registerStates() {
 				//console.log('BOARD.OUT', newCtx)
 			},
 			OVER: function (newCtx: IMouseState) {
-				if (app.sm.data.panningVector || !newCtx.it)
+				if (!newCtx.it || app.sm.data.panningVector || app.sm.data.selection || !newCtx.it)
 					return;
+				//
 				switch (newCtx.over.type) {
 					case "node":
 						app.sm.transition(State.EC_NODE, Action.START, newCtx, {
@@ -124,12 +128,10 @@ function registerStates() {
 							it: newCtx.it
 						})
 						break;
-					default:
-						//console.log('BOARD.OVER');
-						break;
 				}
 			},
 			MOVE: function (newCtx: IMouseState) {
+				//Board panning
 				if (newCtx.altKey) {
 					if (app.sm.data.panningVector) {
 						setViewBoxOrigin(new Point(
@@ -140,8 +142,21 @@ function registerStates() {
 					return;
 				} else
 					app.sm.data.panningVector = void 0;
+				//Selection Rect
+				if (app.sm.data.mouseDown) {
+					if (!app.sm.data.selection) {
+						//start new selection
+						app.sm.data.selection = true;
+						app.selection.show(newCtx.offset);
+						//console.log('startig: ', app.selection.rect)
+					}
+					else
+						app.selection.calculate(newCtx.offset);
+					return;
+				}
 				if (!newCtx.it)
 					return;
+				//
 				switch (newCtx.over.type) {
 					case "node":
 						console.log(`move: ${newCtx.it.id} node: ${newCtx.over.node}`);
@@ -161,17 +176,20 @@ function registerStates() {
 							it: newCtx.it
 						})
 						break;
-					default:
-						//should be a board
-						break;
 				}
 			},
 			DOWN: function (newCtx: IMouseState) {
-				newCtx.altKey && (
-					addClass(app.svgBoard, "dragging"),
-					app.sm.data.panningVector = new Point(newCtx.client.x - app.viewBox.x, newCtx.client.y - app.viewBox.y));
+				//Board pan
+				if (newCtx.altKey) {
+					addClass(app.svgBoard, "dragging");
+					app.sm.data.panningVector = new Point(newCtx.client.x - app.viewBox.x, newCtx.client.y - app.viewBox.y)
+				} else {
+					//Board item selection box
+					app.sm.data.mouseDown = true;
+				}
 			},
 			UP: function (newCtx: IMouseState) {
+				app.sm.data.mouseDown = false;
 				if (newCtx.button == 0)
 					app.execute(Action.UNSELECT_ALL, "");
 				app.rightClick.setVisible(false);
@@ -179,13 +197,28 @@ function registerStates() {
 					app.sm.data.panningVector = void 0,
 					removeClass(app.svgBoard, "dragging")
 				)
+				if (app.sm.data.selection) {
+					app.sm.data.selection = false;
+					//console.log('ending: ', app.selection.rect);
+					(app.selectedComponents =
+						Comp.itemCollection
+							.filter((item) => {
+								return (item.type == Type.EC)
+									&& app.selection.rect.intersect(item.rect())
+							}))
+						.forEach(item => item.select(true));
+					app.selection.hide();
+				}
 			},
 			//transitions
 			START: function () {
 				throw 'BOARD.START ILLEGAL, to catch lose code'
 			},
 			RESUME: function () {
+				app.sm.data.mouseDown = false;
 				app.sm.data.panningVector = void 0;
+				app.sm.data.selection = false;
+				app.selection.hide();
 				app.highlight.hide();
 			}
 		}
@@ -340,17 +373,21 @@ function registerStates() {
 			},
 			UP: function (newCtx: IMouseState) {
 				let
-					self = this as StateMachine;
+					self = this as StateMachine,
+					wire = self.data.wire as Wire;
 				if (self.data.selectedItem) {
-					app.sm.data.wire.editMode = true;
-					app.sm.data.selectedItem?.it.select(false);
-					self.data.wire.bond(self.data.wire.last, self.data.selectedItem.it, self.data.selectedItem.node);
+					let
+						destIt = self.data.selectedItem.it as ItemBoard,
+						destNode = self.data.selectedItem.node as number;
+					wire.editMode = true;
+					destIt.select(false);
+					wire.bond(wire.last, destIt, destNode);
 					app.highlight.hide();
 					app.sm.transition(State.BOARD, Action.RESUME);
 				} else {
 					//otherwise correct last node
-					self.data.wire.setNode(self.data.wire.last, newCtx.offset);
-					self.data.wire.appendNode(newCtx.offset);
+					wire.setNode(wire.last, newCtx.offset);
+					wire.appendNode(newCtx.offset);
 				}
 			},
 			OUT: function (newCtx: IMouseState) {
@@ -365,6 +402,8 @@ function registerStates() {
 					node = -1,
 					pos: IPoint = <any>void 0,
 					it = newCtx.it;
+				if (!it)
+					return;
 				switch (newCtx.over.type) {
 					case "body":
 						pos = (it as EC).getNodeRealXY(node = it.findNode(newCtx.offset));
@@ -373,22 +412,24 @@ function registerStates() {
 						pos = it.getNode(node = (it as Wire).findLineNode(newCtx.offset, newCtx.over.line))
 						break;
 				}
-				if (it?.id != app.sm.data.wire.id && pos) {
-					if (app.sm.data.selectedItem && app.sm.data.selectedItem.it.id != newCtx.it.id) {
+				if (it.id != app.sm.data.wire.id
+					&& pos
+					&& !(it.type == Type.WIRE && (node == 0 || node == it.last))) {
+					if (app.sm.data.selectedItem && app.sm.data.selectedItem.it.id != it.id) {
 						app.sm.data.selectedItem.it.select(false);
 					}
 					(app.sm.data.selectedItem = {
-						it: newCtx.it,
+						it: it,
 						node: node
 					}).it.select(true);
-					app.highlight.show(pos.x, pos.y, newCtx.it.id, node);
+					app.highlight.show(pos.x, pos.y, it.id, node);
 				}
 			},
 			MOVE: function (newCtx: IMouseState) {
 				let
 					self = this as StateMachine,
 					prevNodePos = self.data.wire.getNode(self.data.wire.last - 1),
-					r = 7,
+					r = 10,
 					angle = Math.atan2(newCtx.offset.y - prevNodePos.y, newCtx.offset.x - prevNodePos.x),
 					p = new Point((newCtx.offset.x - r * Math.cos(angle)) | 0,
 						(newCtx.offset.y - r * Math.sin(angle)) | 0);
@@ -435,7 +476,7 @@ function registerStates() {
 					wire = (app.sm.data.it as Wire),
 					line = newCtx.over.line;
 				if (app.sm.data.mouseDown
-					&& app.sm.data.button == 0) {
+					&& newCtx.button == 0) {
 					//node or line
 					if (app.sm.data.node >= 0) {
 						app.sm.transition(State.WIRE_NODE_DRAG, Action.START, newCtx, {
@@ -467,20 +508,23 @@ function registerStates() {
 					app.highlight.show(pos.x, pos.y, wire.id, node);
 				}
 			},
-			DOWN: function (newCtx: IMouseState) {
+			DOWN: function () {
 				app.sm.data.mouseDown = true;
-				app.sm.data.button = newCtx.button;
 			},
-			UP: function () {
+			UP: function (newCtx: IMouseState) {
+				app.rightClick.setVisible(false);
 				app.sm.data.mouseDown = false;
-				(app.sm.data.button == 0)
-					&& app.execute(Action.SELECT, [app.sm.data.it.id, app.sm.data.it.name, "body"].join('::'));
+				(newCtx.button == 0)
+					&& app.execute(
+						newCtx.ctrlKey ?
+							Action.TOGGLE_SELECT :  // Ctrl+click	=> toggle select
+							Action.SELECT,  		// click		=> select one
+						[app.sm.data.it.id, app.sm.data.it.name, "body"].join('::'));
 			},
 			//transitions
-			START: function (newCtx: IMouseState) {
+			START: function () {
 				app.sm.data.node = -1;
 				app.sm.data.mouseDown = false;
-				app.sm.data.button = newCtx.button;
 			},
 		}
 	});
@@ -657,6 +701,7 @@ window.addEventListener("DOMContentLoaded", () => {
 			app.board.appendChild(app.winProps.win);					//add HtmlWindow to board
 			app.board.appendChild(app.rightClick.win);					//add right-click window
 			app.svgBoard.append(app.dash.g);
+			app.svgBoard.append(app.selection.g);
 			app.svgBoard.append(app.tooltip.g);							//top z-index SVG 
 			app.svgBoard.append(app.highlight.g);
 
