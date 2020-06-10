@@ -41,6 +41,8 @@ Used in my testing website [Electric Circuits](http://diogny.com/tests/circuits.
 
 ![working example](dist/img/img08.png)
 
+![working example](dist/img/img09.png)
+
 ### install development packajes
 	pnpm install --save-dev tsconfig-paths-webpack-plugin
 	pnpm install electron-reload --save-dev
