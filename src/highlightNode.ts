@@ -3,11 +3,15 @@ import { Type } from "./types";
 import { IHighlighNodeSettings } from "./interfaces";
 import { extend, attr } from "./dab";
 import { tag } from "./utils";
+import Wire from "./wire";
+import Bond from "./bonds";
+import Comp from "./components";
+import Point from "./point";
 
 export default class HighlightNode extends ItemBase {
 
 	protected settings: IHighlighNodeSettings;
-	protected circle: SVGCircleElement;
+	protected mainNode: SVGCircleElement;
 
 	get type(): Type { return Type.HIGHLIGHT }
 	get radius(): number { return this.settings.radius }
@@ -24,26 +28,29 @@ export default class HighlightNode extends ItemBase {
 		this.g.setAttribute("svg-comp", "h-node");
 		//remove color class, not needed yet
 		this.g.classList.remove(this.color);
-		this.circle = <SVGCircleElement>tag("circle", "", {
+		this.mainNode = <SVGCircleElement>tag("circle", "", {
 			"svg-type": "node",	// "node-x",
 			r: this.radius
 		});
-		this.g.append(this.circle);
+		this.g.append(this.mainNode);
 	}
 
 	public setRadius(value: number): HighlightNode {
-		this.circle.setAttribute("r", <any>(this.settings.radius = value <= 0 ? 5 : value));
+		this.mainNode.setAttribute("r", <any>(this.settings.radius = value <= 0 ? 5 : value));
 		return this;
 	}
 
 	public hide(): HighlightNode {
 		this.g.classList.add("hide");
+		this.mainNode.classList.remove("hide");
+		this.g.innerHTML = "";
+		this.g.append(this.mainNode);
 		return this;
 	}
 
 	public show(x: number, y: number, id: string, node: number): HighlightNode {
 		this.move(x, y);
-		attr(this.circle, {
+		attr(this.mainNode, {
 			cx: this.x,
 			cy: this.y,
 			//"node-x": <any>node,
@@ -52,6 +59,22 @@ export default class HighlightNode extends ItemBase {
 		this.settings.selectedId = id;
 		this.g.classList.remove("hide");
 		return this;
+	}
+
+	public showConnections(nodes: Point[]): HighlightNode {
+		this.mainNode.classList.add("hide");
+		this.g.classList.remove("hide");
+		nodes.forEach(p => {
+			let
+				circle = <SVGCircleElement>tag("circle", "", {
+					cx: p.x,
+					cy: p.y,
+					r: this.radius,
+					class: "node",
+				});
+			this.g.append(circle)
+		})
+		return this
 	}
 
 	public propertyDefaults(): IHighlighNodeSettings {

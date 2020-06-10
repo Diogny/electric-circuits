@@ -27,15 +27,17 @@ var EcProp = /** @class */ (function () {
             if (!propObj || !propObj.value) { //to debug, catch error
                 console.log('hhhmmmm');
             }
-            that.propValue = propObj.value;
-            //set it's UI value, so far only for INPUT, SPAN
-            switch (htmlProp.nodeName) {
-                case "INPUT":
-                    htmlProp.value = that.propValue;
-                    break;
-                case "SPAN":
-                    htmlProp.innerText = that.propValue;
-                    break;
+            else {
+                that.propValue = propObj.value;
+                //set it's UI value, so far only for INPUT, SPAN
+                switch (htmlProp.nodeName) {
+                    case "INPUT":
+                        htmlProp.value = that.propValue;
+                        break;
+                    case "SPAN":
+                        htmlProp.innerText = that.propValue;
+                        break;
+                }
             }
         };
         //create html

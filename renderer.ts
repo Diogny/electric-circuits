@@ -3,10 +3,10 @@ import { templatesDOM, qSA, qS } from "./src/utils"
 import * as fs from 'fs';
 import {
 	IComponentOptions, IApplicationOptions, StateType as State, ActionType as Action,
-	IMachineState, IMouseState, IItemWireOptions, IPoint, IItemSolidOptions
+	IMachineState, IMouseState, IItemWireOptions, IPoint, IItemSolidOptions, IItemNode
 } from "./src/interfaces";
 import Comp from "./src/components";
-import { MyApp, SelectionRect } from "./src/myapp";
+import { MyApp } from "./src/myapp";
 import { attr, aEL, removeClass, toggleClass, addClass, getParentAttr } from "./src/dab";
 import Point from "./src/point";
 import Wire from "./src/wire";
@@ -16,6 +16,7 @@ import { ItemBoard } from "./src/itemsBoard";
 import Size from "src/size";
 import EC from "src/ec";
 import Rect from "src/rect";
+import Bond from "src/bonds";
 
 let
 	app: MyApp;
@@ -67,6 +68,40 @@ function setViewBoxOrigin(p: Point) {
 	app.updateViewBox();
 }
 
+function getWireConnections(wire: Wire): Point[] {
+	let
+		wireCollection: Wire[] = [wire],
+		wiresFound: string[] = [],
+		points: Point[] = [],
+		findComponents = (bond: Bond) => {
+			bond.to.forEach(b => {
+				let
+					w = Comp.item(b.id);
+				if (!w)
+					throw `Invalid bond connections`;
+				switch (b.type) {
+					case Type.WIRE:
+						if (!wiresFound.some(id => id == b.id)) {
+							wiresFound.push(w.id);
+							wireCollection.push(w as Wire);
+							points.push(Point.create(w.getNode(b.ndx)));
+						}
+						break;
+					case Type.EC:
+						points.push((w as EC).getNodeRealXY(b.ndx));
+						break;
+				}
+			})
+		};
+	while (wireCollection.length) {
+		let
+			w = <Wire>wireCollection.shift();
+		wiresFound.push(w.id);
+		w.bonds.forEach(findComponents);
+	}
+	return points
+}
+
 function registerStates() {
 	let
 		showBodyAndTooltip = (offset: Point, label: string) => {
@@ -80,6 +115,14 @@ function registerStates() {
 		hideNodeTooltip = (it: ItemBoard) => {
 			app.highlight.hide();
 			app.tooltip.setVisible(false);
+		},
+		showWireConnections = (wire: Wire) => {
+			app.sm.data.showWireConnections = true;
+			app.highlight.showConnections(getWireConnections(wire));
+		},
+		hideWireConnections = () => {
+			app.sm.data.showWireConnections = false;
+			app.highlight.hide();
 		};
 	//BOARD
 	app.sm.register(<IMachineState>{
@@ -220,6 +263,7 @@ function registerStates() {
 				app.sm.data.selection = false;
 				app.selection.hide();
 				app.highlight.hide();
+				hideWireConnections();
 			}
 		}
 	});
@@ -429,7 +473,7 @@ function registerStates() {
 				let
 					self = this as StateMachine,
 					prevNodePos = self.data.wire.getNode(self.data.wire.last - 1),
-					r = 10,
+					r = 7,
 					angle = Math.atan2(newCtx.offset.y - prevNodePos.y, newCtx.offset.x - prevNodePos.x),
 					p = new Point((newCtx.offset.x - r * Math.cos(angle)) | 0,
 						(newCtx.offset.y - r * Math.sin(angle)) | 0);
@@ -468,13 +512,22 @@ function registerStates() {
 			OUT: function (newCtx: IMouseState) {
 				if (!newCtx.it || app.sm.data.node == -1) {
 					app.highlight.hide();
+					app.tooltip.setVisible(false);
 					app.sm.transition(State.BOARD, Action.RESUME);
+					if (app.sm.data.showWireConnections) {
+						hideWireConnections();
+					}
 				}
 			},
 			MOVE: function (newCtx: IMouseState) {
+				if (app.sm.data.wiringFromNode)
+					return;
 				let
 					wire = (app.sm.data.it as Wire),
 					line = newCtx.over.line;
+				if (app.sm.data.showWireConnections) {
+					hideWireConnections();
+				}
 				if (app.sm.data.mouseDown
 					&& newCtx.button == 0) {
 					//node or line
@@ -506,25 +559,57 @@ function registerStates() {
 				)) {
 					app.sm.data.node = node;
 					app.highlight.show(pos.x, pos.y, wire.id, node);
+				} else {
+					let
+						p = Point.translateBy(newCtx.offset, app.tooltipOfs);
+					!app.tooltip.move(p.x, p.y).visible
+						&& app.tooltip.setVisible(true);
 				}
 			},
-			DOWN: function () {
-				app.sm.data.mouseDown = true;
+			DOWN: function (newCtx: IMouseState) {
+				app.tooltip.setVisible(false);
+				if (newCtx.ctrlKey) {
+					let
+						wire = app.sm.data.it as Wire;
+					if (app.sm.data.node > 0 && app.sm.data.node < wire.last) {
+						app.sm.data.wiringFromNode = true;
+					} else
+						showWireConnections(wire);
+				} else
+					app.sm.data.mouseDown = true;
 			},
 			UP: function (newCtx: IMouseState) {
+				if (app.sm.data.wiringFromNode) {
+					app.sm.transition(State.NEW_WIRE_FROM_EC, Action.START, newCtx, {
+						start: {
+							it: app.sm.data.it,
+							node: app.sm.data.node,
+							fromWire: true
+						},
+					});
+					return;
+				}
 				app.rightClick.setVisible(false);
-				app.sm.data.mouseDown = false;
-				(newCtx.button == 0)
-					&& app.execute(
-						newCtx.ctrlKey ?
-							Action.TOGGLE_SELECT :  // Ctrl+click	=> toggle select
-							Action.SELECT,  		// click		=> select one
-						[app.sm.data.it.id, app.sm.data.it.name, "body"].join('::'));
+				(newCtx.button == 0
+					&& app.sm.data.mouseDown)
+					&& (app.sm.data.mouseDown = false,
+						app.execute(
+							newCtx.ctrlKey ?
+								Action.TOGGLE_SELECT :  // Ctrl+click	=> toggle select
+								Action.SELECT,  		// click		=> select one
+							[app.sm.data.it.id, app.sm.data.it.name, "body"].join('::')));
+				if (app.sm.data.showWireConnections) {
+					hideWireConnections();
+				}
+				showBodyAndTooltip(newCtx.offset, app.sm.data.it.id);
 			},
 			//transitions
-			START: function () {
+			START: function (newCtx: IMouseState) {
 				app.sm.data.node = -1;
 				app.sm.data.mouseDown = false;
+				app.sm.data.showWireConnections = false;
+				app.sm.data.wiringFromNode = false;
+				showBodyAndTooltip(newCtx.offset, app.sm.data.it.id);
 			},
 		}
 	});

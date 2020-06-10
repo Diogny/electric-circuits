@@ -45,16 +45,17 @@ export default class EcProp {
 			//get value from component property
 			if (!propObj || !propObj.value) {		//to debug, catch error
 				console.log('hhhmmmm');
-			}
-			that.propValue = propObj.value;
-			//set it's UI value, so far only for INPUT, SPAN
-			switch (htmlProp.nodeName) {
-				case "INPUT":
-					(<HTMLInputElement>htmlProp).value = that.propValue;
-					break;
-				case "SPAN":
-					(<HTMLSpanElement>htmlProp).innerText = that.propValue
-					break;
+			} else {
+				that.propValue = propObj.value;
+				//set it's UI value, so far only for INPUT, SPAN
+				switch (htmlProp.nodeName) {
+					case "INPUT":
+						(<HTMLInputElement>htmlProp).value = that.propValue;
+						break;
+					case "SPAN":
+						(<HTMLSpanElement>htmlProp).innerText = that.propValue
+						break;
+				}
 			}
 		}
 		//create html

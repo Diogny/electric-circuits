@@ -149,7 +149,8 @@ g[svg-comp] text.big {
 }
 
 g[svg-comp] > circle[svg-type="node"],
-g[svg-comp] > circle[svg-type="node-x"] {
+g[svg-comp] > circle[svg-type="node-x"],
+g[svg-comp] > circle.node {
   fill: #bcdcfb;
   stroke-width: 2px;
   stroke: red;
@@ -299,11 +300,15 @@ g.tooltip > text {
 .wire > line:hover,
 .wire > polyline:hover,
 .wire.selected > line {
-  /*stroke: black;
+  /*not used:
+  	stroke: black;
 	filter: brightness(60%) sepia(100%);
 	stroke-dasharray: 10 10;*/
+
+  /*
+  stays to see if it's better with no wire highlight
   opacity: 0.9;
-  stroke-width: 7px; /*12px;*/
+  stroke-width: 7px;*/
 }
 
 .wire.wiring > line:hover,
@@ -356,7 +361,11 @@ g.tooltip > text {
   user-select: none;
 }
 .bar {
-  background: #3988ce; /* fallback for old browsers */
+  background: linear-gradient(
+    180deg,
+    rgba(150, 150, 150, 1) 28%,
+    rgba(92, 93, 94, 1) 100%
+  ); /*#3988ce;*/
 }
 
 .bar-group {
@@ -366,7 +375,7 @@ g.tooltip > text {
 .bar-item {
   margin: 0;
   padding: 7px 8px 7px 8px;
-  border-right: 1px solid #5d98d4;
+  border-right: 1px solid #8a8a8a; /*1px solid  #5d98d4;*/
   color: white;
   line-height: 26px;
   height: 100%;
@@ -381,12 +390,12 @@ g.tooltip > text {
 }
 
 .bar-item.selected {
-  background: #2464a7; /*cadetblue;*/
+  background: #76787b; /*#2464a7;*/
 }
 
 .bar-item.link:hover {
   /*opacity: 0.6;*/
-  background: #73b2eb;
+  background: #616060; /*#73b2eb;*/
 }
 
 .select-css select {
@@ -397,18 +406,18 @@ g.tooltip > text {
   /* display: block; */
   font-size: 16px;
   font-family: sans-serif;
-  background: #3988ce;
+  background-color: #717171; /*#3988ce;*/
   border: none !important;
   line-height: normal;
 }
 .select-css > select > option::select {
-  background-color: #96dcdc !important;
+  background-color: #bfc5c5 !important; /*#96dcdc !important;*/
 }
 .select-css select:hover {
-  /*   filter: invert(100%);
+  background-color: #616060; /*#2275bf;*/
+    /*   filter: invert(100%);
 	  color:#bdc6c0;
 	  */
-  background-color: #2275bf;
 }
 .select-css select option:checked {
   background-color: white;
@@ -422,9 +431,9 @@ select:disabled {
   cursor: not-allowed;
 }
 .bar-item > input {
-  background-color: #3988ce;
+  background-color: #717171; /*#3988ce;*/
   color: white;
-  border: 1px solid #5d98d4;
+  border: 1px solid #717171; /*#5d98d4;*/
   padding: 0px 7px;
   width: 70px;
 }
@@ -436,140 +445,134 @@ select:disabled {
 
 /********************  BASE WINDOW ********************/
 
-div.win {
+.shadow {
+  border-radius: 1px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1), 0 1px 8px rgba(0, 0, 0, 0.2);
+}
+
+.win {
   /*min-width: 100px;
   min-height: 100px;*/
   position: absolute;
-  border: 1px solid #d6d3d3;
+  border: 1px solid #d6d6d6; /*1px solid rgba(255, 255, 255, 0.2);*/
+  border-radius: 1px;
   display: flex;
   flex-direction: column;
-  background-color: #f1f1f1;
+  background-color: #dedcdc;
   color: black;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1), 0 1px 8px rgba(0, 0, 0, 0.2);
 }
 
-div.win.hide {
+.win.hide {
   display: none;
 }
 
 /********************  APP WINDOW ********************/
 
-div.win.props.collapsed {
+.win.props {
+  border: 1px solid #c5c2c2;
+}
+
+.win.props.collapsed {
   height: 20px !important;
 }
 
 /* HEADER */
-div.win.props > header {
-  background-color: #3988ce;
-  color: white;
+.win.props > header {
+  background: rgba(0, 0, 0, 0.12);
+  color: #756a6a;
   position: relative;
   line-height: 18px;
 }
-div.win.props > header > .title {
+.win.props > header > .title {
   padding: 2px 6px;
 }
 
-div.win.props.selected > header {
-  background-color: #17609f;
-}
-
-div.win.props.collapsed > main,
-div.win.props.collapsed > footer {
+.win.props.collapsed > main,
+.win.props.collapsed > footer {
   display: none;
 }
 
-div.win.props > header.dragging {
+.win.props > header.dragging {
   cursor: move;
 }
 
 /* HEADER Title */
-div.win.props > header > div:nth-of-type(1) {
+.win.props > header > div:nth-of-type(1) {
   font-size: 14px;
 }
 
 /* HEADER buttons */
-div.win.props > header > div:nth-of-type(2) {
+.win.props > header > div:nth-of-type(2) {
   position: absolute;
   top: 2px;
   right: 2px;
 }
 
-div.win.props > header > div > img,
-div.win.props > footer > div > img {
+.win.props > header > div > img,
+.win.props > footer > div > img {
   /* float: right;*/
   cursor: pointer;
 }
 
-div.win.props > header > div:nth-of-type(2) > img:nth-of-type(1) {
+.win.props > header > div:nth-of-type(2) > img:nth-of-type(1) {
   /*content: url(../img/arrow-up-16x16.png); not fully supported yet Firefox*/
   background-image: url(../img/arrow-up-16x16.png);
 }
 
-div.win.props.collapsed > header > div:nth-of-type(2) > img:nth-of-type(1) {
+.win.props.collapsed > header > div:nth-of-type(2) > img:nth-of-type(1) {
   /*content: url(../img/arrow-down-16x16.png); not fully supported yet Firefox*/
   background-image: url(../img/arrow-down-16x16.png);
 }
 
-div.win.props > header > div:nth-of-type(2) > img:nth-of-type(2) {
+.win.props > header > div:nth-of-type(2) > img:nth-of-type(2) {
   /*content: url(../img/close-p3-16x16.png); not fully supported yet Firefox*/
   background-image: url(../img/close-p3-16x16.png);
 }
 
-div.win.props > header > div:nth-of-type(2) > img:hover {
+.win.props > header > div:nth-of-type(2) > img:hover {
   background-color: red;
 }
 
 /* MAIN */
-div.win.props > main {
+.win.props > main {
   height: 100%;
   /*width: 100%;*/
+  background: rgba(10, 10, 10, 0.1);
   flex: 1;
   margin: 0;
   padding: 4px;
 }
 
-div.win.props > main.hide {
+.win.props > main.hide {
   display: none;
 }
 
-div.win.props > main input {
+.win.props > main input.prop {
   width: 80px;
   height: 16px;
+  background-color: #d0d0d0;
+  border-color: #cacaca;
 }
 
 .ec-container {
   margin: 6px 2px;
 }
 
-.ec-container > .label {
-  background-color: #e7e5e5;
-  padding: 1px;
-  margin-right: 5px;
-  border: 1px solid #d6d5d5;
+.ec-container > span.label {
+  padding: 2px;
+  margin-right: 10px;
 }
 
-.ec-container > .prop.readonly {
-  background-color: white;
-  padding: 2px 5px;
-  border: 1px solid black;
-}
-
-.ec-container > .prop.simple {
-  background-color: initial !important;
-  border: none !important;
-}
-
-.ec-container > .prop.readonly:hover {
-  cursor: not-allowed;
-}
-
-.ec-container > .prop.simple:hover {
-  cursor: initial !important;
+.ec-container > span.prop {
+  color: #777474;
 }
 
 .ec-container > .rot {
   display: inline-block;
-  background-color: #3988ce;
+  background-color: #b8bbbd; /*#3988ce;*/
   padding: 1px 2px;
+  border: 1px solid #aba6a6;
 }
 
 .rot > .prop {
@@ -583,8 +586,7 @@ div.win.props > main input {
 }
 
 /* FOOTER */
-div.win.props > footer {
-  background-color: white;
+.win.props > footer {
   margin: 0;
   font-size: 12px;
   padding: 2px 6px;
@@ -592,59 +594,69 @@ div.win.props > footer {
   position: relative;
 }
 
-div.win.props > footer.hide {
+.win.props > footer.hide {
   display: none;
 }
 
 /* HEADER Title */
-div.win.props > footer > span {
+.win.props > footer > span {
   font-size: 14px;
 }
 
 /* HEADER buttons */
-div.win.props > footer > div {
+.win.props > footer > div {
   position: absolute;
   top: 2px;
   right: 2px;
 }
 
-div.win.props > footer > div > img:nth-of-type(1) {
+.win.props > footer > div > img:nth-of-type(1) {
   /*content: url(../img/arrow-up-16x16.png); not fully supported yet Firefox*/
   background-image: url(../img/garbage-blk-p3.png);
 }
 
-div.win.props > footer > div > img:hover {
+.win.props > footer > div > img:hover {
   background-color: #d0cfcf;
 }
 
-/**/
-div.win.ctx > div {
+/* Right Context window */
+
+.win.ctx {
+  /*background: rgba(0, 0, 0, 0.1);*/
+  background: rgba(0, 0, 0, 0.4);
+  -webkit-backdrop-filter: blur(7px);
+  backdrop-filter: blur(7px);
+}
+
+.win.ctx > div {
   padding: 6px 8px;
   font-size: 14px;
 }
 
-div.win.ctx > div:hover {
+.win.ctx > div:hover {
   background-color: #bdbdbf;
   color: white;
   cursor: pointer;
 }
 
-div.win.ctx > div > span {
-  color: #4b5661;
+.win.ctx > div > span {
+  color: #f1f6fd;
 }
 
-div.win.ctx > div > span.right {
+.win.ctx > div > span.right {
   float: right;
 }
 
 /*   */
-div.win.ctx > div[disabled] {
+.win.ctx > div[disabled] {
   background-color: #ececec;
 }
-div.win.ctx > div[disabled] > span {
+
+.win.ctx > div[disabled] > span {
   color: #c7c3c3;
 }
-/*div.win.ctx > div[disabled]:hover {
+
+/*.win.ctx > div[disabled]:hover {
   cursor: not-allowed;
 }*/
 

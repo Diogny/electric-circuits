@@ -7,14 +7,20 @@ Used in my testing website [Electric Circuits](http://diogny.com/tests/circuits.
 	have to use "@types/node": "12.12.21" because of a compatibility bug with Typescript
 
 ### Functionality and Wiring
-	Right-click shows context menu
+
+	Right-click shows context menu for individual board items
+	Board panning: Alt + Left-Click drag
+
 	Start new Wire: Ctrl + Left-Click over EC node
+	Highlighted wire nodes and Wire lines can be dragged and aligned
 	Escape stops wiring
 	Bond lose wire: Ctrl + Left-Click, drag and drop over EC node or Wire node
-	Highlighted wire nodes can be dragged and aligned
-	Board panning: Alt+click drag
-	Ctrl + Left-Click and drag on board select ECs
+	EC and Wire tooltip label should be deleted in the future, only EC node labels should stay
+	
+	Ctrl + Left-Click on Board and drag shows selection rectangle for ECs
 	Ctrl + Left-Click on EC select/unselect
+	
+
 
 ### Last compilation:
 	We are using Node.js 12.14.1, Chromium 83.0.4103.100, and Electron 9.0.3.
@@ -33,6 +39,7 @@ Used in my testing website [Electric Circuits](http://diogny.com/tests/circuits.
 
 ![working example](dist/img/img06.png)
 
+![working example](dist/img/img08.png)
 
 ### install development packajes
 	pnpm install --save-dev tsconfig-paths-webpack-plugin
@@ -73,6 +80,6 @@ Used in my testing website [Electric Circuits](http://diogny.com/tests/circuits.
 	git add -u					stage the modified and deleted files
 	git add -A
 	git commit -m "update message"
-	git tag v1.1.3
+	git tag v1.1.4
 	git push origin master --tags
 

@@ -13,7 +13,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.MyApp = exports.SelectionRect = void 0;
+exports.MyApp = void 0;
 var app_1 = require("./app");
 var interfaces_1 = require("./interfaces");
 var utils_1 = require("./utils");
@@ -29,46 +29,7 @@ var context_window_1 = require("./context-window");
 var types_1 = require("./types");
 var linealign_1 = require("./linealign");
 var highlightNode_1 = require("./highlightNode");
-var SelectionRect = /** @class */ (function () {
-    function SelectionRect(app) {
-        this.app = app;
-        this.g = utils_1.tag("rect", "selection-rect", {
-            class: "dash",
-            x: 0, y: 0, width: 0, height: 0,
-            "stroke-dasharray": "3, 3"
-        });
-        this.hide();
-    }
-    SelectionRect.prototype.show = function (start) {
-        this.start = start;
-        this.rect = new rect_1.default(start.x, start.y, 0, 0);
-        return this.g.classList.remove("hide"), this;
-    };
-    SelectionRect.prototype.hide = function () {
-        this.start = new point_1.default(0, 0);
-        this.rect = new rect_1.default(0, 0, 0, 0);
-        return this.g.classList.add("hide"), this.refresh();
-    };
-    SelectionRect.prototype.refresh = function () {
-        dab_1.attr(this.g, {
-            x: this.rect.x,
-            y: this.rect.y,
-            width: this.rect.width,
-            height: this.rect.height
-        });
-        return this;
-    };
-    SelectionRect.prototype.calculate = function (p) {
-        var startX = Math.min(this.start.x, p.x), startY = Math.min(this.start.y, p.y), endX = Math.max(this.start.x, p.x), endY = Math.max(this.start.y, p.y);
-        this.rect.x = startX;
-        this.rect.y = startY;
-        this.rect.width = endX - startX;
-        this.rect.height = endY - startY;
-        return this.refresh();
-    };
-    return SelectionRect;
-}());
-exports.SelectionRect = SelectionRect;
+var selection_rect_1 = require("./selection-rect");
 var MyApp = /** @class */ (function (_super) {
     __extends(MyApp, _super);
     function MyApp(options) {
@@ -150,7 +111,7 @@ var MyApp = /** @class */ (function (_super) {
         _this.topBarRight = utils_1.qS("#top-bar>div:nth-of-type(2)");
         _this.dash = new linealign_1.default(_this);
         _this.highlight = new highlightNode_1.default({});
-        _this.selection = new SelectionRect(_this);
+        _this.selection = new selection_rect_1.SelectionRect(_this);
         //this'll hold the properties of the current selected component
         _this.winProps = new app_window_1.default({
             app: _this,
