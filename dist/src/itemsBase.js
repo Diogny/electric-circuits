@@ -15,7 +15,6 @@ var __extends = (this && this.__extends) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 var dab_1 = require("./dab");
 var utils_1 = require("./utils");
-var colors_1 = require("./colors");
 var item_1 = require("./item");
 var rect_1 = require("./rect");
 var point_1 = require("./point");
@@ -30,7 +29,6 @@ var ItemBase = /** @class */ (function (_super) {
         _this.settings.g = utils_1.tag("g", _this.settings.id, {
             class: (_this.settings.class = classArr.join(' '))
         });
-        dab_1.addClass(_this.g, _this.color);
         return _this;
     }
     Object.defineProperty(ItemBase.prototype, "g", {
@@ -68,19 +66,6 @@ var ItemBase = /** @class */ (function (_super) {
     ItemBase.prototype.setVisible = function (value) {
         _super.prototype.setVisible.call(this, value);
         this.visible ? dab_1.removeClass(this.g, "hide") : dab_1.addClass(this.g, "hide");
-        return this;
-    };
-    //ec.setColor("red").rotate(45).select(true).highlight.setRadius(15).highlight.show(5)
-    //ec.setColor("red").rotate(45).select(true).setNodeRadius(15).showNode(5)
-    ItemBase.prototype.setColor = function (value) {
-        var newColor = colors_1.Color.getcolor(value);
-        //remove color class
-        dab_1.removeClass(this.g, this.color);
-        //set new color	
-        this.settings.color = newColor;
-        //add new color class
-        dab_1.addClass(this.g, newColor);
-        //for object chaining
         return this;
     };
     ItemBase.prototype.remove = function () {

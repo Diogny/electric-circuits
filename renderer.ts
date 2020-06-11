@@ -778,6 +778,14 @@ window.addEventListener("DOMContentLoaded", () => {
 						onChange: function (value: boolean, where: number) {
 							app.sm.log = value;
 						}
+					},
+					theme_select: {
+						tag: 'select[tool="theme-select"]',
+						onChange: function (value: string, where: number) {
+							(where == 1)	// 1 == "ui"
+								&& (document.body.className != value)
+								&& (document.body.className = value);
+						}
 					}
 				},
 				list: json

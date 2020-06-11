@@ -1,6 +1,5 @@
 import { obj, addClass, removeClass, isStr } from './dab';
 import { tag } from './utils';
-import { Color } from './colors';
 import { IItemBaseProperties, IItemBaseOptions, ISize } from './interfaces';
 import Item from './item';
 import Rect from './rect';
@@ -48,22 +47,6 @@ export default abstract class ItemBase extends Item {
 		this.settings.g = tag("g", this.settings.id, {
 			class: (this.settings.class = classArr.join(' '))
 		});
-		addClass(this.g, this.color);
-	}
-
-	//ec.setColor("red").rotate(45).select(true).highlight.setRadius(15).highlight.show(5)
-	//ec.setColor("red").rotate(45).select(true).setNodeRadius(15).showNode(5)
-	public setColor(value: string): ItemBase {
-		let
-			newColor = Color.getcolor(value);
-		//remove color class
-		removeClass(this.g, this.color);
-		//set new color	
-		this.settings.color = newColor;
-		//add new color class
-		addClass(this.g, newColor);
-		//for object chaining
-		return this;
 	}
 
 	public remove() {

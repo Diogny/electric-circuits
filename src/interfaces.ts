@@ -224,7 +224,7 @@ export interface IItemBaseOptions {
 	name: string;
 	x: number;
 	y: number;
-	color: string;
+	//color: string;
 	class: string;
 	visible: boolean;
 }

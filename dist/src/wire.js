@@ -49,7 +49,6 @@ var Wire = /** @class */ (function (_super) {
                 name: _this.name,
                 x: _this.x,
                 y: _this.y,
-                color: _this.color,
                 points: _this.settings.points,
                 bonds: '[' + _this.bonds.map(function (b) { return b.link; }).join(', ') + ']'
             },
@@ -295,7 +294,6 @@ var Wire = /** @class */ (function (_super) {
             class: "wire",
             highlightNodeName: "node",
             pad: 5,
-            color: "black",
             edit: false // initial is false
         });
     };

@@ -26,8 +26,6 @@ var Label = /** @class */ (function (_super) {
         options.visible = false;
         _this = _super.call(this, options) || this;
         _this.text = '';
-        //remove color class, not needed for a Tooltip text
-        dab_1.removeClass(_this.g, _this.color);
         //create label
         _this.t = utils_1.tag("text", "", {});
         dab_1.aCld(_this.g, _this.t);

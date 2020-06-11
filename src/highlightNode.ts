@@ -3,9 +3,6 @@ import { Type } from "./types";
 import { IHighlighNodeSettings } from "./interfaces";
 import { extend, attr } from "./dab";
 import { tag } from "./utils";
-import Wire from "./wire";
-import Bond from "./bonds";
-import Comp from "./components";
 import Point from "./point";
 
 export default class HighlightNode extends ItemBase {
@@ -26,8 +23,6 @@ export default class HighlightNode extends ItemBase {
 		options.id = "highlighNode";
 		super(options);
 		this.g.setAttribute("svg-comp", "h-node");
-		//remove color class, not needed yet
-		this.g.classList.remove(this.color);
 		this.mainNode = <SVGCircleElement>tag("circle", "", {
 			"svg-type": "node",	// "node-x",
 			r: this.radius

@@ -1,4 +1,3 @@
-
 import { condClass, obj, attr, extend, isFn, isNum } from './dab';
 import Bond from './bonds';
 import ItemBase from './itemsBase';
@@ -9,7 +8,6 @@ import {
 } from './interfaces';
 import { map } from './utils';
 import Point from './point';
-import { Type } from './types';
 
 //ItemBoard->Wire
 export abstract class ItemBoard extends ItemBase {
@@ -88,18 +86,6 @@ export abstract class ItemBoard extends ItemBase {
 				where: 1				//signals it was a change inside the object
 			});
 		}
-		return this;
-	}
-
-	public setColor(value: string): ItemBoard {
-		super.setColor(value);
-		//trigger property changed if applicable
-		this.onProp && this.onProp({
-			id: `#${this.id}`,
-			value: this.color,
-			prop: "color",
-			where: 1				//signals it was a change inside the object
-		})
 		return this;
 	}
 

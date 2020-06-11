@@ -99,17 +99,6 @@ var ItemBoard = /** @class */ (function (_super) {
         }
         return this;
     };
-    ItemBoard.prototype.setColor = function (value) {
-        _super.prototype.setColor.call(this, value);
-        //trigger property changed if applicable
-        this.onProp && this.onProp({
-            id: "#" + this.id,
-            value: this.color,
-            prop: "color",
-            where: 1 //signals it was a change inside the object
-        });
-        return this;
-    };
     ItemBoard.prototype.move = function (x, y) {
         _super.prototype.move.call(this, x, y);
         //trigger property changed if applicable

@@ -14,7 +14,6 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 var point_1 = require("./point");
-var colors_1 = require("./colors");
 var dab_1 = require("./dab");
 var types_1 = require("./types");
 var Item = /** @class */ (function (_super) {
@@ -33,8 +32,6 @@ var Item = /** @class */ (function (_super) {
         //fix (x,y) coordinates if wrongly initially provided
         _this.settings.x = _this.settings.x || 0;
         _this.settings.y = _this.settings.y || 0;
-        //fix color if wrongly provided, default is "white"
-        _this.settings.color = colors_1.Color.getcolor(_this.color, colors_1.Colors.white);
         return _this;
     }
     Object.defineProperty(Item.prototype, "name", {
@@ -67,11 +64,6 @@ var Item = /** @class */ (function (_super) {
         enumerable: false,
         configurable: true
     });
-    Object.defineProperty(Item.prototype, "color", {
-        get: function () { return this.settings.color; },
-        enumerable: false,
-        configurable: true
-    });
     Object.defineProperty(Item.prototype, "visible", {
         get: function () { return this.settings.visible; },
         enumerable: false,
@@ -98,7 +90,6 @@ var Item = /** @class */ (function (_super) {
             name: "",
             x: 0,
             y: 0,
-            color: "white",
             class: "",
             visible: true,
         };

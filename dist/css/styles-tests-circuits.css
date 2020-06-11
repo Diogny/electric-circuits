@@ -1,4 +1,225 @@
-/************************ BOARD ************************/
+.light {
+  background-color: white;
+}
+.dark {
+  background-color: black;
+}
+
+.hide {
+  display: none;
+}
+
+.shadow {
+  border-radius: 1px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1), 0 1px 8px rgba(0, 0, 0, 0.2);
+}
+
+.no-select {
+  -moz-user-select: -moz-none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
+
+.select-css {
+  padding: 0px 10px;
+  font-size: 16px;
+  font-family: sans-serif;
+  border: none !important;
+  line-height: normal;
+  vertical-align: middle;
+  /*appearance: none;
+		  -webkit-appearance: none;  hides arrow*/
+  /* display: block; */
+}
+
+.light .select-css {
+  color: #6f6c6c;
+  background-color: #eaeaea; /*#3988ce;*/
+}
+.dark .select-css {
+  color: #fff;
+  background-color: #969494; /*#3988ce;*/
+}
+
+.light .select-css > option::select {
+  background-color: #bfc5c5 !important; /*#96dcdc !important;*/
+}
+.dark .select-css > option::select {
+  background-color: #bfc5c5 !important; /*#96dcdc !important;*/
+}
+
+.light .select-css:hover {
+  background-color: #e4e4e4; /*#2275bf;*/
+}
+.dark .select-css:hover {
+  background-color: #8e8d8d; /*#2275bf;*/
+  /*   filter: invert(100%);
+			color:#bdc6c0;
+			*/
+}
+
+.light .select-css option:checked {
+  background-color: #e0dfdf;
+  color: black;
+}
+.dark .select-css option:checked {
+  background-color: white;
+  color: black;
+}
+
+.select-css:focus {
+  outline: none;
+}
+.select-css:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/************************ BODY HEADER ************************/
+
+body.light .bar {
+  /*background: linear-gradient(180deg,rgba(244, 242, 242, 1) 28%, rgba(193, 195, 198, 1) 100%);*/
+  background: linear-gradient(
+    180deg,
+    rgba(215, 218, 223, 1) 0%,
+    rgba(231, 231, 231, 1) 10%,
+    rgba(237, 237, 237, 1) 90%,
+    rgba(220, 223, 227, 1) 100%
+  );
+}
+body.dark .bar {
+  /*background: linear-gradient(180deg,rgba(150, 150, 150, 1) 28%,rgba(92, 93, 94, 1) 100%); /*#3988ce;*/
+  background: linear-gradient(
+    180deg,
+    rgba(107, 107, 107, 1) 0%,
+    rgba(156, 154, 154, 1) 10%,
+    rgba(144, 141, 141, 1) 90%,
+    rgba(101, 99, 99, 1) 100%
+  );
+}
+
+.bar-group {
+  height: 100%;
+}
+
+.bar-item {
+  margin: 0;
+  padding: 7px 8px 7px 8px;
+  line-height: 26px;
+  height: 100%;
+}
+body.light .bar-item {
+  border-right: 1px solid #cccccc61; /*1px solid  #5d98d4;*/
+  color: #7f7c7c;
+}
+body.dark .bar-item {
+  border-right: 1px solid #8a8a8a; /*1px solid  #5d98d4;*/
+  color: white;
+}
+
+.bar-item * {
+  vertical-align: middle; /* parent must have height: 100%  px em   https://stackoverflow.com/questions/7273338/how-to-vertically-align-an-image-inside-a-div*/
+}
+
+.bar-item.link {
+  cursor: pointer;
+}
+
+body.light .bar-item.selected {
+  background: #c7c9ce; /*#2464a7;*/
+}
+body.dark .bar-item.selected {
+  background: #76787b; /*#2464a7;*/
+}
+
+body.light .bar-item.link:hover {
+  /*opacity: 0.6;*/
+  background: #c3c2c2; /*#73b2eb;*/
+}
+body.dark .bar-item.link:hover {
+  /*opacity: 0.6;*/
+  background: #616060; /*#73b2eb;*/
+}
+
+body.light .bar-item > input {
+  background-color: #e2e0e0; /*#3988ce;*/
+  color: white;
+  border: 1px solid #e2e0e0; /*#5d98d4;*/
+  padding: 0px 7px;
+  width: 70px;
+}
+body.dark .bar-item > input {
+  background-color: #717171; /*#3988ce;*/
+  color: white;
+  border: 1px solid #717171; /*#5d98d4;*/
+  padding: 0px 7px;
+  width: 70px;
+}
+
+#rot-lbl {
+  width: 35px;
+  display: inline-block;
+  text-align: center;
+}
+.light #rot-lbl {
+  border: 1px solid #e4e4e4;
+}
+.dark #rot-lbl {
+  border: 1px solid #949494;
+}
+
+.bar-item > .icon {
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+}
+body.light .bar-item[action="comp-create"] > .icon {
+  background: url(../img/create-comp16x16-dark.png) no-repeat;
+}
+body.dark .bar-item[action="comp-create"] > .icon {
+  background: url(../img/create-comp16x16.png) no-repeat;
+}
+
+body.light .bar-item[rot-dir="left"] > .icon {
+  background: url(../img/rot-left16x16-dark.png) no-repeat;
+}
+body.dark .bar-item[rot-dir="left"] > .icon {
+  background: url(../img/rot-left16x16.png) no-repeat;
+}
+
+body.light .bar-item[rot-dir="right"] > .icon {
+  background: url(../img/rot-right16x16-dark.png) no-repeat;
+}
+body.dark .bar-item[rot-dir="right"] > .icon {
+  background: url(../img/rot-right16x16.png) no-repeat;
+}
+
+body.light .bar-item[tool="vb-focus"] > .icon {
+  background: url(../img/focus16x16-dark.png) no-repeat;
+}
+body.dark .bar-item[tool="vb-focus"] > .icon {
+  background: url(../img/focus16x16.png) no-repeat;
+}
+
+/*   */
+.expandable {
+  display: inline-block;
+}
+
+.expandable > span > i {
+  display: none;
+  color: #e9e9ed;
+}
+
+.expandable:hover * {
+  display: inline;
+}
+
+/************************ BODY MAIN ************************/
+
+/*********** BOARD ***********/
 
 #board {
   position: relative;
@@ -6,7 +227,7 @@
 }
 
 /* board grid size*/
-.grid30x30 {
+.light .grid30x30 {
   background-size: 10px 10px;
   background-image: linear-gradient(
       to right,
@@ -16,7 +237,7 @@
     linear-gradient(to bottom, rgba(128, 128, 128, 0.1) 1px, transparent 1px);
 }
 
-.grid45x45 {
+.light .grid45x45 {
   background-size: 15px 15px;
   background-image: linear-gradient(
       to right,
@@ -26,7 +247,7 @@
     linear-gradient(to bottom, rgba(128, 128, 128, 0.1) 1px, transparent 1px);
 }
 
-.grid60x60 {
+.light .grid60x60 {
   background-size: 20px 20px;
   background-image: linear-gradient(
       to right,
@@ -35,8 +256,17 @@
     ),
     linear-gradient(to bottom, rgba(128, 128, 128, 0.1) 1px, transparent 1px);
 }
+.dark .grid60x60 {
+  background-size: 20px 20px;
+  background-image: linear-gradient(
+      to right,
+      rgba(255, 255, 255, 0.15) 1px,
+      transparent 1px
+    ),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.15) 1px, transparent 1px);
+}
 
-.grid-dots-60x60 {
+.light .grid-dots-60x60 {
   background: linear-gradient(90deg, #fff 19px, transparent 1%) center,
     linear-gradient(#fff 19px, transparent 1%) center, #a5a2a2;
   background-size: 20px 20px;
@@ -56,68 +286,45 @@
   pointer-events: none;
 }
 
-line.dash,
-rect.dash {
-  stroke: rgb(0, 0, 0);
-  stroke-width: 2;
+circle,
+ellipse,
+rect,
+line,
+polyline,
+polygon,
+path {
+  shape-rendering: auto;
 }
 
-rect.dash {
-  fill: none;
-}
-
-/************************ EC ************************/
+/*********** EC ***********/
 
 .ec {
-  fill: none;
-  stroke-opacity: 0.9;
-  stroke-width: 1px;
+  fill: #f3f0f0;
+  stroke: black;
+  stroke-opacity: 1;
+  stroke-width: 2px;
   stroke-linecap: butt;
   fill-rule: evenodd;
+}
+
+body.dark .ec [svg-type="body"] {
+  stroke: #ffffff;
+}
+body.dark .ec {
+  fill: black;
+  stroke: white;
 }
 
 g[svg-comp] > path[svg-type="node"] {
   stroke-width: 1px;
   fill: darkgray;
 }
-g[svg-comp]:hover {
+
+body.light .ec [svg-type]:hover {
   stroke: red;
-  stroke-width: 1px !important;
 }
-
-.ec.white {
-  stroke: black;
-  fill: black;
-}
-
-g[svg-comp].white > [svg-type="body"],
-.white {
-  fill: white;
-}
-
-.ec.black {
-  stroke: #807b7b;
-  fill: #807b7b;
-}
-
-g[svg-comp].black > [svg-type="body"],
-.black {
-  fill: #636060;
-}
-
-g[svg-comp].black > text {
-  fill: white;
-  stroke: white;
-}
-
-.ec.green {
-  stroke: #0d7537;
-  fill: #0d7537;
-}
-
-g[svg-comp].green > [svg-type="body"],
-.green {
-  fill: #88dc88;
+body.dark .ec [svg-type]:hover {
+  stroke: red;
 }
 
 g[svg-comp] > .thick {
@@ -128,22 +335,29 @@ g[svg-comp] > .thick3 {
   stroke-width: 3px;
 }
 
-g[svg-comp] > .no-fill,
-g[svg-comp].selected > .no-fill {
+.ec > .no-fill,
+.ec.selected > .no-fill {
   fill: none;
 }
 
-g[svg-comp] text {
+.ec text {
   fill: black;
   stroke: black;
   stroke-width: 0.5px;
   font-family: monospace;
   font-size: 10px;
 }
+body.dark g text {
+  fill: white;
+  stroke: white;
+}
 g[svg-comp] text.title {
   font-size: 18px;
 }
 
+g[svg-comp] text.middle {
+  font-size: 27px;
+}
 g[svg-comp] text.big {
   font-size: 50px;
 }
@@ -156,12 +370,53 @@ g[svg-comp] > circle.node {
   stroke: red;
 }
 
-.vcc {
-  stroke: red;
+/*selected*/
+
+.ec.selected > [svg-type="body"] {
+  stroke-width: 4px;
+  fill: #b5b3b3;
 }
 
-.gnd {
-  stroke: black;
+/*********** WIRE ***********/
+
+.wire > line,
+.wire > polyline {
+  stroke-width: 2px;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.wire.selected > line,
+.wire.selected > polyline {
+  stroke-width: 5px;
+}
+
+body.light .wire > line,
+body.light .wire > polyline {
+  stroke: rgb(82, 80, 80);
+}
+body.dark .wire > line,
+body.dark .wire > polyline {
+  stroke: whitesmoke;
+}
+
+/*********** GENERAL ***********/
+
+.dash {
+  stroke-width: 1px;
+}
+rect.dash {
+  fill: none;
+}
+
+.light line.dash,
+.light rect.dash {
+  stroke: rgb(150, 150, 150);
+}
+.dark line.dash,
+.dark rect.dash {
+  stroke: rgb(150, 150, 150);
 }
 
 .dragging {
@@ -173,158 +428,52 @@ g[svg-comp] > circle.node {
 }
 
 /*tooltip*/
-g.tooltip > rect {
-  /*#31e8e5;*/
-  fill: #9de8e7;
-  stroke: #3bab68;
+.tooltip > rect {
   stroke-width: 1;
-  /*fill-opacity: 0.5; too light*/
   fill-opacity: 0.9;
   stroke-opacity: 0.9;
 }
-
-g.tooltip > text {
-  fill: #656262;
-  /*color: black;
-		fill-opacity: 1;
-		stroke-opacity: 1;*/
+.light g.tooltip > rect {
+  fill: white;
+  stroke: black;
 }
-
-.hide {
-  display: none;
-}
-
-/*selected*/
-
-.ec.selected > [svg-type="body"] {
-  stroke-width: 3px;
-}
-
-.ec.white.selected > [svg-type="body"] {
-  fill: #f1efef;
-}
-
-.ec.green.selected > [svg-type="body"] {
-  fill: #f1efef;
-}
-
-.ec.black.selected > [svg-type="body"] {
+.dark g.tooltip > rect {
   fill: black;
+  stroke: white;
+}
+.light g.tooltip > text {
+  fill: #656262;
+}
+.dark g.tooltip > text {
+  fill: white;
 }
 
-/*missing*/
+/************************ BODY FOOTER ************************/
 
-/************************ WIRE   ************************/
-
-.wire > line,
-.wire > polyline {
-  stroke-width: 3px;
-  fill: none;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+body.light > footer {
+  padding: 0 6px;
+  background-color: #eaeaea;
+}
+body.dark > footer {
+  padding: 0 6px;
+  color: #e6e1e1;
+  background-color: #969494;
 }
 
-.wire.selected > line,
-.wire.selected > polyline {
-  stroke-width: 5px;
+body > footer > div > h3 {
+  margin: 2px 0px 2px;
 }
-
-.wire.white > line {
-  stroke: whitesmoke;
+body > footer > div > h3 > span {
+  font-size: 12px;
+  font-weight: initial;
 }
-
-.wire.black > line,
-.wire.black > polyline {
-  stroke: rgb(82, 80, 80);
+body > footer > div {
+  height: 100%;
+  line-height: 26px;
 }
-
-.wire.green > line,
-.wire.green > polyline {
-  stroke: #3cbf71;
+body.dark footer select.select-css {
+  color: #e6e1e1;
 }
-
-.wire.red > line,
-.wire.red > polyline {
-  stroke: #fa646c;
-}
-
-.wire.blue > line,
-.wire.blue > polyline {
-  stroke: #479dee;
-}
-
-.wire.yellow > line,
-.wire.yellow > polyline {
-  stroke: #e6e614;
-}
-
-.wire.orange > line,
-.wire.orange > polyline {
-  stroke: orange;
-}
-
-.wire.purple > line {
-  stroke: purple;
-}
-
-.wire.brown > line,
-.wire.brown > polyline {
-  stroke: brown;
-}
-
-.wire.aqua > line,
-.wire.aqua > polyline {
-  stroke: aqua;
-}
-
-.wire.bisque > line,
-.wire.bisque > polyline {
-  stroke: bisque;
-}
-
-.wire.navy > line,
-.wire.navy > polyline {
-  stroke: navy;
-}
-
-.wire.teal > line,
-.wire.teal > polyline {
-  stroke: teal;
-}
-
-.wire.violet > line,
-.wire.violet > polyline {
-  stroke: violet;
-}
-
-.wire > line:hover,
-.wire > polyline:hover,
-.wire.selected > line {
-  /*not used:
-  	stroke: black;
-	filter: brightness(60%) sepia(100%);
-	stroke-dasharray: 10 10;*/
-
-  /*
-  stays to see if it's better with no wire highlight
-  opacity: 0.9;
-  stroke-width: 7px;*/
-}
-
-.wire.wiring > line:hover,
-.wire.wiring > polyline:hover {
-  stroke-width: initial !important;
-}
-
-/*.wire.wiring > line:hover,
-.wire.wiring > polyline:hover {
-  stroke-width: 3px;
-}*/
-
-/*.wire:hover {
-					  stroke: rgb(0, 255, 0);
-					  stroke-width: 10px;
-					}*/
 
 /************************ beautiful scroll bar  ************************/
 
@@ -351,104 +500,7 @@ g.tooltip > text {
   background-color: #555;
 }
 
-/***************************************************************************************/
-
-.no-select {
-  -moz-user-select: -moz-none;
-  -khtml-user-select: none;
-  -webkit-user-select: none;
-  -o-user-select: none;
-  user-select: none;
-}
-.bar {
-  background: linear-gradient(
-    180deg,
-    rgba(150, 150, 150, 1) 28%,
-    rgba(92, 93, 94, 1) 100%
-  ); /*#3988ce;*/
-}
-
-.bar-group {
-  height: 100%;
-}
-
-.bar-item {
-  margin: 0;
-  padding: 7px 8px 7px 8px;
-  border-right: 1px solid #8a8a8a; /*1px solid  #5d98d4;*/
-  color: white;
-  line-height: 26px;
-  height: 100%;
-}
-
-.bar-item * {
-  vertical-align: middle; /* parent must have height: 100%  px em   https://stackoverflow.com/questions/7273338/how-to-vertically-align-an-image-inside-a-div*/
-}
-
-.bar-item.link {
-  cursor: pointer;
-}
-
-.bar-item.selected {
-  background: #76787b; /*#2464a7;*/
-}
-
-.bar-item.link:hover {
-  /*opacity: 0.6;*/
-  background: #616060; /*#73b2eb;*/
-}
-
-.select-css select {
-  padding: 0px 10px;
-  /*appearance: none;
-	  -webkit-appearance: none;  hides arrow*/
-  color: #fff;
-  /* display: block; */
-  font-size: 16px;
-  font-family: sans-serif;
-  background-color: #717171; /*#3988ce;*/
-  border: none !important;
-  line-height: normal;
-}
-.select-css > select > option::select {
-  background-color: #bfc5c5 !important; /*#96dcdc !important;*/
-}
-.select-css select:hover {
-  background-color: #616060; /*#2275bf;*/
-    /*   filter: invert(100%);
-	  color:#bdc6c0;
-	  */
-}
-.select-css select option:checked {
-  background-color: white;
-  color: black;
-}
-.select-css select:focus {
-  outline: none;
-}
-select:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-.bar-item > input {
-  background-color: #717171; /*#3988ce;*/
-  color: white;
-  border: 1px solid #717171; /*#5d98d4;*/
-  padding: 0px 7px;
-  width: 70px;
-}
-#rot-lbl {
-  width: 35px;
-  display: inline-block;
-  text-align: center;
-}
-
 /********************  BASE WINDOW ********************/
-
-.shadow {
-  border-radius: 1px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1), 0 1px 8px rgba(0, 0, 0, 0.2);
-}
 
 .win {
   /*min-width: 100px;
@@ -621,9 +673,13 @@ select:disabled {
 
 /* Right Context window */
 
-.win.ctx {
-  /*background: rgba(0, 0, 0, 0.1);*/
+.light .win.ctx {
   background: rgba(0, 0, 0, 0.4);
+  -webkit-backdrop-filter: blur(7px);
+  backdrop-filter: blur(7px);
+}
+.dark .win.ctx {
+  background: rgba(255, 255, 255, 0.4);
   -webkit-backdrop-filter: blur(7px);
   backdrop-filter: blur(7px);
 }
@@ -639,42 +695,28 @@ select:disabled {
   cursor: pointer;
 }
 
-.win.ctx > div > span {
-  color: #f1f6fd;
+.light .win.ctx > div > span {
+  color: white;
+}
+.dark .win.ctx > div > span {
+  color: #fdfdfd;
 }
 
 .win.ctx > div > span.right {
   float: right;
 }
 
-/*   */
-.win.ctx > div[disabled] {
-  background-color: #ececec;
+.light .win.ctx > div[disabled] {
+  background: rgba(0, 0, 0, 0.1);
+}
+.dark .win.ctx > div[disabled] {
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .win.ctx > div[disabled] > span {
-  color: #c7c3c3;
+  color: #aba8a8;
 }
 
 /*.win.ctx > div[disabled]:hover {
   cursor: not-allowed;
 }*/
-
-/*   */
-.expandable {
-  display: inline-block;
-}
-
-.expandable > span > i {
-  display: none;
-  color: #e9e9ed;
-}
-
-.expandable:hover * {
-  display: inline;
-}
-
-line.dash {
-  stroke: rgb(150, 150, 150);
-  stroke-width: 1px;
-}

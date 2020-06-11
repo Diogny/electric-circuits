@@ -283,10 +283,8 @@
 		}
 	},
 	"data" : "<circle svg-type='body' cx='30' cy='40' r='30'/>
-<text x='15' y='58' class='big'>V</text>
-<path class='gnd' d='M 0,10 H 10'/>
-<path class='vcc' d='M 70,10 H 60'/>
-<path class='vcc' d='M 65,5 V 15'/>"
+<path class='no-fill' d='M 0,10 H 10'/>
+<path class='no-fill' d='M 65,10 H55 M 60,5 V15'></path>"
 },
 {
 	"type" : "power",
@@ -298,6 +296,12 @@
 	},
 	"tmpl" : {
 		"name" : "gen_power",
+		"label" : {
+			"x" : 5,
+			"y" : 48,
+			"class" : "middle",
+			"text" : "3V3"
+		},
 		"nodeLabels" : ["GND", "3.3V VCC"]
 	}
 },
@@ -311,6 +315,12 @@
 	},
 	"tmpl" : {
 		"name" : "gen_power",
+		"label" : {
+			"x" : 12,
+			"y" : 48,
+			"class" : "middle",
+			"text" : "5V"
+		},
 		"nodeLabels" : ["GND", "5V VCC"]
 	}
 },
@@ -538,7 +548,7 @@
 		}
 	},
 	"data" :"<rect svg-type='body' x='0' y='0' width='60' height='60'/>
-<path class='no-fill' d='M 0,25 H5 V45 H0'/>"
+<path class='no-fill' d='M 0,20 H5 V40 H0'/>"
 },
 {
 	"type" : "dip",
@@ -563,7 +573,7 @@
 		}
 	},
 	"data" : "<rect svg-type='body' x='0' y='0' width='80' height='60'/>
-<path class='no-fill' d='M 0,25 H5 V45 H0'></path>"
+<path class='no-fill' d='M 0,20 H5 V40 H0'></path>"
 },
 {
 	"type" : "dip",
@@ -610,7 +620,7 @@
 		}
 	},
 	"data": "<rect svg-type='body' x='0' y='0' width='100' height='60'/>
-<path class='no-fill' d='M 0,25 H5 V45 H0'></path>"
+<path class='no-fill' d='M 0,20 H5 V40 H0'></path>"
 },
 {
 	"type" : "dip",
@@ -639,7 +649,7 @@
 		}
 	},
 	"data" : "<rect svg-type='body' x='0' y='0' width='120' height='60'/>
-<path class='no-fill' d='M 0,25 H5 V45 H0'></path>"
+<path class='no-fill' d='M 0,20 H5 V40 H0'></path>"
 },
 {
 	"type" : "dip",
@@ -670,7 +680,7 @@
 		}
 	},
 	"data" : "<rect svg-type='body' x='0' y='0' width='140' height='60'/>
-<path class='no-fill' d='M 0,25 H5 V45 H0'></path>"
+<path class='no-fill' d='M 0,20 H5 V40 H0'></path>"
 },
 {
 	"type" : "ic",
@@ -726,7 +736,7 @@
 		}
 	},
 	"data" : "<rect svg-type='body' x='0' y='0' width='160' height='60'/>
-<path class='no-fill' d='M 0,25 H5 V45 H0'></path>"
+<path class='no-fill' d='M 0,20 H5 V40 H0'></path>"
 },
 {
 	"type": "dip",
@@ -777,7 +787,7 @@
 		}
 	},
 	"data": "<rect svg-type='body' x='0' y='0' width='280' height='60'/>
-<path class='no-fill' d='M 0,25 H5 V45 H0'></path>"
+<path class='no-fill' d='M 0,20 H5 V40 H0'></path>"
 },
 {
 	"type" : "capacitor",
@@ -978,9 +988,7 @@
 			]
 		}
 	},
-	"data" : "<rect svg-type='body' x='15' y='0' width='20' height='4'/>
-<rect svg-type='body' x='23' y='4' width='4' height='11'/>
-<rect svg-type='body' x='0' y='15' width='50' height='10'/>
+	"data" : "<path svg-type='body' d='M 0,25 H50 V15 H40 Q 25,0 10,15 H0 Z'></path>
 <circle svg-type='body' cx='6' cy='40' r='5'/>
 <circle svg-type='body' cx='45' cy='40' r='5'/>"
 },

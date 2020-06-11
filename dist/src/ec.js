@@ -67,7 +67,6 @@ var EC = /** @class */ (function (_super) {
                 name: _this.name,
                 x: _this.x,
                 y: _this.y,
-                color: _this.color,
                 rotation: _this.rotation
             },
             method: 'create',

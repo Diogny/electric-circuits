@@ -97,7 +97,6 @@ export default class Wire extends ItemBoard {
 				name: this.name,
 				x: this.x,
 				y: this.y,
-				color: this.color,
 				points: this.settings.points,
 				bonds: '[' + this.bonds.map((b) => b.link).join(', ') + ']'
 			},
@@ -303,7 +302,6 @@ export default class Wire extends ItemBoard {
 			class: "wire",
 			highlightNodeName: "node",
 			pad: 5,					// radius of the highlight circle
-			color: "black",
 			edit: false					// initial is false
 		})
 	}

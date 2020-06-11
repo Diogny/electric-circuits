@@ -43,6 +43,10 @@ Used in my testing website [Electric Circuits](http://diogny.com/tests/circuits.
 
 ![working example](dist/img/img09.png)
 
+![working example](dist/img/img10.png)
+
+![working example](dist/img/img11.png)
+
 ### install development packajes
 	pnpm install --save-dev tsconfig-paths-webpack-plugin
 	pnpm install electron-reload --save-dev
@@ -82,6 +86,6 @@ Used in my testing website [Electric Circuits](http://diogny.com/tests/circuits.
 	git add -u					stage the modified and deleted files
 	git add -A
 	git commit -m "update message"
-	git tag v1.1.4
+	git tag v1.1.5
 	git push origin master --tags
 

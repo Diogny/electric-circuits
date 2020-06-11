@@ -1,7 +1,7 @@
 import ItemBase from "./itemsBase";
 import { Type } from "./types";
 import { ITooltipSettings, ISize, ILabelText } from "./interfaces";
-import { obj, removeClass, aCld, attr, extend } from "./dab";
+import { obj, aCld, attr, extend } from "./dab";
 import { tag } from "./utils";
 
 export class Label extends ItemBase {
@@ -27,8 +27,6 @@ export class Label extends ItemBase {
 		options.visible = false;
 		super(options);
 		this.text = '';
-		//remove color class, not needed for a Tooltip text
-		removeClass(this.g, this.color);
 		//create label
 		this.t = <SVGTextElement>tag("text", "", {});
 		aCld(this.g, this.t);

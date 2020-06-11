@@ -68,7 +68,6 @@ export default class EC extends ItemSolid {
 				name: this.name,
 				x: this.x,
 				y: this.y,
-				color: this.color,
 				rotation: this.rotation
 			},
 			method: 'create',

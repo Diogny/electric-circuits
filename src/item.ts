@@ -1,6 +1,5 @@
 import { ISize, IItemBaseOptions } from "./interfaces";
 import Point from "./point";
-import { Color, Colors } from "./colors";
 import { obj, copy, unique } from "./dab";
 import { TypedClass } from "./types";
 
@@ -15,7 +14,6 @@ export default abstract class Item extends TypedClass {
 	get y(): number { return this.settings.y }
 	get p(): Point { return new Point(this.x, this.y) }
 	get class(): string { return this.settings.class }
-	get color(): string { return this.settings.color }
 	get visible(): boolean { return this.settings.visible; }
 
 	abstract get ClientRect(): ISize;
@@ -36,8 +34,6 @@ export default abstract class Item extends TypedClass {
 		//fix (x,y) coordinates if wrongly initially provided
 		this.settings.x = this.settings.x || 0;
 		this.settings.y = this.settings.y || 0;
-		//fix color if wrongly provided, default is "white"
-		this.settings.color = Color.getcolor(this.color, Colors.white)
 	}
 
 	public setVisible(value: boolean): Item {
@@ -65,7 +61,6 @@ export default abstract class Item extends TypedClass {
 			name: "",
 			x: 0,
 			y: 0,
-			color: "white",		//default color
 			class: "",
 			visible: true,		//defaults is visible
 		}
