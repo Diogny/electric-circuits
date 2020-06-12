@@ -1,6 +1,7 @@
 import { ipcRenderer } from "electron";
 import { templatesDOM, qSA, qS } from "./src/utils"
 import * as fs from 'fs';
+import * as xml2js from 'xml2js';
 import {
 	IComponentOptions, IApplicationOptions, StateType as State, ActionType as Action,
 	IMachineState, IMouseState, IItemWireOptions, IPoint, IItemSolidOptions, IItemNode
@@ -16,7 +17,7 @@ import { ItemBoard } from "./src/itemsBoard";
 import Size from "src/size";
 import EC from "src/ec";
 import Rect from "src/rect";
-import Bond from "src/bonds";
+import { Bond } from "src/bonds";
 
 let
 	app: MyApp;
@@ -24,7 +25,7 @@ let
 //https://www.electronjs.org/docs/tutorial/security
 
 function createEC(name: string): EC {
-	return new EC(<IItemSolidOptions><unknown>{
+	return new EC(app.circuit, <IItemSolidOptions><unknown>{
 		name: name,
 		x: app.center.x,
 		y: app.center.y,
@@ -57,9 +58,17 @@ function hookEvents() {
 	aEL(qS('.bar-item[rot-dir="right"]'), "click", () => app.rotateEC(45), false);
 	//add component
 	aEL(qS('.bar-item[action="comp-create"]'), "click", () =>
-		app.addComponent(createEC(<string>app.prop("comp_option").value)), false);
+		app.circuit.add(createEC(<string>app.prop("comp_option").value), (ec: EC) => {
+			app.addECtoDOM(ec)
+		}), false);
 	//ViewBox Reset
 	aEL(qS('.bar-item[tool="vb-focus"]'), "click", () => setViewBoxOrigin(Point.origin), false);
+	//File Open
+	aEL(qS('.bar-item[file="open"]'), "click", () => {
+		console.log('load: ', ipcRenderer.sendSync('openFile', ""))
+	}, false);
+	//Save File
+	aEL(qS('.bar-item[file="save"]'), "click", () => saveCircuit(), false);
 }
 
 function setViewBoxOrigin(p: Point) {
@@ -76,7 +85,7 @@ function getWireConnections(wire: Wire): Point[] {
 		findComponents = (bond: Bond) => {
 			bond.to.forEach(b => {
 				let
-					w = Comp.item(b.id);
+					w = app.circuit.get(b.id);
 				if (!w)
 					throw `Invalid bond connections`;
 				switch (b.type) {
@@ -243,13 +252,7 @@ function registerStates() {
 				if (app.sm.data.selection) {
 					app.sm.data.selection = false;
 					//console.log('ending: ', app.selection.rect);
-					(app.selectedComponents =
-						Comp.itemCollection
-							.filter((item) => {
-								return (item.type == Type.EC)
-									&& app.selection.rect.intersect(item.rect())
-							}))
-						.forEach(item => item.select(true));
+					app.circuit.selectRect(app.selection.rect);
 					app.selection.hide();
 				}
 			},
@@ -310,7 +313,7 @@ function registerStates() {
 					newCtx.ctrlKey ?
 						Action.TOGGLE_SELECT :  // Ctrl+click	=> toggle select
 						Action.SELECT,  		// click		=> select one
-					[newCtx.it.id, newCtx.it.name, "body"].join('::'));
+					[newCtx.it?.id, newCtx.it?.name, "body"].join('::'));
 			},
 			//transitions
 			START: function (newCtx: IMouseState) {
@@ -331,7 +334,7 @@ function registerStates() {
 						p = Point.minus(newCtx.offset, comp.offset);
 					comp.ec.move(p.x, p.y);
 				});
-				(app.ec?.id == app.winProps.compId) && app.winProps.property("p")?.refresh();
+				(app.circuit.ec?.id == app.winProps.compId) && app.winProps.property("p")?.refresh();
 			},
 			OUT: function () {
 				//has to be empty so dragging is not STOP when passing over another component
@@ -346,19 +349,22 @@ function registerStates() {
 			START: function (newCtx: IMouseState) {
 				let
 					self = this as StateMachine,
-					it = self.data.it;
-				!app.selectedComponents.some(comp => comp.id == newCtx.it.id) &&
-					(app.execute(Action.SELECT_ONLY, `${newCtx.it.id}::${newCtx.it.name}::body`));
+					it = self.data.it,
+					newCtxIt = <ItemBoard>newCtx.it;
+				if (!newCtxIt)
+					throw `EC_DRAG on undefined EC`;
+				!app.circuit.selectedComponents.some(comp => comp.id == newCtxIt.id) &&
+					(app.execute(Action.SELECT_ONLY, `${newCtxIt.id}::${newCtxIt.name}::body`));
 				self.data = {
 					it: it,
 					className: "dragging",
-					dragging: app.selectedComponents.map(comp => ({
+					dragging: app.circuit.selectedComponents.map(comp => ({
 						ec: comp,
 						offset: Point.minus(newCtx.offset, comp.p)
 					}))
 				};
 				addClass(app.svgBoard, self.data.className);
-				hideNodeTooltip(newCtx.it);
+				hideNodeTooltip(newCtxIt);
 				app.rightClick.setVisible(false);
 			},
 		}
@@ -488,16 +494,16 @@ function registerStates() {
 			//transitions
 			START: function () {
 				let
-					ec = (app.sm.data.start.it as EC),
+					ec = (app.sm.data.start.it as ItemBoard),
 					node = app.sm.data.start.node,
-					pos = ec.getNode(node),
-					p = new Point(pos.x, pos.y);
+					pos = app.sm.data.start.fromWire ? ec.getNode(node) : (ec as EC).getNodeRealXY(node);
 				app.highlight.hide();
-				p = Point.plus(p, ec.p);
-				app.sm.data.wire = new Wire(<IItemWireOptions>{
-					points: <IPoint[]>[p, p]
+				app.sm.data.wire = new Wire(app.circuit, <IItemWireOptions>{
+					points: <IPoint[]>[pos, pos]
 				});
-				app.addComponent(app.sm.data.wire);
+				app.circuit.add(app.sm.data.wire, (wire: Wire) => {
+					app.addWiretoDOM(wire)
+				});
 				app.sm.data.wire.bond(0, ec, node);
 				app.execute(Action.UNSELECT_ALL, "");
 				app.sm.data.selectedItem = undefined;
@@ -680,7 +686,7 @@ function registerStates() {
 				let
 					screenBounds = Rect.create(app.viewBox),
 					id = app.sm.data.it.id;
-				app.sm.data.list = Comp.itemCollection
+				app.sm.data.list = app.circuit.components
 					.filter(item => item.id != id)
 					.map((item) => {
 						let
@@ -751,7 +757,6 @@ window.addEventListener("DOMContentLoaded", () => {
 	//load DOM script HTML templates
 	templatesDOM("viewBox01|size01|point01|baseWin01|ctxWin01|ctxItem01|propWin01")
 		.then(async (templates: Object) => {
-			const d = await ipcRenderer.invoke('shared', 'app'); console.log("global.app =", d)
 			let
 				json = readJson('./dist/data/library-circuits.v2.json');
 			json.forEach((element: IComponentOptions) => {
@@ -862,6 +867,39 @@ function updateViewBox(arg: any) {
 	app.setViewBox(<any>undefined);
 }
 
+ipcRenderer.on('fileData', (event, data) => {
+	xml2js.parseString(data, { trim: true }, (err, result) => {
+		if (err)
+			console.log(err);
+		else
+			console.log(result)
+	})
+	//console.log('file content:', data)
+})
+
+function saveCircuit(): boolean {
+	let
+		answer = ipcRenderer.sendSync('saveFile', app.circuit.XML());
+	console.log('save: ', answer);
+	//for now only abort if canceled, later ask again if couldn't save because an error
+	app.circuit.modified = !!answer.canceled;
+	//
+	return !answer.canceled;
+}
+
+ipcRenderer.on("check-before-exit", (event, arg) => {
+	let
+		choice = app.circuit.modified ?
+			ipcRenderer.sendSync('save-dialog', app.circuit.XML()) : 2;
+	if (choice == 1)
+		return
+	else if (choice == 0) {
+		if (!saveCircuit())
+			return;
+	}
+	ipcRenderer.send('app-quit', '')
+});
+
 //this's a proof of concept of how to communicate with main process, the recommended NEW way...
 //	function updateViewBox(arg: any) built this way
 ipcRenderer.on("win-resize", (event, arg) => {
@@ -873,3 +911,19 @@ ipcRenderer.on('asynchronous-reply', (event, arg) => {
 })
 ipcRenderer.send('asynchronous-message', 'ping')
 //remote.getGlobal('sharedObj')	will be deprecated soon
+
+/*
+let
+				a = await ipcRenderer.invoke('shared', 'app');
+			console.log("global.app =", a);
+
+			console.log("global.app.circuit.modified =",
+				await ipcRenderer.invoke('shared-data', ['app.circuit.modified']));
+
+			console.log("global.app.circuit.modified = true; =>",
+				await ipcRenderer.invoke('shared-data', ['app.circuit.modified', true]));
+
+			console.log("global.app.circuit.modified =",
+				await ipcRenderer.invoke('shared-data', ['app.circuit.modified']));
+
+				*/

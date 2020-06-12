@@ -24,12 +24,12 @@ var tooltip_1 = require("./tooltip");
 var dab_1 = require("./dab");
 var app_window_1 = require("./app-window");
 var stateMachine_1 = require("./stateMachine");
-var components_1 = require("./components");
 var context_window_1 = require("./context-window");
 var types_1 = require("./types");
 var linealign_1 = require("./linealign");
 var highlightNode_1 = require("./highlightNode");
 var selection_rect_1 = require("./selection-rect");
+var circuit_1 = require("./circuit");
 var MyApp = /** @class */ (function (_super) {
     __extends(MyApp, _super);
     function MyApp(options) {
@@ -68,7 +68,7 @@ var MyApp = /** @class */ (function (_super) {
                 ctrlKey: ev.ctrlKey,
                 shiftKey: ev.shiftKey,
                 altKey: ev.altKey,
-                it: components_1.default.item(parent.id)
+                it: that.circuit.get(parent.id)
             };
             //post actions
             switch (state.over.type) {
@@ -96,8 +96,6 @@ var MyApp = /** @class */ (function (_super) {
             that.topBarLeft.innerHTML = arr.join(", ");
             return state;
         };
-        _this.compList = new Map();
-        _this.selectedComponents = [];
         _this.viewBox = rect_1.default.empty(); //location is panning, size is for scaling
         _this.multiplier = 0.5; //scaling multipler 2X UI default
         _this.ratio = window.screen.width / window.screen.height; //this's a const value
@@ -112,6 +110,7 @@ var MyApp = /** @class */ (function (_super) {
         _this.dash = new linealign_1.default(_this);
         _this.highlight = new highlightNode_1.default({});
         _this.selection = new selection_rect_1.SelectionRect(_this);
+        _this.circuit = new circuit_1.Circuit(_this, "my circuit");
         //this'll hold the properties of the current selected component
         _this.winProps = new app_window_1.default({
             app: _this,
@@ -183,7 +182,7 @@ var MyApp = /** @class */ (function (_super) {
             //test for highlightNode
             (compName == "h-node") &&
                 (id = that.highlight.selectedId,
-                    comp = components_1.default.item(id),
+                    comp = that.circuit.get(id),
                     compName = comp.type == types_1.Type.WIRE ? "wire" : "ec",
                     (nodeOrLine != that.highlight.selectedNode && console.log("node: " + nodeOrLine + " <> " + that.highlight.selectedNode)));
             key = that.rightClick.setTrigger(id, compName, type, isNaN(nodeOrLine) ? undefined : nodeOrLine);
@@ -217,14 +216,6 @@ var MyApp = /** @class */ (function (_super) {
         enumerable: false,
         configurable: true
     });
-    Object.defineProperty(MyApp.prototype, "ec", {
-        //has value if only one comp selected, none or multiple has undefined
-        get: function () {
-            return this.selectedComponents.length == 1 ? this.selectedComponents[0] : void 0;
-        },
-        enumerable: false,
-        configurable: true
-    });
     MyApp.prototype.insideBoard = function (p) {
         //later include panning
         return p.x > 0 && p.y > 0 && p.x < this.viewBox.width && p.y < this.viewBox.height;
@@ -250,23 +241,18 @@ var MyApp = /** @class */ (function (_super) {
         var ratio = width / height;
         return (Math.abs(ratio - 4 / 3) < Math.abs(ratio - 16 / 9)) ? '4:3' : '16:9';
     };
-    MyApp.prototype.hasComponent = function (id) { return this.compList.has(id); };
-    MyApp.prototype.addComponent = function (comp) {
-        if (comp) {
-            if (this.hasComponent(comp.id))
-                throw "duplicated component " + comp.id;
-            this.compList.set(comp.id, comp);
-            //add it to SVG DOM
-            (comp.type == types_1.Type.WIRE) ?
-                this.dash.g.insertAdjacentElement("afterend", comp.g) :
-                this.svgBoard.insertBefore(comp.g, this.tooltip.g);
-            //do after DOM inserted work
-            comp.afterDOMinserted();
-        }
-        return comp;
+    MyApp.prototype.addECtoDOM = function (ec) {
+        this.svgBoard.insertBefore(ec.g, this.tooltip.g);
+        //do after DOM inserted work
+        ec.afterDOMinserted();
+    };
+    MyApp.prototype.addWiretoDOM = function (wire) {
+        this.dash.g.insertAdjacentElement("afterend", wire.g);
+        //do after DOM inserted work
+        wire.afterDOMinserted();
     };
     MyApp.prototype.rotateEC = function (angle) {
-        this.rotateComponentBy(angle, this.ec);
+        this.rotateComponentBy(angle, this.circuit.ec);
     };
     MyApp.prototype.rotateComponentBy = function (angle, comp) {
         if (!comp || comp.type != types_1.Type.EC)
@@ -282,68 +268,50 @@ var MyApp = /** @class */ (function (_super) {
     };
     //public execute({ action, trigger, data }: { action: ActionType; trigger: string; data?: any; }) {
     MyApp.prototype.execute = function (action, trigger) {
-        var _this = this;
-        var arr = trigger.split('::'), comp = components_1.default.item(arr.shift()), name = arr.shift(), type = arr.shift(), nodeOrLine = parseInt(arr.shift()), data = arr.shift(), compNull = false, selectAll = function (value) {
-            var arr = Array.from(_this.compList.values());
-            arr.forEach(function (comp) { return comp.select(value); });
-            return arr;
-        };
+        var arr = trigger.split('::'), comp = this.circuit.get(arr.shift()), name = arr.shift(), type = arr.shift(), nodeOrLine = parseInt(arr.shift()), data = arr.shift(), compNull = false;
         //this's a temporary fix to make it work
         //	final code will have a centralized action dispatcher
         switch (action) {
             case interfaces_1.ActionType.TOGGLE_SELECT:
-                if (!(compNull = !comp)) {
-                    comp.select(!comp.selected);
-                    this.selectedComponents = Array.from(this.compList.values()).filter(function (c) { return c.selected; });
-                    this.refreshRotation(this.ec);
-                    (this.ec && (this.winProps.load(this.ec), 1)) || this.winProps.clear();
+                if (!(compNull = !comp) && comp.type == types_1.Type.EC) {
+                    this.circuit.toggleSelect(comp);
+                    this.refreshRotation(this.circuit.ec);
+                    (this.circuit.ec && (this.winProps.load(this.circuit.ec), 1)) || this.winProps.clear();
                     //temporary, for testings...
-                    this.ec && (window.ec = this.ec);
+                    this.circuit.ec && (window.ec = this.circuit.ec);
                 }
                 break;
             case interfaces_1.ActionType.SELECT:
             case interfaces_1.ActionType.SELECT_ONLY:
-                if (!(compNull = !comp)) {
-                    selectAll(false);
-                    this.selectedComponents = [comp.select(true)];
+                if (!(compNull = !comp) && comp.type == types_1.Type.EC) {
+                    this.circuit.selectThis(comp);
                     this.refreshRotation(comp);
                     ((action == interfaces_1.ActionType.SELECT) && (this.winProps.load(comp), 1)) || this.winProps.clear();
                     //temporary, for testings...
-                    window.ec = this.ec;
+                    window.ec = this.circuit.ec;
                 }
                 break;
             case interfaces_1.ActionType.SELECT_ALL:
-                this.selectedComponents = selectAll(true);
+                this.circuit.selectAll();
                 this.refreshRotation();
                 this.winProps.clear();
                 //temporary, for testings...
                 window.ec = void 0;
                 break;
             case interfaces_1.ActionType.UNSELECT_ALL:
-                selectAll(false);
-                this.selectedComponents = [];
+                this.circuit.deselectAll();
                 this.refreshRotation();
                 this.winProps.clear();
                 //temporary, for testings...
                 window.ec = void 0;
                 break;
             case interfaces_1.ActionType.DELETE_SELECTED:
-                var selectedCount = this.selectedComponents.length, deletedCount_1 = 0;
-                this.selectedComponents = this.selectedComponents.filter(function (c) {
-                    if (_this.compList.delete(c.id)) {
-                        //disconnects and remove component from DOM
-                        c.disconnect();
-                        c.remove();
-                        deletedCount_1++;
-                        return false;
-                    }
-                    return true;
-                });
+                var selectedCount = this.circuit.selectedComponents.length, deletedCount = this.circuit.deleteSelected();
                 this.refreshRotation();
                 this.winProps.clear().setVisible(false);
                 this.tooltip.setVisible(false);
-                if (selectedCount != deletedCount_1) {
-                    console.log("[" + deletedCount_1 + "] components of [" + selectedCount + "]");
+                if (selectedCount != deletedCount) {
+                    console.log("[" + deletedCount + "] components of [" + selectedCount + "]");
                 }
                 //temporary, for testings...
                 window.ec = void 0;
@@ -351,10 +319,7 @@ var MyApp = /** @class */ (function (_super) {
             case interfaces_1.ActionType.DELETE:
                 //only comp if sent
                 if (!(compNull = !comp)) {
-                    if (this.compList.delete(comp.id)) {
-                        //disconnects and remove component from DOM
-                        comp.disconnect();
-                        comp.remove();
+                    if (this.circuit.delete(comp)) {
                         this.refreshRotation();
                         this.winProps.clear().setVisible(false);
                         this.tooltip.setVisible(false);

@@ -1,13 +1,13 @@
 import { attr, obj, extend, aCld } from './dab';
 import { each, tag } from './utils';
 import { Type } from './types';
-import Comp from './components';
-import Bond from './bonds';
+import { Bond } from './bonds';
 import Point from './point';
 import { IItemSolidOptions, IPoint, IItemNode, IItemBoardProperties } from './interfaces';
 import { ItemSolid } from './itemSolid';
 import Rect from './rect';
 import { Label } from './label';
+import { Circuit } from './circuit';
 
 export default class EC extends ItemSolid {
 
@@ -21,8 +21,8 @@ export default class EC extends ItemSolid {
 		return this.base.meta.nodes.list.length
 	}
 
-	constructor(options: IItemSolidOptions) {
-		super(options);
+	constructor(circuit: Circuit, options: IItemSolidOptions) {
+		super(circuit, options);
 		//this ensures all path, rect, circles are inserted before the highlight circle node
 		//_.svg is used because _.html doesn't work for SVG
 		this.g.innerHTML = this.base.data;
@@ -58,7 +58,6 @@ export default class EC extends ItemSolid {
 			});
 			this.labelSVG.setText(this.label);
 		}
-		//this shows dragx, dragy, and rotate
 		this.refresh();
 		//signal component creation
 		this.onProp && this.onProp({
@@ -73,40 +72,31 @@ export default class EC extends ItemSolid {
 			method: 'create',
 			where: 1			//signals it was a change inside the object
 		});
-		//
-		Comp.save(this);
 	}
 
 	public rotate(value: number): EC {
 		super.rotate(value);
-		//refresh properties and object chaining
 		return this.refresh();
 	}
 
 	public move(x: number, y: number): EC {
 		super.move(x, y);
-		//refresh properties and object chaining
 		return this.refresh();
 	}
 
 	public refresh(): EC {
 		let
 			attrs: any = {
-				//dragx: this.x,
-				//dragy: this.y,
 				transform: `translate(${this.x} ${this.y})`
 			},
 			center = this.origin;
 		if (this.rotation) {
 			attrs.transform += ` rotate(${this.rotation} ${center.x} ${center.y})`
 		}
-		//update SVG DOM attributes
 		attr(this.g, attrs);
-		//refreshBonds
 		each(this.bonds, (b: Bond, key: any) => {
 			this.nodeRefresh(key);
 		});
-		//update label if any
 		if (this.labelSVG) {
 			let
 				pos = Point.plus(this.p, this.labelSVG.p);
@@ -128,7 +118,7 @@ export default class EC extends ItemSolid {
 			pos = this.getNode(node);
 		pos && bond && bond.to.forEach((d) => {
 			let
-				ic = Comp.item(d.id),
+				ic = this.circuit.get(d.id), 
 				p = Point.plus(this.p, this.rotation ? pos.rot : pos).round();
 			ic && ic.setNode(d.ndx, p)	//no transform
 		});
@@ -160,10 +150,6 @@ export default class EC extends ItemSolid {
 	}
 
 	public overNode(p: IPoint, ln: number): number {
-		let
-			px = (p.x - this.x) - 5,
-			py = (p.y - this.y) - 5,
-			rect = new Rect(px, py, 10, 10);
 		for (let i = 0, len = this.count; i < len; i++) {
 			let
 				pin = this.getNode(i);
@@ -229,7 +215,6 @@ export default class EC extends ItemSolid {
 	public propertyDefaults(): IItemBoardProperties {
 		return extend(super.propertyDefaults(), {
 			class: "ec",
-			highlightNodeName: "node"
 		})
 	}
 }

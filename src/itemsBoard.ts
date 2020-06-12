@@ -1,13 +1,14 @@
 import { condClass, obj, attr, extend, isFn, isNum } from './dab';
-import Bond from './bonds';
+import { Bond } from './bonds';
 import ItemBase from './itemsBase';
 import Comp from './components';
 import {
-	IPoint, IItemNode, IItemBoardOptions, IBondItem, IItemBoardProperties,
-	ComponentPropertyType, IComponentProperty
+	IPoint, IItemNode, IBondItem, IItemBoardProperties,
+	ComponentPropertyType, IComponentProperty, IItemBaseOptions
 } from './interfaces';
 import { map } from './utils';
 import Point from './point';
+import { Circuit } from './circuit';
 
 //ItemBoard->Wire
 export abstract class ItemBoard extends ItemBase {
@@ -22,14 +23,14 @@ export abstract class ItemBoard extends ItemBase {
 	label: string;
 	abstract get count(): number;	// EC is node count, Wire is point count
 
-	constructor(options: IItemBoardOptions) {
+	constructor(public circuit: Circuit, options: IItemBaseOptions) {
 		super(options);
 		let
 			base = Comp.find(this.name, true),
 			regex = /(?:{([^}]+?)})+/g,
 			that = this;
-		if (!base)
-			throw `unknown component: ${this.name}`;
+		if (!base || !this.circuit)
+			throw `cannot create component: ${this.name}`;
 		//save base data
 		this.settings.base = base.comp;
 		//global component count incremented
@@ -150,6 +151,7 @@ export abstract class ItemBoard extends ItemBase {
 		} else if (!entry.add(ic, icNode)) {
 			console.log('Oooopsie!')
 		}
+		this.settings.bondsCount++;
 		//refresh this node
 		this.nodeRefresh(thisNode);
 
@@ -174,11 +176,12 @@ export abstract class ItemBoard extends ItemBase {
 			if (bond.count == 0) {
 				//ensures there's no bond object if no destination
 				delete (<any>this.settings.bonds)[node];
+				(--this.settings.bondsCount == 0) && (this.settings.bonds = []);
 			}
 			//refresh this item node
 			this.nodeRefresh(node);
 			let
-				ic = Comp.item(id);
+				ic = this.circuit.get(id);
 			ic && ic.unbond(b.ndx, this.id);
 		}
 	}
@@ -192,9 +195,10 @@ export abstract class ItemBoard extends ItemBase {
 		//try later to use bond.to.forEach, it was giving an error with wire node selection, think it's fixed
 		for (let i = 0, len = bond.to.length; i < len; i++) {
 			link = bond.to[i];
-			Comp.item(link.id)?.unbond(link.ndx, bond.from.id);
+			this.circuit.get(link.id)?.unbond(link.ndx, bond.from.id);
 		}
-		delete (<any>this.settings.bonds)[node]
+		delete (<any>this.settings.bonds)[node];
+		(--this.settings.bondsCount == 0) && (this.settings.bonds = []);
 	}
 
 	public disconnect() {
@@ -219,7 +223,8 @@ export abstract class ItemBoard extends ItemBase {
 		return extend(super.propertyDefaults(), {
 			selected: false,
 			onProp: void 0,
-			bonds: []
+			bonds: [],
+			bondsCount: 0
 		})
 	}
 }

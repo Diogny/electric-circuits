@@ -42,8 +42,8 @@ exports.RotationInjector = RotationInjector;
 //ItemBoard->ItemSolid->EC
 var ItemSolid = /** @class */ (function (_super) {
     __extends(ItemSolid, _super);
-    function ItemSolid(options) {
-        var _this = _super.call(this, options) || this;
+    function ItemSolid(circuit, options) {
+        var _this = _super.call(this, circuit, options) || this;
         //I've to set new properties always, because super just copy defaults()
         //later override method propertyDefaults()
         _this.settings.rotation = point_1.default.validateRotation(options.rotation);

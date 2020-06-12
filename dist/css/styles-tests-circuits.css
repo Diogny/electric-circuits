@@ -115,7 +115,7 @@ body.light .bar-item {
   color: #7f7c7c;
 }
 body.dark .bar-item {
-  border-right: 1px solid #8a8a8a; /*1px solid  #5d98d4;*/
+  border-right: 1px solid #a9a5a5; /*1px solid  #5d98d4;*/
   color: white;
 }
 
@@ -201,6 +201,20 @@ body.light .bar-item[tool="vb-focus"] > .icon {
 }
 body.dark .bar-item[tool="vb-focus"] > .icon {
   background: url(../img/focus16x16.png) no-repeat;
+}
+
+body.light .bar-item[file="open"] > .icon {
+  background: url(../img/file-open16x16-dark.png) no-repeat;
+}
+body.dark .bar-item[file="open"] > .icon {
+  background: url(../img/file-open16x16.png) no-repeat;
+}
+
+body.light .bar-item[file="save"] > .icon {
+  background: url(../img/file-save16x16-dark.png) no-repeat;
+}
+body.dark .bar-item[file="save"] > .icon {
+  background: url(../img/file-save16x16.png) no-repeat;
 }
 
 /*   */
@@ -532,7 +546,7 @@ body.dark footer select.select-css {
 /* HEADER */
 .win.props > header {
   background: rgba(0, 0, 0, 0.12);
-  color: #756a6a;
+  /*color: black;*/
   position: relative;
   line-height: 18px;
 }

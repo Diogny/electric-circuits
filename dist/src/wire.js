@@ -17,13 +17,12 @@ var dab_1 = require("./dab");
 var utils_1 = require("./utils");
 var types_1 = require("./types");
 var itemsBoard_1 = require("./itemsBoard");
-var components_1 = require("./components");
 var point_1 = require("./point");
 var rect_1 = require("./rect");
 var Wire = /** @class */ (function (_super) {
     __extends(Wire, _super);
-    function Wire(options) {
-        var _this = _super.call(this, options) || this;
+    function Wire(circuit, options) {
+        var _this = _super.call(this, circuit, options) || this;
         _this.settings.polyline = utils_1.tag("polyline", "", {
             "svg-type": "line",
             line: "0",
@@ -55,7 +54,6 @@ var Wire = /** @class */ (function (_super) {
             method: 'create',
             where: 1 //signals it was a change inside the object
         });
-        components_1.default.save(_this);
         return _this;
     }
     Object.defineProperty(Wire.prototype, "type", {
@@ -84,6 +82,11 @@ var Wire = /** @class */ (function (_super) {
         configurable: true
     });
     Wire.prototype.rect = function () { return rect_1.default.create(this.box); };
+    Object.defineProperty(Wire.prototype, "points", {
+        get: function () { return Array.from(this.settings.points); },
+        enumerable: false,
+        configurable: true
+    });
     Object.defineProperty(Wire.prototype, "editMode", {
         //edit-mode
         get: function () { return this.settings.edit; },
@@ -137,6 +140,7 @@ var Wire = /** @class */ (function (_super) {
         return this;
     };
     Wire.prototype.nodeRefresh = function (node) {
+        var _this = this;
         if (this.editMode) {
             //update lines  only if in edit mode
             var ln = void 0, p = this.settings.points[node];
@@ -151,7 +155,7 @@ var Wire = /** @class */ (function (_super) {
             var bond = this.nodeBonds(node), p_1 = this.settings.points[node];
             bond && bond.to.forEach(function (b) {
                 var _a;
-                (_a = components_1.default.item(b.id)) === null || _a === void 0 ? void 0 : _a.setNode(b.ndx, p_1);
+                (_a = _this.circuit.get(b.id)) === null || _a === void 0 ? void 0 : _a.setNode(b.ndx, p_1);
             });
         }
         return this;
@@ -292,7 +296,6 @@ var Wire = /** @class */ (function (_super) {
         return dab_1.extend(_super.prototype.propertyDefaults.call(this), {
             name: "wire",
             class: "wire",
-            highlightNodeName: "node",
             pad: 5,
             edit: false // initial is false
         });
@@ -318,7 +321,7 @@ function fixBondIndexes(node, newIndex) {
     lastBond.from.ndx = newIndex;
     //because it's a wire last node, it has only one destination, so fix all incoming indexes
     lastBond.to.forEach(function (bond) {
-        var compTo = components_1.default.item(bond.id), compToBonds = compTo === null || compTo === void 0 ? void 0 : compTo.nodeBonds(bond.ndx);
+        var compTo = _this.circuit.get(bond.id), compToBonds = compTo === null || compTo === void 0 ? void 0 : compTo.nodeBonds(bond.ndx);
         compToBonds === null || compToBonds === void 0 ? void 0 : compToBonds.to.filter(function (b) { return b.id == _this.id; }).forEach(function (b) {
             b.ndx = newIndex;
         });

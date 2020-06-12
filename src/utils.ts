@@ -122,32 +122,19 @@ export const filterArray = (obj: any, fn: (value: any, key: string, ndx: number)
 	return o;
 };
 
-export const prop = function () {
+export const prop = function (o: any, path: string, value?: any) {
 	let
-		a = Array.from(arguments),
-		o,
-		r;
-	if (a.length) {
-		//get object
-		o = a.shift();
-		//get properties
-		r = a.shift().split('.');
-		if (!a.length) {
-			//it's a get property value
-			for (var f = o[r.shift()], u = 0, i = r.length; i > u; u++)
-				f = f[r[u]];
-			return f
-		} else {
-			//it's a set property value
-			let
-				f = o,
-				prop;
-			if (!(prop = r.pop()))
-				return o;
-			r.forEach((k: any) => f = f[k]);
-			//set
-			f[prop] = a.shift();
-		}
+		r = path.split('.').map(s => s.trim()),
+		last = r.pop(),
+		result = <any>void 0;
+	for (let i = 0; !!o && i < r.length; i++) {
+		o = o[r[i]]
+	}
+	result = o && last && o[last];
+	if (value == undefined) {
+		return result
+	} else {
+		return (result != undefined) && (o[<string>last] = value, true)
 	}
 };
 

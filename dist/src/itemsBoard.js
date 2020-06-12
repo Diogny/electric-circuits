@@ -23,11 +23,12 @@ var point_1 = require("./point");
 //ItemBoard->Wire
 var ItemBoard = /** @class */ (function (_super) {
     __extends(ItemBoard, _super);
-    function ItemBoard(options) {
+    function ItemBoard(circuit, options) {
         var _this = _super.call(this, options) || this;
+        _this.circuit = circuit;
         var base = components_1.default.find(_this.name, true), regex = /(?:{([^}]+?)})+/g, that = _this;
-        if (!base)
-            throw "unknown component: " + _this.name;
+        if (!base || !_this.circuit)
+            throw "cannot create component: " + _this.name;
         //save base data
         _this.settings.base = base.comp;
         //global component count incremented
@@ -148,11 +149,12 @@ var ItemBoard = /** @class */ (function (_super) {
             return false;
         //make bond if first, or append new one
         if (!entry) {
-            this.settings.bonds[thisNode] = entry = new bonds_1.default(this, ic, icNode, thisNode);
+            this.settings.bonds[thisNode] = entry = new bonds_1.Bond(this, ic, icNode, thisNode);
         }
         else if (!entry.add(ic, icNode)) {
             console.log('Oooopsie!');
         }
+        this.settings.bondsCount++;
         //refresh this node
         this.nodeRefresh(thisNode);
         //make bond the other way, to this component, if not already done
@@ -171,10 +173,11 @@ var ItemBoard = /** @class */ (function (_super) {
             if (bond.count == 0) {
                 //ensures there's no bond object if no destination
                 delete this.settings.bonds[node];
+                (--this.settings.bondsCount == 0) && (this.settings.bonds = []);
             }
             //refresh this item node
             this.nodeRefresh(node);
-            var ic = components_1.default.item(id);
+            var ic = this.circuit.get(id);
             ic && ic.unbond(b.ndx, this.id);
         }
     };
@@ -186,9 +189,10 @@ var ItemBoard = /** @class */ (function (_super) {
         //try later to use bond.to.forEach, it was giving an error with wire node selection, think it's fixed
         for (var i = 0, len = bond.to.length; i < len; i++) {
             link = bond.to[i];
-            (_a = components_1.default.item(link.id)) === null || _a === void 0 ? void 0 : _a.unbond(link.ndx, bond.from.id);
+            (_a = this.circuit.get(link.id)) === null || _a === void 0 ? void 0 : _a.unbond(link.ndx, bond.from.id);
         }
         delete this.settings.bonds[node];
+        (--this.settings.bondsCount == 0) && (this.settings.bonds = []);
     };
     ItemBoard.prototype.disconnect = function () {
         for (var node = 0; node < this.count; node++)
@@ -198,7 +202,8 @@ var ItemBoard = /** @class */ (function (_super) {
         return dab_1.extend(_super.prototype.propertyDefaults.call(this), {
             selected: false,
             onProp: void 0,
-            bonds: []
+            bonds: [],
+            bondsCount: 0
         });
     };
     return ItemBoard;

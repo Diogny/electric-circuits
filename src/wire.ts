@@ -3,9 +3,9 @@ import { tag } from './utils';
 import { Type } from './types';
 import { IItemWireOptions, IItemNode, IPoint, IWireProperties, ComponentPropertyType } from './interfaces';
 import { ItemBoard } from './itemsBoard';
-import Comp from './components';
 import Point from './point';
 import Rect from './rect';
+import { Circuit } from './circuit';
 
 export default class Wire extends ItemBoard {
 
@@ -22,6 +22,8 @@ export default class Wire extends ItemBoard {
 	get isOpen(): boolean { return !this.nodeBonds(0) || !this.nodeBonds(this.last) }
 
 	public rect(): Rect { return Rect.create(this.box) }
+
+	get points(): Point[] { return Array.from(this.settings.points) }
 
 	//edit-mode
 	get editMode(): boolean { return this.settings.edit }
@@ -66,8 +68,8 @@ export default class Wire extends ItemBoard {
 		this.settings.edit = value
 	}
 
-	constructor(options: IItemWireOptions) {
-		super(options);
+	constructor(circuit: Circuit, options: IItemWireOptions) {
+		super(circuit, options);
 		this.settings.polyline = tag("polyline", "", {
 			"svg-type": "line",
 			line: "0",
@@ -103,7 +105,6 @@ export default class Wire extends ItemBoard {
 			method: 'create',
 			where: 1			//signals it was a change inside the object
 		});
-		Comp.save(this);
 	}
 
 	public refresh(): Wire {
@@ -132,7 +133,7 @@ export default class Wire extends ItemBoard {
 				bond = this.nodeBonds(node),
 				p = this.settings.points[node];
 			bond && bond.to.forEach(b => {
-				Comp.item(b.id)?.setNode(b.ndx, p)
+				this.circuit.get(b.id)?.setNode(b.ndx, p)
 			})
 		}
 		return this;
@@ -300,7 +301,6 @@ export default class Wire extends ItemBoard {
 		return extend(super.propertyDefaults(), {
 			name: "wire",
 			class: "wire",
-			highlightNodeName: "node",
 			pad: 5,					// radius of the highlight circle
 			edit: false					// initial is false
 		})
@@ -329,7 +329,7 @@ function fixBondIndexes(node: number, newIndex: number): boolean {
 	//because it's a wire last node, it has only one destination, so fix all incoming indexes
 	lastBond.to.forEach(bond => {
 		let
-			compTo = Comp.item(bond.id),
+			compTo = (this as Wire).circuit.get(bond.id),
 			compToBonds = compTo?.nodeBonds(bond.ndx);
 		compToBonds?.to
 			.filter(b => b.id == (this as Wire).id)

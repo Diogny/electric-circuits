@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.Bond = void 0;
 var types_1 = require("./types");
 var dab_1 = require("./dab");
 var Bond = /** @class */ (function () {
@@ -79,11 +80,5 @@ var Bond = /** @class */ (function () {
     Bond.display = function (arr) { return arr.map(function (o) { return o.toString(); }); };
     return Bond;
 }());
-exports.default = Bond;
-/*
-gets the start bond for the wire:
-    Comp.item('wire-0').bond().filter((b)=> b.from.ndx == 0)
-gets the end bond for the wire:
-    Comp.item('wire-0').bond().filter((b)=> b.from.ndx == -1)	//scrapped
-*/ 
+exports.Bond = Bond;
 //# sourceMappingURL=bonds.js.map

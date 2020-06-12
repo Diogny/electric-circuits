@@ -3,7 +3,7 @@ import { obj } from './dab';
 import { ItemBoard } from './itemsBoard';
 import { IBondItem } from './interfaces';
 
-export default class Bond implements TypedClass {
+export class Bond implements TypedClass {
 
 	public from: IBondItem;
 	public to: IBondItem[];
@@ -87,10 +87,3 @@ export default class Bond implements TypedClass {
 	public static display = (arr: Bond[]): string[] => { return arr.map((o) => o.toString()) }
 
 }
-
-/*
-gets the start bond for the wire:
-	Comp.item('wire-0').bond().filter((b)=> b.from.ndx == 0)
-gets the end bond for the wire:
-	Comp.item('wire-0').bond().filter((b)=> b.from.ndx == -1)	//scrapped
-*/

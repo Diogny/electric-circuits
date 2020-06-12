@@ -1,13 +1,17 @@
-import { app, BrowserWindow, Menu, ipcMain } from "electron";
+import { app, BrowserWindow, ipcMain, dialog } from "electron";
 import * as path from "path";
+import * as fs from 'fs';
 import Store from "./src/store";
+import { prop } from "src/utils";
 //import { format as formatUrl } from 'url';
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
 const args = process.argv.slice(1);
 let
-	serve = args.some(val => val === '--serve');
+	serve = args.some(val => val === '--serve'),
+	forceQuit = false;
+
 if (serve) {
 	require('electron-reload')(__dirname, {});
 }
@@ -32,7 +36,7 @@ let mainWindow: Electron.BrowserWindow;
 
 function createMainWindow(opt: any) {
 
-	const window = new BrowserWindow({
+	mainWindow = new BrowserWindow({
 		x: opt.x || 50,
 		y: opt.y || 50,
 		width: opt.width || 1120,
@@ -46,98 +50,41 @@ function createMainWindow(opt: any) {
 		show: false,
 	});
 
-	window.once('ready-to-show', () => {
-		window.show()
-		window.focus()
+	mainWindow.once('ready-to-show', () => {
+		mainWindow.show()
+		mainWindow.focus()
 	});
 
-	// load the index.html of the app.
 	let url = path.join(app.getAppPath(), "index.html");
 	console.log('main index.html', url);
-	window.loadFile(url);
+	mainWindow.loadFile(url);
 
 	if (isDevelopment) {
 		//uncomment for dev
-		//window.webContents.openDevTools()
+		mainWindow.webContents.openDevTools()
 	}
 
-	// Emitted when the window is closed.
-	window.on("closed", () => {
-		// Dereference the window object, usually you would store windows
-		// in an array if your app supports multi windows, this is the time
-		// when you should delete the corresponding element.
-		mainWindow = <any>null;
-	});
-
-	window.webContents.on('devtools-opened', () => {
-		window.focus()
+	mainWindow.webContents.on('devtools-opened', () => {
+		mainWindow.focus()
 		setImmediate(() => {
-			window.focus()
+			mainWindow.focus()
 		})
 	})
 
-	createMenu();
-
-	return window;
+	// Disable menu
+	mainWindow.removeMenu();
 }
 
-function createMenu() {
-	//this's just an start ...
-	const template: Electron.MenuItemConstructorOptions[] = [{
-		label: 'Edit',
-		submenu: [
-			{ role: 'undo' },
-			{ role: 'redo' },
-			{ type: 'separator' },
-			{ role: 'cut' },
-			{ role: 'copy' },
-			{ role: 'paste' },
-			{ role: 'delete' }
-		]
-	},
-	{
-		label: 'View',
-		submenu: [
-			{ role: 'reload' },
-			{ type: 'separator' },
-			{ role: 'toggleDevTools' },
-			{ role: 'togglefullscreen' }
-		]
-	},
-	{ role: 'window', submenu: [{ role: 'minimize' }, { role: 'close' }] },
-	{
-		role: 'help',
-		submenu: [{
-			label: 'Learn More',
-			click() {
-				require('electron').shell.openExternal('https://electron.atom.io');
-			}
-		}]
-	}
-	];
-
-	let
-		menu = Menu.buildFromTemplate(template);
-	Menu.setApplicationMenu(menu);
-}
-
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
 app.on("ready", () => {
 	// defaults if there wasn't anything saved
 	let
 		{ width, height } = store.get('windowBounds'),
 		{ x, y } = store.get('location');
 
-	mainWindow = createMainWindow({ x, y, width, height });
+	createMainWindow({ x, y, width, height });
 	//sendMainWindowSize(width, height);
 
-	// The BrowserWindow class extends the node.js core EventEmitter class, so we use that API
-	// to listen to events on the BrowserWindow. The resize event is emitted when the window size changes.
 	mainWindow.on('resize', () => {
-		// The event doesn't pass us the window size, so we call the `getBounds` method which returns an object with
-		// the height, width, and x and y coordinates.
 		let { width, height } = mainWindow.getContentBounds(); //.getBounds();
 		// save them
 		store.set('windowBounds', { width, height });
@@ -149,28 +96,38 @@ app.on("ready", () => {
 		let pos = mainWindow.getPosition();
 		store.set('location', { x: pos[0], y: pos[1] });
 	});
+
+	mainWindow.on("close", (e: MouseEvent) => {
+		if (!forceQuit) {
+			e.preventDefault();
+			mainWindow.webContents.send("check-before-exit", {});
+		}
+	});
+
+	mainWindow.on("closed", (e: any) => {
+		mainWindow = <any>null;
+	});
 });
 
-// Quit when all windows are closed.
 app.on("window-all-closed", () => {
-	// On OS X it is common for applications and their menu bar
-	// to stay active until the user quits explicitly with Cmd + Q
 	if (process.platform !== "darwin") {
 		app.quit();
 	}
 });
 
 app.on("activate", () => {
-	// On OS X it"s common to re-create a window in the app when the
-	// dock icon is clicked and there are no other windows open.
 	if (mainWindow === null) {
-		mainWindow = createMainWindow({});
+		createMainWindow({});
 	}
 });
 
 let
 	_sharedObj = {
-		app: 5,
+		app: {
+			circuit: {
+				modified: false
+			}
+		},
 		templates: null
 	};
 
@@ -186,7 +143,15 @@ Object.defineProperty(global, 'shared', {
 ipcMain.handle('shared', async (event, arg: string) => {
 	let
 		prop = global["shared"][arg];
+	console.log(`shared.${arg} =` + JSON.stringify(prop))
 	return prop;
+});
+
+ipcMain.handle('shared-data', async (event, arg: any[]) => {
+	let
+		nm = arg[0],
+		value = arg[1];
+	return prop(global["shared"], nm, value)
 });
 
 // In this file you can include the rest of your app"s specific main process
@@ -207,6 +172,86 @@ ipcMain.on('get-win-size', (event, arg) => {
 	data.contentBounds = mainWindow.getContentBounds();
 	//
 	event.returnValue = data //.getBounds();
+})
+
+ipcMain.on('openFile', (event, path) => {
+	dialog.showOpenDialog(mainWindow, {
+		filters: [{ name: "Schematic", extensions: ["xml"] }],
+		properties: ["openFile"]
+	})
+		.then((value) => {
+			if (!value.canceled) {
+				fs.readFile(value.filePaths[0], 'utf-8', (err: any, data: any) => {
+					if (err) {
+						event.returnValue = {
+							error: true,
+							message: err.message
+						};
+					} else {
+						event.returnValue = {
+							filepath: value.filePaths[0]
+						};
+						event.reply('fileData', data)
+					}
+				})
+			} else
+				event.returnValue = {
+					canceled: true,
+					message: "File Open Canceled"
+				};
+		}).catch(err => {
+			event.returnValue = {
+				error: true,
+				message: err.message
+			}
+		})
+})
+
+ipcMain.on('saveFile', (event, data) => {
+	dialog.showSaveDialog(mainWindow, {
+		filters: [{ name: "Schematic", extensions: ["xml"] }],
+		properties: ["createDirectory"]
+	})
+		.then((value) => {
+			if (!value.canceled) {
+				fs.writeFile(<string>value.filePath, data, (err: any) => {
+					if (err) {
+						event.returnValue = {
+							error: true,
+							message: err.message
+						}
+					} else
+						event.returnValue = {
+							filepath: value.filePath
+						}
+				})
+			} else
+				event.returnValue = {
+					canceled: true,
+					message: "File Save Canceled"
+				}
+		}).catch(err => {
+			event.returnValue = {
+				error: true,
+				message: err.message
+			}
+		})
+})
+
+ipcMain.on('save-dialog', (event, arg) => {
+	event.returnValue =
+		dialog.showMessageBoxSync({
+			type: 'warning',
+			buttons: ['Save', 'Cancel', `Don't save`],
+			cancelId: 1,
+			title: 'Confirm',
+			message: 'You have unsaved work!'
+		});
+})
+
+ipcMain.on('app-quit', (event, arg) => {
+	forceQuit = true;
+	mainWindow.close()
 })
 
 //this will contain the communication section...

@@ -1,5 +1,5 @@
 import Comp from "./components";
-import Bond from "./bonds";
+import { Bond } from "./bonds";
 import { Type } from "./types";
 import Point from './point';
 import Prop from "./props";
@@ -11,6 +11,8 @@ import StateMachine from "./stateMachine";
 import { ItemBoard } from "./itemsBoard";
 import { Application } from "./app";
 import EcProp from "./ecprop";
+import EC from "./ec";
+import Wire from "./wire";
 
 export interface IExec {
 	result: any;
@@ -112,8 +114,6 @@ export interface IMyApp extends IApplication {
 }
 
 export interface IMouseState {
-	//always
-	//id: string;
 	type: string;
 	button: number;
 	client: Point;
@@ -124,9 +124,7 @@ export interface IMouseState {
 	ctrlKey: boolean;
 	shiftKey: boolean;
 	altKey: boolean;
-	it: ItemBoard;
-	//[obsolete] will be eliminated
-	//disableOut: boolean;
+	it: EC | Wire | undefined;
 }
 
 export interface ICompOverState {
@@ -229,14 +227,15 @@ export interface IItemBaseOptions {
 	visible: boolean;
 }
 
-export interface IItemBoardOptions extends IItemBaseOptions {
-	highlightNodeName: string;
-}
-
-export interface IItemWireOptions extends IItemBoardOptions {
+export interface IItemWireOptions extends IItemBaseOptions {
 	start: IWireBond;
 	end: IWireBond;
 	points: IPoint[];
+}
+
+export interface IItemSolidOptions extends IItemBaseOptions {
+	rotation: number;
+	onProp: Function;
 }
 
 export interface ILabelText extends IItemBaseOptions {
@@ -252,22 +251,19 @@ export interface IWireBond {
 	node: number;
 }
 
-export interface IItemSolidOptions extends IItemBoardOptions {
-	rotation: number;
-	onProp: Function;
-}
-
 //the object item base has all properties, but restricted in the constructor
-export interface IItemBaseProperties extends IItemBoardOptions {
+export interface IItemBaseProperties extends IItemBaseOptions {
 	g: SVGElement;
 }
 
-export interface ITooltipSettings extends IItemBaseProperties {
+export interface ITooltipSettings extends IItemBaseOptions {
+	g: SVGElement;
 	fontSize: number;
 	borderRadius: number;
 }
 
-export interface IHighlighNodeSettings extends IItemBaseProperties {
+export interface IHighlighNodeSettings extends IItemBaseOptions {
+	g: SVGElement;
 	radius: number;
 	//these're the current selected node properties
 	selectedId: string;
@@ -280,6 +276,7 @@ export interface IItemBoardProperties extends IItemBaseProperties {
 	selected: boolean;
 	onProp: Function;
 	bonds: Bond[];
+	bondsCount: number;
 }
 
 export interface IItemSolidProperties extends IItemBoardProperties {

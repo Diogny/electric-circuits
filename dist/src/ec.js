@@ -16,15 +16,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var dab_1 = require("./dab");
 var utils_1 = require("./utils");
 var types_1 = require("./types");
-var components_1 = require("./components");
 var point_1 = require("./point");
 var itemSolid_1 = require("./itemSolid");
-var rect_1 = require("./rect");
 var label_1 = require("./label");
 var EC = /** @class */ (function (_super) {
     __extends(EC, _super);
-    function EC(options) {
-        var _this = _super.call(this, options) || this;
+    function EC(circuit, options) {
+        var _this = _super.call(this, circuit, options) || this;
         //this ensures all path, rect, circles are inserted before the highlight circle node
         //_.svg is used because _.html doesn't work for SVG
         _this.g.innerHTML = _this.base.data;
@@ -57,7 +55,6 @@ var EC = /** @class */ (function (_super) {
             });
             _this.labelSVG.setText(_this.label);
         }
-        //this shows dragx, dragy, and rotate
         _this.refresh();
         //signal component creation
         _this.onProp && _this.onProp({
@@ -72,8 +69,6 @@ var EC = /** @class */ (function (_super) {
             method: 'create',
             where: 1 //signals it was a change inside the object
         });
-        //
-        components_1.default.save(_this);
         return _this;
     }
     Object.defineProperty(EC.prototype, "last", {
@@ -95,31 +90,24 @@ var EC = /** @class */ (function (_super) {
     });
     EC.prototype.rotate = function (value) {
         _super.prototype.rotate.call(this, value);
-        //refresh properties and object chaining
         return this.refresh();
     };
     EC.prototype.move = function (x, y) {
         _super.prototype.move.call(this, x, y);
-        //refresh properties and object chaining
         return this.refresh();
     };
     EC.prototype.refresh = function () {
         var _this = this;
         var attrs = {
-            //dragx: this.x,
-            //dragy: this.y,
             transform: "translate(" + this.x + " " + this.y + ")"
         }, center = this.origin;
         if (this.rotation) {
             attrs.transform += " rotate(" + this.rotation + " " + center.x + " " + center.y + ")";
         }
-        //update SVG DOM attributes
         dab_1.attr(this.g, attrs);
-        //refreshBonds
         utils_1.each(this.bonds, function (b, key) {
             _this.nodeRefresh(key);
         });
-        //update label if any
         if (this.labelSVG) {
             var pos = point_1.default.plus(this.p, this.labelSVG.p);
             attrs = {
@@ -135,7 +123,7 @@ var EC = /** @class */ (function (_super) {
         var _this = this;
         var bond = this.nodeBonds(node), pos = this.getNode(node);
         pos && bond && bond.to.forEach(function (d) {
-            var ic = components_1.default.item(d.id), p = point_1.default.plus(_this.p, _this.rotation ? pos.rot : pos).round();
+            var ic = _this.circuit.get(d.id), p = point_1.default.plus(_this.p, _this.rotation ? pos.rot : pos).round();
             ic && ic.setNode(d.ndx, p); //no transform
         });
         return this;
@@ -159,7 +147,6 @@ var EC = /** @class */ (function (_super) {
         return pos ? point_1.default.plus(this.p, this.rotation ? pos.rot : pos).round() : null;
     };
     EC.prototype.overNode = function (p, ln) {
-        var px = (p.x - this.x) - 5, py = (p.y - this.y) - 5, rect = new rect_1.default(px, py, 10, 10);
         for (var i = 0, len = this.count; i < len; i++) {
             var pin = this.getNode(i);
             if (this.rotation) {
@@ -211,7 +198,6 @@ var EC = /** @class */ (function (_super) {
     EC.prototype.propertyDefaults = function () {
         return dab_1.extend(_super.prototype.propertyDefaults.call(this), {
             class: "ec",
-            highlightNodeName: "node"
         });
     };
     return EC;

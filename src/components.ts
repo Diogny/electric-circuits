@@ -1,5 +1,4 @@
 import { obj } from './dab';
-import { ItemBoard } from './itemsBoard';
 import { IBaseComponent, IComponentOptions, IBaseStoreComponent, IComponentMetadata } from './interfaces';
 
 const defaultIdTemplate = "{this.name}-{base.count}";
@@ -21,8 +20,9 @@ export default class Comp {
 	private static baseComps: Map<string, IBaseComponent> =
 		Comp.initializeComponents([defaultComponent("tooltip"), defaultComponent("wire")]);
 
-	//all ecs, wires in the board
-	private static boardItems: Map<string, ItemBoard> = new Map();
+	//all ecs, wires in the board,
+	//will be moved to Circuit class
+	//private static boardItems: Map<string, ItemBoard> = new Map();
 	protected settings: IComponentOptions;
 
 	get name(): string { return this.settings.name }
@@ -70,23 +70,6 @@ export default class Comp {
 	}
 
 	////////////////////////////// STATIC ////////////////////////////////
-
-	public static each = (callbackfn: (value: ItemBoard, key: string, map: Map<string, ItemBoard>) => void) => Comp.boardItems.forEach(callbackfn);
-
-	public static get itemCollection(): ItemBoard[] { return Array.from(Comp.boardItems.values()) }
-
-	//it can be sent #id
-	public static item = (id: string): ItemBoard | undefined => Comp.boardItems.get((id).startsWith('#') ? id.slice(1) : id);
-
-	public static save = function (obj?: ItemBoard): boolean {
-		if (!obj)
-			return false;
-		return (Comp.boardItems.set(obj.id, obj), true);
-	}
-
-	public static get count() { return Comp.boardItems.size }
-
-	//BASE COMPONENT METADATA
 
 	//register a new base component template
 	public static register = (options: IComponentOptions) => new Comp(options);

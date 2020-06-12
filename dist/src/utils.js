@@ -104,28 +104,17 @@ exports.filterArray = function (obj, fn) {
     });
     return o;
 };
-exports.prop = function () {
-    var a = Array.from(arguments), o, r;
-    if (a.length) {
-        //get object
-        o = a.shift();
-        //get properties
-        r = a.shift().split('.');
-        if (!a.length) {
-            //it's a get property value
-            for (var f = o[r.shift()], u = 0, i = r.length; i > u; u++)
-                f = f[r[u]];
-            return f;
-        }
-        else {
-            //it's a set property value
-            var f_1 = o, prop_1;
-            if (!(prop_1 = r.pop()))
-                return o;
-            r.forEach(function (k) { return f_1 = f_1[k]; });
-            //set
-            f_1[prop_1] = a.shift();
-        }
+exports.prop = function (o, path, value) {
+    var r = path.split('.').map(function (s) { return s.trim(); }), last = r.pop(), result = void 0;
+    for (var i = 0; !!o && i < r.length; i++) {
+        o = o[r[i]];
+    }
+    result = o && last && o[last];
+    if (value == undefined) {
+        return result;
+    }
+    else {
+        return (result != undefined) && (o[last] = value, true);
     }
 };
 exports.ready = function (fn) {

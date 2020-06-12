@@ -11,7 +11,6 @@ import Tooltip from "./tooltip";
 import { attr, aEL, nano } from "./dab";
 import AppWindow from "./app-window";
 import StateMachine from "./stateMachine";
-import Comp from "./components";
 import ContextWindow from "./context-window";
 import { ItemBoard } from "./itemsBoard";
 import EC from "./ec";
@@ -20,6 +19,7 @@ import LinesAligner from "./linealign";
 import HighlightNode from "./highlightNode";
 import Wire from "./wire";
 import { SelectionRect } from "./selection-rect";
+import { Circuit } from "./circuit";
 
 export class MyApp extends Application implements IMyApp {
 
@@ -35,8 +35,8 @@ export class MyApp extends Application implements IMyApp {
 	readonly rightClick: ContextWindow;
 	readonly dash: LinesAligner;
 	readonly highlight: HighlightNode;
-
 	readonly selection: SelectionRect;
+	readonly circuit: Circuit;
 
 	viewBox: Rect;
 	baseViewBox: Size;
@@ -47,15 +47,8 @@ export class MyApp extends Application implements IMyApp {
 	//all window height
 	contentHeight: number;
 	size: Size;
-	compList: Map<string, ItemBoard>;
-	selectedComponents: ItemBoard[];
 
 	get tooltipOfs(): number { return 15 }
-
-	//has value if only one comp selected, none or multiple has undefined
-	get ec(): ItemBoard | undefined {
-		return this.selectedComponents.length == 1 ? this.selectedComponents[0] : void 0;
-	}
 
 	constructor(options: IApplicationOptions) {
 		super(options);
@@ -100,7 +93,7 @@ export class MyApp extends Application implements IMyApp {
 						ctrlKey: ev.ctrlKey,
 						shiftKey: ev.shiftKey,
 						altKey: ev.altKey,
-						it: Comp.item(parent.id)
+						it: that.circuit.get(parent.id)
 					};
 				//post actions
 				switch (state.over.type) {
@@ -128,8 +121,6 @@ export class MyApp extends Application implements IMyApp {
 				that.topBarLeft.innerHTML = arr.join(", ");
 				return state;
 			};
-		this.compList = new Map();
-		this.selectedComponents = [];
 		this.viewBox = Rect.empty();		//location is panning, size is for scaling
 		this.multiplier = 0.5;  //scaling multipler 2X UI default
 		this.ratio = window.screen.width / window.screen.height;		//this's a const value
@@ -143,8 +134,8 @@ export class MyApp extends Application implements IMyApp {
 		this.topBarRight = qS("#top-bar>div:nth-of-type(2)");
 		this.dash = new LinesAligner(this);
 		this.highlight = new HighlightNode(<any>{});
-
 		this.selection = new SelectionRect(this);
+		this.circuit = new Circuit(this, "my circuit");
 
 		//this'll hold the properties of the current selected component
 		this.winProps = new AppWindow(<IAppWindowOptions>{
@@ -242,7 +233,7 @@ export class MyApp extends Application implements IMyApp {
 			//test for highlightNode
 			(compName == "h-node") &&
 				(id = that.highlight.selectedId,
-					comp = <ItemBoard>Comp.item(id),
+					comp = <ItemBoard>that.circuit.get(id),
 					compName = comp.type == Type.WIRE ? "wire" : "ec",
 					(nodeOrLine != that.highlight.selectedNode && console.log(`node: ${nodeOrLine} <> ${that.highlight.selectedNode}`)));
 
@@ -312,26 +303,20 @@ export class MyApp extends Application implements IMyApp {
 
 	public tooltipFontSize = () => Math.max(10, 35 * this.multiplier)
 
-	public hasComponent(id: string): boolean { return this.compList.has(id); }
+	public addECtoDOM(ec: EC) {
+		this.svgBoard.insertBefore(ec.g, this.tooltip.g);
+		//do after DOM inserted work
+		ec.afterDOMinserted();
+	}
 
-	public addComponent(comp: ItemBoard): ItemBoard {
-		if (comp) {
-			if (this.hasComponent(comp.id))
-				throw `duplicated component ${comp.id}`;
-			this.compList.set(comp.id, comp);
-
-			//add it to SVG DOM
-			(comp.type == Type.WIRE) ?
-				this.dash.g.insertAdjacentElement("afterend", comp.g) :
-				this.svgBoard.insertBefore(comp.g, this.tooltip.g);
-			//do after DOM inserted work
-			comp.afterDOMinserted();
-		}
-		return <ItemBoard>comp;
+	public addWiretoDOM(wire: Wire) {
+		this.dash.g.insertAdjacentElement("afterend", wire.g);
+		//do after DOM inserted work
+		wire.afterDOMinserted();
 	}
 
 	public rotateEC(angle: number) {
-		this.rotateComponentBy(angle, this.ec)
+		this.rotateComponentBy(angle, this.circuit.ec)
 	}
 
 	public rotateComponentBy(angle: number, comp?: ItemBoard) {
@@ -353,52 +338,43 @@ export class MyApp extends Application implements IMyApp {
 	public execute(action: ActionType, trigger: string) {
 		let
 			arr = trigger.split('::'),
-			comp = Comp.item(<string>arr.shift()),
+			comp = this.circuit.get(<string>arr.shift()),
 			name = arr.shift(),
 			type = arr.shift(),
 			nodeOrLine = parseInt(<any>arr.shift()),
 			data = arr.shift(),
-			compNull = false,
-			selectAll = (value: boolean): ItemBoard[] => {
-				let
-					arr = Array.from(this.compList.values());
-				arr.forEach(comp => comp.select(value));
-				return arr;
-			}
+			compNull = false;
 		//this's a temporary fix to make it work
 		//	final code will have a centralized action dispatcher
 		switch (action) {
 			case ActionType.TOGGLE_SELECT:
-				if (!(compNull = !comp)) {
-					comp.select(!comp.selected);
-					this.selectedComponents = Array.from(this.compList.values()).filter(c => c.selected);
-					this.refreshRotation(this.ec);
-					(this.ec && (this.winProps.load(this.ec), 1)) || this.winProps.clear();
+				if (!(compNull = !comp) && comp.type == Type.EC) {
+					this.circuit.toggleSelect(comp as EC);
+					this.refreshRotation(this.circuit.ec);
+					(this.circuit.ec && (this.winProps.load(this.circuit.ec), 1)) || this.winProps.clear();
 					//temporary, for testings...
-					this.ec && ((<any>window).ec = this.ec);
+					this.circuit.ec && ((<any>window).ec = this.circuit.ec);
 				}
 				break;
 			case ActionType.SELECT:
 			case ActionType.SELECT_ONLY:
-				if (!(compNull = !comp)) {
-					selectAll(false);
-					this.selectedComponents = [comp.select(true)];
+				if (!(compNull = !comp) && comp.type == Type.EC) {
+					this.circuit.selectThis(comp as EC);
 					this.refreshRotation(comp);
 					((action == ActionType.SELECT) && (this.winProps.load(comp), 1)) || this.winProps.clear();
 					//temporary, for testings...
-					(<any>window).ec = this.ec;
+					(<any>window).ec = this.circuit.ec;
 				}
 				break;
 			case ActionType.SELECT_ALL:
-				this.selectedComponents = selectAll(true);
+				this.circuit.selectAll();
 				this.refreshRotation();
 				this.winProps.clear();
 				//temporary, for testings...
 				(<any>window).ec = void 0;
 				break;
 			case ActionType.UNSELECT_ALL:
-				selectAll(false);
-				this.selectedComponents = [];
+				this.circuit.deselectAll();
 				this.refreshRotation();
 				this.winProps.clear();
 				//temporary, for testings...
@@ -406,18 +382,8 @@ export class MyApp extends Application implements IMyApp {
 				break;
 			case ActionType.DELETE_SELECTED:
 				let
-					selectedCount = this.selectedComponents.length,
-					deletedCount = 0;
-				this.selectedComponents = this.selectedComponents.filter((c) => {
-					if (this.compList.delete(c.id)) {
-						//disconnects and remove component from DOM
-						c.disconnect();
-						c.remove();
-						deletedCount++;
-						return false;
-					}
-					return true;
-				});
+					selectedCount = this.circuit.selectedComponents.length,
+					deletedCount = this.circuit.deleteSelected();
 				this.refreshRotation();
 				this.winProps.clear().setVisible(false);
 				this.tooltip.setVisible(false);
@@ -430,10 +396,7 @@ export class MyApp extends Application implements IMyApp {
 			case ActionType.DELETE:
 				//only comp if sent
 				if (!(compNull = !comp)) {
-					if (this.compList.delete(comp.id)) {
-						//disconnects and remove component from DOM
-						comp.disconnect();
-						comp.remove();
+					if (this.circuit.delete(comp)) {
 						this.refreshRotation();
 						this.winProps.clear().setVisible(false);
 						this.tooltip.setVisible(false);

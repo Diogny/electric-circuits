@@ -4,6 +4,7 @@ import ItemBase from "./itemsBase";
 import Rect from "./rect";
 import Size from "./size";
 import Point from "./point";
+import { Circuit } from "./circuit";
 
 export class RotationInjector extends PropertyInjector {
 
@@ -25,8 +26,8 @@ export abstract class ItemSolid extends ItemBoard {
 
 	protected settings: IItemSolidProperties;
 
-	constructor(options: IItemSolidOptions) {
-		super(options);
+	constructor(circuit: Circuit, options: IItemSolidOptions) {
+		super(circuit, options);
 		//I've to set new properties always, because super just copy defaults()
 		//later override method propertyDefaults()
 		this.settings.rotation = Point.validateRotation(options.rotation);

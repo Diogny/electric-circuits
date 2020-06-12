@@ -71,16 +71,6 @@ var Comp = /** @class */ (function () {
         enumerable: false,
         configurable: true
     });
-    Object.defineProperty(Comp, "itemCollection", {
-        get: function () { return Array.from(Comp.boardItems.values()); },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(Comp, "count", {
-        get: function () { return Comp.boardItems.size; },
-        enumerable: false,
-        configurable: true
-    });
     Comp.storeComponent = function (map, name, o) {
         return map.set(name, dab_1.obj({
             //interface IBaseComponent
@@ -100,18 +90,7 @@ var Comp = /** @class */ (function () {
     };
     // all base components with metadata
     Comp.baseComps = Comp.initializeComponents([defaultComponent("tooltip"), defaultComponent("wire")]);
-    //all ecs, wires in the board
-    Comp.boardItems = new Map();
     ////////////////////////////// STATIC ////////////////////////////////
-    Comp.each = function (callbackfn) { return Comp.boardItems.forEach(callbackfn); };
-    //it can be sent #id
-    Comp.item = function (id) { return Comp.boardItems.get((id).startsWith('#') ? id.slice(1) : id); };
-    Comp.save = function (obj) {
-        if (!obj)
-            return false;
-        return (Comp.boardItems.set(obj.id, obj), true);
-    };
-    //BASE COMPONENT METADATA
     //register a new base component template
     Comp.register = function (options) { return new Comp(options); };
     Comp.store = function (name, comp) {
