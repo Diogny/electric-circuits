@@ -91,7 +91,7 @@ var AppWindow = /** @class */ (function (_super) {
         return this.barTitle.innerText = (this.settings.bar = value), this;
     };
     AppWindow.prototype.onMouseEnter = function (e) {
-        this.app.topBarLeft.innerHTML = "&nbsp;";
+        this.app.bottomBarLeft.innerHTML = "&nbsp;";
         this.settings.offset && (this.settings.offset = new point_1.default(e.offsetX, e.offsetY));
         //console.log('IN app window', e.eventPhase, (e.target as HTMLElement).id);
     };
@@ -145,7 +145,7 @@ var AppWindow = /** @class */ (function (_super) {
         this.compId = comp.id;
         comp.properties().forEach(function (name) {
             _this.appendPropChild(new ecprop_1.default(comp, name, function onEcPropChange(value) {
-                console.log(this, value);
+                //console.log(this, value)
             }, true));
         });
         this.setVisible(true);

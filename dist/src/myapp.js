@@ -14,6 +14,7 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MyApp = void 0;
+var electron_1 = require("electron");
 var app_1 = require("./app");
 var interfaces_1 = require("./interfaces");
 var utils_1 = require("./utils");
@@ -93,11 +94,10 @@ var MyApp = /** @class */ (function (_super) {
             //arr.push(`client ${clientXY.toString()}`);
             //arr.push(`scaled: x: ${clientXYScaled.x} y: ${clientXYScaled.y}`);
             //render
-            that.topBarLeft.innerHTML = arr.join(", ");
+            that.bottomBarLeft.innerHTML = arr.join(", ");
             return state;
         };
         _this.viewBox = rect_1.default.empty(); //location is panning, size is for scaling
-        _this.multiplier = 0.5; //scaling multipler 2X UI default
         _this.ratio = window.screen.width / window.screen.height; //this's a const value
         _this.ratioX = 1;
         _this.ratioY = 1;
@@ -105,12 +105,12 @@ var MyApp = /** @class */ (function (_super) {
         _this.rootDir = utils_1.basePath(); //not used in electron
         _this.board = utils_1.qS("#board");
         _this.svgBoard = _this.board.children[0];
-        _this.topBarLeft = utils_1.qS("#top-bar>div:nth-of-type(1)");
-        _this.topBarRight = utils_1.qS("#top-bar>div:nth-of-type(2)");
+        _this.bottomBarLeft = utils_1.qS('[bar="bottom-left"]');
+        _this.bottomBarCenter = utils_1.qS('[bar="bottom-center"]');
         _this.dash = new linealign_1.default(_this);
         _this.highlight = new highlightNode_1.default({});
         _this.selection = new selection_rect_1.SelectionRect(_this);
-        _this.circuit = new circuit_1.Circuit(_this, "my circuit");
+        _this.circuit = new circuit_1.Circuit(_this, { name: "my circuit", multiplier: options.multiplier }); //scaling multipler 2X UI default
         //this'll hold the properties of the current selected component
         _this.winProps = new app_window_1.default({
             app: _this,
@@ -139,7 +139,7 @@ var MyApp = /** @class */ (function (_super) {
                 LEAVE: function (newCtx) {
                     //cannot save new context, erases wiring status
                     hideNodeTooltip(newCtx);
-                    that.topBarLeft.innerHTML = "&nbsp;";
+                    that.bottomBarLeft.innerHTML = "&nbsp;";
                 },
                 KEY: function (code) {
                     //console.log(`KEY: ${code}`);
@@ -184,7 +184,9 @@ var MyApp = /** @class */ (function (_super) {
                 (id = that.highlight.selectedId,
                     comp = that.circuit.get(id),
                     compName = comp.type == types_1.Type.WIRE ? "wire" : "ec",
-                    (nodeOrLine != that.highlight.selectedNode && console.log("node: " + nodeOrLine + " <> " + that.highlight.selectedNode)));
+                    (nodeOrLine != that.highlight.selectedNode
+                    //&& console.log(`node: ${nodeOrLine} <> ${that.highlight.selectedNode}`)
+                    ));
             key = that.rightClick.setTrigger(id, compName, type, isNaN(nodeOrLine) ? undefined : nodeOrLine);
             key &&
                 that.rightClick
@@ -211,6 +213,11 @@ var MyApp = /** @class */ (function (_super) {
         };
         return _this;
     }
+    Object.defineProperty(MyApp.prototype, "multiplier", {
+        get: function () { return this.circuit.multiplier; },
+        enumerable: false,
+        configurable: true
+    });
     Object.defineProperty(MyApp.prototype, "tooltipOfs", {
         get: function () { return 15; },
         enumerable: false,
@@ -220,36 +227,29 @@ var MyApp = /** @class */ (function (_super) {
         //later include panning
         return p.x > 0 && p.y > 0 && p.x < this.viewBox.width && p.y < this.viewBox.height;
     };
-    MyApp.prototype.setViewBox = function (m) {
-        if (!m) {
-            var zoom_item = utils_1.qS('.bar-item[data-scale].selected'), o = dab_1.attr(zoom_item, "data-scale");
-            m = parseFloat(o);
+    MyApp.prototype.setBoardZoom = function (m, updateDOM) {
+        this.circuit.multiplier = m;
+        if (updateDOM) {
+            //remove all selected class, should be one
+            utils_1.qSA('.bar-item[data-scale].selected').forEach(function (item) {
+                dab_1.removeClass(item, "selected");
+            });
+            dab_1.addClass(utils_1.qS("[data-scale=\"" + this.circuit.multiplier + "\"]"), "selected");
         }
-        this.multiplier = m;
         this.baseViewBox = new size_1.default(this.board.clientWidth * this.ratio | 0, this.board.clientHeight * this.ratio | 0);
         //calculate size
         this.viewBox.width = this.baseViewBox.width * this.multiplier | 0;
         this.viewBox.height = this.baseViewBox.height * this.multiplier | 0;
         calculateAndUpdateViewBoxData.call(this);
     };
-    MyApp.prototype.updateViewBox = function () { calculateAndUpdateViewBoxData.call(this); };
+    MyApp.prototype.updateViewBox = function (x, y) { calculateAndUpdateViewBoxData.call(this, x, y); };
     MyApp.prototype.refreshTopBarRight = function () {
-        this.topBarRight.innerHTML = dab_1.nano(this.templates.viewBox01, this.viewBox) + "&nbsp; " +
+        this.bottomBarCenter.innerHTML = dab_1.nano(this.templates.viewBox01, this.viewBox) + "&nbsp; " +
             dab_1.nano(this.templates.size01, this.size);
     };
     MyApp.prototype.getAspectRatio = function (width, height) {
         var ratio = width / height;
         return (Math.abs(ratio - 4 / 3) < Math.abs(ratio - 16 / 9)) ? '4:3' : '16:9';
-    };
-    MyApp.prototype.addECtoDOM = function (ec) {
-        this.svgBoard.insertBefore(ec.g, this.tooltip.g);
-        //do after DOM inserted work
-        ec.afterDOMinserted();
-    };
-    MyApp.prototype.addWiretoDOM = function (wire) {
-        this.dash.g.insertAdjacentElement("afterend", wire.g);
-        //do after DOM inserted work
-        wire.afterDOMinserted();
     };
     MyApp.prototype.rotateEC = function (angle) {
         this.rotateComponentBy(angle, this.circuit.ec);
@@ -257,7 +257,9 @@ var MyApp = /** @class */ (function (_super) {
     MyApp.prototype.rotateComponentBy = function (angle, comp) {
         if (!comp || comp.type != types_1.Type.EC)
             return;
-        comp.rotate(comp.rotation + angle);
+        var rotation = comp.rotation;
+        (rotation != comp.rotate(comp.rotation + angle).rotation)
+            && (this.circuit.modified = true);
         this.refreshRotation(comp);
     };
     MyApp.prototype.refreshRotation = function (ec) {
@@ -368,11 +370,63 @@ var MyApp = /** @class */ (function (_super) {
             //console.log(`action: ${action}, id: ${comp?.id}, name: ${name}, type: ${type}, trigger: ${trigger}`);
         }
     };
+    MyApp.prototype.addToDOM = function (comp) {
+        switch (comp.type) {
+            case types_1.Type.EC:
+                this.svgBoard.insertBefore(comp.g, this.tooltip.g);
+                break;
+            case types_1.Type.WIRE:
+                this.dash.g.insertAdjacentElement("afterend", comp.g);
+                break;
+            default:
+                return false;
+        }
+        comp.afterDOMinserted();
+        return true;
+    };
+    MyApp.prototype.loadCircuit = function () {
+        var _this = this;
+        try {
+            var choice = this.circuit.save(false);
+            if (choice == 5)
+                return; // Error: 5		already logged to console
+            if (!(choice == 0 || choice == 3)) // Save: 0 or Not Modified: 3
+                return;
+            var answer = electron_1.ipcRenderer.sendSync('openFile', "");
+            //error treatment
+            if (answer.error) {
+                console.log(answer); //later popup with error
+                return;
+            }
+            if (answer.canceled) {
+                console.log(answer);
+                return;
+            }
+            if (!answer.data) {
+                console.log(answer); //later popup with error
+                return;
+            }
+            var circuit = new circuit_1.Circuit(this, answer.data);
+            //everything OK here
+            this.circuit.destroy();
+            //start loading new circuit
+            this.circuit = circuit;
+            this.setBoardZoom(circuit.multiplier, true);
+            //circuit add to DOM
+            this.circuit.components
+                .forEach(function (comp) { return _this.addToDOM(comp); });
+        }
+        catch (e) {
+            console.log(e.message); //later popup with error
+        }
+    };
     return MyApp;
 }(app_1.Application));
 exports.MyApp = MyApp;
-function calculateAndUpdateViewBoxData() {
+function calculateAndUpdateViewBoxData(x, y) {
     var self = this;
+    (x != undefined) && (self.viewBox.x = x);
+    (y != undefined) && (self.viewBox.y = y);
     //set SVG DOM viewBox attribute
     dab_1.attr(self.svgBoard, { "viewBox": self.viewBox.x + " " + self.viewBox.y + " " + self.viewBox.width + " " + self.viewBox.height });
     //calculate ratio

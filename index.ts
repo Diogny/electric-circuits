@@ -189,9 +189,10 @@ ipcMain.on('openFile', (event, path) => {
 						};
 					} else {
 						event.returnValue = {
-							filepath: value.filePaths[0]
+							filepath: value.filePaths[0],
+							data: data
 						};
-						event.reply('fileData', data)
+						//event.reply('fileData', data)
 					}
 				})
 			} else
@@ -207,14 +208,19 @@ ipcMain.on('openFile', (event, path) => {
 		})
 })
 
-ipcMain.on('saveFile', (event, data) => {
-	dialog.showSaveDialog(mainWindow, {
-		filters: [{ name: "Schematic", extensions: ["xml"] }],
-		properties: ["createDirectory"]
-	})
+ipcMain.on('saveFile', (event, arg) => {
+	let
+		options = <any>{
+			filters: [{ name: "Schematic", extensions: ["xml"] }],
+			properties: ["createDirectory"]
+		};
+	arg.filePath
+		&& (options.defaultPath = arg.filePath);
+
+	dialog.showSaveDialog(mainWindow, options)
 		.then((value) => {
 			if (!value.canceled) {
-				fs.writeFile(<string>value.filePath, data, (err: any) => {
+				fs.writeFile(<string>value.filePath, arg.data, (err: any) => {
 					if (err) {
 						event.returnValue = {
 							error: true,

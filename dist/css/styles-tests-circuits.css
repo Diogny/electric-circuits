@@ -1,3 +1,7 @@
+body {
+  overflow-y: hidden;
+}
+
 .light {
   background-color: white;
 }
@@ -215,20 +219,6 @@ body.light .bar-item[file="save"] > .icon {
 }
 body.dark .bar-item[file="save"] > .icon {
   background: url(../img/file-save16x16.png) no-repeat;
-}
-
-/*   */
-.expandable {
-  display: inline-block;
-}
-
-.expandable > span > i {
-  display: none;
-  color: #e9e9ed;
-}
-
-.expandable:hover * {
-  display: inline;
 }
 
 /************************ BODY MAIN ************************/
@@ -467,6 +457,7 @@ rect.dash {
 body.light > footer {
   padding: 0 6px;
   background-color: #eaeaea;
+  color: #696767;
 }
 body.dark > footer {
   padding: 0 6px;
@@ -474,19 +465,49 @@ body.dark > footer {
   background-color: #969494;
 }
 
-body > footer > div > h3 {
-  margin: 2px 0px 2px;
-}
-body > footer > div > h3 > span {
-  font-size: 12px;
+body > footer div[bar="bottom-left"],
+body > footer div[bar="bottom-center"] {
+  /*margin: 2px 0px 2px;*/
+  font-size: 14px;
   font-weight: initial;
 }
-body > footer > div {
-  height: 100%;
-  line-height: 26px;
+
+body.light > footer > div:not(:last-child) > div {
+  border-right: 1px solid #e2d9d9;
+  margin-left: 5px;
 }
+body.dark > footer > div:not(:last-child) > div {
+  border-right: 1px solid #847d7d;
+  margin-left: 5px;
+}
+
+body > footer > div.bar-group {
+  height: 26px;
+  line-height: 25px;
+}
+
 body.dark footer select.select-css {
   color: #e6e1e1;
+}
+
+/*   */
+.expandable {
+  display: inline-block;
+}
+
+.expandable > span > i {
+  display: none;
+}
+
+body.light .expandable > span > i {
+  color: #a8a8ab;
+}
+body.dark .expandable > span > i {
+  color: #c6c6c7;
+}
+
+.expandable:hover * {
+  display: inline;
 }
 
 /************************ beautiful scroll bar  ************************/

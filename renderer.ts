@@ -4,7 +4,7 @@ import * as fs from 'fs';
 import * as xml2js from 'xml2js';
 import {
 	IComponentOptions, IApplicationOptions, StateType as State, ActionType as Action,
-	IMachineState, IMouseState, IItemWireOptions, IPoint, IItemSolidOptions, IItemNode
+	IMachineState, IMouseState, IPoint, IMyAppOptions
 } from "./src/interfaces";
 import Comp from "./src/components";
 import { MyApp } from "./src/myapp";
@@ -20,20 +20,27 @@ import Rect from "src/rect";
 import { Bond } from "src/bonds";
 
 let
-	app: MyApp;
-
-//https://www.electronjs.org/docs/tutorial/security
-
-function createEC(name: string): EC {
-	return new EC(app.circuit, <IItemSolidOptions><unknown>{
-		name: name,
-		x: app.center.x,
-		y: app.center.y,
-		onProp: function (e: any) {
-			//this happens when this component is created
-		}
-	})
-}
+	app: MyApp,
+	showBodyAndTooltip = (offset: Point, label: string) => {
+		let
+			p = Point.translateBy(offset, app.tooltipOfs);
+		app.tooltip.setVisible(true)
+			.move(p.x, p.y)
+			.setFontSize(app.tooltipFontSize())
+			.setText(label);
+	},
+	hideNodeTooltip = (it: ItemBoard) => {
+		app.highlight.hide();
+		app.tooltip.setVisible(false);
+	},
+	showWireConnections = (wire: Wire) => {
+		app.sm.data.showWireConnections = true;
+		app.highlight.showConnections(getWireConnections(wire));
+	},
+	hideWireConnections = () => {
+		app.sm.data.showWireConnections = false;
+		app.highlight.hide();
+	};
 
 function hookEvents() {
 	//ZOOM controls
@@ -45,12 +52,7 @@ function hookEvents() {
 				m = parseFloat(o);
 			if (app.multiplier == m)
 				return;
-			app.setViewBox(m);
-			//remove all selected class
-			qSA('.bar-item[data-scale].selected').forEach((item: any) => {
-				removeClass(item, "selected");
-			});
-			toggleClass(scaleTarget, "selected");
+			app.setBoardZoom(m, true);
 		}, false);
 	});
 	//Rotations
@@ -58,23 +60,13 @@ function hookEvents() {
 	aEL(qS('.bar-item[rot-dir="right"]'), "click", () => app.rotateEC(45), false);
 	//add component
 	aEL(qS('.bar-item[action="comp-create"]'), "click", () =>
-		app.circuit.add(createEC(<string>app.prop("comp_option").value), (ec: EC) => {
-			app.addECtoDOM(ec)
-		}), false);
+		app.circuit.add(<string>app.prop("comp_option").value, true), false);
 	//ViewBox Reset
-	aEL(qS('.bar-item[tool="vb-focus"]'), "click", () => setViewBoxOrigin(Point.origin), false);
+	aEL(qS('.bar-item[tool="vb-focus"]'), "click", () => app.updateViewBox(0, 0), false);
 	//File Open
-	aEL(qS('.bar-item[file="open"]'), "click", () => {
-		console.log('load: ', ipcRenderer.sendSync('openFile', ""))
-	}, false);
+	aEL(qS('.bar-item[file="open"]'), "click", () => app.loadCircuit(), false);
 	//Save File
-	aEL(qS('.bar-item[file="save"]'), "click", () => saveCircuit(), false);
-}
-
-function setViewBoxOrigin(p: Point) {
-	app.viewBox.x = p.x;
-	app.viewBox.y = p.y;
-	app.updateViewBox();
+	aEL(qS('.bar-item[file="save"]'), "click", () => app.circuit.save(false), false);
 }
 
 function getWireConnections(wire: Wire): Point[] {
@@ -87,7 +79,7 @@ function getWireConnections(wire: Wire): Point[] {
 				let
 					w = app.circuit.get(b.id);
 				if (!w)
-					throw `Invalid bond connections`;
+					throw `Invalid bond connections`;			//shouldn't happer, but to catch wrong code
 				switch (b.type) {
 					case Type.WIRE:
 						if (!wiresFound.some(id => id == b.id)) {
@@ -111,29 +103,7 @@ function getWireConnections(wire: Wire): Point[] {
 	return points
 }
 
-function registerStates() {
-	let
-		showBodyAndTooltip = (offset: Point, label: string) => {
-			let
-				p = Point.translateBy(offset, app.tooltipOfs);
-			app.tooltip.setVisible(true)
-				.move(p.x, p.y)
-				.setFontSize(app.tooltipFontSize())
-				.setText(label);
-		},
-		hideNodeTooltip = (it: ItemBoard) => {
-			app.highlight.hide();
-			app.tooltip.setVisible(false);
-		},
-		showWireConnections = (wire: Wire) => {
-			app.sm.data.showWireConnections = true;
-			app.highlight.showConnections(getWireConnections(wire));
-		},
-		hideWireConnections = () => {
-			app.sm.data.showWireConnections = false;
-			app.highlight.hide();
-		};
-	//BOARD
+function registerBoardState() {
 	app.sm.register(<IMachineState>{
 		key: State.BOARD,
 		overType: "function",	//forward
@@ -150,7 +120,7 @@ function registerStates() {
 				removeClass(app.svgBoard, "dragging");
 			},
 			LEAVE: function (newCtx: IMouseState) {
-				app.topBarLeft.innerHTML = "&nbsp;";
+				app.bottomBarLeft.innerHTML = "&nbsp;";
 				//console.log('BOARD.LEAVE', newCtx)
 			},
 			OUT: function (newCtx: IMouseState) {
@@ -186,10 +156,10 @@ function registerStates() {
 				//Board panning
 				if (newCtx.altKey) {
 					if (app.sm.data.panningVector) {
-						setViewBoxOrigin(new Point(
+						app.updateViewBox(
 							newCtx.client.x - app.sm.data.panningVector.x,
 							newCtx.client.y - app.sm.data.panningVector.y
-						))
+						)
 					}
 					return;
 				} else
@@ -270,7 +240,8 @@ function registerStates() {
 			}
 		}
 	});
-	//EC_BODY
+}
+function registerEcBodyState() {
 	app.sm.register(<IMachineState>{
 		key: State.EC_BODY,
 		overType: "deny",
@@ -323,7 +294,8 @@ function registerStates() {
 			}
 		}
 	});
-	//EC_DRAG
+}
+function registerEcDragState() {
 	app.sm.register(<IMachineState>{
 		key: State.EC_DRAG,
 		overType: "deny",
@@ -363,13 +335,15 @@ function registerStates() {
 						offset: Point.minus(newCtx.offset, comp.p)
 					}))
 				};
+				app.circuit.modified = true;
 				addClass(app.svgBoard, self.data.className);
 				hideNodeTooltip(newCtxIt);
 				app.rightClick.setVisible(false);
 			},
 		}
 	});
-	//EC_NODE
+}
+function registerEcNodeState() {
 	app.sm.register(<IMachineState>{
 		key: State.EC_NODE,
 		overType: "deny",
@@ -408,7 +382,8 @@ function registerStates() {
 			},
 		}
 	});
-	//NEW_WIRE_FROM_EC
+}
+function registerBewWireFromEcState() {
 	app.sm.register(<IMachineState>{
 		key: State.NEW_WIRE_FROM_EC,
 		overType: "function",
@@ -498,19 +473,15 @@ function registerStates() {
 					node = app.sm.data.start.node,
 					pos = app.sm.data.start.fromWire ? ec.getNode(node) : (ec as EC).getNodeRealXY(node);
 				app.highlight.hide();
-				app.sm.data.wire = new Wire(app.circuit, <IItemWireOptions>{
-					points: <IPoint[]>[pos, pos]
-				});
-				app.circuit.add(app.sm.data.wire, (wire: Wire) => {
-					app.addWiretoDOM(wire)
-				});
+				app.sm.data.wire = app.circuit.add("wire", true, <IPoint[]>[pos, pos]);
 				app.sm.data.wire.bond(0, ec, node);
 				app.execute(Action.UNSELECT_ALL, "");
 				app.sm.data.selectedItem = undefined;
 			},
 		}
 	});
-	//WIRE_LINE
+}
+function registerWireLineState() {
 	app.sm.register(<IMachineState>{
 		key: State.WIRE_LINE,
 		overType: "deny",
@@ -619,7 +590,8 @@ function registerStates() {
 			},
 		}
 	});
-	//WIRE_NODE_DRAG
+}
+function registerWireNodeDragState() {
 	app.sm.register(<IMachineState>{
 		key: State.WIRE_NODE_DRAG,
 		overType: "deny",
@@ -697,12 +669,14 @@ function registerStates() {
 							r: r
 						}
 					}).filter(elem => !elem.r.empty);
+				app.circuit.modified = true;
 				app.sm.data.selectedItem = undefined;
 				app.sm.data.it.select(false);
 			},
 		}
 	});
-	//WIRE_LINE_DRAG
+}
+function registerWireLineDragState() {
 	app.sm.register(<IMachineState>{
 		key: State.WIRE_LINE_DRAG,
 		overType: "deny",
@@ -740,6 +714,7 @@ function registerStates() {
 				app.sm.data.B = Point.minus(newCtx.offset, wire.getNode(line));
 				addClass(app.svgBoard, app.sm.data.className = "dragging");
 				app.rightClick.setVisible(false);
+				app.circuit.modified = true;
 			},
 		}
 	});
@@ -763,9 +738,10 @@ window.addEventListener("DOMContentLoaded", () => {
 				Comp.register(element);
 			});
 			json = readJson('./dist/data/context-menu.json');
-			app = new MyApp(<IApplicationOptions>{
+			app = new MyApp(<IMyAppOptions>{
 				templates: templates,
 				includePropsInThis: true,
+				multiplier: getUIZoom(),
 				props: {
 					rot_lbl: {
 						tag: "#rot-lbl"
@@ -795,66 +771,48 @@ window.addEventListener("DOMContentLoaded", () => {
 				},
 				list: json
 			});
-			updateViewBox(ipcRenderer.sendSync('get-win-size', ''));	//set SVG viewBox values
-			app.board.appendChild(app.winProps.win);					//add HtmlWindow to board
-			app.board.appendChild(app.rightClick.win);					//add right-click window
+			updateViewBox(ipcRenderer.sendSync('get-win-size', ''));
+			app.board.appendChild(app.winProps.win);
+			app.board.appendChild(app.rightClick.win);
 			app.svgBoard.append(app.dash.g);
 			app.svgBoard.append(app.selection.g);
-			app.svgBoard.append(app.tooltip.g);							//top z-index SVG 
+			app.svgBoard.append(app.tooltip.g);
 			app.svgBoard.append(app.highlight.g);
 
 			hookEvents();
-			registerStates();
+			//register states
+			registerBoardState();
+			registerEcBodyState();
+			registerEcDragState();
+			registerEcNodeState();
+			registerBewWireFromEcState();
+			registerWireLineState();
+			registerWireNodeDragState();
+			registerWireLineDragState();
 			app.sm.enabled = true;
 
 			//////////////////// TESTINGS /////////////////
-			//create default EC first
-			//app.addComponent(createEC(<string>app.prop("comp_option").value));
-
-			//this's temporary, until create wire tool works
-			//wire.setPoints([{x:50,y:100}, {x:200,y:100}, {x:200, y:25}, {x:250,y:25}])
-			/*
-			app.addComponent(new Wire((<IItemWireOptions>{
-				points: <IPoint[]>[
-					{ x: 25, y: 50 },
-					{ x: 25, y: 100 },
-					{ x: 200, y: 100 },
-					{ x: 200, y: 25 },
-					{ x: 250, y: 25 }]
-			})));
-			*/
-			//testings
-			//to debug faster
 			//(<any>window).win = app.winProps;
 			//(<any>window).combo = app.prop("comp_option");
-			//(<any>window).board = app.board;
 			(<any>window).tooltip = app.tooltip;
 			(<any>window).rc = app.rightClick;
 			(<any>window).Rect = Rect;
-			//(<any>window).compColor = app.prop("comp_color");
-			//(<any>window).Colors = Colors;
-			//(<any>window).Unit = Unit;
-			//var u = new Unit("2.5mV");	//console testings k = new unit.constructor("3mW");
-			//(<any>window).Prop = Prop;
-			//(<any>window).EcProp = EcProp;
-			//var p = new Prop({ tag: "#inp02", onChange : function(e) { console.log(e) } })
 			(<any>window).MyApp = app;
-			const replaceText = (selector: string, text: string) => {
-				const element = document.getElementById(selector);
-				if (element) {
-					element.innerText = text;
-				}
-			};
-			for (const type of ["chrome", "node", "electron"]) {
-				replaceText(`${type}-version`, (process.versions as any)[type]);
-			}
+			console.log(`We are using ${process.versions.node}, ${process.versions.chrome}, and ${process.versions.electron}`)
 			//////////////////// TESTINGS /////////////////
-
 		})
 		.catch((ex: any) => {
 			console.log(ex)
 		});
 });
+
+function getUIZoom(): number {
+	let
+		zoom_item = qS('.bar-item[data-scale].selected'),
+		o = attr(zoom_item, "data-scale"),
+		m = parseFloat(o);
+	return m;
+}
 
 function updateViewBox(arg: any) {
 	qS("body").style.height = arg.height + "px";
@@ -864,9 +822,10 @@ function updateViewBox(arg: any) {
 	app.board.style.height = mainHeight + "px";
 	app.size = new Size(arg.width, arg.height);
 	app.contentHeight = mainHeight;
-	app.setViewBox(<any>undefined);
+	app.setBoardZoom(getUIZoom(), false);
 }
 
+//[Obsolete]
 ipcRenderer.on('fileData', (event, data) => {
 	xml2js.parseString(data, { trim: true }, (err, result) => {
 		if (err)
@@ -877,26 +836,9 @@ ipcRenderer.on('fileData', (event, data) => {
 	//console.log('file content:', data)
 })
 
-function saveCircuit(): boolean {
-	let
-		answer = ipcRenderer.sendSync('saveFile', app.circuit.XML());
-	console.log('save: ', answer);
-	//for now only abort if canceled, later ask again if couldn't save because an error
-	app.circuit.modified = !!answer.canceled;
-	//
-	return !answer.canceled;
-}
-
 ipcRenderer.on("check-before-exit", (event, arg) => {
-	let
-		choice = app.circuit.modified ?
-			ipcRenderer.sendSync('save-dialog', app.circuit.XML()) : 2;
-	if (choice == 1)
-		return
-	else if (choice == 0) {
-		if (!saveCircuit())
-			return;
-	}
+	if (app.circuit.save(true) == 1)		// Cancel
+		return;
 	ipcRenderer.send('app-quit', '')
 });
 
@@ -911,6 +853,7 @@ ipcRenderer.on('asynchronous-reply', (event, arg) => {
 })
 ipcRenderer.send('asynchronous-message', 'ping')
 //remote.getGlobal('sharedObj')	will be deprecated soon
+//https://www.electronjs.org/docs/tutorial/security
 
 /*
 let

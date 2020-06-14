@@ -81,13 +81,13 @@ export default class Wire extends ItemBoard {
 		this.setPoints(options.points);
 
 		//bond wire ends if any
-		if (options.start) {
+		//if (options.start) {
 			//...
-		}
+		//}
 
-		if (options.end) {
+		//if (options.end) {
 			//...
-		}
+		//}
 
 		//place it
 		this.move(this.settings.points[0].x, this.settings.points[0].y);

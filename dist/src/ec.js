@@ -23,10 +23,7 @@ var EC = /** @class */ (function (_super) {
     __extends(EC, _super);
     function EC(circuit, options) {
         var _this = _super.call(this, circuit, options) || this;
-        //this ensures all path, rect, circles are inserted before the highlight circle node
-        //_.svg is used because _.html doesn't work for SVG
         _this.g.innerHTML = _this.base.data;
-        //add component label if available
         var createText = function (attr, text) {
             var svgText = utils_1.tag("text", "", attr);
             return svgText.innerHTML = text, svgText;

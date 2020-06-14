@@ -92,6 +92,8 @@ var Item = /** @class */ (function (_super) {
             y: 0,
             class: "",
             visible: true,
+            base: void 0,
+            label: ""
         };
     };
     return Item;

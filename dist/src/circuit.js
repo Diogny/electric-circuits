@@ -1,39 +1,81 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Circuit = void 0;
+var ec_1 = require("./ec");
+var wire_1 = require("./wire");
 var types_1 = require("./types");
 var dab_1 = require("./dab");
 var electron_1 = require("electron");
+var xml2js = require("xml2js");
+var point_1 = require("./point");
+var components_1 = require("./components");
 var Circuit = /** @class */ (function () {
-    function Circuit(app, name, description) {
+    function Circuit(app, options) {
         this.app = app;
-        this.name = name;
-        this.description = description;
+        this.compMap = new Map();
         this.ecMap = new Map();
         this.wireMap = new Map();
         this.selectedComponents = [];
+        this.uniqueCounters = {};
+        if (typeof options == "string") {
+            //load Circuit
+            parseCircuitXML.call(this, options);
+        }
+        else {
+            //empty Circuit
+            this.version = options.version || "1.1.5";
+            this.__multiplier = options.multiplier;
+            this.name = options.name;
+            this.description = options.description;
+            this.filePath = options.filePath;
+        }
+        //overrides
         this.__modified = false;
     }
+    Circuit.prototype.rootComponent = function (name) {
+        return this.compMap.get(name);
+    };
+    Object.defineProperty(Circuit.prototype, "multiplier", {
+        get: function () { return this.__multiplier; },
+        set: function (value) {
+            if (isNaN(value)
+                || value == this.__multiplier
+                || !["0.125", "0.166", "0.25", "0.33", "0.5", "0.75", "1", "2", "4", "8"].some(function (s) { return parseFloat(s) == value; }))
+                return;
+            this.__multiplier = value;
+            this.modified = true;
+        },
+        enumerable: false,
+        configurable: true
+    });
     Object.defineProperty(Circuit.prototype, "modified", {
         get: function () { return this.__modified; },
         set: function (value) {
             if (value == this.__modified)
                 return;
-            electron_1.ipcRenderer.invoke('shared-data', ['app.circuit.modified', value])
-                .then(function (value) {
-                console.log('setting modified: ', value);
-            });
             this.__modified = value;
+            //proof of concept
+            /*ipcRenderer.invoke('shared-data', ['app.circuit.modified', value])
+                .then(value => {
+                    console.log('setting modified: ', value)
+                });*/
         },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(Circuit.prototype, "ecList", {
+        get: function () { return Array.from(this.ecMap.values()); },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(Circuit.prototype, "wireList", {
+        get: function () { return Array.from(this.wireMap.values()); },
         enumerable: false,
         configurable: true
     });
     Object.defineProperty(Circuit.prototype, "components", {
         //returns all components: ECs, Wires
-        get: function () {
-            return Array.from(this.ecMap.values())
-                .concat(Array.from(this.wireMap.values()));
-        },
+        get: function () { return this.ecList.concat(this.wireList); },
         enumerable: false,
         configurable: true
     });
@@ -48,7 +90,7 @@ var Circuit = /** @class */ (function () {
         enumerable: false,
         configurable: true
     });
-    //components
+    //selection
     Circuit.prototype.hasComponent = function (id) { return this.ecMap.has(id); };
     Circuit.prototype.selectAll = function () {
         this.selectedComponents = selectAll.call(this, false);
@@ -59,18 +101,16 @@ var Circuit = /** @class */ (function () {
     };
     Circuit.prototype.toggleSelect = function (comp) {
         comp.select(!comp.selected);
-        this.selectedComponents = Array.from(this.ecMap.values()).filter(function (c) { return c.selected; });
+        this.selectedComponents = this.ecList.filter(function (c) { return c.selected; });
     };
     Circuit.prototype.selectThis = function (comp) {
         selectAll.call(this, false);
         this.selectedComponents = [comp.select(true)];
     };
     Circuit.prototype.selectRect = function (rect) {
-        (this.selectedComponents =
-            Array.from(this.ecMap.values())
-                .filter(function (item) {
-                return rect.intersect(item.rect());
-            }))
+        (this.selectedComponents = this.ecList.filter(function (item) {
+            return rect.intersect(item.rect());
+        }))
             .forEach(function (item) { return item.select(true); });
     };
     Circuit.prototype.deleteSelected = function () {
@@ -86,6 +126,7 @@ var Circuit = /** @class */ (function () {
         this.modified = deletedCount != 0;
         return deletedCount;
     };
+    //add/delete
     Circuit.prototype.delete = function (comp) {
         if (comp.type == types_1.Type.WIRE ?
             this.wireMap.delete(comp.id) :
@@ -97,44 +138,213 @@ var Circuit = /** @class */ (function () {
         }
         return false;
     };
-    Circuit.prototype.add = function (comp, fn) {
-        switch (comp.type) {
-            case types_1.Type.EC:
-                return !this.ecMap.has(comp.id)
-                    && (this.ecMap.set(comp.id, comp), fn && fn(comp), this.modified = true, true);
-            case types_1.Type.WIRE:
-                return !this.wireMap.has(comp.id)
-                    && (this.wireMap.set(comp.id, comp), fn && fn(comp), this.modified = true, true);
-        }
-        return false;
+    Circuit.prototype.add = function (name, addToDOM, points) {
+        var options = {
+            name: name
+        }, comp;
+        ((name == "wire") && (options.points = points || [point_1.default.origin, point_1.default.origin], true))
+            || (options.x = this.app.center.x, options.y = this.app.center.y);
+        comp = createBoardItem.call(this, options, addToDOM);
+        this.modified = true;
+        return comp;
     };
+    //load/save
     Circuit.prototype.XML = function () {
-        var ecs = '\t<ecs>\n'
-            + Array.from(this.ecMap.values())
-                .map(function (comp) { return dab_1.nano('\t\t<ec id="{id}" name="{name}" x="{x}" y="{y}" rot="{rotation}" />\n', comp); })
+        var _this = this;
+        var circuitMetadata = function () {
+            var description = _this.description
+                ? " description=\"" + _this.description + "\"" : "";
+            return "<circuit version=\"1.1.5\" zoom=\"" + _this.app.multiplier + "\" name=\"" + _this.name + "\"" + description + ">\n";
+        }, ecTmpl = '\t\t<ec id="{id}" name="{name}" x="{x}" y="{y}" rot="{rotation}" label="{label}" />\n', ecs = '\t<ecs>\n'
+            + this.ecList
+                .map(function (comp) { return dab_1.nano(ecTmpl, comp); })
                 .join('')
-            + '\t</ecs>\n', wires = '\t<wires>\n'
-            + Array.from(this.wireMap.values())
-                .map(function (wire) { return dab_1.nano('\t\t<wire id="{id}" points="{points}" />\n', {
+            + '\t</ecs>\n', wireTnpl = '\t\t<wire id="{id}" points="{points}" label="{label}" />\n', wires = '\t<wires>\n'
+            + this.wireList
+                .map(function (wire) { return dab_1.nano(wireTnpl, {
                 id: wire.id,
                 points: wire.points.map(function (p) { return dab_1.nano('{x},{y}', p); })
                     .join('|')
             }); })
                 .join('')
-            + '\t</wires>\n', bonds = this.components.map(function (comp) { return !comp.bonds.length ? "" : dab_1.nano("\t\t<bond id=\"{id}\" d=\"" + comp.bonds.map(function (o) { return o.link; }).filter(function (s) { return !!s; }).join(',') + "\" />\n", comp); })
-            .filter(function (s) { return !!s; })
+            + '\t</wires>\n', bonds = getAllCircuitBonds.call(this)
+            .map(function (b) { return "\t\t<bond>" + b + "</bond>\n"; })
             .join('');
-        return '<?xml version="1.0" encoding="utf-8"?>\n<circuit version="1.1.5">\n'
-            + ecs + wires
+        //this.components.map(comp => !comp.bonds.length ? "" : nano(`\t\t<bond id="{id}" d="${comp.bonds.map((o) => o.link).filter(s => !!s).join(',')}" />\n`, comp)).filter(s => !!s).join('');
+        return '<?xml version="1.0" encoding="utf-8"?>\n'
+            + circuitMetadata()
+            + ecs
+            + wires
             + '\t<bonds>\n' + bonds + '\t</bonds>\n'
             + '</circuit>\n';
     };
-    Circuit.prototype.load = function (content) {
-        return true;
+    Circuit.prototype.save = function (showDialog) {
+        var _this = this;
+        try {
+            if (!this.modified)
+                return 3; // Not Modified: 3
+            if (showDialog) {
+                var choice = electron_1.ipcRenderer.sendSync('save-dialog', this.XML());
+                if (choice != 0)
+                    return choice; // Cancel: 1 or Don't Save: 2
+            }
+            //try to save
+            var getOptions = function () {
+                var options = {
+                    data: _this.XML()
+                };
+                _this.filePath && (options.filePath = _this.filePath);
+                return options;
+            }, answer = electron_1.ipcRenderer.sendSync('saveFile', getOptions());
+            //error treatment
+            if (answer.canceled)
+                return 1; // Cancel: 1
+            if (answer.error) {
+                console.log(answer); //later popup with error
+                return 5; // Error: 5
+            }
+            //OK
+            this.filePath = answer.filepath;
+            this.modified = false;
+            return 0; // Save: 0
+        }
+        catch (e) {
+            console.log(e.message);
+            return 5; // Error: 5
+        }
+    };
+    //cleaning
+    Circuit.prototype.destroy = function () {
+        var _this = this;
+        this.ecList.forEach(function (ec) { return _this.delete(ec); });
+        this.wireList.forEach(function (wire) { return _this.delete(wire); });
+        //maps should be empty here
+        this.compMap = void 0;
+        this.ecMap = void 0;
+        this.wireMap = void 0;
+        this.selectedComponents = void 0;
+        this.__modified = false;
+        this.filePath = void 0;
     };
     return Circuit;
 }());
 exports.Circuit = Circuit;
+function createBoardItem(options, addToDOM) {
+    var self = this, regex = /(?:{([^}]+?)})+/g, name = (options === null || options === void 0 ? void 0 : options.name) || "", base = self.rootComponent(name), newComp = !base, item = void 0;
+    //register new component in the circuit
+    !base && (base = {
+        comp: components_1.default.find(name),
+        count: 0
+    });
+    if (!base.comp)
+        throw "unregistered component: " + name;
+    newComp
+        && (base.count = base.comp.meta.countStart | 0, self.compMap.set(name, base));
+    options.base = base.comp;
+    if (!options.id) {
+        //if not ID
+        options.id = name + "-" + base.count;
+        //use template to create label according to defined strategy
+        options.label = base.comp.meta.nameTmpl.replace(regex, function (match, group) {
+            var arr = group.split('.'), getRoot = function (name) {
+                //valid entry points
+                switch (name) {
+                    case "base": return base;
+                    case "Circuit": return self.uniqueCounters;
+                }
+            }, rootName = arr.shift() || "", rootRef = getRoot(rootName), prop = arr.pop(), isUniqueCounter = function () { return rootName == "Circuit"; }, result;
+            while (rootRef && arr.length)
+                rootRef = rootRef[arr.shift()];
+            if (rootRef == undefined
+                || ((result = rootRef[prop]) == undefined
+                    && (!isUniqueCounter()
+                        || (result = rootRef[prop] = base.comp.meta.countStart | 0, false))))
+                throw "invalid label template";
+            //increment counter only for static properties
+            isUniqueCounter() && dab_1.isNum(result) && (rootRef[prop] = result + 1);
+            return result;
+        });
+        base.count++;
+    }
+    switch (name) {
+        case "wire":
+            item = new wire_1.default(self, options);
+            if (self.wireMap.has(item.id))
+                throw "duplicated id: " + item.id;
+            self.wireMap.set(item.id, item);
+            break;
+        default:
+            !options.onProp && (options.onProp = function () {
+                //this happens when this component is created...
+            });
+            item = new ec_1.default(self, options);
+            if (self.ecMap.has(item.id))
+                throw "duplicated id: " + item.id;
+            self.ecMap.set(item.id, item);
+            break;
+    }
+    addToDOM && self.app.addToDOM(item);
+    return item;
+}
+function parseCircuitXML(data) {
+    var self = this;
+    //answer.filepath
+    xml2js.parseString(data, { trim: true, explicitArray: false }, function (err, json) {
+        if (err)
+            console.log(err);
+        else {
+            var atttrs = json.circuit.$, ecs = json.circuit.ecs.ec, wires = json.circuit.wires.wire, bonds = json.circuit.bonds.bond;
+            //attributes
+            self.version = atttrs.version;
+            self.multiplier = parseFloat(atttrs.zoom) || 1;
+            self.name = atttrs.name;
+            self.description = atttrs.description;
+            //create ECs
+            ecs.forEach(function (xml) {
+                var ec = createBoardItem.call(self, {
+                    id: xml.$.id,
+                    name: xml.$.name,
+                    x: parseInt(xml.$.x),
+                    y: parseInt(xml.$.y),
+                    rotation: parseInt(xml.$.rot),
+                    label: xml.$.label,
+                }, false);
+            });
+            wires.forEach(function (xml) {
+                var options = {
+                    id: xml.$.id,
+                    name: "wire",
+                    label: xml.$.label,
+                    points: xml.$.points.split('|').map(function (s) { return point_1.default.parse(s); }),
+                };
+                if (options.points.some(function (p) { return !p; }))
+                    throw "invalid wire points";
+                var wire = createBoardItem.call(self, options, false);
+            });
+            bonds.forEach(function (s) {
+                var arr = s.split(','), fromIt = self.get(arr.shift()), fromNdx = parseInt(arr.shift()), toIt = self.get(arr.shift()), toNdx = parseInt(arr.shift());
+                if (arr.length || !fromIt || !toIt || !fromIt.getNode(fromNdx) || !toIt.getNode(toNdx))
+                    throw "invalid bond";
+                fromIt.bond(fromNdx, toIt, toNdx);
+            });
+        }
+    });
+}
+function getAllCircuitBonds() {
+    var bonds = [], keyDict = new Set(), findBonds = function (bond) {
+        var fromId = bond.from.id, fromNdx = bond.from.ndx, keyRoot = fromId + "," + fromNdx;
+        bond.to.forEach(function (b) {
+            var otherRoot = b.id + "," + b.ndx, key0 = keyRoot + "," + otherRoot;
+            if (!keyDict.has(key0)) {
+                keyDict.add(key0).add(otherRoot + "," + keyRoot);
+                bonds.push(key0);
+            }
+        });
+    };
+    this.components
+        .forEach(function (comp) { return comp.bonds.forEach(findBonds); });
+    return bonds;
+}
 function selectAll(value) {
     var arr = Array.from(this.ecMap.values());
     arr.forEach(function (comp) { return comp.select(value); });

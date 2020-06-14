@@ -1,14 +1,15 @@
+import { ipcRenderer } from "electron";
 import { Application } from "./app";
 import {
-	IApplicationOptions, IMyApp, ITooltipText, IAppWindowOptions, IStateMachineOptions,
-	StateType, ActionType, IMouseState, IContextMenuOptions
+	IMyApp, ITooltipText, IAppWindowOptions, IStateMachineOptions,
+	StateType, ActionType, IMouseState, IContextMenuOptions, IMyAppOptions
 } from "./interfaces";
-import { basePath, qS, pad } from "./utils";
+import { basePath, qS, pad, qSA } from "./utils";
 import Rect from "./rect";
 import Size from "./size";
 import Point from './point';
 import Tooltip from "./tooltip";
-import { attr, aEL, nano } from "./dab";
+import { attr, aEL, nano, removeClass, addClass } from "./dab";
 import AppWindow from "./app-window";
 import StateMachine from "./stateMachine";
 import ContextWindow from "./context-window";
@@ -28,19 +29,19 @@ export class MyApp extends Application implements IMyApp {
 	readonly ratio: number;
 	readonly svgBoard: SVGElement;
 	readonly tooltip: Tooltip;
-	readonly topBarLeft: HTMLElement;
-	readonly topBarRight: HTMLElement;
+	readonly bottomBarLeft: HTMLElement;
+	readonly bottomBarCenter: HTMLElement;
 	readonly winProps: AppWindow;
 	readonly sm: StateMachine;
 	readonly rightClick: ContextWindow;
 	readonly dash: LinesAligner;
 	readonly highlight: HighlightNode;
 	readonly selection: SelectionRect;
-	readonly circuit: Circuit;
+	circuit: Circuit;
 
 	viewBox: Rect;
 	baseViewBox: Size;
-	multiplier: number;
+	get multiplier(): number { return this.circuit.multiplier }
 	ratioX: number;
 	ratioY: number;
 	center: Point;
@@ -50,7 +51,7 @@ export class MyApp extends Application implements IMyApp {
 
 	get tooltipOfs(): number { return 15 }
 
-	constructor(options: IApplicationOptions) {
+	constructor(options: IMyAppOptions) {
 		super(options);
 		let
 			that: MyApp = this,
@@ -118,11 +119,10 @@ export class MyApp extends Application implements IMyApp {
 				//arr.push(`client ${clientXY.toString()}`);
 				//arr.push(`scaled: x: ${clientXYScaled.x} y: ${clientXYScaled.y}`);
 				//render
-				that.topBarLeft.innerHTML = arr.join(", ");
+				that.bottomBarLeft.innerHTML = arr.join(", ");
 				return state;
 			};
 		this.viewBox = Rect.empty();		//location is panning, size is for scaling
-		this.multiplier = 0.5;  //scaling multipler 2X UI default
 		this.ratio = window.screen.width / window.screen.height;		//this's a const value
 		this.ratioX = 1;
 		this.ratioY = 1;
@@ -130,12 +130,12 @@ export class MyApp extends Application implements IMyApp {
 		this.rootDir = <string>basePath();			//not used in electron
 		this.board = (<HTMLElement>qS("#board"));
 		this.svgBoard = (<SVGElement>this.board.children[0]);
-		this.topBarLeft = qS("#top-bar>div:nth-of-type(1)");
-		this.topBarRight = qS("#top-bar>div:nth-of-type(2)");
+		this.bottomBarLeft = qS('[bar="bottom-left"]');
+		this.bottomBarCenter = qS('[bar="bottom-center"]');
 		this.dash = new LinesAligner(this);
 		this.highlight = new HighlightNode(<any>{});
 		this.selection = new SelectionRect(this);
-		this.circuit = new Circuit(this, "my circuit");
+		this.circuit = new Circuit(this, { name: "my circuit", multiplier: options.multiplier }); //scaling multipler 2X UI default
 
 		//this'll hold the properties of the current selected component
 		this.winProps = new AppWindow(<IAppWindowOptions>{
@@ -165,7 +165,7 @@ export class MyApp extends Application implements IMyApp {
 				LEAVE: function (newCtx: IMouseState) {
 					//cannot save new context, erases wiring status
 					hideNodeTooltip(newCtx);
-					that.topBarLeft.innerHTML = "&nbsp;";
+					that.bottomBarLeft.innerHTML = "&nbsp;";
 				},
 				KEY: function (code: any) {
 					//console.log(`KEY: ${code}`);
@@ -235,7 +235,9 @@ export class MyApp extends Application implements IMyApp {
 				(id = that.highlight.selectedId,
 					comp = <ItemBoard>that.circuit.get(id),
 					compName = comp.type == Type.WIRE ? "wire" : "ec",
-					(nodeOrLine != that.highlight.selectedNode && console.log(`node: ${nodeOrLine} <> ${that.highlight.selectedNode}`)));
+					(nodeOrLine != that.highlight.selectedNode 
+						//&& console.log(`node: ${nodeOrLine} <> ${that.highlight.selectedNode}`)
+					));
 
 			key = that.rightClick.setTrigger(
 				id,
@@ -273,14 +275,15 @@ export class MyApp extends Application implements IMyApp {
 		return p.x > 0 && p.y > 0 && p.x < this.viewBox.width && p.y < this.viewBox.height
 	}
 
-	public setViewBox(m: number) {
-		if (!m) {
-			let
-				zoom_item = qS('.bar-item[data-scale].selected'),
-				o = attr(zoom_item, "data-scale");
-			m = parseFloat(o);
+	public setBoardZoom(m: number, updateDOM: boolean) {
+		this.circuit.multiplier = m;
+		if (updateDOM) {
+			//remove all selected class, should be one
+			qSA('.bar-item[data-scale].selected').forEach((item: any) => {
+				removeClass(item, "selected");
+			});
+			addClass(qS(`[data-scale="${this.circuit.multiplier}"]`), "selected");
 		}
-		this.multiplier = m;
 		this.baseViewBox = new Size(this.board.clientWidth * this.ratio | 0, this.board.clientHeight * this.ratio | 0);
 		//calculate size
 		this.viewBox.width = this.baseViewBox.width * this.multiplier | 0;
@@ -288,10 +291,10 @@ export class MyApp extends Application implements IMyApp {
 		calculateAndUpdateViewBoxData.call(this);
 	}
 
-	public updateViewBox() { calculateAndUpdateViewBoxData.call(this); }
+	public updateViewBox(x?: number, y?: number) { calculateAndUpdateViewBoxData.call(this, x, y); }
 
-	public refreshTopBarRight() {
-		this.topBarRight.innerHTML = nano(this.templates.viewBox01, this.viewBox) + "&nbsp; " +
+	public refreshTopBarRight() {//topBarRight
+		this.bottomBarCenter.innerHTML = nano(this.templates.viewBox01, this.viewBox) + "&nbsp; " +
 			nano(this.templates.size01, this.size);
 	}
 
@@ -303,18 +306,6 @@ export class MyApp extends Application implements IMyApp {
 
 	public tooltipFontSize = () => Math.max(10, 35 * this.multiplier)
 
-	public addECtoDOM(ec: EC) {
-		this.svgBoard.insertBefore(ec.g, this.tooltip.g);
-		//do after DOM inserted work
-		ec.afterDOMinserted();
-	}
-
-	public addWiretoDOM(wire: Wire) {
-		this.dash.g.insertAdjacentElement("afterend", wire.g);
-		//do after DOM inserted work
-		wire.afterDOMinserted();
-	}
-
 	public rotateEC(angle: number) {
 		this.rotateComponentBy(angle, this.circuit.ec)
 	}
@@ -322,7 +313,10 @@ export class MyApp extends Application implements IMyApp {
 	public rotateComponentBy(angle: number, comp?: ItemBoard) {
 		if (!comp || comp.type != Type.EC)
 			return;
-		(comp as EC).rotate((comp as EC).rotation + angle);
+		let
+			rotation = (comp as EC).rotation;
+		(rotation != (comp as EC).rotate((comp as EC).rotation + angle).rotation)
+			&& (this.circuit.modified = true);
 		this.refreshRotation(comp);
 	}
 
@@ -444,11 +438,66 @@ export class MyApp extends Application implements IMyApp {
 			//console.log(`action: ${action}, id: ${comp?.id}, name: ${name}, type: ${type}, trigger: ${trigger}`);
 		}
 	}
+
+	public addToDOM(comp: EC | Wire): boolean {
+		switch (comp.type) {
+			case Type.EC:
+				this.svgBoard.insertBefore(comp.g, this.tooltip.g);
+				break;
+			case Type.WIRE:
+				this.dash.g.insertAdjacentElement("afterend", comp.g);
+				break;
+			default:
+				return false;
+		}
+		comp.afterDOMinserted();
+		return true;
+	}
+
+	public loadCircuit() {
+		try {
+			let
+				choice = this.circuit.save(false);
+			if (choice == 5)
+				return;		// Error: 5		already logged to console
+			if (!(choice == 0 || choice == 3))	// Save: 0 or Not Modified: 3
+				return;
+			let
+				answer = ipcRenderer.sendSync('openFile', "");
+			//error treatment
+			if (answer.error) {
+				console.log(answer);	//later popup with error
+				return;
+			}
+			if (answer.canceled) {
+				console.log(answer);
+				return;
+			}
+			if (!answer.data) {
+				console.log(answer);	//later popup with error
+				return;
+			}
+			let
+				circuit = new Circuit(this, answer.data);
+			//everything OK here
+			this.circuit.destroy();
+			//start loading new circuit
+			this.circuit = circuit;
+			this.setBoardZoom(circuit.multiplier, true);
+			//circuit add to DOM
+			this.circuit.components
+				.forEach(comp => this.addToDOM(<any>comp))
+		} catch (e) {
+			console.log(e.message);			//later popup with error
+		}
+	}
 }
 
-function calculateAndUpdateViewBoxData() {
+function calculateAndUpdateViewBoxData(x?: number, y?: number) {
 	let
 		self = this as MyApp;
+	(x != undefined) && (self.viewBox.x = x);
+	(y != undefined) && (self.viewBox.y = y);
 	//set SVG DOM viewBox attribute
 	attr(self.svgBoard, { "viewBox": `${self.viewBox.x} ${self.viewBox.y} ${self.viewBox.width} ${self.viewBox.height}` });
 	//calculate ratio

@@ -61,7 +61,7 @@ export default class Point implements IPoint {
 		return (val = (val | 0) % 360, (val < 0) && (val += 360), val);
 	}
 
-	static origin = new Point(0, 0);
+	static get origin() { return new Point(0, 0) }
 
 	static create(p: IPoint) {
 		return new Point(p.x, p.y)

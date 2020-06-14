@@ -90,7 +90,7 @@ export interface IApplication {
 //***************************************** MyApp ************************************//
 
 export interface IMyAppOptions extends IApplicationOptions {
-
+	multiplier: number;
 }
 
 export interface IMyApp extends IApplication {
@@ -106,8 +106,7 @@ export interface IMyApp extends IApplication {
 	ratioY: number;
 	center: Point;
 	tooltip: Tooltip;
-	topBarLeft: HTMLElement;
-	topBarRight: HTMLElement;
+	bottomBarLeft: HTMLElement;
 	winProps: HtmlWindow;
 
 	sm: StateMachine;
@@ -222,14 +221,16 @@ export interface IItemBaseOptions {
 	name: string;
 	x: number;
 	y: number;
-	//color: string;
 	class: string;
 	visible: boolean;
+	label: string;
+	base: Comp;
+	//color: string;
 }
 
 export interface IItemWireOptions extends IItemBaseOptions {
-	start: IWireBond;
-	end: IWireBond;
+	//start: IWireBond;
+	//end: IWireBond;
 	points: IPoint[];
 }
 
@@ -271,7 +272,6 @@ export interface IHighlighNodeSettings extends IItemBaseOptions {
 }
 
 export interface IItemBoardProperties extends IItemBaseProperties {
-	base: Comp;
 	props: any;
 	selected: boolean;
 	onProp: Function;

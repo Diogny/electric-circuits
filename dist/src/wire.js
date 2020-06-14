@@ -32,12 +32,12 @@ var Wire = /** @class */ (function (_super) {
         //set new points in polyline
         _this.setPoints(options.points);
         //bond wire ends if any
-        if (options.start) {
-            //...
-        }
-        if (options.end) {
-            //...
-        }
+        //if (options.start) {
+        //...
+        //}
+        //if (options.end) {
+        //...
+        //}
         //place it
         _this.move(_this.settings.points[0].x, _this.settings.points[0].y);
         //signal component creation

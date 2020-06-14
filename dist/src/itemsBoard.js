@@ -26,35 +26,8 @@ var ItemBoard = /** @class */ (function (_super) {
     function ItemBoard(circuit, options) {
         var _this = _super.call(this, options) || this;
         _this.circuit = circuit;
-        var base = components_1.default.find(_this.name, true), regex = /(?:{([^}]+?)})+/g, that = _this;
-        if (!base || !_this.circuit)
-            throw "cannot create component: " + _this.name;
-        //save base data
-        _this.settings.base = base.comp;
-        //global component count incremented
-        _this.settings.id = _this.base.name + "-" + base.count;
-        //use template to create label according to defined strategy
-        _this.label = base.comp.meta.nameTmpl.replace(regex, function (match, group) {
-            var arr = group.split('.'), getRoot = function (name) {
-                //valid entry points
-                switch (name) {
-                    case "this": return that;
-                    case "base": return base;
-                    case "Comp": return components_1.default;
-                }
-            }, rootName = arr.shift() || "", rootRef = getRoot(rootName), prop = arr.pop(), result;
-            while (rootRef && arr.length)
-                rootRef = rootRef[arr.shift()];
-            if (rootRef == undefined || (result = rootRef[prop]) == undefined)
-                throw "invalid label template";
-            //increment counter only for static properties
-            (rootName == "Comp") && dab_1.isNum(result) && (rootRef[prop] = result + 1);
-            return result;
-        });
-        base.count++;
-        //deep copy component properties
-        _this.settings.props = dab_1.obj(base.comp.props);
-        //add properties to DOM
+        var base = components_1.default.find(_this.name);
+        _this.settings.props = dab_1.obj(base.props);
         dab_1.attr(_this.g, {
             id: _this.id,
             "svg-comp": _this.base.type,
@@ -81,6 +54,11 @@ var ItemBoard = /** @class */ (function (_super) {
     });
     Object.defineProperty(ItemBoard.prototype, "bonds", {
         get: function () { return this.settings.bonds; },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(ItemBoard.prototype, "label", {
+        get: function () { return this.settings.label; },
         enumerable: false,
         configurable: true
     });

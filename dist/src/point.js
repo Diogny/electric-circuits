@@ -43,6 +43,11 @@ var Point = /** @class */ (function () {
     Point.validateRotation = function (val) {
         return (val = (val | 0) % 360, (val < 0) && (val += 360), val);
     };
+    Object.defineProperty(Point, "origin", {
+        get: function () { return new Point(0, 0); },
+        enumerable: false,
+        configurable: true
+    });
     Point.create = function (p) {
         return new Point(p.x, p.y);
     };
@@ -69,7 +74,6 @@ var Point = /** @class */ (function () {
     Point.plus = function (v1, v2) { return new Point(v1.x + v2.x, v1.y + v2.y); };
     //
     Point.inside = function (p, s) { return p.x >= 0 && p.x <= s.width && p.y >= 0 && p.y <= s.height; };
-    Point.origin = new Point(0, 0);
     return Point;
 }());
 exports.default = Point;

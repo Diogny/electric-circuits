@@ -81,7 +81,7 @@ export default class AppWindow extends BaseWindow {
 	}
 
 	public onMouseEnter(e: MouseEvent) {
-		(this.app as MyApp).topBarLeft.innerHTML = "&nbsp;";
+		(this.app as MyApp).bottomBarLeft.innerHTML = "&nbsp;";
 		this.settings.offset && (this.settings.offset = new Point(e.offsetX, e.offsetY));
 		//console.log('IN app window', e.eventPhase, (e.target as HTMLElement).id);
 	}
@@ -144,7 +144,7 @@ export default class AppWindow extends BaseWindow {
 		comp.properties().forEach((name: string) => {
 			this.appendPropChild(new EcProp(<ItemBoard>comp, name,
 				function onEcPropChange(value: any) {
-					console.log(this, value)
+					//console.log(this, value)
 				}, true));
 		});
 		this.setVisible(true);

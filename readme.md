@@ -10,15 +10,19 @@ Used in my testing website [Electric Circuits](http://diogny.com/tests/circuits.
 
 	Right-click shows context menu for individual board items
 	Board panning: Alt + Left-Click drag
+	Board ViewBox reset/center using tool button click
+	Board Zoom click on zoom buttoms, later scroll will do it
 
 	Start new Wire: Ctrl + Left-Click over EC node
 	Highlighted wire nodes and Wire lines can be dragged and aligned
 	Escape stops wiring
-	Bond lose wire: Ctrl + Left-Click, drag and drop over EC node or Wire node
+	Bond lose wire end: Ctrl + Left-Click on highlighted wire node, drag and drop over EC node or Wire node
 	EC and Wire tooltip label should be deleted in the future, only EC node labels should stay
 	
 	Ctrl + Left-Click on Board and drag shows selection rectangle for ECs
+	Left-Click on EC body hold and drag, multiple selected are dragged too
 	Ctrl + Left-Click on EC select/unselect
+	Left-Click on EC body shows it's properties
 	
 
 
@@ -88,6 +92,6 @@ Used in my testing website [Electric Circuits](http://diogny.com/tests/circuits.
 	git add -u					stage the modified and deleted files
 	git add -A
 	git commit -m "update message"
-	git tag v1.1.6
+	git tag v1.1.7
 	git push origin master --tags
 

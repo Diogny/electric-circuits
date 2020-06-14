@@ -1,4 +1,4 @@
-import { condClass, obj, attr, extend, isFn, isNum } from './dab';
+import { condClass, obj, attr, extend, isFn } from './dab';
 import { Bond } from './bonds';
 import ItemBase from './itemsBase';
 import Comp from './components';
@@ -19,51 +19,15 @@ export abstract class ItemBoard extends ItemBase {
 	get onProp(): Function { return this.settings.onProp }
 	get selected(): boolean { return this.settings.selected }
 	get bonds(): Bond[] { return this.settings.bonds }
+	get label(): string { return this.settings.label }
 
-	label: string;
 	abstract get count(): number;	// EC is node count, Wire is point count
 
 	constructor(public circuit: Circuit, options: IItemBaseOptions) {
 		super(options);
 		let
-			base = Comp.find(this.name, true),
-			regex = /(?:{([^}]+?)})+/g,
-			that = this;
-		if (!base || !this.circuit)
-			throw `cannot create component: ${this.name}`;
-		//save base data
-		this.settings.base = base.comp;
-		//global component count incremented
-		this.settings.id = `${this.base.name}-${base.count}`;
-		//use template to create label according to defined strategy
-		this.label = base.comp.meta.nameTmpl.replace(regex,
-			function (match: string, group: string): string { //, offset: number, str: string
-				let
-					arr = group.split('.'),
-					getRoot = (name: string): any => {
-						//valid entry points
-						switch (name) {
-							case "this": return that;
-							case "base": return base;
-							case "Comp": return Comp;
-						}
-					},
-					rootName = arr.shift() || "",
-					rootRef = getRoot(rootName),
-					prop = arr.pop(),
-					result: any;
-				while (rootRef && arr.length)
-					rootRef = rootRef[<any>arr.shift()];
-				if (rootRef == undefined || (result = rootRef[<any>prop]) == undefined)
-					throw `invalid label template`;
-				//increment counter only for static properties
-				(rootName == "Comp") && isNum(result) && (rootRef[<any>prop] = result + 1)
-				return result;
-			});
-		base.count++
-		//deep copy component properties
-		this.settings.props = obj(base.comp.props);
-		//add properties to DOM
+			base = <Comp>Comp.find(this.name);
+		this.settings.props = obj(base.props);
 		attr(this.g, {
 			id: this.id,
 			"svg-comp": this.base.type,

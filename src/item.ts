@@ -63,6 +63,8 @@ export default abstract class Item extends TypedClass {
 			y: 0,
 			class: "",
 			visible: true,		//defaults is visible
+			base: <any>void 0,
+			label: ""
 		}
 	}
 }

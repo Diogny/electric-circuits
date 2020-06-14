@@ -5,7 +5,6 @@ import { Bond } from './bonds';
 import Point from './point';
 import { IItemSolidOptions, IPoint, IItemNode, IItemBoardProperties } from './interfaces';
 import { ItemSolid } from './itemSolid';
-import Rect from './rect';
 import { Label } from './label';
 import { Circuit } from './circuit';
 
@@ -23,10 +22,7 @@ export default class EC extends ItemSolid {
 
 	constructor(circuit: Circuit, options: IItemSolidOptions) {
 		super(circuit, options);
-		//this ensures all path, rect, circles are inserted before the highlight circle node
-		//_.svg is used because _.html doesn't work for SVG
 		this.g.innerHTML = this.base.data;
-		//add component label if available
 		let
 			createText = (attr: any, text: string) => {
 				let
