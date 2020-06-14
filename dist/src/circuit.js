@@ -164,7 +164,8 @@ var Circuit = /** @class */ (function () {
                 .map(function (wire) { return dab_1.nano(wireTnpl, {
                 id: wire.id,
                 points: wire.points.map(function (p) { return dab_1.nano('{x},{y}', p); })
-                    .join('|')
+                    .join('|'),
+                label: wire.label
             }); })
                 .join('')
             + '\t</wires>\n', bonds = getAllCircuitBonds.call(this)
@@ -179,39 +180,43 @@ var Circuit = /** @class */ (function () {
             + '</circuit>\n';
     };
     Circuit.prototype.save = function (showDialog) {
-        var _this = this;
-        try {
-            if (!this.modified)
-                return 3; // Not Modified: 3
-            if (showDialog) {
-                var choice = electron_1.ipcRenderer.sendSync('save-dialog', this.XML());
-                if (choice != 0)
-                    return choice; // Cancel: 1 or Don't Save: 2
+        if (!this.modified)
+            return Promise.resolve(3); // Not Modified: 3
+        var self = this, getOptions = function () {
+            var options = {
+                data: self.XML()
+            };
+            self.filePath && (options.filePath = self.filePath);
+            return options;
+        };
+        this.circuitLoadingOrSaving = true;
+        return (showDialog ?
+            this.app.dialog.showDialog("Confirm", "You have unsaved work!", ["Save", "Cancel", "Don't Save"])
+                .then(function (choice) {
+                return Promise.resolve(choice); // Save: 0,  Cancel: 1, Don't Save: 2
+            })
+                .catch(function (reason) {
+                return Promise.resolve(5); // Error: 5
+            })
+            : Promise.resolve(0)).then(function (choice) {
+            if (choice == 0) {
+                //try to save
+                var answer = electron_1.ipcRenderer.sendSync('saveFile', getOptions());
+                //error treatment
+                if (answer.canceled)
+                    choice = 1; // Cancel: 1
+                else if (answer.error) {
+                    console.log(answer); //later popup with error
+                    choice = 5; // Error: 5
+                }
+                else { //OK
+                    self.filePath = answer.filepath;
+                    self.modified = false;
+                }
             }
-            //try to save
-            var getOptions = function () {
-                var options = {
-                    data: _this.XML()
-                };
-                _this.filePath && (options.filePath = _this.filePath);
-                return options;
-            }, answer = electron_1.ipcRenderer.sendSync('saveFile', getOptions());
-            //error treatment
-            if (answer.canceled)
-                return 1; // Cancel: 1
-            if (answer.error) {
-                console.log(answer); //later popup with error
-                return 5; // Error: 5
-            }
-            //OK
-            this.filePath = answer.filepath;
-            this.modified = false;
-            return 0; // Save: 0
-        }
-        catch (e) {
-            console.log(e.message);
-            return 5; // Error: 5
-        }
+            self.circuitLoadingOrSaving = false;
+            return Promise.resolve(choice);
+        });
     };
     //cleaning
     Circuit.prototype.destroy = function () {

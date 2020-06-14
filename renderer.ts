@@ -730,7 +730,7 @@ function readJson(path: string): any {
 window.addEventListener("DOMContentLoaded", () => {
 
 	//load DOM script HTML templates
-	templatesDOM("viewBox01|size01|point01|baseWin01|ctxWin01|ctxItem01|propWin01")
+	templatesDOM("viewBox01|size01|point01|baseWin01|ctxWin01|ctxItem01|propWin01|dialogWin01")
 		.then(async (templates: Object) => {
 			let
 				json = readJson('./dist/data/library-circuits.v2.json');
@@ -778,6 +778,7 @@ window.addEventListener("DOMContentLoaded", () => {
 			app.svgBoard.append(app.selection.g);
 			app.svgBoard.append(app.tooltip.g);
 			app.svgBoard.append(app.highlight.g);
+			qS('body>footer').insertAdjacentElement("afterend", app.dialog.win);
 
 			hookEvents();
 			//register states
@@ -798,6 +799,8 @@ window.addEventListener("DOMContentLoaded", () => {
 			(<any>window).rc = app.rightClick;
 			(<any>window).Rect = Rect;
 			(<any>window).MyApp = app;
+			(<any>window).dialog = app.dialog;
+
 			console.log(`We are using ${process.versions.node}, ${process.versions.chrome}, and ${process.versions.electron}`)
 			//////////////////// TESTINGS /////////////////
 		})
@@ -837,9 +840,14 @@ ipcRenderer.on('fileData', (event, data) => {
 })
 
 ipcRenderer.on("check-before-exit", (event, arg) => {
-	if (app.circuit.save(true) == 1)		// Cancel
+	if (app.dialog.visible
+		|| app.circuit.circuitLoadingOrSaving)
 		return;
-	ipcRenderer.send('app-quit', '')
+	app.circuit.save(true)
+		.then(choice => {
+			if (choice != 1)		// Cancel
+				ipcRenderer.send('app-quit', '')
+		})
 });
 
 //this's a proof of concept of how to communicate with main process, the recommended NEW way...

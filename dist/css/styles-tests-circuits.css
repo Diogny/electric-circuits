@@ -1,5 +1,6 @@
 body {
-  overflow-y: hidden;
+  overflow: hidden;
+  position: relative;
 }
 
 .light {
@@ -755,3 +756,42 @@ body.dark .expandable > span > i {
 /*.win.ctx > div[disabled]:hover {
   cursor: not-allowed;
 }*/
+
+/****************************** DIALOG WINDOW ***********************************/
+.win.dialog {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backdrop-filter: blur(5px);
+  z-index: 1000;
+  top: 0;
+  left: 0;
+  margin: 0;
+  overflow: hidden;
+}
+.light .win.dialog {
+  background: #35353452;
+}
+.dark .win.dialog {
+  background: #b9b9b952;
+}
+
+.win.dialog > div.content {
+  display: inline-block;
+  margin: auto;
+  background: #77948be0;
+  padding: 10px 19px;
+}
+.win.dialog > div.content > h4,
+.win.dialog > div.content > h5 {
+  color: #4d4e4e;
+}
+.win.dialog > div.content > div > button {
+  margin: 0px 4px;
+  background-color: #d4d4cd;
+  border-style: none;
+}
+.win.dialog > div.content > div > button:hover {
+  background-color: #717272e0;
+  color: white;
+}

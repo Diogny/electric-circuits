@@ -21,17 +21,12 @@ var BaseWindow = /** @class */ (function (_super) {
     __extends(BaseWindow, _super);
     function BaseWindow(options) {
         var _this = _super.call(this, options) || this;
-        !_this.settings.templateName && (_this.settings.templateName = "baseWin01");
         _this.settings.win = utils_1.html(dab_1.nano(_this.app.templates[_this.settings.templateName], {
             id: _this.id,
             class: _this.class
         }));
         _this.move(_this.x, _this.y);
-        _this.size = _this.settings.size;
         _this.setVisible(!!_this.settings.visible);
-        var that = _this;
-        dab_1.aEL(_this.win, "mouseenter", function (e) { return that.onMouseEnter.call(that, e); }, false);
-        dab_1.aEL(_this.win, "mouseleave", function (e) { return that.onMouseLeave.call(that, e); }, false);
         return _this;
     }
     Object.defineProperty(BaseWindow.prototype, "type", {
@@ -49,6 +44,14 @@ var BaseWindow = /** @class */ (function (_super) {
         enumerable: false,
         configurable: true
     });
+    Object.defineProperty(BaseWindow.prototype, "title", {
+        get: function () { return this.settings.title; },
+        enumerable: false,
+        configurable: true
+    });
+    BaseWindow.prototype.setTitle = function (value) {
+        return this.settings.title = value, this;
+    };
     Object.defineProperty(BaseWindow.prototype, "ClientRect", {
         get: function () {
             var b = this.win.getBoundingClientRect(); //gives the DOM screen info
@@ -67,54 +70,18 @@ var BaseWindow = /** @class */ (function (_super) {
         enumerable: false,
         configurable: true
     });
-    BaseWindow.prototype.setVisible = function (value) {
-        return _super.prototype.setVisible.call(this, value).visible ? dab_1.removeClass(this.win, "hide") : dab_1.addClass(this.win, "hide"), this;
-    };
-    Object.defineProperty(BaseWindow.prototype, "size", {
-        get: function () { return this.settings.size; },
-        set: function (value) {
-            if (!dab_1.pojo(value)) {
-                return;
-            }
-            this.settings.size = {
-                width: Math.max(BaseWindow.minWidth, value.width | 0),
-                height: Math.max(BaseWindow.minHeight, value.height | 0)
-            };
-            this.win.style.width = this.size.width + "px";
-            !this.settings.ignoreHeight && (this.win.style.height = this.size.height + "px");
-        },
-        enumerable: false,
-        configurable: true
-    });
-    BaseWindow.prototype.onMouseEnter = function (e) { };
-    BaseWindow.prototype.onMouseLeave = function (e) { };
-    BaseWindow.prototype.move = function (x, y) {
-        _super.prototype.move.call(this, x, y);
-        dab_1.css(this.win, {
-            top: this.y + "px",
-            left: this.x + "px"
-        });
-        return this;
-    };
     BaseWindow.prototype.clear = function () {
         return this.win.innerHTML = "", this;
-    };
-    BaseWindow.prototype.dispose = function () {
-        //release hook handlers, ...
     };
     BaseWindow.prototype.propertyDefaults = function () {
         return dab_1.extend(_super.prototype.propertyDefaults.call(this), {
             app: void 0,
-            size: {
-                width: 120,
-                height: 150
-            },
             visible: false,
-            ignoreHeight: false
+            ignoreHeight: false,
+            title: "",
+            templateName: "baseWin01"
         });
     };
-    BaseWindow.minWidth = 200;
-    BaseWindow.minHeight = 100;
     return BaseWindow;
 }(item_1.default));
 exports.default = BaseWindow;

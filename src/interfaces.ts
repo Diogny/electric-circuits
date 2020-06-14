@@ -319,25 +319,34 @@ export interface IBondItem {
 
 export interface IBaseWindowOptions extends IItemBaseOptions {
 	app: Application;
-	size: ISize;
 	title: string;
 	templateName: string;
-	ignoreHeight: boolean;
 }
 
 export interface IBaseWindowSettings extends IBaseWindowOptions {
 	win: HTMLElement;
 }
 
+
+export interface IBoardWindowOptions extends IBaseWindowOptions {
+	size: ISize;
+	ignoreHeight: boolean;
+}
+
+export interface IBoardWindowProperties extends IBoardWindowOptions {
+	win: HTMLElement;
+}
+
 //***************************************** AppWindow ************************************//
 
-export interface IAppWindowOptions extends IBaseWindowOptions {
+export interface IAppWindowOptions extends IBoardWindowOptions {
 	selected: boolean;
 	content: string;
 	bar: string;
 }
 
-export interface IAppWindowProperties extends IAppWindowOptions, IBaseWindowSettings {
+export interface IAppWindowProperties extends IAppWindowOptions {
+	win: HTMLElement;
 	//
 	titleDOM: HTMLElement;
 	main: HTMLElement;
@@ -347,6 +356,7 @@ export interface IAppWindowProperties extends IAppWindowOptions, IBaseWindowSett
 	offset: Point;
 	//
 	properties: EcProp[];
+	compId: string;
 }
 
 //***************************************** ContextWindow ************************************//
@@ -360,7 +370,7 @@ export interface IContextMenuItem {
 	enabled: StateType[];
 }
 
-export interface IContextMenuOptions extends IBaseWindowOptions {
+export interface IContextMenuOptions extends IBoardWindowOptions {
 	list: Map<string, IContextMenuItem[]>;
 }
 

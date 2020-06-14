@@ -244,17 +244,6 @@ ipcMain.on('saveFile', (event, arg) => {
 		})
 })
 
-ipcMain.on('save-dialog', (event, arg) => {
-	event.returnValue =
-		dialog.showMessageBoxSync({
-			type: 'warning',
-			buttons: ['Save', 'Cancel', `Don't save`],
-			cancelId: 1,
-			title: 'Confirm',
-			message: 'You have unsaved work!'
-		});
-})
-
 ipcMain.on('app-quit', (event, arg) => {
 	forceQuit = true;
 	mainWindow.close()

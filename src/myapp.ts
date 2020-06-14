@@ -21,6 +21,7 @@ import HighlightNode from "./highlightNode";
 import Wire from "./wire";
 import { SelectionRect } from "./selection-rect";
 import { Circuit } from "./circuit";
+import DialogWindow from "./dialog-window";
 
 export class MyApp extends Application implements IMyApp {
 
@@ -37,6 +38,7 @@ export class MyApp extends Application implements IMyApp {
 	readonly dash: LinesAligner;
 	readonly highlight: HighlightNode;
 	readonly selection: SelectionRect;
+	readonly dialog: DialogWindow;
 	circuit: Circuit;
 
 	viewBox: Rect;
@@ -135,6 +137,10 @@ export class MyApp extends Application implements IMyApp {
 		this.dash = new LinesAligner(this);
 		this.highlight = new HighlightNode(<any>{});
 		this.selection = new SelectionRect(this);
+		this.dialog = new DialogWindow(<any>{
+			app: this as Application,
+			id: "win-dialog",
+		});
 		this.circuit = new Circuit(this, { name: "my circuit", multiplier: options.multiplier }); //scaling multipler 2X UI default
 
 		//this'll hold the properties of the current selected component
@@ -235,7 +241,7 @@ export class MyApp extends Application implements IMyApp {
 				(id = that.highlight.selectedId,
 					comp = <ItemBoard>that.circuit.get(id),
 					compName = comp.type == Type.WIRE ? "wire" : "ec",
-					(nodeOrLine != that.highlight.selectedNode 
+					(nodeOrLine != that.highlight.selectedNode
 						//&& console.log(`node: ${nodeOrLine} <> ${that.highlight.selectedNode}`)
 					));
 
@@ -251,7 +257,8 @@ export class MyApp extends Application implements IMyApp {
 					.movePoint(clientXY)
 					.setVisible(true);
 		}, false);
-		document.onkeydown = function (ev: KeyboardEvent) {
+
+		document.addEventListener("keydown", (ev: KeyboardEvent) => {
 			//https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/code
 			switch (ev.code) {
 				case 'Enter':
@@ -263,11 +270,12 @@ export class MyApp extends Application implements IMyApp {
 				case 'Delete':
 				case 'ControlLeft':
 				case 'ControlRight':
-					that.sm.send(ActionType.KEY, ev.code);
+					if (!that.dialog.visible)
+						that.sm.send(ActionType.KEY, ev.code);
 					break;
 			}
-			//console.log(ev.code)
-		}
+			console.log(ev.code)
+		}, false);
 	}
 
 	public insideBoard(p: Point): boolean {
@@ -454,42 +462,44 @@ export class MyApp extends Application implements IMyApp {
 		return true;
 	}
 
-	public loadCircuit() {
-		try {
-			let
-				choice = this.circuit.save(false);
-			if (choice == 5)
-				return;		// Error: 5		already logged to console
-			if (!(choice == 0 || choice == 3))	// Save: 0 or Not Modified: 3
-				return;
-			let
-				answer = ipcRenderer.sendSync('openFile', "");
-			//error treatment
-			if (answer.error) {
-				console.log(answer);	//later popup with error
-				return;
-			}
-			if (answer.canceled) {
-				console.log(answer);
-				return;
-			}
-			if (!answer.data) {
-				console.log(answer);	//later popup with error
-				return;
-			}
-			let
-				circuit = new Circuit(this, answer.data);
-			//everything OK here
-			this.circuit.destroy();
-			//start loading new circuit
-			this.circuit = circuit;
-			this.setBoardZoom(circuit.multiplier, true);
-			//circuit add to DOM
-			this.circuit.components
-				.forEach(comp => this.addToDOM(<any>comp))
-		} catch (e) {
-			console.log(e.message);			//later popup with error
-		}
+	public loadCircuit(): Promise<number> {
+		let
+			self = this as MyApp;
+		return this.circuit.save(false)
+			.then(choice => {
+				self.circuit.circuitLoadingOrSaving = true;
+				if (choice == 0 || choice == 2 || choice == 3) { // Save: 0, Don't Save: 2, Not Modified: 3
+					let
+						answer = ipcRenderer.sendSync('openFile', "");
+					//error treatment
+					if (answer.error) {
+						console.log(answer);	//later popup with error
+						choice = 5;					// Error: 5
+					}
+					else if (answer.canceled) {
+						console.log(answer);
+						choice = 1;				// Cancel: 1
+					}
+					else if (!answer.data) {
+						console.log(answer);	//later popup with error
+						choice = 5;					// Error: 5
+					}
+					else {
+						let
+							circuit = new Circuit(self, answer.data);
+						//everything OK here
+						self.circuit.destroy();
+						//start loading new circuit
+						self.circuit = circuit;
+						self.setBoardZoom(circuit.multiplier, true);
+						//circuit add to DOM
+						self.circuit.components
+							.forEach(comp => self.addToDOM(<any>comp));
+						choice = 4;						// Load: 4
+					}
+				}
+				return Promise.resolve(choice)
+			})
 	}
 }
 

@@ -29,27 +29,31 @@ Used in my testing website [Electric Circuits](http://diogny.com/tests/circuits.
 ### Last compilation:
 	We are using Node.js 12.14.1, Chromium 83.0.4103.100, and Electron 9.0.3.
 
-![working example](dist/img/img01.png)
+![components](dist/img/img01.png)
 
-![working example](dist/img/img02.png)
+![right context menu](dist/img/img02.png)
 
-![working example](dist/img/img03.png)
+![simple connection](dist/img/img03.png)
 
-![working example](dist/img/img04.png)
+![a lot of components](dist/img/img04.png)
 
-![working example](dist/img/img05.png)
+![wire alignment](dist/img/img05.png)
 
-![working example](dist/img/img07.png)
+![board selection tool](dist/img/img07.png)
 
-![working example](dist/img/img06.png)
+![simple circuit](dist/img/img06.png)
 
-![working example](dist/img/img08.png)
+![wire bonds highlight](dist/img/img08.png)
 
-![working example](dist/img/img09.png)
+![new UI look](dist/img/img09.png)
 
-![working example](dist/img/img10.png)
+![light theme](dist/img/img10.png)
 
-![working example](dist/img/img11.png)
+![dark theme](dist/img/img11.png)
+
+![last UI look](dist/img/img12.png)
+
+![modal dialog window](dist/img/img13.png)
 
 ### install development packajes
 	pnpm install --save-dev tsconfig-paths-webpack-plugin
@@ -92,6 +96,6 @@ Used in my testing website [Electric Circuits](http://diogny.com/tests/circuits.
 	git add -u					stage the modified and deleted files
 	git add -A
 	git commit -m "update message"
-	git tag v1.1.7
+	git tag v1.1.8
 	git push origin master --tags
 

@@ -1,13 +1,13 @@
-import BaseWindow from "./base-window";
 import {
-	IContextMenuOptions, IContextMenuItem, IContextMenuSettings, ActionType, IBaseWindowOptions, StateType
+	IContextMenuOptions, IContextMenuItem, IContextMenuSettings, ActionType, IBaseWindowOptions, StateType, IBoardWindowOptions
 } from "./interfaces";
 import { each } from "./utils";
 import { nano, aEL, getParentAttr, attr, extend } from "./dab";
 import { MyApp } from "./myapp";
 import Point from "./point";
+import BoardWindow from "./board-window";
 
-export default class ContextWindow extends BaseWindow {
+export default class ContextWindow extends BoardWindow {
 
 	protected settings: IContextMenuSettings;
 	//client x,y where mouse right-click
@@ -111,7 +111,7 @@ export default class ContextWindow extends BaseWindow {
 		return this;
 	}
 
-	public propertyDefaults(): IBaseWindowOptions {
+	public propertyDefaults(): IBoardWindowOptions {
 		return extend(super.propertyDefaults(), {
 			class: "win ctx",
 			ignoreHeight: true,

@@ -1,25 +1,24 @@
 import { extend, removeClass, addClass, aEL, toggleClass, clamp } from "./dab";
 import { IAppWindowProperties, IAppWindowOptions, StateType, ActionType } from "./interfaces";
-import BaseWindow from "./base-window";
 import { html } from "./utils";
 import Point from "./point";
 import EcProp from "./ecprop";
 import { MyApp } from "./myapp";
 import { ItemBoard } from "./itemsBoard";
+import BoardWindow from "./board-window";
 
-export default class AppWindow extends BaseWindow {
+export default class AppWindow extends BoardWindow {
 
 	//extend
 	protected settings: IAppWindowProperties;
 
-	public compId: string;
+	get compId(): string { return this.settings.compId }
 
 	//title/header
 	titleHTML: HTMLDivElement;
 	titleButtons: HTMLDivElement;
-	get title(): string { return this.settings.title }
 	public setTitle(value: string): AppWindow {
-		return this.titleHTML.innerText = (this.settings.title = value), this
+		return this.titleHTML.innerText = super.setTitle(value).title, this
 	}
 
 	//main/content
@@ -112,7 +111,7 @@ export default class AppWindow extends BaseWindow {
 	public clear(): AppWindow {
 		//don't call base.clear because it clears all innerHTML
 		this.setTextHtml("");
-		this.compId = "";
+		this.settings.compId = "";
 		this.settings.properties = [];
 		this.setVisible(false);
 		return this;
@@ -140,7 +139,7 @@ export default class AppWindow extends BaseWindow {
 		if (!comp)
 			return false;
 		this.clear();
-		this.compId = comp.id;
+		this.settings.compId = comp.id;
 		comp.properties().forEach((name: string) => {
 			this.appendPropChild(new EcProp(<ItemBoard>comp, name,
 				function onEcPropChange(value: any) {
@@ -174,7 +173,8 @@ export default class AppWindow extends BaseWindow {
 			content: "",
 			bar: "",
 			selected: false,
-			properties: []
+			properties: [],
+			compId: "",
 		})
 	}
 

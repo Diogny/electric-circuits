@@ -31,6 +31,7 @@ var linealign_1 = require("./linealign");
 var highlightNode_1 = require("./highlightNode");
 var selection_rect_1 = require("./selection-rect");
 var circuit_1 = require("./circuit");
+var dialog_window_1 = require("./dialog-window");
 var MyApp = /** @class */ (function (_super) {
     __extends(MyApp, _super);
     function MyApp(options) {
@@ -110,6 +111,10 @@ var MyApp = /** @class */ (function (_super) {
         _this.dash = new linealign_1.default(_this);
         _this.highlight = new highlightNode_1.default({});
         _this.selection = new selection_rect_1.SelectionRect(_this);
+        _this.dialog = new dialog_window_1.default({
+            app: _this,
+            id: "win-dialog",
+        });
         _this.circuit = new circuit_1.Circuit(_this, { name: "my circuit", multiplier: options.multiplier }); //scaling multipler 2X UI default
         //this'll hold the properties of the current selected component
         _this.winProps = new app_window_1.default({
@@ -194,7 +199,7 @@ var MyApp = /** @class */ (function (_super) {
                     .movePoint(clientXY)
                     .setVisible(true);
         }, false);
-        document.onkeydown = function (ev) {
+        document.addEventListener("keydown", function (ev) {
             //https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/code
             switch (ev.code) {
                 case 'Enter':
@@ -206,11 +211,12 @@ var MyApp = /** @class */ (function (_super) {
                 case 'Delete':
                 case 'ControlLeft':
                 case 'ControlRight':
-                    that.sm.send(interfaces_1.ActionType.KEY, ev.code);
+                    if (!that.dialog.visible)
+                        that.sm.send(interfaces_1.ActionType.KEY, ev.code);
                     break;
             }
-            //console.log(ev.code)
-        };
+            console.log(ev.code);
+        }, false);
         return _this;
     }
     Object.defineProperty(MyApp.prototype, "multiplier", {
@@ -385,40 +391,40 @@ var MyApp = /** @class */ (function (_super) {
         return true;
     };
     MyApp.prototype.loadCircuit = function () {
-        var _this = this;
-        try {
-            var choice = this.circuit.save(false);
-            if (choice == 5)
-                return; // Error: 5		already logged to console
-            if (!(choice == 0 || choice == 3)) // Save: 0 or Not Modified: 3
-                return;
-            var answer = electron_1.ipcRenderer.sendSync('openFile', "");
-            //error treatment
-            if (answer.error) {
-                console.log(answer); //later popup with error
-                return;
+        var self = this;
+        return this.circuit.save(false)
+            .then(function (choice) {
+            self.circuit.circuitLoadingOrSaving = true;
+            if (choice == 0 || choice == 2 || choice == 3) { // Save: 0, Don't Save: 2, Not Modified: 3
+                var answer = electron_1.ipcRenderer.sendSync('openFile', "");
+                //error treatment
+                if (answer.error) {
+                    console.log(answer); //later popup with error
+                    choice = 5; // Error: 5
+                }
+                else if (answer.canceled) {
+                    console.log(answer);
+                    choice = 1; // Cancel: 1
+                }
+                else if (!answer.data) {
+                    console.log(answer); //later popup with error
+                    choice = 5; // Error: 5
+                }
+                else {
+                    var circuit = new circuit_1.Circuit(self, answer.data);
+                    //everything OK here
+                    self.circuit.destroy();
+                    //start loading new circuit
+                    self.circuit = circuit;
+                    self.setBoardZoom(circuit.multiplier, true);
+                    //circuit add to DOM
+                    self.circuit.components
+                        .forEach(function (comp) { return self.addToDOM(comp); });
+                    choice = 4; // Load: 4
+                }
             }
-            if (answer.canceled) {
-                console.log(answer);
-                return;
-            }
-            if (!answer.data) {
-                console.log(answer); //later popup with error
-                return;
-            }
-            var circuit = new circuit_1.Circuit(this, answer.data);
-            //everything OK here
-            this.circuit.destroy();
-            //start loading new circuit
-            this.circuit = circuit;
-            this.setBoardZoom(circuit.multiplier, true);
-            //circuit add to DOM
-            this.circuit.components
-                .forEach(function (comp) { return _this.addToDOM(comp); });
-        }
-        catch (e) {
-            console.log(e.message); //later popup with error
-        }
+            return Promise.resolve(choice);
+        });
     };
     return MyApp;
 }(app_1.Application));

@@ -15,10 +15,10 @@ var __extends = (this && this.__extends) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 var dab_1 = require("./dab");
 var interfaces_1 = require("./interfaces");
-var base_window_1 = require("./base-window");
 var utils_1 = require("./utils");
 var point_1 = require("./point");
 var ecprop_1 = require("./ecprop");
+var board_window_1 = require("./board-window");
 var AppWindow = /** @class */ (function (_super) {
     __extends(AppWindow, _super);
     function AppWindow(options) {
@@ -57,13 +57,13 @@ var AppWindow = /** @class */ (function (_super) {
         dragWindow(_this);
         return _this;
     }
-    Object.defineProperty(AppWindow.prototype, "title", {
-        get: function () { return this.settings.title; },
+    Object.defineProperty(AppWindow.prototype, "compId", {
+        get: function () { return this.settings.compId; },
         enumerable: false,
         configurable: true
     });
     AppWindow.prototype.setTitle = function (value) {
-        return this.titleHTML.innerText = (this.settings.title = value), this;
+        return this.titleHTML.innerText = _super.prototype.setTitle.call(this, value).title, this;
     };
     Object.defineProperty(AppWindow.prototype, "main", {
         //main/content
@@ -116,7 +116,7 @@ var AppWindow = /** @class */ (function (_super) {
     AppWindow.prototype.clear = function () {
         //don't call base.clear because it clears all innerHTML
         this.setTextHtml("");
-        this.compId = "";
+        this.settings.compId = "";
         this.settings.properties = [];
         this.setVisible(false);
         return this;
@@ -142,7 +142,7 @@ var AppWindow = /** @class */ (function (_super) {
         if (!comp)
             return false;
         this.clear();
-        this.compId = comp.id;
+        this.settings.compId = comp.id;
         comp.properties().forEach(function (name) {
             _this.appendPropChild(new ecprop_1.default(comp, name, function onEcPropChange(value) {
                 //console.log(this, value)
@@ -171,11 +171,12 @@ var AppWindow = /** @class */ (function (_super) {
             content: "",
             bar: "",
             selected: false,
-            properties: []
+            properties: [],
+            compId: "",
         });
     };
     return AppWindow;
-}(base_window_1.default));
+}(board_window_1.default));
 exports.default = AppWindow;
 function checkPosition(win, x, y) {
     return {

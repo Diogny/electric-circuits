@@ -13,11 +13,11 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var base_window_1 = require("./base-window");
 var interfaces_1 = require("./interfaces");
 var utils_1 = require("./utils");
 var dab_1 = require("./dab");
 var point_1 = require("./point");
+var board_window_1 = require("./board-window");
 var ContextWindow = /** @class */ (function (_super) {
     __extends(ContextWindow, _super);
     function ContextWindow(options) {
@@ -119,6 +119,6 @@ var ContextWindow = /** @class */ (function (_super) {
         });
     };
     return ContextWindow;
-}(base_window_1.default));
+}(board_window_1.default));
 exports.default = ContextWindow;
 //# sourceMappingURL=context-window.js.map

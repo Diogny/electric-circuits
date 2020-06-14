@@ -148,7 +148,7 @@ exports.propDescriptor = function (obj, prop) {
     return desc;
 };
 exports.aEL = function (el, eventName, fn, b) { return el.addEventListener(eventName, fn, b); };
-exports.rEL = function (el, eventName, fn) { return el.removeEventListener(eventName, fn); };
+exports.rEL = function (el, eventName, fn, b) { return el.removeEventListener(eventName, fn, b); };
 exports.dP = function (obj, propName, attrs) { return Object.defineProperty(obj, propName, attrs); };
 exports.aCld = function (parent, child) { return parent.appendChild(child); };
 exports.hasClass = function (el, className) { return el.classList.contains(className); };

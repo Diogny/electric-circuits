@@ -72,6 +72,8 @@ export class Circuit {
 		return !this.selectedComponents.length ? void 0 : this.selectedComponents[0]
 	}
 
+	circuitLoadingOrSaving: boolean;
+
 	constructor(public app: MyApp, options: string | { name: string, multiplier: number, version?: string, filePath?: string, description?: string }) {
 		this.compMap = new Map();
 		this.ecMap = new Map();
@@ -185,14 +187,14 @@ export class Circuit {
 					.map(wire => nano(wireTnpl, {
 						id: wire.id,
 						points: wire.points.map(p => nano('{x},{y}', p))
-							.join('|')
+							.join('|'),
+						label: wire.label
 					}))
 					.join('')
 				+ '\t</wires>\n',
 			bonds = getAllCircuitBonds.call(this)
 				.map((b: string) => `\t\t<bond>${b}</bond>\n`)
 				.join('');
-		//this.components.map(comp => !comp.bonds.length ? "" : nano(`\t\t<bond id="{id}" d="${comp.bonds.map((o) => o.link).filter(s => !!s).join(',')}" />\n`, comp)).filter(s => !!s).join('');
 		return '<?xml version="1.0" encoding="utf-8"?>\n'
 			+ circuitMetadata()
 			+ ecs
@@ -201,42 +203,48 @@ export class Circuit {
 			+ '</circuit>\n'
 	}
 
-	public save(showDialog: boolean): number {
-		try {
-			if (!this.modified)
-				return 3;	// Not Modified: 3
-			if (showDialog) {
+	public save(showDialog: boolean): Promise<number> {
+		if (!this.modified)
+			return Promise.resolve(3);	// Not Modified: 3
+		let
+			self = this as Circuit,
+			getOptions = () => {
 				let
-					choice = ipcRenderer.sendSync('save-dialog', this.XML());
-				if (choice != 0)
-					return choice;	// Cancel: 1 or Don't Save: 2
+					options = <any>{
+						data: self.XML()
+					};
+				self.filePath && (options.filePath = self.filePath)
+				return options
+			};
+		this.circuitLoadingOrSaving = true;
+		return (showDialog ?
+			this.app.dialog.showDialog("Confirm", "You have unsaved work!", ["Save", "Cancel", "Don't Save"])
+				.then((choice) => {
+					return Promise.resolve(choice); // Save: 0,  Cancel: 1, Don't Save: 2
+				})
+				.catch((reason) => {
+					return Promise.resolve(5)	// Error: 5
+				})
+			: Promise.resolve(0)
+		).then((choice) => {    // Save: 0,  Cancel: 1, Don't Save: 2, Error: 5
+			if (choice == 0) {
+				//try to save
+				let answer = ipcRenderer.sendSync('saveFile', getOptions());
+				//error treatment
+				if (answer.canceled)
+					choice = 1;		// Cancel: 1
+				else if (answer.error) {
+					console.log(answer);				//later popup with error
+					choice = 5;		// Error: 5
+				}
+				else {						//OK
+					self.filePath = answer.filepath;
+					self.modified = false;
+				}
 			}
-			//try to save
-			let
-				getOptions = () => {
-					let
-						options = <any>{
-							data: this.XML()
-						};
-					this.filePath && (options.filePath = this.filePath)
-					return options
-				},
-				answer = ipcRenderer.sendSync('saveFile', getOptions());
-			//error treatment
-			if (answer.canceled)
-				return 1;		// Cancel: 1
-			if (answer.error) {
-				console.log(answer);				//later popup with error
-				return 5;		// Error: 5
-			}
-			//OK
-			this.filePath = answer.filepath;
-			this.modified = false;
-			return 0;		// Save: 0
-		} catch (e) {
-			console.log(e.message);
-			return 5		// Error: 5
-		}
+			self.circuitLoadingOrSaving = false;
+			return Promise.resolve(choice);
+		})
 	}
 
 	//cleaning
