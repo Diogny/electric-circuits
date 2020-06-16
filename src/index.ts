@@ -1,19 +1,19 @@
 import { ipcRenderer } from "electron";
-import { templatesDOM, qSA, qS, tag } from "./src/utils"
+import { templatesDOM, qSA, qS, tag } from "./utils"
 import * as fs from 'fs';
 import * as xml2js from 'xml2js';
 import {
 	IComponentOptions, StateType as State, ActionType as Action,
 	IMachineState, IMouseState, IPoint, IMyAppOptions
-} from "./src/interfaces";
-import Comp from "./src/components";
-import { MyApp } from "./src/myapp";
-import { attr, aEL, removeClass, addClass, getParentAttr, range } from "./src/dab";
-import Point from "./src/point";
-import Wire from "./src/wire";
-import StateMachine from "./src/stateMachine";
-import { Type } from "./src/types";
-import { ItemBoard } from "./src/itemsBoard";
+} from "./interfaces";
+import Comp from "./components";
+import { MyApp } from "./myapp";
+import { attr, aEL, removeClass, addClass, getParentAttr, range } from "./dab";
+import Point from "./point";
+import Wire from "./wire";
+import StateMachine from "./stateMachine";
+import { Type } from "./types";
+import { ItemBoard } from "./itemsBoard";
 import Size from "src/size";
 import EC from "src/ec";
 import Rect from "src/rect";

@@ -1,7 +1,7 @@
 import { app, BrowserWindow, ipcMain, dialog } from "electron";
 import * as path from "path";
 import * as fs from 'fs';
-import Store from "./src/store";
+import Store from "./store";
 import { prop } from "src/utils";
 //import { format as formatUrl } from 'url';
 
@@ -42,6 +42,7 @@ function createMainWindow(opt: any) {
 		width: opt.width || 1120,
 		height: opt.height || 800,
 		useContentSize: true,
+		icon: path.join(app.getAppPath(), 'html/favicon.ico'),
 		webPreferences: {
 			nodeIntegration: true,
 			enableRemoteModule: false,
@@ -55,7 +56,7 @@ function createMainWindow(opt: any) {
 		mainWindow.focus()
 	});
 
-	let url = path.join(app.getAppPath(), "index.html");
+	let url = path.join(app.getAppPath(), "html/index.html");
 	console.log('main index.html', url);
 	mainWindow.loadFile(url);
 

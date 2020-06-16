@@ -1,7 +1,7 @@
 'use strict';
 var expect = require('chai').expect;
-var Unit = require('../dist/src/units').default;
-var dab = require('../dist/src/dab');
+var Unit = require('../dist/js/units').default;
+var dab = require('../dist/js/dab');
 
 //console.log(Unit);
 //console.log(dab.clamp);

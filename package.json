@@ -31,9 +31,9 @@
 		"eslint": "eslint \"./src/*.ts\" \"./src/**/*.ts\" --report-unused-disable-directives",
 		"build-dev": "pnpm run build-ts && webpack --config webpack.dev.js",
 		"start": "pnpm run build-dev && pnpm run app",
-		"app": "electron ./dist/index.js",
+		"app": "electron ./dist/main.js",
 		"webpack-watch": "webpack --watch",
-		"serve": "npm run build:main && electron ./dist/index.js --serve",
+		"serve": "npm run build:main && electron ./dist/main.js --serve",
 		"build:main": "tsc && webpack --config webpack.dev.js"
 	},
 	"files": [],

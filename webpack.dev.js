@@ -37,13 +37,13 @@ module.exports = module.exports = [
 	Object.assign(
 		{
 			target: 'electron-main',
-			entry: { index: './index.ts' }
+			entry: { main: './src/main.ts' }
 		},
 		commonConfig),
 	Object.assign(
 		{
 			target: 'electron-renderer',
-			entry: { renderer: './renderer.ts' }
+			entry: { index: './src/index.ts' }
 		},
 		commonConfig),
 ];

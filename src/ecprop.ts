@@ -118,9 +118,9 @@ export default class EcProp {
 			let
 				div = <HTMLDivElement>document.createElement("div");
 			div.classList.add("rot");
-			div.appendChild(<HTMLImageElement>html(`<img src="img/rot-left-16x16-p2.png" rot-angle="-45" title="Rotate left"/>`));
+			div.appendChild(<HTMLImageElement>html(`<img src="../img/rot-left-16x16-p2.png" rot-angle="-45" title="Rotate left"/>`));
 			div.appendChild(htmlProp);
-			div.appendChild(<HTMLImageElement>html(`<img src="img/rot-right-16x16-p2.png" rot-angle="45" title="Rotate right"/>`));
+			div.appendChild(<HTMLImageElement>html(`<img src="../img/rot-right-16x16-p2.png" rot-angle="45" title="Rotate right"/>`));
 			this.html.appendChild(div);
 			//register click events
 			div.querySelectorAll(".rot>img").forEach(((elem: HTMLElement) => {

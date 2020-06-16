@@ -10,7 +10,7 @@
 		"sourceMap": true,
 		"removeComments": false,
 		"noEmitOnError": true,
-		"outDir": "./dist",
+		"outDir": "./dist/js",
 		"baseUrl": ".",
 		"paths": {
 			"src/*": [
@@ -19,14 +19,9 @@
 			"*": [
 				"node_modules/*"
 			]
-		},
-		"types": [
-			"node"
-		],
+		}
 	},
 	"include": [
-		"src/**/*",
-		"index.ts",
-		"renderer.ts"
+		"src/**/*"
 	]
 }
