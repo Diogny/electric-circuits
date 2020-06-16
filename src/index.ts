@@ -292,31 +292,6 @@ function registerEcBodyState() {
 		actions: {
 			KEY: cursorBoardHandler,
 			MOVE: function (newCtx: IMouseState) {
-				/*
-				//experimental
-				if (newCtx.shiftKey) {
-					let
-						ec = app.sm.data.it as EC,
-						p = Point.plus(ec.origin, ec.p);
-					attr(app.sm.data.x.center, {
-						cx: p.x,
-						cy: p.y
-					});
-					app.sm.data.x.circles.forEach((c: SVGCircleElement, ndx: number) => {
-						let
-							p = ec.getNodeRealXY(ndx);
-						attr(c, {
-							cx: p.x,
-							cy: p.y
-						})
-					});
-					removeClass(ecCircles.g, "hide")
-					return;
-				} else {
-					addClass(ecCircles.g, "hide")
-				}
-				*/
-
 				if (app.sm.data.mouseDown
 					&& app.sm.data.button == 0) {
 					app.sm.transition(State.EC_DRAG, Action.START, newCtx, {
@@ -342,9 +317,6 @@ function registerEcBodyState() {
 			OUT: function () {
 				app.tooltip.setVisible(false);
 				app.sm.transition(State.BOARD, Action.RESUME);
-
-				//experimental
-				//addClass(ecCircles.g, "hide")
 			},
 			DOWN: function (newCtx: IMouseState) {
 				app.sm.data.mouseDown = true;
@@ -364,28 +336,6 @@ function registerEcBodyState() {
 				showBodyAndTooltip(newCtx.offset, app.sm.data.it.id);
 				app.sm.data.mouseDown = false;
 				app.sm.data.button = newCtx.button;
-
-				/*
-				//experimental
-				let
-					ec = app.sm.data.it as EC,
-					circle = (p: IPoint) => {
-						return <SVGCircleElement>tag("circle", "", {
-							cx: p.x,
-							cy: p.y,
-							r: 9
-						})
-					};
-
-				app.sm.data.x = {
-					shiftKey: false,
-					center: circle(Point.plus(ec.origin, ec.p)),
-					circles: range(0, ec.count).map(n => circle(ec.getNodeRealXY(n)))
-				}
-				ecCircles.g.innerHTML = app.sm.data.x.center.outerHTML
-					+ app.sm.data.x.circles.map((c: SVGCircleElement) => c.outerHTML).join('');
-				*/
-
 			}
 		}
 	});

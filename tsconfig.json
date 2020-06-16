@@ -23,5 +23,9 @@
 	},
 	"include": [
 		"src/**/*"
+	],
+	"exclude": [
+		"src/main.ts",
+		"src/index.ts"
 	]
 }
