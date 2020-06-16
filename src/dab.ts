@@ -206,6 +206,8 @@ export const getParentAttr = function (p: HTMLElement, attr: string) {
 	return p;
 }
 
+export const range = (s: number, e: number) => Array.from('x'.repeat(e - s), (_, i) => s + i);
+
 //Sets
 const unique = (x: any[]): any[] => x.filter((elem, index) => x.indexOf(elem) === index);
 export { unique }

@@ -7,6 +7,7 @@ var types_1 = require("./types");
 var dab_1 = require("./dab");
 var electron_1 = require("electron");
 var xml2js = require("xml2js");
+var fs = require("fs");
 var point_1 = require("./point");
 var components_1 = require("./components");
 var Circuit = /** @class */ (function () {
@@ -93,7 +94,7 @@ var Circuit = /** @class */ (function () {
     //selection
     Circuit.prototype.hasComponent = function (id) { return this.ecMap.has(id); };
     Circuit.prototype.selectAll = function () {
-        this.selectedComponents = selectAll.call(this, false);
+        this.selectedComponents = selectAll.call(this, true);
     };
     Circuit.prototype.deselectAll = function () {
         selectAll.call(this, false);
@@ -171,7 +172,6 @@ var Circuit = /** @class */ (function () {
             + '\t</wires>\n', bonds = getAllCircuitBonds.call(this)
             .map(function (b) { return "\t\t<bond>" + b + "</bond>\n"; })
             .join('');
-        //this.components.map(comp => !comp.bonds.length ? "" : nano(`\t\t<bond id="{id}" d="${comp.bonds.map((o) => o.link).filter(s => !!s).join(',')}" />\n`, comp)).filter(s => !!s).join('');
         return '<?xml version="1.0" encoding="utf-8"?>\n'
             + circuitMetadata()
             + ecs
@@ -201,17 +201,29 @@ var Circuit = /** @class */ (function () {
             : Promise.resolve(0)).then(function (choice) {
             if (choice == 0) {
                 //try to save
-                var answer = electron_1.ipcRenderer.sendSync('saveFile', getOptions());
-                //error treatment
-                if (answer.canceled)
-                    choice = 1; // Cancel: 1
-                else if (answer.error) {
-                    console.log(answer); //later popup with error
-                    choice = 5; // Error: 5
+                if (self.filePath) {
+                    try {
+                        fs.writeFileSync(self.filePath, getOptions().data, 'utf-8');
+                        self.modified = false;
+                    }
+                    catch (e) {
+                        console.log(e.message); //later popup with error
+                        choice = 5; // Error: 5
+                    }
                 }
-                else { //OK
-                    self.filePath = answer.filepath;
-                    self.modified = false;
+                else {
+                    var answer = electron_1.ipcRenderer.sendSync('saveFile', getOptions());
+                    //error treatment
+                    if (answer.canceled)
+                        choice = 1; // Cancel: 1
+                    else if (answer.error) {
+                        console.log(answer); //later popup with error
+                        choice = 5; // Error: 5
+                    }
+                    else { //OK
+                        self.filePath = answer.filePath;
+                        self.modified = false;
+                    }
                 }
             }
             self.circuitLoadingOrSaving = false;
@@ -293,7 +305,7 @@ function createBoardItem(options, addToDOM) {
 }
 function parseCircuitXML(data) {
     var self = this;
-    //answer.filepath
+    //answer.filePath
     xml2js.parseString(data, { trim: true, explicitArray: false }, function (err, json) {
         if (err)
             console.log(err);

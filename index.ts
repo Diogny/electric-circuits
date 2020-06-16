@@ -60,7 +60,7 @@ function createMainWindow(opt: any) {
 	mainWindow.loadFile(url);
 
 	if (isDevelopment) {
-		//uncomment for dev
+		//uncomment for not dev
 		mainWindow.webContents.openDevTools()
 	}
 
@@ -71,12 +71,10 @@ function createMainWindow(opt: any) {
 		})
 	})
 
-	// Disable menu
 	mainWindow.removeMenu();
 }
 
 app.on("ready", () => {
-	// defaults if there wasn't anything saved
 	let
 		{ width, height } = store.get('windowBounds'),
 		{ x, y } = store.get('location');
@@ -85,7 +83,7 @@ app.on("ready", () => {
 	//sendMainWindowSize(width, height);
 
 	mainWindow.on('resize', () => {
-		let { width, height } = mainWindow.getContentBounds(); //.getBounds();
+		let { width, height } = mainWindow.getContentBounds();
 		// save them
 		store.set('windowBounds', { width, height });
 		//send
@@ -154,11 +152,7 @@ ipcMain.handle('shared-data', async (event, arg: any[]) => {
 	return prop(global["shared"], nm, value)
 });
 
-// In this file you can include the rest of your app"s specific main process
-// code. You can also put them in separate files and require them here.
-
 function sendMainWindowSize(width: number, height: number) {
-	//send
 	mainWindow.webContents.send("win-resize", { width, height });
 }
 
@@ -189,7 +183,7 @@ ipcMain.on('openFile', (event, path) => {
 						};
 					} else {
 						event.returnValue = {
-							filepath: value.filePaths[0],
+							filePath: value.filePaths[0],
 							data: data
 						};
 						//event.reply('fileData', data)
@@ -228,7 +222,7 @@ ipcMain.on('saveFile', (event, arg) => {
 						}
 					} else
 						event.returnValue = {
-							filepath: value.filePath
+							filePath: value.filePath
 						}
 				})
 			} else

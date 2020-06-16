@@ -2,7 +2,7 @@ devDependencies:
   '@types/node': 12.12.21
   '@types/xml2js': 0.4.5
   chai: 4.2.0
-  electron: 9.0.3
+  electron: 9.0.4
   electron-reload: 1.5.0
   eslint: 7.2.0
   html-webpack-plugin: 4.3.0_webpack@4.43.0
@@ -1395,7 +1395,7 @@ packages:
     dev: true
     resolution:
       integrity: sha512-L9X6LzsL3Bt2j0eJ4/MBrI9Vt902KvVUtBB7J4qrL1A9sXqC2fE0lpvUAlOThpJYh6zWO1l86U/YiEN9bDURHw==
-  /electron/9.0.3:
+  /electron/9.0.4:
     dependencies:
       '@electron/get': 1.12.2
       '@types/node': 12.12.46
@@ -1406,7 +1406,7 @@ packages:
     hasBin: true
     requiresBuild: true
     resolution:
-      integrity: sha512-rY59wy50z0oWp/q69zq0UIzvtcM5j2BJbLAwEoLfVNS3DLt9wDZqRqSIBvLEBl+xWbafCnRA9haEqi7ssM94GA==
+      integrity: sha512-QzkeZNAiNB7KxcdoQKSoaiVT/GQdB4Vt0/ZZOuU8tIKABAsni2I7ztiAbUzxcsnQsqEBSfChuPuDQ5A4VbbzPg==
   /elliptic/6.5.2:
     dependencies:
       bn.js: 4.11.8
@@ -5180,7 +5180,7 @@ specifiers:
   '@types/node': 12.12.21
   '@types/xml2js': ^0.4.5
   chai: ^4.2.0
-  electron: ^9.0.3
+  electron: ^9.0.4
   electron-reload: ^1.5.0
   eslint: ^7.2.0
   html-webpack-plugin: ^4.3.0

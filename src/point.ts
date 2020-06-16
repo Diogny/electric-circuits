@@ -5,13 +5,8 @@ import { IPoint, ISize } from './interfaces';
 import { round, isNumeric } from './dab';
 
 export default class Point implements IPoint {
-	public x: number;
-	public y: number;
 
-	constructor(x: number, y: number) {
-		this.x = parseFloat(<any>x);	//ensure it's a number
-		this.y = parseFloat(<any>y);
-	}
+	constructor(public x: number, public y: number) { }
 
 	public distance(p: Point) {
 		var dx = this.x - p.x;
@@ -53,7 +48,7 @@ export default class Point implements IPoint {
 			sin = Math.sin(radians),
 			nx = (cos * (this.x - cx)) + (sin * (this.y - cy)) + cx,
 			ny = (cos * (this.y - cy)) - (sin * (this.x - cx)) + cy;
-		return new Point(round(nx, 3), round(ny, 3))
+		return new Point(nx, ny)	//round(nx, 3), round(ny, 3)
 	}
 
 	//static

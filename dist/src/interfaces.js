@@ -34,7 +34,7 @@ var ActionType;
     ActionType[ActionType["KEY"] = 40] = "KEY";
     //unified actions
     ActionType[ActionType["SELECT"] = 100] = "SELECT";
-    ActionType[ActionType["SELECT_ONLY"] = 101] = "SELECT_ONLY";
+    //SELECT_ONLY = 101,
     ActionType[ActionType["TOGGLE_SELECT"] = 102] = "TOGGLE_SELECT";
     ActionType[ActionType["SELECT_ALL"] = 103] = "SELECT_ALL";
     ActionType[ActionType["UNSELECT_ALL"] = 104] = "UNSELECT_ALL";

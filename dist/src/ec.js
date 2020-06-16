@@ -151,7 +151,7 @@ var EC = /** @class */ (function (_super) {
                 pin.y = Math.round(pin.rot.y);
             }
             //radius 5 =>  5^2 = 25
-            if ((Math.pow((p.x - this.x) - pin.x, 2) + Math.pow((p.y - this.y) - pin.y, 2)) <= 25)
+            if ((Math.pow((p.x - this.x) - pin.x, 2) + Math.pow((p.y - this.y) - pin.y, 2)) <= 81)
                 return i;
         }
         return -1;
@@ -163,13 +163,13 @@ var EC = /** @class */ (function (_super) {
                 ? point_1.default.prototype.rotateBy.call(meta, origin.x, origin.y, rotation)
                 : meta;
             //radius 5 =>  5^2 = 25
-            if ((Math.pow(dx - nodePoint.x, 2) + Math.pow(dy - nodePoint.y, 2)) <= 25)
+            if ((Math.pow(dx - nodePoint.x, 2) + Math.pow(dy - nodePoint.y, 2)) <= 81)
                 return i;
         }
         return -1;
     };
     EC.prototype.setNode = function (node, p) {
-        //State.WIRE_EDIT_NODE_DRAG tries to call this, investigate later...
+        //Some code tries to call this, investigate later...
         throw 'somebody called me, not good!';
     };
     EC.prototype.valid = function (node) {

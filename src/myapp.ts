@@ -260,21 +260,39 @@ export class MyApp extends Application implements IMyApp {
 
 		document.addEventListener("keydown", (ev: KeyboardEvent) => {
 			//https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/code
+			if (that.dialog.visible)
+				return;
+			let
+				keyCode = ev.code;
 			switch (ev.code) {
 				case 'Enter':
 				case 'Escape':
+				case 'Space':
+				case 'Delete':
+				//
 				case 'ArrowLeft':
 				case 'ArrowUp':
 				case 'ArrowRight':
 				case 'ArrowDown':
-				case 'Delete':
-				case 'ControlLeft':
-				case 'ControlRight':
-					if (!that.dialog.visible)
-						that.sm.send(ActionType.KEY, ev.code);
+					//case 'ControlLeft':
+					//case 'ControlRight':
 					break;
+				case 'KeyA':	// CtrlKeyA		select all ECs
+				case 'KeyC':	// CtrlKeyC		copy selected ECs
+				case 'KeyV':	// CtrlKeyV		paste cloned selected ECs
+				//case 'KeyX':	// CtrlKeyX		cut selected ECs - see if it makes sense
+				case 'KeyS':	// CtrlKeyS		saves current circuit
+				case 'KeyL':	// CtrlKeyL		loads a new circuit
+				case 'KeyP':	// CtrlKeyP		prints current circuit
+				case 'KeyZ':	// CtrlKeyZ		undo previous command
+				case 'KeyY':	// CtrlKeyY		redo previous undone command
+					ev.ctrlKey && (keyCode = "Ctrl" + keyCode);	// CtrlKeyA
+					break;
+				default:
+					return;
 			}
-			console.log(ev.code)
+			that.sm.send(ActionType.KEY, keyCode);
+			//console.log(ev.code)
 		}, false);
 	}
 
@@ -359,7 +377,6 @@ export class MyApp extends Application implements IMyApp {
 				}
 				break;
 			case ActionType.SELECT:
-			case ActionType.SELECT_ONLY:
 				if (!(compNull = !comp) && comp.type == Type.EC) {
 					this.circuit.selectThis(comp as EC);
 					this.refreshRotation(comp);
@@ -492,6 +509,7 @@ export class MyApp extends Application implements IMyApp {
 						//start loading new circuit
 						self.circuit = circuit;
 						self.setBoardZoom(circuit.multiplier, true);
+						self.circuit.filePath = answer.filePath;
 						//circuit add to DOM
 						self.circuit.components
 							.forEach(comp => self.addToDOM(<any>comp));

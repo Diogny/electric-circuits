@@ -1,14 +1,14 @@
 import { ipcRenderer } from "electron";
-import { templatesDOM, qSA, qS } from "./src/utils"
+import { templatesDOM, qSA, qS, tag } from "./src/utils"
 import * as fs from 'fs';
 import * as xml2js from 'xml2js';
 import {
-	IComponentOptions, IApplicationOptions, StateType as State, ActionType as Action,
+	IComponentOptions, StateType as State, ActionType as Action,
 	IMachineState, IMouseState, IPoint, IMyAppOptions
 } from "./src/interfaces";
 import Comp from "./src/components";
 import { MyApp } from "./src/myapp";
-import { attr, aEL, removeClass, toggleClass, addClass, getParentAttr } from "./src/dab";
+import { attr, aEL, removeClass, addClass, getParentAttr, range } from "./src/dab";
 import Point from "./src/point";
 import Wire from "./src/wire";
 import StateMachine from "./src/stateMachine";
@@ -40,6 +40,49 @@ let
 	hideWireConnections = () => {
 		app.sm.data.showWireConnections = false;
 		app.highlight.hide();
+	},
+	cursorDeltas = {
+		ArrowLeft: { x: -1, y: 0 },
+		ArrowUp: { x: 0, y: -1 },
+		ArrowRight: { x: 1, y: 0 },
+		ArrowDown: { x: 0, y: 1 }
+	},
+	cursorBoardHandler = (code: any) => {
+		app.tooltip.setVisible(false);
+		app.highlight.setVisible(false);
+		//console.log(`BOARD key code: ${code}`)
+		switch (code) {
+			case 'CtrlKeyA':
+				app.execute(Action.SELECT_ALL, "");
+				break;
+			case 'CtrlKeyS':
+				app.circuit.save(false);
+				break;
+			case 'CtrlKeyL':
+				app.loadCircuit();
+				break;
+			case 'Delete':
+				app.execute(Action.DELETE_SELECTED, "");
+				break;
+			case 'ArrowLeft':
+			case 'ArrowUp':
+			case 'ArrowRight':
+			case 'ArrowDown':
+				let
+					vector = cursorDeltas[code];
+				app.circuit.selectedComponents
+					.forEach(comp => comp.move(comp.x + vector.x, comp.y + vector.y));
+				app.circuit.modified = true;
+				break;
+		}
+	};
+
+//experimental
+let
+	ecCircles = {
+		g: tag("g", "ec-circles", {
+			class: "hide"
+		})
 	};
 
 function hookEvents() {
@@ -79,7 +122,7 @@ function getWireConnections(wire: Wire): Point[] {
 				let
 					w = app.circuit.get(b.id);
 				if (!w)
-					throw `Invalid bond connections`;			//shouldn't happer, but to catch wrong code
+					throw `Invalid bond connections`;			//shouldn't happen, but to catch wrong code
 				switch (b.type) {
 					case Type.WIRE:
 						if (!wiresFound.some(id => id == b.id)) {
@@ -111,6 +154,7 @@ function registerBoardState() {
 		data: {
 		},
 		actions: {
+			KEY: cursorBoardHandler,
 			ENTER: function (newCtx: IMouseState) {
 				//console.log('BOARD.ENTER')
 				app.sm.data.panningVector = void 0;
@@ -246,7 +290,33 @@ function registerEcBodyState() {
 		key: State.EC_BODY,
 		overType: "deny",
 		actions: {
+			KEY: cursorBoardHandler,
 			MOVE: function (newCtx: IMouseState) {
+				/*
+				//experimental
+				if (newCtx.shiftKey) {
+					let
+						ec = app.sm.data.it as EC,
+						p = Point.plus(ec.origin, ec.p);
+					attr(app.sm.data.x.center, {
+						cx: p.x,
+						cy: p.y
+					});
+					app.sm.data.x.circles.forEach((c: SVGCircleElement, ndx: number) => {
+						let
+							p = ec.getNodeRealXY(ndx);
+						attr(c, {
+							cx: p.x,
+							cy: p.y
+						})
+					});
+					removeClass(ecCircles.g, "hide")
+					return;
+				} else {
+					addClass(ecCircles.g, "hide")
+				}
+				*/
+
 				if (app.sm.data.mouseDown
 					&& app.sm.data.button == 0) {
 					app.sm.transition(State.EC_DRAG, Action.START, newCtx, {
@@ -272,6 +342,9 @@ function registerEcBodyState() {
 			OUT: function () {
 				app.tooltip.setVisible(false);
 				app.sm.transition(State.BOARD, Action.RESUME);
+
+				//experimental
+				//addClass(ecCircles.g, "hide")
 			},
 			DOWN: function (newCtx: IMouseState) {
 				app.sm.data.mouseDown = true;
@@ -291,6 +364,28 @@ function registerEcBodyState() {
 				showBodyAndTooltip(newCtx.offset, app.sm.data.it.id);
 				app.sm.data.mouseDown = false;
 				app.sm.data.button = newCtx.button;
+
+				/*
+				//experimental
+				let
+					ec = app.sm.data.it as EC,
+					circle = (p: IPoint) => {
+						return <SVGCircleElement>tag("circle", "", {
+							cx: p.x,
+							cy: p.y,
+							r: 9
+						})
+					};
+
+				app.sm.data.x = {
+					shiftKey: false,
+					center: circle(Point.plus(ec.origin, ec.p)),
+					circles: range(0, ec.count).map(n => circle(ec.getNodeRealXY(n)))
+				}
+				ecCircles.g.innerHTML = app.sm.data.x.center.outerHTML
+					+ app.sm.data.x.circles.map((c: SVGCircleElement) => c.outerHTML).join('');
+				*/
+
 			}
 		}
 	});
@@ -326,7 +421,7 @@ function registerEcDragState() {
 				if (!newCtxIt)
 					throw `EC_DRAG on undefined EC`;
 				!app.circuit.selectedComponents.some(comp => comp.id == newCtxIt.id) &&
-					(app.execute(Action.SELECT_ONLY, `${newCtxIt.id}::${newCtxIt.name}::body`));
+					(app.execute(Action.SELECT, `${newCtxIt.id}::${newCtxIt.name}::body`));
 				self.data = {
 					it: it,
 					className: "dragging",
@@ -348,6 +443,7 @@ function registerEcNodeState() {
 		key: State.EC_NODE,
 		overType: "deny",
 		actions: {
+			KEY: cursorBoardHandler,
 			MOVE: function (newCtx: IMouseState) {
 				let
 					node = app.sm.data.it.overNode(newCtx.offset, 0),
@@ -383,7 +479,7 @@ function registerEcNodeState() {
 		}
 	});
 }
-function registerBewWireFromEcState() {
+function registerNewWireFromEcState() {
 	app.sm.register(<IMachineState>{
 		key: State.NEW_WIRE_FROM_EC,
 		overType: "function",
@@ -486,6 +582,7 @@ function registerWireLineState() {
 		key: State.WIRE_LINE,
 		overType: "deny",
 		actions: {
+			KEY: cursorBoardHandler,
 			OUT: function (newCtx: IMouseState) {
 				if (!newCtx.it || app.sm.data.node == -1) {
 					app.highlight.hide();
@@ -780,13 +877,17 @@ window.addEventListener("DOMContentLoaded", () => {
 			app.svgBoard.append(app.highlight.g);
 			qS('body>footer').insertAdjacentElement("afterend", app.dialog.win);
 
+			//experimental
+			//app.svgBoard.append(ecCircles.g);
+
+
 			hookEvents();
 			//register states
 			registerBoardState();
 			registerEcBodyState();
 			registerEcDragState();
 			registerEcNodeState();
-			registerBewWireFromEcState();
+			registerNewWireFromEcState();
 			registerWireLineState();
 			registerWireNodeDragState();
 			registerWireLineDragState();
@@ -801,7 +902,7 @@ window.addEventListener("DOMContentLoaded", () => {
 			(<any>window).MyApp = app;
 			(<any>window).dialog = app.dialog;
 
-			console.log(`We are using ${process.versions.node}, ${process.versions.chrome}, and ${process.versions.electron}`)
+			console.log(`We are using Node.js ${process.versions.node}, Chromium ${process.versions.chrome}, and Electron ${process.versions.electron}`)
 			//////////////////// TESTINGS /////////////////
 		})
 		.catch((ex: any) => {

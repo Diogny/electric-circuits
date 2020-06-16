@@ -7,6 +7,7 @@ import { nano, isNum } from "./dab";
 import { MyApp } from "./myapp";
 import { ipcRenderer } from "electron";
 import * as xml2js from 'xml2js';
+import * as fs from 'fs';
 import { IPoint, IBaseComponent } from "./interfaces";
 import Point from "./point";
 import Comp from "./components";
@@ -99,7 +100,7 @@ export class Circuit {
 	public hasComponent(id: string): boolean { return this.ecMap.has(id); }
 
 	public selectAll() {
-		this.selectedComponents = selectAll.call(this, false);
+		this.selectedComponents = selectAll.call(this, true);
 	}
 
 	public deselectAll() {
@@ -229,17 +230,28 @@ export class Circuit {
 		).then((choice) => {    // Save: 0,  Cancel: 1, Don't Save: 2, Error: 5
 			if (choice == 0) {
 				//try to save
-				let answer = ipcRenderer.sendSync('saveFile', getOptions());
-				//error treatment
-				if (answer.canceled)
-					choice = 1;		// Cancel: 1
-				else if (answer.error) {
-					console.log(answer);				//later popup with error
-					choice = 5;		// Error: 5
-				}
-				else {						//OK
-					self.filePath = answer.filepath;
-					self.modified = false;
+				if (self.filePath) {
+					try {
+						fs.writeFileSync(self.filePath, getOptions().data, 'utf-8');
+						self.modified = false;
+					}
+					catch (e) {
+						console.log(e.message);				//later popup with error
+						choice = 5;		// Error: 5
+					}
+				} else {
+					let answer = ipcRenderer.sendSync('saveFile', getOptions());
+					//error treatment
+					if (answer.canceled)
+						choice = 1;		// Cancel: 1
+					else if (answer.error) {
+						console.log(answer);				//later popup with error
+						choice = 5;		// Error: 5
+					}
+					else {						//OK
+						self.filePath = answer.filePath;
+						self.modified = false;
+					}
 				}
 			}
 			self.circuitLoadingOrSaving = false;
@@ -338,7 +350,7 @@ function createBoardItem(options: any, addToDOM?: boolean): EC | Wire {
 function parseCircuitXML(data: string) {
 	let
 		self = (this as Circuit);
-	//answer.filepath
+	//answer.filePath
 	xml2js.parseString(data, { trim: true, explicitArray: false }, (err, json) => {
 		if (err)
 			console.log(err);

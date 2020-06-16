@@ -463,7 +463,7 @@ export enum ActionType {
 
 	//unified actions
 	SELECT = 100,						//"Select"						7
-	SELECT_ONLY = 101,
+	//SELECT_ONLY = 101,
 	TOGGLE_SELECT = 102,				//"Toggle Select"				6
 	SELECT_ALL = 103,					//"Select All"					8
 	UNSELECT_ALL = 104,					//"Deselect All"				9

@@ -5,8 +5,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var dab_1 = require("./dab");
 var Point = /** @class */ (function () {
     function Point(x, y) {
-        this.x = parseFloat(x); //ensure it's a number
-        this.y = parseFloat(y);
+        this.x = x;
+        this.y = y;
     }
     Point.prototype.distance = function (p) {
         var dx = this.x - p.x;
@@ -37,7 +37,7 @@ var Point = /** @class */ (function () {
      */
     Point.prototype.rotateBy = function (cx, cy, angle) {
         var radians = (Math.PI / 180) * angle, cos = Math.cos(radians), sin = Math.sin(radians), nx = (cos * (this.x - cx)) + (sin * (this.y - cy)) + cx, ny = (cos * (this.y - cy)) - (sin * (this.x - cx)) + cy;
-        return new Point(dab_1.round(nx, 3), dab_1.round(ny, 3));
+        return new Point(nx, ny); //round(nx, 3), round(ny, 3)
     };
     //static
     Point.validateRotation = function (val) {

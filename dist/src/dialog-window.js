@@ -15,10 +15,8 @@ var __extends = (this && this.__extends) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 var dab_1 = require("./dab");
 var base_window_1 = require("./base-window");
-//later check main window resize, should recenter automatically
 var DialogWindow = /** @class */ (function (_super) {
     __extends(DialogWindow, _super);
-    //Save, Cancel, Don't Save
     function DialogWindow(options) {
         var _this = _super.call(this, options) || this;
         _this.titleHTML = _this.win.querySelector("div>h4");
@@ -64,7 +62,7 @@ var DialogWindow = /** @class */ (function (_super) {
     };
     DialogWindow.prototype.propertyDefaults = function () {
         return dab_1.extend(_super.prototype.propertyDefaults.call(this), {
-            class: "win dialog hide",
+            class: "win dialog no-select hide",
             templateName: "dialogWin01",
         });
     };

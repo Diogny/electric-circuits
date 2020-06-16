@@ -201,21 +201,38 @@ var MyApp = /** @class */ (function (_super) {
         }, false);
         document.addEventListener("keydown", function (ev) {
             //https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/code
+            if (that.dialog.visible)
+                return;
+            var keyCode = ev.code;
             switch (ev.code) {
                 case 'Enter':
                 case 'Escape':
+                case 'Space':
+                case 'Delete':
+                //
                 case 'ArrowLeft':
                 case 'ArrowUp':
                 case 'ArrowRight':
                 case 'ArrowDown':
-                case 'Delete':
-                case 'ControlLeft':
-                case 'ControlRight':
-                    if (!that.dialog.visible)
-                        that.sm.send(interfaces_1.ActionType.KEY, ev.code);
+                    //case 'ControlLeft':
+                    //case 'ControlRight':
                     break;
+                case 'KeyA': // CtrlKeyA		select all ECs
+                case 'KeyC': // CtrlKeyC		copy selected ECs
+                case 'KeyV': // CtrlKeyV		paste cloned selected ECs
+                //case 'KeyX':	// CtrlKeyX		cut selected ECs - see if it makes sense
+                case 'KeyS': // CtrlKeyS		saves current circuit
+                case 'KeyL': // CtrlKeyL		loads a new circuit
+                case 'KeyP': // CtrlKeyP		prints current circuit
+                case 'KeyZ': // CtrlKeyZ		undo previous command
+                case 'KeyY': // CtrlKeyY		redo previous undone command
+                    ev.ctrlKey && (keyCode = "Ctrl" + keyCode); // CtrlKeyA
+                    break;
+                default:
+                    return;
             }
-            console.log(ev.code);
+            that.sm.send(interfaces_1.ActionType.KEY, keyCode);
+            //console.log(ev.code)
         }, false);
         return _this;
     }
@@ -290,7 +307,6 @@ var MyApp = /** @class */ (function (_super) {
                 }
                 break;
             case interfaces_1.ActionType.SELECT:
-            case interfaces_1.ActionType.SELECT_ONLY:
                 if (!(compNull = !comp) && comp.type == types_1.Type.EC) {
                     this.circuit.selectThis(comp);
                     this.refreshRotation(comp);
@@ -417,6 +433,7 @@ var MyApp = /** @class */ (function (_super) {
                     //start loading new circuit
                     self.circuit = circuit;
                     self.setBoardZoom(circuit.multiplier, true);
+                    self.circuit.filePath = answer.filePath;
                     //circuit add to DOM
                     self.circuit.components
                         .forEach(function (comp) { return self.addToDOM(comp); });

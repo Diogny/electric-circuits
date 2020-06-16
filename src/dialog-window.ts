@@ -60,7 +60,7 @@ export default class DialogWindow extends BaseWindow {
 
 	public propertyDefaults(): IBaseWindowOptions {
 		return extend(super.propertyDefaults(), {
-			class: "win dialog hide",
+			class: "win dialog no-select hide",
 			templateName: "dialogWin01",
 		})
 	}

@@ -167,7 +167,7 @@ export default class AppWindow extends BoardWindow {
 
 	public propertyDefaults(): IAppWindowProperties {
 		return extend(super.propertyDefaults(), {
-			class: "win props",
+			class: "win props no-select",
 			templateName: "propWin01",
 			title: "Window",
 			content: "",

@@ -165,7 +165,7 @@ var AppWindow = /** @class */ (function (_super) {
     };
     AppWindow.prototype.propertyDefaults = function () {
         return dab_1.extend(_super.prototype.propertyDefaults.call(this), {
-            class: "win props",
+            class: "win props no-select",
             templateName: "propWin01",
             title: "Window",
             content: "",
