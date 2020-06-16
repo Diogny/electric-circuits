@@ -29,31 +29,31 @@ Used in my testing website [Electric Circuits](http://diogny.com/tests/circuits.
 ### Last compilation:
 	We are using Node.js 12.14.1, Chromium 83.0.4103.104, and Electron 9.0.4.
 
-![components](dist/img/img01.png)
+![components](img/img01.png)
 
-![right context menu](dist/img/img02.png)
+![right context menu](img/img02.png)
 
-![simple connection](dist/img/img03.png)
+![simple connection](img/img03.png)
 
-![a lot of components](dist/img/img04.png)
+![a lot of components](img/img04.png)
 
-![wire alignment](dist/img/img05.png)
+![wire alignment](img/img05.png)
 
-![board selection tool](dist/img/img07.png)
+![board selection tool](img/img07.png)
 
-![simple circuit](dist/img/img06.png)
+![simple circuit](img/img06.png)
 
-![wire bonds highlight](dist/img/img08.png)
+![wire bonds highlight](img/img08.png)
 
-![new UI look](dist/img/img09.png)
+![new UI look](img/img09.png)
 
-![light theme](dist/img/img10.png)
+![light theme](img/img10.png)
 
-![dark theme](dist/img/img11.png)
+![dark theme](img/img11.png)
 
-![last UI look](dist/img/img12.png)
+![last UI look](img/img12.png)
 
-![modal dialog window](dist/img/img13.png)
+![modal dialog window](img/img13.png)
 
 ### install development packajes
 	pnpm install --save-dev tsconfig-paths-webpack-plugin
