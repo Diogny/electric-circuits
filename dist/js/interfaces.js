@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ActionType = exports.StateType = void 0;
+exports.DialogType = exports.ActionType = exports.StateType = void 0;
 var StateType;
 (function (StateType) {
     StateType[StateType["IDLE"] = 1] = "IDLE";
@@ -54,6 +54,15 @@ var ActionType;
     ActionType[ActionType["UNBOND"] = 206] = "UNBOND";
     ActionType[ActionType["RESUME_EDIT"] = 207] = "RESUME_EDIT";
 })(ActionType = exports.ActionType || (exports.ActionType = {}));
+//***************************************** Dialog Windows ************************************//
+var DialogType;
+(function (DialogType) {
+    DialogType[DialogType["OK"] = 0] = "OK";
+    DialogType[DialogType["Canceled"] = 1] = "Canceled";
+    DialogType[DialogType["Error"] = 2] = "Error";
+    DialogType[DialogType["Loaded"] = 3] = "Loaded";
+    DialogType[DialogType["Saved"] = 4] = "Saved";
+})(DialogType = exports.DialogType || (exports.DialogType = {}));
 /*
 
 */ 

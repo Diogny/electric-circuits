@@ -90,7 +90,7 @@ export interface IApplication {
 //***************************************** MyApp ************************************//
 
 export interface IMyAppOptions extends IApplicationOptions {
-	multiplier: number;
+	//zoom: number;
 }
 
 export interface IMyApp extends IApplication {
@@ -101,7 +101,7 @@ export interface IMyApp extends IApplication {
 	ratio: number;
 	viewBox: Rect;
 	baseViewBox: Size;
-	multiplier: number;
+	//zoom: number;
 	ratioX: number;
 	ratioY: number;
 	center: Point;
@@ -389,7 +389,8 @@ export interface IStateMachineBaseOptions {
 }
 
 export interface IMachineActionCallback {
-	(newContext: IMouseState): boolean | undefined;				//so later I can change it
+	//(newContext: IMouseState): boolean | undefined;				 
+	(arg: IMouseState | string): boolean | undefined | void
 }
 
 export interface IStateMachineOptions extends IStateMachineBaseOptions {
@@ -413,7 +414,7 @@ export type MachineOverActionType = "forward" | "deny" | "function";
 export interface IMachineState {
 	key: StateType;
 	overType: MachineOverActionType;
-	actions: { [key: string]: (newContext: IMouseState) => boolean | undefined };
+	actions: { [key: string]: IMachineActionCallback };
 	//data held in this state after a transition, initially is set to undefined
 	data?: any;
 	//persists data between transistions, it's not DELETED
@@ -485,6 +486,18 @@ export enum ActionType {
 	UNBOND = 206,						//"Unbond"						30
 	RESUME_EDIT = 207,					//ex "Connections"					31
 }
+
+//***************************************** Dialog Windows ************************************//
+
+export enum DialogType {
+	OK = 0,
+	Canceled = 1,		// ESC openFile, saveFile, == Don't Save
+	Error = 2,
+	Loaded = 3,
+	Saved = 4,
+
+}
+
 /*
 
 */

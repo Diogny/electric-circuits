@@ -1,19 +1,7 @@
 "use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MyApp = void 0;
+var tslib_1 = require("tslib");
 var electron_1 = require("electron");
 var app_1 = require("./app");
 var interfaces_1 = require("./interfaces");
@@ -32,12 +20,13 @@ var highlightNode_1 = require("./highlightNode");
 var selection_rect_1 = require("./selection-rect");
 var circuit_1 = require("./circuit");
 var dialog_window_1 = require("./dialog-window");
+var form_window_1 = require("./form-window");
 var MyApp = /** @class */ (function (_super) {
-    __extends(MyApp, _super);
+    tslib_1.__extends(MyApp, _super);
     function MyApp(options) {
         var _a;
         var _this = _super.call(this, options) || this;
-        _this.tooltipFontSize = function () { return Math.max(10, 35 * _this.multiplier); };
+        _this.tooltipFontSize = function () { return Math.max(10, 35 * _this.circuit.zoom); };
         var that = _this, hideNodeTooltip = function (newCtx) {
             that.highlight.hide();
             that.tooltip.setVisible(false);
@@ -89,7 +78,7 @@ var MyApp = /** @class */ (function (_super) {
             }
             //UI logs
             arr.push(utils_1.pad(state.event, 5, '&nbsp;') + " " + parent.id + " " + state.type + "^" + state.over.type);
-            //arr.push(`multiplier: ${that.multiplier}`);
+            //arr.push(`zoom: ${that.zoom}`);
             arr.push("state: " + interfaces_1.StateType[that.sm.state]);
             arr.push(state.offset.toString()); //`x: ${round(state.offset.x, 1)} y: ${round(state.offset.y, 1)}`
             //arr.push(`client ${clientXY.toString()}`);
@@ -108,6 +97,7 @@ var MyApp = /** @class */ (function (_super) {
         _this.svgBoard = _this.board.children[0];
         _this.bottomBarLeft = utils_1.qS('[bar="bottom-left"]');
         _this.bottomBarCenter = utils_1.qS('[bar="bottom-center"]');
+        _this.circuitName = utils_1.qS('footer [circuit="name"]');
         _this.dash = new linealign_1.default(_this);
         _this.highlight = new highlightNode_1.default({});
         _this.selection = new selection_rect_1.SelectionRect(_this);
@@ -115,7 +105,12 @@ var MyApp = /** @class */ (function (_super) {
             app: _this,
             id: "win-dialog",
         });
-        _this.circuit = new circuit_1.Circuit(_this, { name: "my circuit", multiplier: options.multiplier }); //scaling multipler 2X UI default
+        _this.form = new form_window_1.default({
+            app: _this,
+            id: "win-form",
+        });
+        _this.circuit = new circuit_1.Circuit({ name: "my circuit", zoom: _this.getUIZoom() }); //scaling multipler 2X UI default
+        _this.circuitName.innerText = _this.circuit.name;
         //this'll hold the properties of the current selected component
         _this.winProps = new app_window_1.default({
             app: _this,
@@ -223,9 +218,11 @@ var MyApp = /** @class */ (function (_super) {
                 //case 'KeyX':	// CtrlKeyX		cut selected ECs - see if it makes sense
                 case 'KeyS': // CtrlKeyS		saves current circuit
                 case 'KeyL': // CtrlKeyL		loads a new circuit
+                case 'KeyN': // CtrlKeyN		creates a new circuit
                 case 'KeyP': // CtrlKeyP		prints current circuit
                 case 'KeyZ': // CtrlKeyZ		undo previous command
                 case 'KeyY': // CtrlKeyY		redo previous undone command
+                case 'KeyH': // CtrlKeyZ		help
                     ev.ctrlKey && (keyCode = "Ctrl" + keyCode); // CtrlKeyA
                     break;
                 default:
@@ -236,11 +233,6 @@ var MyApp = /** @class */ (function (_super) {
         }, false);
         return _this;
     }
-    Object.defineProperty(MyApp.prototype, "multiplier", {
-        get: function () { return this.circuit.multiplier; },
-        enumerable: false,
-        configurable: true
-    });
     Object.defineProperty(MyApp.prototype, "tooltipOfs", {
         get: function () { return 15; },
         enumerable: false,
@@ -250,22 +242,25 @@ var MyApp = /** @class */ (function (_super) {
         //later include panning
         return p.x > 0 && p.y > 0 && p.x < this.viewBox.width && p.y < this.viewBox.height;
     };
-    MyApp.prototype.setBoardZoom = function (m, updateDOM) {
-        this.circuit.multiplier = m;
-        if (updateDOM) {
-            //remove all selected class, should be one
-            utils_1.qSA('.bar-item[data-scale].selected').forEach(function (item) {
-                dab_1.removeClass(item, "selected");
-            });
-            dab_1.addClass(utils_1.qS("[data-scale=\"" + this.circuit.multiplier + "\"]"), "selected");
-        }
+    MyApp.prototype.getUIZoom = function () {
+        var zoom_item = utils_1.qS('.bar-item[data-scale].selected'), o = dab_1.attr(zoom_item, "data-scale"), m = parseFloat(o);
+        return m;
+    };
+    MyApp.prototype.setBoardZoom = function (zoom) {
+        //remove all selected class, should be one
+        utils_1.qSA('.bar-item[data-scale].selected').forEach(function (item) {
+            dab_1.removeClass(item, "selected");
+        });
+        dab_1.addClass(utils_1.qS("[data-scale=\"" + zoom + "\"]"), "selected");
+        this.updateViewBox(zoom);
+    };
+    MyApp.prototype.updateViewBox = function (zoom, x, y) {
         this.baseViewBox = new size_1.default(this.board.clientWidth * this.ratio | 0, this.board.clientHeight * this.ratio | 0);
         //calculate size
-        this.viewBox.width = this.baseViewBox.width * this.multiplier | 0;
-        this.viewBox.height = this.baseViewBox.height * this.multiplier | 0;
-        calculateAndUpdateViewBoxData.call(this);
+        this.viewBox.width = this.baseViewBox.width * zoom | 0;
+        this.viewBox.height = this.baseViewBox.height * zoom | 0;
+        calculateAndUpdateViewBoxData.call(this, x, y);
     };
-    MyApp.prototype.updateViewBox = function (x, y) { calculateAndUpdateViewBoxData.call(this, x, y); };
     MyApp.prototype.refreshTopBarRight = function () {
         this.bottomBarCenter.innerHTML = dab_1.nano(this.templates.viewBox01, this.viewBox) + "&nbsp; " +
             dab_1.nano(this.templates.size01, this.size);
@@ -406,11 +401,68 @@ var MyApp = /** @class */ (function (_super) {
         comp.afterDOMinserted();
         return true;
     };
+    MyApp.prototype.saveDialogIfModified = function () {
+        var _this = this;
+        return this.circuit.modified
+            ? this.dialog.showDialog("Confirm", "You have unsaved work!", ["Save", "Cancel", "Don't Save"])
+                .then(function (choice) {
+                if (choice == 0)
+                    return _this.circuit.save(); // Save: 0, Cancel: 1, Error: 5
+                else
+                    return Promise.resolve(choice);
+            })
+            : Promise.resolve(3); // Not Modified: 3
+    };
+    MyApp.prototype.newCircuit = function () {
+        var self = this, options = [
+            { label: "name", value: "", required: true, placeHolder: "Name" },
+            { label: "description", value: "", placeHolder: "Description" },
+        ];
+        this.circuitLoadingOrSaving = true;
+        return this.saveDialogIfModified()
+            .then(function (choice) {
+            if (choice == 0 || choice == 2 || choice == 3) { // Save: 0, Don't Save: 2, Not Modified: 3
+                return self.form.showDialog("New Circuit", options)
+                    .then(function (choice) {
+                    if (choice == 0) {
+                        console.log(options);
+                        var circuit = new circuit_1.Circuit({
+                            name: options[0].value,
+                            description: options[1].value,
+                            zoom: self.getUIZoom()
+                        });
+                        //everything OK here
+                        self.circuit.destroy();
+                        self.circuit = circuit;
+                        self.circuitName.innerText = circuit.name;
+                        choice = 4; // Load: 4
+                    }
+                    self.circuitLoadingOrSaving = false;
+                    return Promise.resolve(choice);
+                });
+            }
+            else {
+                self.circuitLoadingOrSaving = false;
+                return Promise.resolve(choice);
+            }
+        })
+            .catch(function (reason) {
+            self.circuitLoadingOrSaving = false;
+            console.log('error: ', reason);
+            return Promise.resolve(5); // Error: 5
+        });
+    };
+    MyApp.prototype.saveCircuit = function (showDialog) {
+        //here make later a dialogBox with error or something else
+        return showDialog
+            ? this.saveDialogIfModified()
+            : this.circuit.save();
+    };
     MyApp.prototype.loadCircuit = function () {
         var self = this;
-        return this.circuit.save(false)
+        this.circuitLoadingOrSaving = true;
+        return this.saveDialogIfModified()
             .then(function (choice) {
-            self.circuit.circuitLoadingOrSaving = true;
             if (choice == 0 || choice == 2 || choice == 3) { // Save: 0, Don't Save: 2, Not Modified: 3
                 var answer = electron_1.ipcRenderer.sendSync('openFile', "");
                 //error treatment
@@ -427,20 +479,24 @@ var MyApp = /** @class */ (function (_super) {
                     choice = 5; // Error: 5
                 }
                 else {
-                    var circuit = new circuit_1.Circuit(self, answer.data);
+                    var circuit = circuit_1.Circuit.load({ filePath: answer.filePath, data: answer.data });
                     //everything OK here
                     self.circuit.destroy();
-                    //start loading new circuit
                     self.circuit = circuit;
-                    self.setBoardZoom(circuit.multiplier, true);
-                    self.circuit.filePath = answer.filePath;
-                    //circuit add to DOM
+                    self.setBoardZoom(circuit.zoom);
+                    self.circuitName.innerText = circuit.name;
                     self.circuit.components
                         .forEach(function (comp) { return self.addToDOM(comp); });
                     choice = 4; // Load: 4
                 }
             }
+            self.circuitLoadingOrSaving = false;
             return Promise.resolve(choice);
+        })
+            .catch(function (reason) {
+            self.circuitLoadingOrSaving = false;
+            console.log('error: ', reason);
+            return Promise.resolve(5); // Error: 5
         });
     };
     return MyApp;

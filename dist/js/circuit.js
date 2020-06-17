@@ -11,44 +11,37 @@ var fs = require("fs");
 var point_1 = require("./point");
 var components_1 = require("./components");
 var Circuit = /** @class */ (function () {
-    function Circuit(app, options) {
-        this.app = app;
+    function Circuit(options) {
         this.compMap = new Map();
         this.ecMap = new Map();
         this.wireMap = new Map();
         this.selectedComponents = [];
         this.uniqueCounters = {};
-        if (typeof options == "string") {
-            //load Circuit
-            parseCircuitXML.call(this, options);
-        }
-        else {
-            //empty Circuit
-            this.version = options.version || "1.1.5";
-            this.__multiplier = options.multiplier;
-            this.name = options.name;
-            this.description = options.description;
-            this.filePath = options.filePath;
-        }
-        //overrides
+        //empty Circuit
+        this.version = options.version || "1.1.5";
+        this.__zoom = Circuit.validZoom(options.zoom) ? options.zoom : Circuit.defaultZoom;
+        this.name = options.name;
+        this.description = options.description;
+        this.filePath = options.filePath;
         this.__modified = false;
     }
     Circuit.prototype.rootComponent = function (name) {
         return this.compMap.get(name);
     };
-    Object.defineProperty(Circuit.prototype, "multiplier", {
-        get: function () { return this.__multiplier; },
+    Object.defineProperty(Circuit.prototype, "zoom", {
+        get: function () { return this.__zoom; },
         set: function (value) {
-            if (isNaN(value)
-                || value == this.__multiplier
-                || !["0.125", "0.166", "0.25", "0.33", "0.5", "0.75", "1", "2", "4", "8"].some(function (s) { return parseFloat(s) == value; }))
-                return;
-            this.__multiplier = value;
-            this.modified = true;
+            Circuit.validZoom(value)
+                && (this.__zoom != value)
+                && (this.__zoom = value);
         },
         enumerable: false,
         configurable: true
     });
+    Circuit.validZoom = function (zoom) {
+        return !(isNaN(zoom)
+            || !["0.125", "0.166", "0.25", "0.33", "0.5", "0.75", "1", "2", "4", "8"].some(function (s) { return parseFloat(s) == zoom; }));
+    };
     Object.defineProperty(Circuit.prototype, "modified", {
         get: function () { return this.__modified; },
         set: function (value) {
@@ -71,6 +64,11 @@ var Circuit = /** @class */ (function () {
     });
     Object.defineProperty(Circuit.prototype, "wireList", {
         get: function () { return Array.from(this.wireMap.values()); },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(Circuit.prototype, "empty", {
+        get: function () { return !(this.wireMap.size || this.ecMap.size); },
         enumerable: false,
         configurable: true
     });
@@ -139,95 +137,51 @@ var Circuit = /** @class */ (function () {
         }
         return false;
     };
-    Circuit.prototype.add = function (name, addToDOM, points) {
-        var options = {
-            name: name
-        }, comp;
-        ((name == "wire") && (options.points = points || [point_1.default.origin, point_1.default.origin], true))
-            || (options.x = this.app.center.x, options.y = this.app.center.y);
-        comp = createBoardItem.call(this, options, addToDOM);
+    Circuit.prototype.add = function (options) {
+        var comp;
+        ((name == "wire") && (options.points = options.points, true))
+            || (options.x = options.x, options.y = options.y);
+        comp = createBoardItem.call(this, options);
         this.modified = true;
         return comp;
     };
     //load/save
-    Circuit.prototype.XML = function () {
-        var _this = this;
-        var circuitMetadata = function () {
-            var description = _this.description
-                ? " description=\"" + _this.description + "\"" : "";
-            return "<circuit version=\"1.1.5\" zoom=\"" + _this.app.multiplier + "\" name=\"" + _this.name + "\"" + description + ">\n";
-        }, ecTmpl = '\t\t<ec id="{id}" name="{name}" x="{x}" y="{y}" rot="{rotation}" label="{label}" />\n', ecs = '\t<ecs>\n'
-            + this.ecList
-                .map(function (comp) { return dab_1.nano(ecTmpl, comp); })
-                .join('')
-            + '\t</ecs>\n', wireTnpl = '\t\t<wire id="{id}" points="{points}" label="{label}" />\n', wires = '\t<wires>\n'
-            + this.wireList
-                .map(function (wire) { return dab_1.nano(wireTnpl, {
-                id: wire.id,
-                points: wire.points.map(function (p) { return dab_1.nano('{x},{y}', p); })
-                    .join('|'),
-                label: wire.label
-            }); })
-                .join('')
-            + '\t</wires>\n', bonds = getAllCircuitBonds.call(this)
-            .map(function (b) { return "\t\t<bond>" + b + "</bond>\n"; })
-            .join('');
-        return '<?xml version="1.0" encoding="utf-8"?>\n'
-            + circuitMetadata()
-            + ecs
-            + wires
-            + '\t<bonds>\n' + bonds + '\t</bonds>\n'
-            + '</circuit>\n';
+    Circuit.load = function (args) {
+        //check filePath & data
+        var circuit = new Circuit({
+            filePath: args.filePath,
+            name: "",
+            zoom: 0,
+            version: "",
+        });
+        parseCircuitXML.call(circuit, args.data);
+        return circuit;
     };
-    Circuit.prototype.save = function (showDialog) {
-        if (!this.modified)
-            return Promise.resolve(3); // Not Modified: 3
-        var self = this, getOptions = function () {
-            var options = {
-                data: self.XML()
-            };
-            self.filePath && (options.filePath = self.filePath);
-            return options;
-        };
-        this.circuitLoadingOrSaving = true;
-        return (showDialog ?
-            this.app.dialog.showDialog("Confirm", "You have unsaved work!", ["Save", "Cancel", "Don't Save"])
-                .then(function (choice) {
-                return Promise.resolve(choice); // Save: 0,  Cancel: 1, Don't Save: 2
-            })
-                .catch(function (reason) {
-                return Promise.resolve(5); // Error: 5
-            })
-            : Promise.resolve(0)).then(function (choice) {
-            if (choice == 0) {
-                //try to save
-                if (self.filePath) {
-                    try {
-                        fs.writeFileSync(self.filePath, getOptions().data, 'utf-8');
-                        self.modified = false;
-                    }
-                    catch (e) {
-                        console.log(e.message); //later popup with error
-                        choice = 5; // Error: 5
-                    }
+    Circuit.prototype.save = function () {
+        var self = this;
+        return new Promise(function (resolve, reject) {
+            var choice = 0;
+            if (self.filePath) {
+                fs.writeFileSync(self.filePath, getCircuitXML.call(self), 'utf-8');
+                self.modified = false;
+            }
+            else {
+                var answer = electron_1.ipcRenderer.sendSync('saveFile', {
+                    data: getCircuitXML.call(self)
+                });
+                //error treatment
+                if (answer.canceled)
+                    choice = 1; // Cancel: 1
+                else if (answer.error) {
+                    console.log(answer); //later popup with error
+                    choice = 5; // Error: 5
                 }
-                else {
-                    var answer = electron_1.ipcRenderer.sendSync('saveFile', getOptions());
-                    //error treatment
-                    if (answer.canceled)
-                        choice = 1; // Cancel: 1
-                    else if (answer.error) {
-                        console.log(answer); //later popup with error
-                        choice = 5; // Error: 5
-                    }
-                    else { //OK
-                        self.filePath = answer.filePath;
-                        self.modified = false;
-                    }
+                else { //OK
+                    self.filePath = answer.filePath;
+                    self.modified = false;
                 }
             }
-            self.circuitLoadingOrSaving = false;
-            return Promise.resolve(choice);
+            resolve(choice); // Save: 0, Cancel: 1, Error: 5
         });
     };
     //cleaning
@@ -243,10 +197,11 @@ var Circuit = /** @class */ (function () {
         this.__modified = false;
         this.filePath = void 0;
     };
+    Circuit.defaultZoom = 0.5; // 2X
     return Circuit;
 }());
 exports.Circuit = Circuit;
-function createBoardItem(options, addToDOM) {
+function createBoardItem(options) {
     var self = this, regex = /(?:{([^}]+?)})+/g, name = (options === null || options === void 0 ? void 0 : options.name) || "", base = self.rootComponent(name), newComp = !base, item = void 0;
     //register new component in the circuit
     !base && (base = {
@@ -300,7 +255,6 @@ function createBoardItem(options, addToDOM) {
             self.ecMap.set(item.id, item);
             break;
     }
-    addToDOM && self.app.addToDOM(item);
     return item;
 }
 function parseCircuitXML(data) {
@@ -310,10 +264,18 @@ function parseCircuitXML(data) {
         if (err)
             console.log(err);
         else {
-            var atttrs = json.circuit.$, ecs = json.circuit.ecs.ec, wires = json.circuit.wires.wire, bonds = json.circuit.bonds.bond;
+            var atttrs = json.circuit.$, getData = function (value) {
+                if (!value || (typeof value == "string"))
+                    return [];
+                if (value.$)
+                    return [value];
+                else
+                    return value;
+            }, ecs = getData(json.circuit.ecs.ec), wires = getData(json.circuit.wires.wire), bonds = getData(json.circuit.bonds.bond);
             //attributes
             self.version = atttrs.version;
-            self.multiplier = parseFloat(atttrs.zoom) || 1;
+            !Circuit.validZoom(self.zoom = parseFloat(atttrs.zoom))
+                && (self.zoom = Circuit.defaultZoom);
             self.name = atttrs.name;
             self.description = atttrs.description;
             //create ECs
@@ -361,6 +323,34 @@ function getAllCircuitBonds() {
     this.components
         .forEach(function (comp) { return comp.bonds.forEach(findBonds); });
     return bonds;
+}
+function getCircuitXML() {
+    var self = this, circuitMetadata = function () {
+        var description = self.description
+            ? " description=\"" + self.description + "\"" : "";
+        return "<circuit version=\"1.1.5\" zoom=\"" + self.zoom + "\" name=\"" + self.name + "\"" + description + ">\n";
+    }, ecTmpl = '\t\t<ec id="{id}" name="{name}" x="{x}" y="{y}" rot="{rotation}" label="{label}" />\n', ecs = '\t<ecs>\n'
+        + self.ecList
+            .map(function (comp) { return dab_1.nano(ecTmpl, comp); })
+            .join('')
+        + '\t</ecs>\n', wireTnpl = '\t\t<wire id="{id}" points="{points}" label="{label}" />\n', wires = '\t<wires>\n'
+        + self.wireList
+            .map(function (wire) { return dab_1.nano(wireTnpl, {
+            id: wire.id,
+            points: wire.points.map(function (p) { return dab_1.nano('{x},{y}', p); })
+                .join('|'),
+            label: wire.label
+        }); })
+            .join('')
+        + '\t</wires>\n', bonds = getAllCircuitBonds.call(self)
+        .map(function (b) { return "\t\t<bond>" + b + "</bond>\n"; })
+        .join('');
+    return '<?xml version="1.0" encoding="utf-8"?>\n'
+        + circuitMetadata()
+        + ecs
+        + wires
+        + '\t<bonds>\n' + bonds + '\t</bonds>\n'
+        + '</circuit>\n';
 }
 function selectAll(value) {
     var arr = Array.from(this.ecMap.values());

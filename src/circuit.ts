@@ -12,6 +12,7 @@ import { IPoint, IBaseComponent } from "./interfaces";
 import Point from "./point";
 import Comp from "./components";
 import { Bond } from "./bonds";
+import DialogWindow from "./dialog-window";
 
 export class Circuit {
 
@@ -29,15 +30,21 @@ export class Circuit {
 		return this.compMap.get(name)
 	}
 
-	__multiplier: number;
-	get multiplier(): number { return this.__multiplier }
-	set multiplier(value: number) {
-		if (isNaN(value)
-			|| value == this.__multiplier
-			|| !["0.125", "0.166", "0.25", "0.33", "0.5", "0.75", "1", "2", "4", "8"].some(s => parseFloat(s) == value))
-			return;
-		this.__multiplier = value;
-		this.modified = true;
+	public static defaultZoom: number = 0.5;	// 2X
+
+	__zoom: number;
+	get zoom(): number { return this.__zoom }
+	set zoom(value: number) {
+		Circuit.validZoom(value)
+			&& (this.__zoom != value)
+			&& (this.__zoom = value)
+	}
+
+	public static validZoom(zoom: number): boolean {
+		return !(
+			isNaN(zoom)
+			|| !["0.125", "0.166", "0.25", "0.33", "0.5", "0.75", "1", "2", "4", "8"].some(s => parseFloat(s) == zoom)
+		)
 	}
 
 	__modified: boolean;
@@ -57,6 +64,8 @@ export class Circuit {
 
 	get wireList(): Wire[] { return Array.from(this.wireMap.values()) }
 
+	get empty(): boolean { return !(this.wireMap.size || this.ecMap.size) }
+
 	//returns all components: ECs, Wires
 	get components(): ItemBoard[] { return (this.ecList as ItemBoard[]).concat(this.wireList) }
 
@@ -73,26 +82,18 @@ export class Circuit {
 		return !this.selectedComponents.length ? void 0 : this.selectedComponents[0]
 	}
 
-	circuitLoadingOrSaving: boolean;
-
-	constructor(public app: MyApp, options: string | { name: string, multiplier: number, version?: string, filePath?: string, description?: string }) {
+	constructor(options: { name: string, zoom: number, version?: string, filePath?: string, description?: string }) {
 		this.compMap = new Map();
 		this.ecMap = new Map();
 		this.wireMap = new Map();
 		this.selectedComponents = [];
 		this.uniqueCounters = {};
-		if (typeof options == "string") {
-			//load Circuit
-			parseCircuitXML.call(this, options);
-		} else {
-			//empty Circuit
-			this.version = options.version || "1.1.5";
-			this.__multiplier = options.multiplier;
-			this.name = options.name;
-			this.description = <string>options.description;
-			this.filePath = <string>options.filePath;
-		}
-		//overrides
+		//empty Circuit
+		this.version = options.version || "1.1.5";
+		this.__zoom = Circuit.validZoom(options.zoom) ? options.zoom : Circuit.defaultZoom;
+		this.name = options.name;
+		this.description = <string>options.description;
+		this.filePath = <string>options.filePath;
 		this.__modified = false;
 	}
 
@@ -153,109 +154,56 @@ export class Circuit {
 		return false
 	}
 
-	public add(name: string, addToDOM?: boolean, points?: IPoint[]): EC | Wire {
+	public add(options: { name: string, x: number, y: number, points: IPoint[] }): EC | Wire {
 		let
-			options = <any>{
-				name: name
-			},
 			comp: EC | Wire;
-		((name == "wire") && (options.points = points || [Point.origin, Point.origin], true))
-			|| (options.x = this.app.center.x, options.y = this.app.center.y);
-		comp = createBoardItem.call(this, options, addToDOM);
+		((name == "wire") && (options.points = options.points, true))
+			|| (options.x = options.x, options.y = options.y);
+		comp = createBoardItem.call(this, options);
 		this.modified = true;
 		return <any>comp
 	}
 
 	//load/save
-	public XML(): string {
-		let
-			circuitMetadata = () => {
-				let
-					description = this.description
-						? ` description="${this.description}"` : "";
-				return `<circuit version="1.1.5" zoom="${this.app.multiplier}" name="${this.name}"${description}>\n`
-			},
-			ecTmpl = '\t\t<ec id="{id}" name="{name}" x="{x}" y="{y}" rot="{rotation}" label="{label}" />\n',
-			ecs = '\t<ecs>\n'
-				+ this.ecList
-					.map(comp => nano(ecTmpl, comp))
-					.join('')
-				+ '\t</ecs>\n',
-			wireTnpl = '\t\t<wire id="{id}" points="{points}" label="{label}" />\n',
-			wires =
-				'\t<wires>\n'
-				+ this.wireList
-					.map(wire => nano(wireTnpl, {
-						id: wire.id,
-						points: wire.points.map(p => nano('{x},{y}', p))
-							.join('|'),
-						label: wire.label
-					}))
-					.join('')
-				+ '\t</wires>\n',
-			bonds = getAllCircuitBonds.call(this)
-				.map((b: string) => `\t\t<bond>${b}</bond>\n`)
-				.join('');
-		return '<?xml version="1.0" encoding="utf-8"?>\n'
-			+ circuitMetadata()
-			+ ecs
-			+ wires
-			+ '\t<bonds>\n' + bonds + '\t</bonds>\n'
-			+ '</circuit>\n'
+	public static load(args: { filePath: string, data: string }): Circuit {
+		//check filePath & data
+
+		let circuit = new Circuit({
+			filePath: args.filePath,
+			name: "",
+			zoom: 0,
+			version: "",
+		});
+		parseCircuitXML.call(circuit, args.data);
+		return circuit;
 	}
 
-	public save(showDialog: boolean): Promise<number> {
-		if (!this.modified)
-			return Promise.resolve(3);	// Not Modified: 3
+	public save(): Promise<number> {
 		let
-			self = this as Circuit,
-			getOptions = () => {
-				let
-					options = <any>{
-						data: self.XML()
-					};
-				self.filePath && (options.filePath = self.filePath)
-				return options
-			};
-		this.circuitLoadingOrSaving = true;
-		return (showDialog ?
-			this.app.dialog.showDialog("Confirm", "You have unsaved work!", ["Save", "Cancel", "Don't Save"])
-				.then((choice) => {
-					return Promise.resolve(choice); // Save: 0,  Cancel: 1, Don't Save: 2
-				})
-				.catch((reason) => {
-					return Promise.resolve(5)	// Error: 5
-				})
-			: Promise.resolve(0)
-		).then((choice) => {    // Save: 0,  Cancel: 1, Don't Save: 2, Error: 5
-			if (choice == 0) {
-				//try to save
-				if (self.filePath) {
-					try {
-						fs.writeFileSync(self.filePath, getOptions().data, 'utf-8');
-						self.modified = false;
-					}
-					catch (e) {
-						console.log(e.message);				//later popup with error
-						choice = 5;		// Error: 5
-					}
-				} else {
-					let answer = ipcRenderer.sendSync('saveFile', getOptions());
-					//error treatment
-					if (answer.canceled)
-						choice = 1;		// Cancel: 1
-					else if (answer.error) {
-						console.log(answer);				//later popup with error
-						choice = 5;		// Error: 5
-					}
-					else {						//OK
-						self.filePath = answer.filePath;
-						self.modified = false;
-					}
+			self = this as Circuit;
+		return new Promise(function (resolve, reject) {
+			let
+				choice = 0;
+			if (self.filePath) {
+				fs.writeFileSync(self.filePath, getCircuitXML.call(self), 'utf-8');
+				self.modified = false;
+			} else {
+				let answer = ipcRenderer.sendSync('saveFile', {
+					data: getCircuitXML.call(self)
+				});
+				//error treatment
+				if (answer.canceled)
+					choice = 1;		// Cancel: 1
+				else if (answer.error) {
+					console.log(answer);				//later popup with error
+					choice = 5;		// Error: 5
+				}
+				else {						//OK
+					self.filePath = answer.filePath;
+					self.modified = false;
 				}
 			}
-			self.circuitLoadingOrSaving = false;
-			return Promise.resolve(choice);
+			resolve(choice); // Save: 0, Cancel: 1, Error: 5
 		})
 	}
 
@@ -273,7 +221,7 @@ export class Circuit {
 	}
 }
 
-function createBoardItem(options: any, addToDOM?: boolean): EC | Wire {
+function createBoardItem(options: any): EC | Wire {
 	let
 		self = (this as Circuit),
 		regex = /(?:{([^}]+?)})+/g,
@@ -343,7 +291,6 @@ function createBoardItem(options: any, addToDOM?: boolean): EC | Wire {
 			self.ecMap.set(item.id, <EC>item);
 			break;
 	}
-	addToDOM && self.app.addToDOM(<any>item);
 	return <any>item
 }
 
@@ -357,12 +304,21 @@ function parseCircuitXML(data: string) {
 		else {
 			let
 				atttrs = json.circuit.$,
-				ecs = json.circuit.ecs.ec,
-				wires = json.circuit.wires.wire,
-				bonds = json.circuit.bonds.bond;
+				getData = (value: any): any[] => {
+					if (!value || (typeof value == "string"))
+						return [];
+					if (value.$)
+						return [value]
+					else
+						return value;
+				},
+				ecs = getData(json.circuit.ecs.ec),
+				wires = getData(json.circuit.wires.wire),
+				bonds = getData(json.circuit.bonds.bond);
 			//attributes
 			self.version = atttrs.version;
-			self.multiplier = parseFloat(atttrs.zoom) || 1;
+			!Circuit.validZoom(self.zoom = parseFloat(atttrs.zoom))
+				&& (self.zoom = Circuit.defaultZoom);
 			self.name = atttrs.name;
 			self.description = atttrs.description;
 			//create ECs
@@ -428,6 +384,44 @@ function getAllCircuitBonds(): string[] {
 	(this as Circuit).components
 		.forEach(comp => comp.bonds.forEach(findBonds));
 	return bonds;
+}
+
+function getCircuitXML(): string {
+	let
+		self = this as Circuit,
+		circuitMetadata = () => {
+			let
+				description = self.description
+					? ` description="${self.description}"` : "";
+			return `<circuit version="1.1.5" zoom="${self.zoom}" name="${self.name}"${description}>\n`
+		},
+		ecTmpl = '\t\t<ec id="{id}" name="{name}" x="{x}" y="{y}" rot="{rotation}" label="{label}" />\n',
+		ecs = '\t<ecs>\n'
+			+ self.ecList
+				.map(comp => nano(ecTmpl, comp))
+				.join('')
+			+ '\t</ecs>\n',
+		wireTnpl = '\t\t<wire id="{id}" points="{points}" label="{label}" />\n',
+		wires =
+			'\t<wires>\n'
+			+ self.wireList
+				.map(wire => nano(wireTnpl, {
+					id: wire.id,
+					points: wire.points.map(p => nano('{x},{y}', p))
+						.join('|'),
+					label: wire.label
+				}))
+				.join('')
+			+ '\t</wires>\n',
+		bonds = getAllCircuitBonds.call(self)
+			.map((b: string) => `\t\t<bond>${b}</bond>\n`)
+			.join('');
+	return '<?xml version="1.0" encoding="utf-8"?>\n'
+		+ circuitMetadata()
+		+ ecs
+		+ wires
+		+ '\t<bonds>\n' + bonds + '\t</bonds>\n'
+		+ '</circuit>\n'
 }
 
 function selectAll(value: boolean): EC[] {

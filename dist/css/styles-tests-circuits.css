@@ -511,6 +511,10 @@ body.dark .expandable > span > i {
   display: inline;
 }
 
+[circuit="name"] {
+  border-left: 1px solid #e2d9d9;
+  padding-left: 5px;
+}
 /************************ beautiful scroll bar  ************************/
 
 .scroll-rgt {
@@ -786,6 +790,9 @@ body.dark .expandable > span > i {
 .win.dialog > div.content > h5 {
   color: #4d4e4e;
 }
+.win.dialog > div.content > div {
+  text-align: center;
+}
 .win.dialog > div.content > div > button {
   margin: 0px 4px;
   background-color: #d4d4cd;
@@ -794,4 +801,9 @@ body.dark .expandable > span > i {
 .win.dialog > div.content > div > button:hover {
   background-color: #717272e0;
   color: white;
+}
+.win.dialog > div.content > form > fieldset > div > span {
+  color: red;
+  font-size: 1.5em;
+  font-weight: bolder;
 }

@@ -1,4 +1,3 @@
-
 import { ISize } from './interfaces';
 import { round } from './dab';
 

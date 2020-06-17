@@ -1,4 +1,3 @@
-
 export enum Type {
 	UNDEFINED = 0,
 	EC = 1,

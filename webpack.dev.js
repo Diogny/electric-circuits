@@ -46,4 +46,16 @@ module.exports = module.exports = [
 			entry: { index: './src/index.ts' }
 		},
 		commonConfig),
+	Object.assign(
+		{
+			target: 'electron-renderer',
+			entry: { print: './src/index.print.ts' }
+		},
+		commonConfig),
+	Object.assign(
+		{
+			target: 'electron-renderer',
+			entry: { help: './src/index.help.ts' }
+		},
+		commonConfig),
 ];

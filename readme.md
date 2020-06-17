@@ -60,6 +60,7 @@ Used in my testing website [Electric Circuits](http://diogny.com/tests/circuits.
 	pnpm install electron-reload --save-dev
 	pnpm install xml2js --save-dev
 	pnpm install @types/xml2js  --save-dev
+	pnpm install tslib --save-dev
 
 ### testings
 	pnpm i mocha -D
@@ -96,6 +97,6 @@ Used in my testing website [Electric Circuits](http://diogny.com/tests/circuits.
 	git add -u					stage the modified and deleted files
 	git add -A
 	git commit -m "update message"
-	git tag v1.1.9
+	git tag v1.1.10
 	git push origin master --tags
 

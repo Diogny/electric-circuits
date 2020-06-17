@@ -1,25 +1,13 @@
 "use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 Object.defineProperty(exports, "__esModule", { value: true });
+var tslib_1 = require("tslib");
 var dab_1 = require("./dab");
 var utils_1 = require("./utils");
 var item_1 = require("./item");
 var rect_1 = require("./rect");
 var point_1 = require("./point");
 var ItemBase = /** @class */ (function (_super) {
-    __extends(ItemBase, _super);
+    tslib_1.__extends(ItemBase, _super);
     function ItemBase(options) {
         var _this = _super.call(this, options) || this;
         var classArr = dab_1.isStr(_this.class) ? _this.class.split(' ') : [];

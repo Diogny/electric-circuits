@@ -2,7 +2,7 @@ import { app, BrowserWindow, ipcMain, dialog } from "electron";
 import * as path from "path";
 import * as fs from 'fs';
 import Store from "./store";
-import { prop } from "src/utils";
+import { prop } from "./utils";
 //import { format as formatUrl } from 'url';
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
@@ -32,7 +32,10 @@ const store = new Store({
 
 //https://www.electronjs.org/docs/tutorial/security
 // global reference to mainWindow (necessary to prevent window from being garbage collected)
-let mainWindow: Electron.BrowserWindow;
+let
+	mainWindow: Electron.BrowserWindow,
+	printWindow: Electron.BrowserWindow,
+	helpWindow: Electron.BrowserWindow;
 
 function createMainWindow(opt: any) {
 
@@ -73,6 +76,85 @@ function createMainWindow(opt: any) {
 	})
 
 	mainWindow.removeMenu();
+
+	createPrintWindow();
+	createHelpWindow();
+}
+
+function createPrintWindow() {
+	//printing window
+	printWindow = new BrowserWindow({
+		parent: mainWindow,
+		modal: true,
+		title: "Circuit Printing",
+		center: true,
+		width: 800,
+		height: 500,
+		minWidth: 800,
+		minHeight: 500,
+		//useContentSize: true,
+		webPreferences: {
+			nodeIntegration: true,
+			enableRemoteModule: false,
+			nodeIntegrationInSubFrames: true,
+		},
+		show: false,
+		//closable: false,
+		minimizable: false,
+		maximizable: false,
+		fullscreenable: false,
+		//thickFrame: false,
+		resizable: true,
+	});
+	let
+		url = path.join(app.getAppPath(), "html/print.html");
+
+	printWindow.loadFile(url);
+	//printWindow.loadURL('https://github.com')
+	printWindow.once('ready-to-show', () => {
+		//printWindow.show();
+	});
+	printWindow.on("closed", (e: any) => {
+		printWindow = <any>null;
+	});
+}
+
+function createHelpWindow() {
+	//printing window
+	helpWindow = new BrowserWindow({
+		parent: mainWindow,
+		modal: true,
+		title: "Circuit Help",
+		center: true,
+		width: 800,
+		height: 500,
+		minWidth: 800,
+		minHeight: 500,
+		//useContentSize: true,
+		webPreferences: {
+			nodeIntegration: true,
+			enableRemoteModule: false,
+			nodeIntegrationInSubFrames: true,
+		},
+		show: false,
+		//closable: false,
+		minimizable: false,
+		maximizable: false,
+		fullscreenable: false,
+		//thickFrame: false,
+		resizable: true,
+	});
+	let
+		url = path.join(app.getAppPath(), "html/help.html");
+
+	helpWindow.loadFile(url);
+	//helpWindow.loadURL('https://github.com')
+	helpWindow.once('ready-to-show', () => {
+		//helpWindow.show();
+	});
+	helpWindow.on("closed", (e: any) => {
+		helpWindow = <any>null;
+	});
 }
 
 app.on("ready", () => {
@@ -105,6 +187,8 @@ app.on("ready", () => {
 
 	mainWindow.on("closed", (e: any) => {
 		mainWindow = <any>null;
+		printWindow = <any>null;
+		helpWindow = <any>null;
 	});
 });
 
@@ -237,6 +321,22 @@ ipcMain.on('saveFile', (event, arg) => {
 				message: err.message
 			}
 		})
+})
+
+ipcMain.on('print-circuit', (event, arg) => {
+	console.log(arg);
+	if (!printWindow)
+		createPrintWindow();
+	printWindow.show();
+	event.returnValue = "printing...";
+})
+
+ipcMain.on('help-circuit', (event, arg) => {
+	console.log(arg);
+	if (!helpWindow)
+		createHelpWindow();
+		helpWindow.show();
+	event.returnValue = "help is working...";
 })
 
 ipcMain.on('app-quit', (event, arg) => {

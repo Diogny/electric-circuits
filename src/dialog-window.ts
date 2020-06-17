@@ -29,12 +29,11 @@ export default class DialogWindow extends BaseWindow {
 				},
 				clickHandler = (e: MouseEvent) => {
 					let
-						option = parseInt(<any>(e.target as HTMLElement).getAttribute("dialog-option"));
-					console.log(option);
-					if (isNaN(option))
+						choice = parseInt(<any>(e.target as HTMLElement).getAttribute("dialog-option"));
+					if (isNaN(choice))
 						return;
 					cleanUp();
-					resolve(option);
+					resolve(choice);
 				},
 				keyHandler = (ev: KeyboardEvent) => {
 					if (ev.code == 'Escape') {
@@ -55,12 +54,22 @@ export default class DialogWindow extends BaseWindow {
 			aEL(self.contentHTML, "click", clickHandler, false);
 			self.setVisible(true);
 			removeClass(self.win, "hide");
-		});
+		})
+	}
+
+	public showMessage(title: string, message: string): Promise<void> {
+		return this.showDialog(title, message, ["OK"])
+			.then(choice => {
+				return Promise.resolve()
+			})
+			.catch(reason => {
+				return Promise.resolve()
+			})
 	}
 
 	public propertyDefaults(): IBaseWindowOptions {
 		return extend(super.propertyDefaults(), {
-			class: "win dialog no-select hide",
+			class: "win dialog box no-select hide",
 			templateName: "dialogWin01",
 		})
 	}

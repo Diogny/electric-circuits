@@ -22,6 +22,7 @@ import Wire from "./wire";
 import { SelectionRect } from "./selection-rect";
 import { Circuit } from "./circuit";
 import DialogWindow from "./dialog-window";
+import FormWindow from "./form-window";
 
 export class MyApp extends Application implements IMyApp {
 
@@ -32,6 +33,7 @@ export class MyApp extends Application implements IMyApp {
 	readonly tooltip: Tooltip;
 	readonly bottomBarLeft: HTMLElement;
 	readonly bottomBarCenter: HTMLElement;
+	readonly circuitName: HTMLDivElement;
 	readonly winProps: AppWindow;
 	readonly sm: StateMachine;
 	readonly rightClick: ContextWindow;
@@ -39,11 +41,11 @@ export class MyApp extends Application implements IMyApp {
 	readonly highlight: HighlightNode;
 	readonly selection: SelectionRect;
 	readonly dialog: DialogWindow;
+	readonly form: FormWindow;
 	circuit: Circuit;
 
 	viewBox: Rect;
 	baseViewBox: Size;
-	get multiplier(): number { return this.circuit.multiplier }
 	ratioX: number;
 	ratioY: number;
 	center: Point;
@@ -52,6 +54,8 @@ export class MyApp extends Application implements IMyApp {
 	size: Size;
 
 	get tooltipOfs(): number { return 15 }
+
+	circuitLoadingOrSaving: boolean;
 
 	constructor(options: IMyAppOptions) {
 		super(options);
@@ -115,7 +119,7 @@ export class MyApp extends Application implements IMyApp {
 				}
 				//UI logs
 				arr.push(`${pad(state.event, 5, '&nbsp;')} ${parent.id} ${state.type}^${state.over.type}`);
-				//arr.push(`multiplier: ${that.multiplier}`);
+				//arr.push(`zoom: ${that.zoom}`);
 				arr.push(`state: ${StateType[that.sm.state]}`);
 				arr.push(state.offset.toString()); //`x: ${round(state.offset.x, 1)} y: ${round(state.offset.y, 1)}`
 				//arr.push(`client ${clientXY.toString()}`);
@@ -134,6 +138,7 @@ export class MyApp extends Application implements IMyApp {
 		this.svgBoard = (<SVGElement>this.board.children[0]);
 		this.bottomBarLeft = qS('[bar="bottom-left"]');
 		this.bottomBarCenter = qS('[bar="bottom-center"]');
+		this.circuitName = <HTMLDivElement>qS('footer [circuit="name"]');
 		this.dash = new LinesAligner(this);
 		this.highlight = new HighlightNode(<any>{});
 		this.selection = new SelectionRect(this);
@@ -141,7 +146,12 @@ export class MyApp extends Application implements IMyApp {
 			app: this as Application,
 			id: "win-dialog",
 		});
-		this.circuit = new Circuit(this, { name: "my circuit", multiplier: options.multiplier }); //scaling multipler 2X UI default
+		this.form = new FormWindow(<any>{
+			app: this as Application,
+			id: "win-form",
+		});
+		this.circuit = new Circuit({ name: "new circuit", zoom: this.getUIZoom() }); //scaling multipler 2X UI default
+		this.circuitName.innerText = this.circuit.name;
 
 		//this'll hold the properties of the current selected component
 		this.winProps = new AppWindow(<IAppWindowOptions>{
@@ -283,9 +293,11 @@ export class MyApp extends Application implements IMyApp {
 				//case 'KeyX':	// CtrlKeyX		cut selected ECs - see if it makes sense
 				case 'KeyS':	// CtrlKeyS		saves current circuit
 				case 'KeyL':	// CtrlKeyL		loads a new circuit
+				case 'KeyN':	// CtrlKeyN		creates a new circuit
 				case 'KeyP':	// CtrlKeyP		prints current circuit
 				case 'KeyZ':	// CtrlKeyZ		undo previous command
 				case 'KeyY':	// CtrlKeyY		redo previous undone command
+				case 'KeyH':	// CtrlKeyZ		help
 					ev.ctrlKey && (keyCode = "Ctrl" + keyCode);	// CtrlKeyA
 					break;
 				default:
@@ -301,23 +313,30 @@ export class MyApp extends Application implements IMyApp {
 		return p.x > 0 && p.y > 0 && p.x < this.viewBox.width && p.y < this.viewBox.height
 	}
 
-	public setBoardZoom(m: number, updateDOM: boolean) {
-		this.circuit.multiplier = m;
-		if (updateDOM) {
-			//remove all selected class, should be one
-			qSA('.bar-item[data-scale].selected').forEach((item: any) => {
-				removeClass(item, "selected");
-			});
-			addClass(qS(`[data-scale="${this.circuit.multiplier}"]`), "selected");
-		}
-		this.baseViewBox = new Size(this.board.clientWidth * this.ratio | 0, this.board.clientHeight * this.ratio | 0);
-		//calculate size
-		this.viewBox.width = this.baseViewBox.width * this.multiplier | 0;
-		this.viewBox.height = this.baseViewBox.height * this.multiplier | 0;
-		calculateAndUpdateViewBoxData.call(this);
+	public getUIZoom(): number {
+		let
+			zoom_item = qS('.bar-item[data-scale].selected'),
+			o = attr(zoom_item, "data-scale"),
+			m = parseFloat(o);
+		return m;
 	}
 
-	public updateViewBox(x?: number, y?: number) { calculateAndUpdateViewBoxData.call(this, x, y); }
+	public setBoardZoom(zoom: number) {
+		//remove all selected class, should be one
+		qSA('.bar-item[data-scale].selected').forEach((item: any) => {
+			removeClass(item, "selected");
+		});
+		addClass(qS(`[data-scale="${zoom}"]`), "selected");
+		this.updateViewBox(zoom);
+	}
+
+	public updateViewBox(zoom: number, x?: number, y?: number) {
+		this.baseViewBox = new Size(this.board.clientWidth * this.ratio | 0, this.board.clientHeight * this.ratio | 0);
+		//calculate size
+		this.viewBox.width = this.baseViewBox.width * zoom | 0;
+		this.viewBox.height = this.baseViewBox.height * zoom | 0;
+		calculateAndUpdateViewBoxData.call(this, x, y);
+	}
 
 	public refreshTopBarRight() {//topBarRight
 		this.bottomBarCenter.innerHTML = nano(this.templates.viewBox01, this.viewBox) + "&nbsp; " +
@@ -330,7 +349,7 @@ export class MyApp extends Application implements IMyApp {
 		return (Math.abs(ratio - 4 / 3) < Math.abs(ratio - 16 / 9)) ? '4:3' : '16:9';
 	}
 
-	public tooltipFontSize = () => Math.max(10, 35 * this.multiplier)
+	public tooltipFontSize = () => Math.max(10, 35 * this.circuit.zoom)
 
 	public rotateEC(angle: number) {
 		this.rotateComponentBy(angle, this.circuit.ec)
@@ -479,12 +498,74 @@ export class MyApp extends Application implements IMyApp {
 		return true;
 	}
 
+	protected saveDialogIfModified(): Promise<number> {
+		return this.circuit.modified
+			? this.dialog.showDialog("Confirm", "You have unsaved work!", ["Save", "Cancel", "Don't Save"])
+				.then((choice) => {
+					if (choice == 0)
+						return this.circuit.save()	// Save: 0, Cancel: 1, Error: 5
+					else
+						return Promise.resolve(choice)
+				})
+			: Promise.resolve(3)			// Not Modified: 3
+	}
+
+	public newCircuit(): Promise<number> {
+		let
+			self = this as MyApp,
+			options = [
+				{ label: "name", value: "", required: true, placeHolder: "Name" },
+				{ label: "description", value: "", placeHolder: "Description" },
+			];
+		this.circuitLoadingOrSaving = true;
+		return this.saveDialogIfModified()
+			.then((choice) => {
+				if (choice == 0 || choice == 2 || choice == 3) { // Save: 0, Don't Save: 2, Not Modified: 3
+					return self.form.showDialog("New Circuit", options)
+						.then(choice => {
+							if (choice == 0) {
+								console.log(options);
+								let
+									circuit = new Circuit({
+										name: options[0].value,
+										description: options[1].value,
+										zoom: self.getUIZoom()
+									});
+								//everything OK here
+								self.circuit.destroy();
+								self.circuit = circuit;
+								self.circuitName.innerText = circuit.name;
+								choice = 4;						// Load: 4
+							}
+							self.circuitLoadingOrSaving = false;
+							return Promise.resolve(choice)
+						})
+				}
+				else {
+					self.circuitLoadingOrSaving = false;
+					return Promise.resolve(choice)
+				}
+			})
+			.catch((reason) => {
+				self.circuitLoadingOrSaving = false;
+				console.log('error: ', reason);
+				return Promise.resolve(5)	// Error: 5
+			})
+	}
+
+	public saveCircuit(showDialog: boolean): Promise<number> {
+		//here make later a dialogBox with error or something else
+		return showDialog
+			? this.saveDialogIfModified()
+			: this.circuit.save();
+	}
+
 	public loadCircuit(): Promise<number> {
 		let
 			self = this as MyApp;
-		return this.circuit.save(false)
-			.then(choice => {
-				self.circuit.circuitLoadingOrSaving = true;
+		this.circuitLoadingOrSaving = true;
+		return this.saveDialogIfModified()
+			.then((choice) => {
 				if (choice == 0 || choice == 2 || choice == 3) { // Save: 0, Don't Save: 2, Not Modified: 3
 					let
 						answer = ipcRenderer.sendSync('openFile', "");
@@ -503,20 +584,24 @@ export class MyApp extends Application implements IMyApp {
 					}
 					else {
 						let
-							circuit = new Circuit(self, answer.data);
+							circuit = Circuit.load({ filePath: answer.filePath, data: answer.data });
 						//everything OK here
 						self.circuit.destroy();
-						//start loading new circuit
 						self.circuit = circuit;
-						self.setBoardZoom(circuit.multiplier, true);
-						self.circuit.filePath = answer.filePath;
-						//circuit add to DOM
+						self.setBoardZoom(circuit.zoom);
+						self.circuitName.innerText = circuit.name;
 						self.circuit.components
 							.forEach(comp => self.addToDOM(<any>comp));
 						choice = 4;						// Load: 4
 					}
 				}
+				self.circuitLoadingOrSaving = false;
 				return Promise.resolve(choice)
+			})
+			.catch((reason) => {
+				self.circuitLoadingOrSaving = false;
+				console.log('error: ', reason);
+				return Promise.resolve(5)	// Error: 5
 			})
 	}
 }

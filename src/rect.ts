@@ -1,4 +1,3 @@
-
 import { IPoint, IRect } from "./interfaces";
 
 export default class Rect implements IRect {

@@ -1,4 +1,3 @@
-
 export default abstract class ajaxp {
 
 	static sGet: string = "GET";

@@ -1,5 +1,4 @@
 "use strict";
-//props.ts
 Object.defineProperty(exports, "__esModule", { value: true });
 var dab_1 = require("./dab");
 var utils_1 = require("./utils");

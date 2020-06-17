@@ -1,5 +1,5 @@
 import {
-	IContextMenuOptions, IContextMenuItem, IContextMenuSettings, ActionType, IBaseWindowOptions, StateType, IBoardWindowOptions
+	IContextMenuOptions, IContextMenuItem, IContextMenuSettings, ActionType, StateType, IBoardWindowOptions
 } from "./interfaces";
 import { each } from "./utils";
 import { nano, aEL, getParentAttr, attr, extend } from "./dab";

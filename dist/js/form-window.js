@@ -1,18 +1,18 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var tslib_1 = require("tslib");
-var dab_1 = require("./dab");
 var base_window_1 = require("./base-window");
-var DialogWindow = /** @class */ (function (_super) {
-    tslib_1.__extends(DialogWindow, _super);
-    function DialogWindow(options) {
+var dab_1 = require("./dab");
+var FormWindow = /** @class */ (function (_super) {
+    tslib_1.__extends(FormWindow, _super);
+    function FormWindow(options) {
         var _this = _super.call(this, options) || this;
         _this.titleHTML = _this.win.querySelector("div>h4");
-        _this.messageHTML = _this.win.querySelector("div>h5");
+        _this.formHTML = _this.win.querySelector("div>form>fieldset");
         _this.contentHTML = _this.win.querySelector("div>div>div");
         return _this;
     }
-    DialogWindow.prototype.showDialog = function (title, message, buttons) {
+    FormWindow.prototype.showDialog = function (title, formItems) {
         var self = this;
         return new Promise(function (resolve, reject) {
             var cancelIndex = -1, cleanUp = function () {
@@ -24,6 +24,19 @@ var DialogWindow = /** @class */ (function (_super) {
                 var choice = parseInt(e.target.getAttribute("dialog-option"));
                 if (isNaN(choice))
                     return;
+                if (choice == 0) {
+                    if ((Array.from(self.formHTML.querySelectorAll("div>input"))
+                        .filter(function (item, index) {
+                        if (!(formItems[index].value = item.value) && formItems[index].required) {
+                            dab_1.removeClass(item.nextElementSibling, "hide");
+                            return true;
+                        }
+                        else
+                            dab_1.addClass(item.nextElementSibling, "hide");
+                    })).length) {
+                        return;
+                    }
+                }
                 cleanUp();
                 resolve(choice);
             }, keyHandler = function (ev) {
@@ -33,9 +46,14 @@ var DialogWindow = /** @class */ (function (_super) {
                 }
             };
             self.titleHTML.innerText = title;
-            self.messageHTML.innerText = message;
+            //form
+            self.formHTML.innerHTML = formItems.map(function (item, index) {
+                var label = "<label for=\"dialog-form-" + index + "\">" + item.label + "</label>", placeHolder = item.placeHolder ? " placeholder=\"" + item.placeHolder + "\"" : "", input = "<input type=\"text\" id=\"dialog-form-" + index + "\"" + placeHolder + " />", required = "<span class=\"hide\"> *</span>";
+                return '<div class="pure-control-group">' + label + input + required + '</div>';
+            })
+                .join('');
             self.contentHTML.innerHTML =
-                buttons.map(function (text, index) {
+                ["Save", "Cancel"].map(function (text, index) {
                     if (text.toUpperCase() == "CANCEL")
                         cancelIndex = index;
                     return "<button dialog-option=\"" + index + "\">" + text + "</button>";
@@ -47,22 +65,13 @@ var DialogWindow = /** @class */ (function (_super) {
             dab_1.removeClass(self.win, "hide");
         });
     };
-    DialogWindow.prototype.showMessage = function (title, message) {
-        return this.showDialog(title, message, ["OK"])
-            .then(function (choice) {
-            return Promise.resolve();
-        })
-            .catch(function (reason) {
-            return Promise.resolve();
-        });
-    };
-    DialogWindow.prototype.propertyDefaults = function () {
+    FormWindow.prototype.propertyDefaults = function () {
         return dab_1.extend(_super.prototype.propertyDefaults.call(this), {
-            class: "win dialog box no-select hide",
-            templateName: "dialogWin01",
+            class: "win dialog form no-select hide",
+            templateName: "formWin01",
         });
     };
-    return DialogWindow;
+    return FormWindow;
 }(base_window_1.default));
-exports.default = DialogWindow;
-//# sourceMappingURL=dialog-window.js.map
+exports.default = FormWindow;
+//# sourceMappingURL=form-window.js.map

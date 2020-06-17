@@ -1,25 +1,13 @@
 "use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ItemSolid = exports.RotationInjector = void 0;
+var tslib_1 = require("tslib");
 var itemsBoard_1 = require("./itemsBoard");
 var rect_1 = require("./rect");
 var size_1 = require("./size");
 var point_1 = require("./point");
 var RotationInjector = /** @class */ (function (_super) {
-    __extends(RotationInjector, _super);
+    tslib_1.__extends(RotationInjector, _super);
     function RotationInjector(ec, name) {
         return _super.call(this, ec, name, true) || this;
     }
@@ -41,7 +29,7 @@ var RotationInjector = /** @class */ (function (_super) {
 exports.RotationInjector = RotationInjector;
 //ItemBoard->ItemSolid->EC
 var ItemSolid = /** @class */ (function (_super) {
-    __extends(ItemSolid, _super);
+    tslib_1.__extends(ItemSolid, _super);
     function ItemSolid(circuit, options) {
         var _this = _super.call(this, circuit, options) || this;
         //I've to set new properties always, because super just copy defaults()

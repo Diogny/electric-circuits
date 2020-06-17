@@ -26,6 +26,8 @@
 	],
 	"exclude": [
 		"src/main.ts",
-		"src/index.ts"
+		"src/index.ts",
+		"src/index.print.ts",
+		"src/index.help.ts"
 	]
 }

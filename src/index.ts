@@ -14,10 +14,10 @@ import Wire from "./wire";
 import StateMachine from "./stateMachine";
 import { Type } from "./types";
 import { ItemBoard } from "./itemsBoard";
-import Size from "src/size";
-import EC from "src/ec";
-import Rect from "src/rect";
-import { Bond } from "src/bonds";
+import Size from "./size";
+import EC from "./ec";
+import Rect from "./rect";
+import { Bond } from "./bonds";
 
 let
 	app: MyApp,
@@ -47,7 +47,7 @@ let
 		ArrowRight: { x: 1, y: 0 },
 		ArrowDown: { x: 0, y: 1 }
 	},
-	cursorBoardHandler = (code: any) => {
+	cursorBoardHandler = (code: string): boolean | undefined => {
 		app.tooltip.setVisible(false);
 		app.highlight.setVisible(false);
 		//console.log(`BOARD key code: ${code}`)
@@ -56,10 +56,19 @@ let
 				app.execute(Action.SELECT_ALL, "");
 				break;
 			case 'CtrlKeyS':
-				app.circuit.save(false);
+				app.saveCircuit(false);
 				break;
 			case 'CtrlKeyL':
 				app.loadCircuit();
+				break;
+			case 'CtrlKeyN':
+				app.newCircuit();
+				break;
+			case 'CtrlKeyP':
+				ipcRenderer.sendSync('print-circuit');
+				break;
+			case 'CtrlKeyH':
+				ipcRenderer.sendSync('help-circuit');
 				break;
 			case 'Delete':
 				app.execute(Action.DELETE_SELECTED, "");
@@ -75,6 +84,7 @@ let
 				app.circuit.modified = true;
 				break;
 		}
+		return;
 	};
 
 //experimental
@@ -93,23 +103,30 @@ function hookEvents() {
 				scaleTarget = getParentAttr(<HTMLElement>e.target, "data-scale"),
 				o = attr(scaleTarget, "data-scale"),
 				m = parseFloat(o);
-			if (app.multiplier == m)
-				return;
-			app.setBoardZoom(m, true);
+			if (app.circuit.zoom != m)
+				app.circuit.modified = true;
+			app.setBoardZoom(app.circuit.zoom = m);
 		}, false);
 	});
 	//Rotations
 	aEL(qS('.bar-item[rot-dir="left"]'), "click", () => app.rotateEC(-45), false);
 	aEL(qS('.bar-item[rot-dir="right"]'), "click", () => app.rotateEC(45), false);
 	//add component
-	aEL(qS('.bar-item[action="comp-create"]'), "click", () =>
-		app.circuit.add(<string>app.prop("comp_option").value, true), false);
+	aEL(qS('.bar-item[action="comp-create"]'), "click", () => {
+		let
+			comp = app.circuit.add(<any>{
+				name: <string>app.prop("comp_option").value,
+				x: app.center.x,
+				y: app.center.y
+			});
+		comp && app.addToDOM(comp);
+	}, false);
 	//ViewBox Reset
 	aEL(qS('.bar-item[tool="vb-focus"]'), "click", () => app.updateViewBox(0, 0), false);
 	//File Open
 	aEL(qS('.bar-item[file="open"]'), "click", () => app.loadCircuit(), false);
 	//Save File
-	aEL(qS('.bar-item[file="save"]'), "click", () => app.circuit.save(false), false);
+	aEL(qS('.bar-item[file="save"]'), "click", () => app.saveCircuit(false), false);
 }
 
 function getWireConnections(wire: Wire): Point[] {
@@ -519,7 +536,11 @@ function registerNewWireFromEcState() {
 					node = app.sm.data.start.node,
 					pos = app.sm.data.start.fromWire ? ec.getNode(node) : (ec as EC).getNodeRealXY(node);
 				app.highlight.hide();
-				app.sm.data.wire = app.circuit.add("wire", true, <IPoint[]>[pos, pos]);
+				app.sm.data.wire = app.circuit.add(<any>{
+					name: "wire",
+					points: <IPoint[]>[pos, pos]
+				});
+				app.addToDOM(app.sm.data.wire);
 				app.sm.data.wire.bond(0, ec, node);
 				app.execute(Action.UNSELECT_ALL, "");
 				app.sm.data.selectedItem = undefined;
@@ -777,7 +798,7 @@ function readJson(path: string): any {
 window.addEventListener("DOMContentLoaded", () => {
 
 	//load DOM script HTML templates
-	templatesDOM("viewBox01|size01|point01|baseWin01|ctxWin01|ctxItem01|propWin01|dialogWin01")
+	templatesDOM("viewBox01|size01|point01|baseWin01|ctxWin01|ctxItem01|propWin01|dialogWin01|formWin01")
 		.then(async (templates: Object) => {
 			let
 				json = readJson('./dist/data/library-circuits.v2.json');
@@ -788,7 +809,6 @@ window.addEventListener("DOMContentLoaded", () => {
 			app = new MyApp(<IMyAppOptions>{
 				templates: templates,
 				includePropsInThis: true,
-				multiplier: getUIZoom(),
 				props: {
 					rot_lbl: {
 						tag: "#rot-lbl"
@@ -826,6 +846,7 @@ window.addEventListener("DOMContentLoaded", () => {
 			app.svgBoard.append(app.tooltip.g);
 			app.svgBoard.append(app.highlight.g);
 			qS('body>footer').insertAdjacentElement("afterend", app.dialog.win);
+			qS('body>footer').insertAdjacentElement("afterend", app.form.win);
 
 			//experimental
 			//app.svgBoard.append(ecCircles.g);
@@ -860,14 +881,6 @@ window.addEventListener("DOMContentLoaded", () => {
 		});
 });
 
-function getUIZoom(): number {
-	let
-		zoom_item = qS('.bar-item[data-scale].selected'),
-		o = attr(zoom_item, "data-scale"),
-		m = parseFloat(o);
-	return m;
-}
-
 function updateViewBox(arg: any) {
 	qS("body").style.height = arg.height + "px";
 	let
@@ -876,36 +889,39 @@ function updateViewBox(arg: any) {
 	app.board.style.height = mainHeight + "px";
 	app.size = new Size(arg.width, arg.height);
 	app.contentHeight = mainHeight;
-	app.setBoardZoom(getUIZoom(), false);
+	app.updateViewBox(app.circuit.zoom);
 }
 
-//[Obsolete]
-ipcRenderer.on('fileData', (event, data) => {
-	xml2js.parseString(data, { trim: true }, (err, result) => {
-		if (err)
-			console.log(err);
-		else
-			console.log(result)
-	})
-	//console.log('file content:', data)
-})
+ipcRenderer.on("win-resize", (event, arg) => {
+	updateViewBox(arg)
+});
 
 ipcRenderer.on("check-before-exit", (event, arg) => {
 	if (app.dialog.visible
-		|| app.circuit.circuitLoadingOrSaving)
+		|| app.form.visible
+		|| app.circuitLoadingOrSaving)
 		return;
-	app.circuit.save(true)
+
+	app.saveCircuit(true)
 		.then(choice => {
-			if (choice != 1)		// Cancel
+			let
+				exit = false;
+			switch (choice) {		// Save:0, Cancel: 1, Error: 5
+				case 5:
+				//show error and exit
+				//....
+				case 0:	// Save
+				case 2:	// Don't Save
+				case 3:	// Not Modified
+					exit = true;
+					break;
+			}
+			if (exit)
 				ipcRenderer.send('app-quit', '')
 		})
 });
 
 //this's a proof of concept of how to communicate with main process, the recommended NEW way...
-//	function updateViewBox(arg: any) built this way
-ipcRenderer.on("win-resize", (event, arg) => {
-	updateViewBox(arg)
-});
 console.log(ipcRenderer.sendSync('synchronous-message', 'ping')) // prints "pong"
 ipcRenderer.on('asynchronous-reply', (event, arg) => {
 	console.log(arg) // prints "pong"

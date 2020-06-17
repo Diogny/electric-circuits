@@ -27,6 +27,8 @@ export abstract class ItemBoard extends ItemBase {
 		super(options);
 		let
 			base = <Comp>Comp.find(this.name);
+		if (!base || !circuit)
+			throw `cannot create component`;
 		this.settings.props = obj(base.props);
 		attr(this.g, {
 			id: this.id,

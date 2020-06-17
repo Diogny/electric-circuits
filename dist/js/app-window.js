@@ -1,18 +1,6 @@
 "use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 Object.defineProperty(exports, "__esModule", { value: true });
+var tslib_1 = require("tslib");
 var dab_1 = require("./dab");
 var interfaces_1 = require("./interfaces");
 var utils_1 = require("./utils");
@@ -20,7 +8,7 @@ var point_1 = require("./point");
 var ecprop_1 = require("./ecprop");
 var board_window_1 = require("./board-window");
 var AppWindow = /** @class */ (function (_super) {
-    __extends(AppWindow, _super);
+    tslib_1.__extends(AppWindow, _super);
     function AppWindow(options) {
         var _this = _super.call(this, options) || this;
         var header = _this.win.querySelector("header"), footer = _this.win.querySelector("footer");

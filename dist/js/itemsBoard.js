@@ -1,19 +1,7 @@
 "use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BondsInjector = exports.IdInjector = exports.StringInjector = exports.PositionInjector = exports.PointInjector = exports.PropertyInjector = exports.ItemBoard = void 0;
+var tslib_1 = require("tslib");
 var dab_1 = require("./dab");
 var bonds_1 = require("./bonds");
 var itemsBase_1 = require("./itemsBase");
@@ -22,11 +10,13 @@ var utils_1 = require("./utils");
 var point_1 = require("./point");
 //ItemBoard->Wire
 var ItemBoard = /** @class */ (function (_super) {
-    __extends(ItemBoard, _super);
+    tslib_1.__extends(ItemBoard, _super);
     function ItemBoard(circuit, options) {
         var _this = _super.call(this, options) || this;
         _this.circuit = circuit;
         var base = components_1.default.find(_this.name);
+        if (!base || !circuit)
+            throw "cannot create component";
         _this.settings.props = dab_1.obj(base.props);
         dab_1.attr(_this.g, {
             id: _this.id,
@@ -215,7 +205,7 @@ var PropertyInjector = /** @class */ (function () {
 }());
 exports.PropertyInjector = PropertyInjector;
 var PointInjector = /** @class */ (function (_super) {
-    __extends(PointInjector, _super);
+    tslib_1.__extends(PointInjector, _super);
     function PointInjector() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
@@ -234,7 +224,7 @@ var PointInjector = /** @class */ (function (_super) {
 }(PropertyInjector));
 exports.PointInjector = PointInjector;
 var PositionInjector = /** @class */ (function (_super) {
-    __extends(PositionInjector, _super);
+    tslib_1.__extends(PositionInjector, _super);
     function PositionInjector(ec) {
         var _this = _super.call(this, ec, "p", false) || this;
         _this.ec = ec;
@@ -253,7 +243,7 @@ var PositionInjector = /** @class */ (function (_super) {
 }(PointInjector));
 exports.PositionInjector = PositionInjector;
 var StringInjector = /** @class */ (function (_super) {
-    __extends(StringInjector, _super);
+    tslib_1.__extends(StringInjector, _super);
     function StringInjector(ec, name, readonly) {
         return _super.call(this, ec, name, readonly) || this;
     }
@@ -274,7 +264,7 @@ var StringInjector = /** @class */ (function (_super) {
 }(PropertyInjector));
 exports.StringInjector = StringInjector;
 var IdInjector = /** @class */ (function (_super) {
-    __extends(IdInjector, _super);
+    tslib_1.__extends(IdInjector, _super);
     function IdInjector(ec) {
         return _super.call(this, ec, "id", true) || this;
     }
@@ -288,7 +278,7 @@ var IdInjector = /** @class */ (function (_super) {
 }(StringInjector));
 exports.IdInjector = IdInjector;
 var BondsInjector = /** @class */ (function (_super) {
-    __extends(BondsInjector, _super);
+    tslib_1.__extends(BondsInjector, _super);
     function BondsInjector(ec) {
         var _this = _super.call(this, ec, "bonds", true) || this;
         _this.class = "simple";
