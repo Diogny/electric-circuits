@@ -1,9 +1,9 @@
 {
 	"name": "electric-circuits",
 	"author": "Diogny A. B. <diognyab@outlook.com>",
-	"version": "1.1.10",
+	"version": "1.1.11",
 	"description": "Creates an electric circuits app",
-	"license": "ISC",
+	"license": "MIT",
 	"main": "./dist/index.js",
 	"homepage": "https://github.com/Diogny/electric-circuits",
 	"bugs": {

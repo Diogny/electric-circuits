@@ -151,7 +151,7 @@ export class MyApp extends Application implements IMyApp {
 			id: "win-form",
 		});
 		this.circuit = new Circuit({ name: "new circuit", zoom: this.getUIZoom() }); //scaling multipler 2X UI default
-		this.circuitName.innerText = this.circuit.name;
+		this.updateCircuitLabel();
 
 		//this'll hold the properties of the current selected component
 		this.winProps = new AppWindow(<IAppWindowOptions>{
@@ -330,6 +330,13 @@ export class MyApp extends Application implements IMyApp {
 		this.updateViewBox(zoom);
 	}
 
+	public updateCircuitLabel() {
+		this.circuitName.innerHTML = nano('<span class="{class}">*</span><span>{name}</span>', {
+			name: this.circuit.name,
+			class: this.circuit.modified ? "" : "hide"
+		});
+	}
+
 	public updateViewBox(zoom: number, x?: number, y?: number) {
 		this.baseViewBox = new Size(this.board.clientWidth * this.ratio | 0, this.board.clientHeight * this.ratio | 0);
 		//calculate size
@@ -338,9 +345,9 @@ export class MyApp extends Application implements IMyApp {
 		calculateAndUpdateViewBoxData.call(this, x, y);
 	}
 
-	public refreshTopBarRight() {//topBarRight
-		this.bottomBarCenter.innerHTML = nano(this.templates.viewBox01, this.viewBox) + "&nbsp; " +
-			nano(this.templates.size01, this.size);
+	public refreshViewBoxData() {
+		this.bottomBarCenter.innerHTML = nano(this.templates.viewBox01, this.viewBox) + "&nbsp; "
+		//+ nano(this.templates.size01, this.size);
 	}
 
 	public getAspectRatio(width: number, height: number) {
@@ -361,7 +368,7 @@ export class MyApp extends Application implements IMyApp {
 		let
 			rotation = (comp as EC).rotation;
 		(rotation != (comp as EC).rotate((comp as EC).rotation + angle).rotation)
-			&& (this.circuit.modified = true);
+			&& (this.circuit.modified = true, this.updateCircuitLabel());
 		this.refreshRotation(comp);
 	}
 
@@ -425,6 +432,7 @@ export class MyApp extends Application implements IMyApp {
 				this.refreshRotation();
 				this.winProps.clear().setVisible(false);
 				this.tooltip.setVisible(false);
+				this.updateCircuitLabel();
 				if (selectedCount != deletedCount) {
 					console.log(`[${deletedCount}] components of [${selectedCount}]`)
 				}
@@ -438,6 +446,7 @@ export class MyApp extends Application implements IMyApp {
 						this.refreshRotation();
 						this.winProps.clear().setVisible(false);
 						this.tooltip.setVisible(false);
+						this.updateCircuitLabel();
 						this.sm.send(ActionType.AFTER_DELETE, comp.id);
 					}
 				}
@@ -449,6 +458,7 @@ export class MyApp extends Application implements IMyApp {
 				if (!(compNull = !comp)) {
 					(comp as Wire).deleteLine(nodeOrLine);
 					this.winProps.refresh();
+					this.updateCircuitLabel();
 				}
 				break;
 			case ActionType.DELETE_WIRE_NODE:
@@ -456,6 +466,7 @@ export class MyApp extends Application implements IMyApp {
 				if (!(compNull = !comp)) {
 					(comp as Wire).deleteNode(nodeOrLine);
 					this.winProps.refresh();
+					this.updateCircuitLabel();
 				}
 				break;
 			case ActionType.SPLIT_THIS_LINE:
@@ -463,6 +474,7 @@ export class MyApp extends Application implements IMyApp {
 				if (!(compNull = !comp)) {
 					(comp as Wire).insertNode(nodeOrLine, this.rightClick.offset);
 					this.winProps.refresh();
+					this.updateCircuitLabel();
 				}
 				break;
 			case ActionType.SHOW_PROPERTIES:
@@ -520,6 +532,7 @@ export class MyApp extends Application implements IMyApp {
 		this.circuitLoadingOrSaving = true;
 		return this.saveDialogIfModified()
 			.then((choice) => {
+				self.updateCircuitLabel();
 				if (choice == 0 || choice == 2 || choice == 3) { // Save: 0, Don't Save: 2, Not Modified: 3
 					return self.form.showDialog("New Circuit", options)
 						.then(choice => {
@@ -534,7 +547,9 @@ export class MyApp extends Application implements IMyApp {
 								//everything OK here
 								self.circuit.destroy();
 								self.circuit = circuit;
-								self.circuitName.innerText = circuit.name;
+								self.updateViewBox(circuit.zoom, circuit.view.x, circuit.view.y);
+								circuit.modified = false;
+								self.updateCircuitLabel();
 								choice = 4;						// Load: 4
 							}
 							self.circuitLoadingOrSaving = false;
@@ -554,10 +569,17 @@ export class MyApp extends Application implements IMyApp {
 	}
 
 	public saveCircuit(showDialog: boolean): Promise<number> {
+		let
+			self = this as MyApp;
 		//here make later a dialogBox with error or something else
-		return showDialog
+		return (showDialog
 			? this.saveDialogIfModified()
-			: this.circuit.save();
+			: this.circuit.save()
+		)
+			.then(choice => {
+				self.updateCircuitLabel();
+				return Promise.resolve(choice)
+			})
 	}
 
 	public loadCircuit(): Promise<number> {
@@ -566,6 +588,7 @@ export class MyApp extends Application implements IMyApp {
 		this.circuitLoadingOrSaving = true;
 		return this.saveDialogIfModified()
 			.then((choice) => {
+				self.updateCircuitLabel();
 				if (choice == 0 || choice == 2 || choice == 3) { // Save: 0, Don't Save: 2, Not Modified: 3
 					let
 						answer = ipcRenderer.sendSync('openFile', "");
@@ -589,9 +612,11 @@ export class MyApp extends Application implements IMyApp {
 						self.circuit.destroy();
 						self.circuit = circuit;
 						self.setBoardZoom(circuit.zoom);
-						self.circuitName.innerText = circuit.name;
 						self.circuit.components
 							.forEach(comp => self.addToDOM(<any>comp));
+						self.updateViewBox(circuit.zoom, circuit.view.x, circuit.view.y);
+						circuit.modified = false;
+						self.updateCircuitLabel();
 						choice = 4;						// Load: 4
 					}
 				}
@@ -608,9 +633,10 @@ export class MyApp extends Application implements IMyApp {
 
 function calculateAndUpdateViewBoxData(x?: number, y?: number) {
 	let
-		self = this as MyApp;
-	(x != undefined) && (self.viewBox.x = x);
-	(y != undefined) && (self.viewBox.y = y);
+		self = this as MyApp,
+		updateCircuit = false;
+	(x != undefined) && (self.viewBox.x = x, updateCircuit = true);
+	(y != undefined) && (self.viewBox.y = y, updateCircuit = true);
 	//set SVG DOM viewBox attribute
 	attr(self.svgBoard, { "viewBox": `${self.viewBox.x} ${self.viewBox.y} ${self.viewBox.width} ${self.viewBox.height}` });
 	//calculate ratio
@@ -618,5 +644,10 @@ function calculateAndUpdateViewBoxData(x?: number, y?: number) {
 	self.ratioY = self.viewBox.height / self.svgBoard.clientHeight;
 	self.center = new Point(Math.round(self.viewBox.x + self.viewBox.width / 2),
 		Math.round(self.viewBox.y + self.viewBox.height / 2));
-	self.refreshTopBarRight();
+	self.refreshViewBoxData();
+	if (updateCircuit) {
+		self.circuit.view = new Point(self.viewBox.x, self.viewBox.y);
+		self.circuit.modified = true;
+		self.updateCircuitLabel();
+	}
 }

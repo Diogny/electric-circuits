@@ -51,10 +51,13 @@
 						<option value="5v">5V</option>
 						<option value="3v3">3.3v</option>
 						<option value="gnd">GND</option>
+						<option value="fuse">FUSE</option>
 						<option value="push-button">PUSH BUTTON</option>
 						<option value="switch">SWITCH</option>
 						<option value="switch-sdpt">SDPT SWITCH</option>
 						<option value="inductor">INDUCTOR</option>
+						<option value="piezo-buzzer">PIEZO BUZZER</option>
+						<option value="ac-lamp">AC LAMP</option>
 						<option value="transformer">TRANSFORMER</option>
 						<option value="and">AND</option>
 						<option value="nand">NAND</option>
@@ -132,17 +135,17 @@
 		<div class="pure-u-1-2 bar-group">
 			<div bar="bottom-left">...</div>
 		</div>
-		<div class="pure-u-1-4 bar-group">
+		<div class="pure-u-1-5 bar-group">
 			<div bar="bottom-center">...</div>
 		</div>
-		<div class="pure-u-1-4 bar-group">
-			<div class="pure-u-1-4">
+		<div class="pure-u-7-24 bar-group">
+			<div style="display: flex;">
 				<select class="select-css" tool="theme-select">
 					<option value="light" selected>Light</option>
 					<option value="dark">dark</option>
 				</select>
+				<div circuit="name"></div>
 			</div>
-			<div class="pure-u-17-24" circuit="name"></div>
 		</div>
 	</footer>
 	<!-- -->

@@ -109,8 +109,8 @@ var MyApp = /** @class */ (function (_super) {
             app: _this,
             id: "win-form",
         });
-        _this.circuit = new circuit_1.Circuit({ name: "my circuit", zoom: _this.getUIZoom() }); //scaling multipler 2X UI default
-        _this.circuitName.innerText = _this.circuit.name;
+        _this.circuit = new circuit_1.Circuit({ name: "new circuit", zoom: _this.getUIZoom() }); //scaling multipler 2X UI default
+        _this.updateCircuitLabel();
         //this'll hold the properties of the current selected component
         _this.winProps = new app_window_1.default({
             app: _this,
@@ -254,6 +254,12 @@ var MyApp = /** @class */ (function (_super) {
         dab_1.addClass(utils_1.qS("[data-scale=\"" + zoom + "\"]"), "selected");
         this.updateViewBox(zoom);
     };
+    MyApp.prototype.updateCircuitLabel = function () {
+        this.circuitName.innerHTML = dab_1.nano('<span class="{class}">*</span><span>{name}</span>', {
+            name: this.circuit.name,
+            class: this.circuit.modified ? "" : "hide"
+        });
+    };
     MyApp.prototype.updateViewBox = function (zoom, x, y) {
         this.baseViewBox = new size_1.default(this.board.clientWidth * this.ratio | 0, this.board.clientHeight * this.ratio | 0);
         //calculate size
@@ -261,9 +267,9 @@ var MyApp = /** @class */ (function (_super) {
         this.viewBox.height = this.baseViewBox.height * zoom | 0;
         calculateAndUpdateViewBoxData.call(this, x, y);
     };
-    MyApp.prototype.refreshTopBarRight = function () {
-        this.bottomBarCenter.innerHTML = dab_1.nano(this.templates.viewBox01, this.viewBox) + "&nbsp; " +
-            dab_1.nano(this.templates.size01, this.size);
+    MyApp.prototype.refreshViewBoxData = function () {
+        this.bottomBarCenter.innerHTML = dab_1.nano(this.templates.viewBox01, this.viewBox) + "&nbsp; ";
+        //+ nano(this.templates.size01, this.size);
     };
     MyApp.prototype.getAspectRatio = function (width, height) {
         var ratio = width / height;
@@ -277,7 +283,7 @@ var MyApp = /** @class */ (function (_super) {
             return;
         var rotation = comp.rotation;
         (rotation != comp.rotate(comp.rotation + angle).rotation)
-            && (this.circuit.modified = true);
+            && (this.circuit.modified = true, this.updateCircuitLabel());
         this.refreshRotation(comp);
     };
     MyApp.prototype.refreshRotation = function (ec) {
@@ -329,6 +335,7 @@ var MyApp = /** @class */ (function (_super) {
                 this.refreshRotation();
                 this.winProps.clear().setVisible(false);
                 this.tooltip.setVisible(false);
+                this.updateCircuitLabel();
                 if (selectedCount != deletedCount) {
                     console.log("[" + deletedCount + "] components of [" + selectedCount + "]");
                 }
@@ -342,6 +349,7 @@ var MyApp = /** @class */ (function (_super) {
                         this.refreshRotation();
                         this.winProps.clear().setVisible(false);
                         this.tooltip.setVisible(false);
+                        this.updateCircuitLabel();
                         this.sm.send(interfaces_1.ActionType.AFTER_DELETE, comp.id);
                     }
                 }
@@ -353,6 +361,7 @@ var MyApp = /** @class */ (function (_super) {
                 if (!(compNull = !comp)) {
                     comp.deleteLine(nodeOrLine);
                     this.winProps.refresh();
+                    this.updateCircuitLabel();
                 }
                 break;
             case interfaces_1.ActionType.DELETE_WIRE_NODE:
@@ -360,6 +369,7 @@ var MyApp = /** @class */ (function (_super) {
                 if (!(compNull = !comp)) {
                     comp.deleteNode(nodeOrLine);
                     this.winProps.refresh();
+                    this.updateCircuitLabel();
                 }
                 break;
             case interfaces_1.ActionType.SPLIT_THIS_LINE:
@@ -367,6 +377,7 @@ var MyApp = /** @class */ (function (_super) {
                 if (!(compNull = !comp)) {
                     comp.insertNode(nodeOrLine, this.rightClick.offset);
                     this.winProps.refresh();
+                    this.updateCircuitLabel();
                 }
                 break;
             case interfaces_1.ActionType.SHOW_PROPERTIES:
@@ -421,6 +432,7 @@ var MyApp = /** @class */ (function (_super) {
         this.circuitLoadingOrSaving = true;
         return this.saveDialogIfModified()
             .then(function (choice) {
+            self.updateCircuitLabel();
             if (choice == 0 || choice == 2 || choice == 3) { // Save: 0, Don't Save: 2, Not Modified: 3
                 return self.form.showDialog("New Circuit", options)
                     .then(function (choice) {
@@ -434,7 +446,9 @@ var MyApp = /** @class */ (function (_super) {
                         //everything OK here
                         self.circuit.destroy();
                         self.circuit = circuit;
-                        self.circuitName.innerText = circuit.name;
+                        self.updateViewBox(circuit.zoom, circuit.view.x, circuit.view.y);
+                        circuit.modified = false;
+                        self.updateCircuitLabel();
                         choice = 4; // Load: 4
                     }
                     self.circuitLoadingOrSaving = false;
@@ -453,16 +467,22 @@ var MyApp = /** @class */ (function (_super) {
         });
     };
     MyApp.prototype.saveCircuit = function (showDialog) {
+        var self = this;
         //here make later a dialogBox with error or something else
-        return showDialog
+        return (showDialog
             ? this.saveDialogIfModified()
-            : this.circuit.save();
+            : this.circuit.save())
+            .then(function (choice) {
+            self.updateCircuitLabel();
+            return Promise.resolve(choice);
+        });
     };
     MyApp.prototype.loadCircuit = function () {
         var self = this;
         this.circuitLoadingOrSaving = true;
         return this.saveDialogIfModified()
             .then(function (choice) {
+            self.updateCircuitLabel();
             if (choice == 0 || choice == 2 || choice == 3) { // Save: 0, Don't Save: 2, Not Modified: 3
                 var answer = electron_1.ipcRenderer.sendSync('openFile', "");
                 //error treatment
@@ -484,9 +504,11 @@ var MyApp = /** @class */ (function (_super) {
                     self.circuit.destroy();
                     self.circuit = circuit;
                     self.setBoardZoom(circuit.zoom);
-                    self.circuitName.innerText = circuit.name;
                     self.circuit.components
                         .forEach(function (comp) { return self.addToDOM(comp); });
+                    self.updateViewBox(circuit.zoom, circuit.view.x, circuit.view.y);
+                    circuit.modified = false;
+                    self.updateCircuitLabel();
                     choice = 4; // Load: 4
                 }
             }
@@ -503,15 +525,20 @@ var MyApp = /** @class */ (function (_super) {
 }(app_1.Application));
 exports.MyApp = MyApp;
 function calculateAndUpdateViewBoxData(x, y) {
-    var self = this;
-    (x != undefined) && (self.viewBox.x = x);
-    (y != undefined) && (self.viewBox.y = y);
+    var self = this, updateCircuit = false;
+    (x != undefined) && (self.viewBox.x = x, updateCircuit = true);
+    (y != undefined) && (self.viewBox.y = y, updateCircuit = true);
     //set SVG DOM viewBox attribute
     dab_1.attr(self.svgBoard, { "viewBox": self.viewBox.x + " " + self.viewBox.y + " " + self.viewBox.width + " " + self.viewBox.height });
     //calculate ratio
     self.ratioX = self.viewBox.width / self.svgBoard.clientWidth;
     self.ratioY = self.viewBox.height / self.svgBoard.clientHeight;
     self.center = new point_1.default(Math.round(self.viewBox.x + self.viewBox.width / 2), Math.round(self.viewBox.y + self.viewBox.height / 2));
-    self.refreshTopBarRight();
+    self.refreshViewBoxData();
+    if (updateCircuit) {
+        self.circuit.view = new point_1.default(self.viewBox.x, self.viewBox.y);
+        self.circuit.modified = true;
+        self.updateCircuitLabel();
+    }
 }
 //# sourceMappingURL=myapp.js.map

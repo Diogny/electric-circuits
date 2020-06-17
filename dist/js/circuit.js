@@ -24,6 +24,7 @@ var Circuit = /** @class */ (function () {
         this.description = options.description;
         this.filePath = options.filePath;
         this.__modified = false;
+        this.view = new point_1.default(0, 0);
     }
     Circuit.prototype.rootComponent = function (name) {
         return this.compMap.get(name);
@@ -122,10 +123,8 @@ var Circuit = /** @class */ (function () {
             }
             return true;
         });
-        this.modified = deletedCount != 0;
         return deletedCount;
     };
-    //add/delete
     Circuit.prototype.delete = function (comp) {
         if (comp.type == types_1.Type.WIRE ?
             this.wireMap.delete(comp.id) :
@@ -145,7 +144,6 @@ var Circuit = /** @class */ (function () {
         this.modified = true;
         return comp;
     };
-    //load/save
     Circuit.load = function (args) {
         //check filePath & data
         var circuit = new Circuit({
@@ -184,7 +182,6 @@ var Circuit = /** @class */ (function () {
             resolve(choice); // Save: 0, Cancel: 1, Error: 5
         });
     };
-    //cleaning
     Circuit.prototype.destroy = function () {
         var _this = this;
         this.ecList.forEach(function (ec) { return _this.delete(ec); });
@@ -271,16 +268,17 @@ function parseCircuitXML(data) {
                     return [value];
                 else
                     return value;
-            }, ecs = getData(json.circuit.ecs.ec), wires = getData(json.circuit.wires.wire), bonds = getData(json.circuit.bonds.bond);
+            }, ecs = getData(json.circuit.ecs.ec), wires = getData(json.circuit.wires.wire), bonds = getData(json.circuit.bonds.bond), view = (atttrs.view || "").split(',');
             //attributes
             self.version = atttrs.version;
             !Circuit.validZoom(self.zoom = parseFloat(atttrs.zoom))
                 && (self.zoom = Circuit.defaultZoom);
             self.name = atttrs.name;
             self.description = atttrs.description;
+            self.view = new point_1.default(parseInt(view[0]) | 0, parseInt(view[1]) | 0);
             //create ECs
             ecs.forEach(function (xml) {
-                var ec = createBoardItem.call(self, {
+                createBoardItem.call(self, {
                     id: xml.$.id,
                     name: xml.$.name,
                     x: parseInt(xml.$.x),
@@ -298,7 +296,7 @@ function parseCircuitXML(data) {
                 };
                 if (options.points.some(function (p) { return !p; }))
                     throw "invalid wire points";
-                var wire = createBoardItem.call(self, options, false);
+                createBoardItem.call(self, options, false);
             });
             bonds.forEach(function (s) {
                 var arr = s.split(','), fromIt = self.get(arr.shift()), fromNdx = parseInt(arr.shift()), toIt = self.get(arr.shift()), toNdx = parseInt(arr.shift());
@@ -328,7 +326,7 @@ function getCircuitXML() {
     var self = this, circuitMetadata = function () {
         var description = self.description
             ? " description=\"" + self.description + "\"" : "";
-        return "<circuit version=\"1.1.5\" zoom=\"" + self.zoom + "\" name=\"" + self.name + "\"" + description + ">\n";
+        return "<circuit version=\"1.1.5\" zoom=\"" + self.zoom + "\" name=\"" + self.name + "\"" + description + " view=\"" + self.view.x + "," + self.view.y + "\">\n";
     }, ecTmpl = '\t\t<ec id="{id}" name="{name}" x="{x}" y="{y}" rot="{rotation}" label="{label}" />\n', ecs = '\t<ecs>\n'
         + self.ecList
             .map(function (comp) { return dab_1.nano(ecTmpl, comp); })

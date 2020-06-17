@@ -4,7 +4,6 @@ import { ItemBoard } from "./itemsBoard";
 import { Type } from "./types";
 import Rect from "./rect";
 import { nano, isNum } from "./dab";
-import { MyApp } from "./myapp";
 import { ipcRenderer } from "electron";
 import * as xml2js from 'xml2js';
 import * as fs from 'fs';
@@ -12,7 +11,6 @@ import { IPoint, IBaseComponent } from "./interfaces";
 import Point from "./point";
 import Comp from "./components";
 import { Bond } from "./bonds";
-import DialogWindow from "./dialog-window";
 
 export class Circuit {
 
@@ -71,11 +69,13 @@ export class Circuit {
 
 	selectedComponents: EC[];
 
+	filePath: string;
+
+	view: Point;
+
 	public get(id: string): EC | Wire | undefined {
 		return this.ecMap.get(id) || this.wireMap.get(id)
 	}
-
-	filePath: string;
 
 	//has value if only one comp selected, none or multiple has undefined
 	get ec(): EC | undefined {
@@ -95,6 +95,7 @@ export class Circuit {
 		this.description = <string>options.description;
 		this.filePath = <string>options.filePath;
 		this.__modified = false;
+		this.view = new Point(0, 0);
 	}
 
 	//selection
@@ -136,11 +137,9 @@ export class Circuit {
 			}
 			return true;
 		});
-		this.modified = deletedCount != 0;
 		return deletedCount
 	}
 
-	//add/delete
 	public delete(comp: ItemBoard): boolean {
 		if (comp.type == Type.WIRE ?
 			this.wireMap.delete(comp.id) :
@@ -164,7 +163,6 @@ export class Circuit {
 		return <any>comp
 	}
 
-	//load/save
 	public static load(args: { filePath: string, data: string }): Circuit {
 		//check filePath & data
 
@@ -207,7 +205,6 @@ export class Circuit {
 		})
 	}
 
-	//cleaning
 	public destroy() {
 		this.ecList.forEach(ec => this.delete(ec));
 		this.wireList.forEach(wire => this.delete(wire));
@@ -314,25 +311,25 @@ function parseCircuitXML(data: string) {
 				},
 				ecs = getData(json.circuit.ecs.ec),
 				wires = getData(json.circuit.wires.wire),
-				bonds = getData(json.circuit.bonds.bond);
+				bonds = getData(json.circuit.bonds.bond),
+				view = (atttrs.view || "").split(',');
 			//attributes
 			self.version = atttrs.version;
 			!Circuit.validZoom(self.zoom = parseFloat(atttrs.zoom))
 				&& (self.zoom = Circuit.defaultZoom);
 			self.name = atttrs.name;
 			self.description = atttrs.description;
+			self.view = new Point(parseInt(view[0]) | 0, parseInt(view[1]) | 0);
 			//create ECs
 			ecs.forEach((xml: { $: { id: string, name: string, x: string, y: string, rot: string, label: string } }) => {
-				let
-					ec = <EC>createBoardItem.call(self, {
-						id: xml.$.id,
-						name: xml.$.name,
-						x: parseInt(xml.$.x),
-						y: parseInt(xml.$.y),
-						rotation: parseInt(xml.$.rot),
-						label: xml.$.label,
-					}, false);
-
+				<EC>createBoardItem.call(self, {
+					id: xml.$.id,
+					name: xml.$.name,
+					x: parseInt(xml.$.x),
+					y: parseInt(xml.$.y),
+					rotation: parseInt(xml.$.rot),
+					label: xml.$.label,
+				}, false);
 			})
 			wires.forEach((xml: { $: { id: string, points: string, label: string } }) => {
 				let
@@ -344,8 +341,7 @@ function parseCircuitXML(data: string) {
 					};
 				if (options.points.some(p => !p))
 					throw `invalid wire points`;
-				let
-					wire = <Wire>createBoardItem.call(self, options, false);
+				<Wire>createBoardItem.call(self, options, false);
 			})
 			bonds.forEach((s: string) => {
 				let
@@ -393,7 +389,7 @@ function getCircuitXML(): string {
 			let
 				description = self.description
 					? ` description="${self.description}"` : "";
-			return `<circuit version="1.1.5" zoom="${self.zoom}" name="${self.name}"${description}>\n`
+			return `<circuit version="1.1.5" zoom="${self.zoom}" name="${self.name}"${description} view="${self.view.x},${self.view.y}">\n`
 		},
 		ecTmpl = '\t\t<ec id="{id}" name="{name}" x="{x}" y="{y}" rot="{rotation}" label="{label}" />\n',
 		ecs = '\t<ecs>\n'

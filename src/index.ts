@@ -82,6 +82,7 @@ let
 				app.circuit.selectedComponents
 					.forEach(comp => comp.move(comp.x + vector.x, comp.y + vector.y));
 				app.circuit.modified = true;
+				app.updateCircuitLabel();
 				break;
 		}
 		return;
@@ -105,6 +106,7 @@ function hookEvents() {
 				m = parseFloat(o);
 			if (app.circuit.zoom != m)
 				app.circuit.modified = true;
+			app.updateCircuitLabel();
 			app.setBoardZoom(app.circuit.zoom = m);
 		}, false);
 	});
@@ -119,10 +121,10 @@ function hookEvents() {
 				x: app.center.x,
 				y: app.center.y
 			});
-		comp && app.addToDOM(comp);
+		comp && (app.addToDOM(comp), app.updateCircuitLabel());
 	}, false);
 	//ViewBox Reset
-	aEL(qS('.bar-item[tool="vb-focus"]'), "click", () => app.updateViewBox(0, 0), false);
+	aEL(qS('.bar-item[tool="vb-focus"]'), "click", () => app.updateViewBox(app.circuit.zoom, 0, 0), false);
 	//File Open
 	aEL(qS('.bar-item[file="open"]'), "click", () => app.loadCircuit(), false);
 	//Save File
@@ -218,6 +220,7 @@ function registerBoardState() {
 				if (newCtx.altKey) {
 					if (app.sm.data.panningVector) {
 						app.updateViewBox(
+							app.circuit.zoom,
 							newCtx.client.x - app.sm.data.panningVector.x,
 							newCtx.client.y - app.sm.data.panningVector.y
 						)
@@ -398,6 +401,7 @@ function registerEcDragState() {
 					}))
 				};
 				app.circuit.modified = true;
+				app.updateCircuitLabel();
 				addClass(app.svgBoard, self.data.className);
 				hideNodeTooltip(newCtxIt);
 				app.rightClick.setVisible(false);
@@ -541,6 +545,7 @@ function registerNewWireFromEcState() {
 					points: <IPoint[]>[pos, pos]
 				});
 				app.addToDOM(app.sm.data.wire);
+				app.updateCircuitLabel();
 				app.sm.data.wire.bond(0, ec, node);
 				app.execute(Action.UNSELECT_ALL, "");
 				app.sm.data.selectedItem = undefined;
@@ -738,6 +743,7 @@ function registerWireNodeDragState() {
 						}
 					}).filter(elem => !elem.r.empty);
 				app.circuit.modified = true;
+				app.updateCircuitLabel();
 				app.sm.data.selectedItem = undefined;
 				app.sm.data.it.select(false);
 			},
@@ -783,6 +789,7 @@ function registerWireLineDragState() {
 				addClass(app.svgBoard, app.sm.data.className = "dragging");
 				app.rightClick.setVisible(false);
 				app.circuit.modified = true;
+				app.updateCircuitLabel();
 			},
 		}
 	});

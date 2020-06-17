@@ -97,6 +97,6 @@ Used in my testing website [Electric Circuits](http://diogny.com/tests/circuits.
 	git add -u					stage the modified and deleted files
 	git add -A
 	git commit -m "update message"
-	git tag v1.1.10
+	git tag v1.1.11
 	git push origin master --tags
 
