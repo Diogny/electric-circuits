@@ -425,10 +425,8 @@ var MyApp = /** @class */ (function (_super) {
             : Promise.resolve(3); // Not Modified: 3
     };
     MyApp.prototype.newCircuit = function () {
-        var self = this, options = [
-            { label: "name", value: "", required: true, placeHolder: "Name" },
-            { label: "description", value: "", placeHolder: "Description" },
-        ];
+        var self = this, options = circuit_1.Circuit.circuitProperties(), path = options.find(function (value) { return value.label == "path"; });
+        path && (path.visible = false);
         this.circuitLoadingOrSaving = true;
         return this.saveDialogIfModified()
             .then(function (choice) {

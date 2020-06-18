@@ -18,12 +18,13 @@ import Size from "./size";
 import EC from "./ec";
 import Rect from "./rect";
 import { Bond } from "./bonds";
+import { Circuit, CircuitProperty } from "./circuit";
 
 let
 	app: MyApp,
 	showBodyAndTooltip = (offset: Point, label: string) => {
 		let
-			p = Point.translateBy(offset, app.tooltipOfs);
+			p = Point.translateBy(offset, app.tooltipOfs, app.tooltipOfs);
 		app.tooltip.setVisible(true)
 			.move(p.x, p.y)
 			.setFontSize(app.tooltipFontSize())
@@ -83,6 +84,7 @@ let
 					.forEach(comp => comp.move(comp.x + vector.x, comp.y + vector.y));
 				app.circuit.modified = true;
 				app.updateCircuitLabel();
+				(app.circuit.ec?.id == app.winProps.compId) && app.winProps.property("p")?.refresh();
 				break;
 		}
 		return;
@@ -129,8 +131,31 @@ function hookEvents() {
 	aEL(qS('.bar-item[file="open"]'), "click", () => app.loadCircuit(), false);
 	//Save File
 	aEL(qS('.bar-item[file="save"]'), "click", () => app.saveCircuit(false), false);
+	//Circuit Property edit
+	aEL(app.circuitName, "click", () => {
+		let
+			options = Circuit.circuitProperties(app.circuit);
+		app.form.showDialog("Circuit Properties", options)
+			.then(choice => {
+				if (choice == 0) {
+					//assign values
+					if (options.filter((opt: CircuitProperty) => {
+						if (opt.readonly)
+							return;
+						let
+							prop = app.circuit[opt.label];
+						return (opt.value != prop) && (app.circuit[opt.label] = opt.value, true)
+					}).length) {
+						app.circuit.modified = true;
+						app.updateCircuitLabel();
+					}
+				}
+			})
+	}, false);
 }
 
+//later move to ItemBoard static function, and leave specific point transform here
+//	should return { ec: EC | Wire, node: number }
 function getWireConnections(wire: Wire): Point[] {
 	let
 		wireCollection: Wire[] = [wire],
@@ -217,7 +242,7 @@ function registerBoardState() {
 			},
 			MOVE: function (newCtx: IMouseState) {
 				//Board panning
-				if (newCtx.altKey) {
+				if (newCtx.shiftKey) {
 					if (app.sm.data.panningVector) {
 						app.updateViewBox(
 							app.circuit.zoom,
@@ -266,7 +291,7 @@ function registerBoardState() {
 			},
 			DOWN: function (newCtx: IMouseState) {
 				//Board pan
-				if (newCtx.altKey) {
+				if (newCtx.shiftKey) {
 					addClass(app.svgBoard, "dragging");
 					app.sm.data.panningVector = new Point(newCtx.client.x - app.viewBox.x, newCtx.client.y - app.viewBox.y)
 				} else {
@@ -329,7 +354,7 @@ function registerEcBodyState() {
 						})
 					} else {
 						let
-							p = Point.translateBy(newCtx.offset, app.tooltipOfs);
+							p = Point.translateBy(newCtx.offset, app.tooltipOfs, app.tooltipOfs);
 						app.tooltip.move(p.x, p.y);
 					}
 				}
@@ -371,6 +396,14 @@ function registerEcDragState() {
 						p = Point.minus(newCtx.offset, comp.offset);
 					comp.ec.move(p.x, p.y);
 				});
+				app.sm.data.wires &&
+					app.sm.data.wires.forEach((comp: { wire: Wire, start: { x: number, y: number } }) => {
+						let
+							p0 = comp.wire.getNode(0),
+							p = new Point(p0.x - comp.start.x, p0.y - comp.start.y);
+						comp.wire.translate(p.x, p.y)
+						comp.start = p0;
+					});
 				(app.circuit.ec?.id == app.winProps.compId) && app.winProps.property("p")?.refresh();
 			},
 			OUT: function () {
@@ -400,6 +433,12 @@ function registerEcDragState() {
 						offset: Point.minus(newCtx.offset, comp.p)
 					}))
 				};
+				newCtx.shiftKey &&
+					(self.data.wires = ItemBoard.connectedWiresTo(app.circuit.selectedComponents)
+						.map(w => ({
+							wire: w,
+							start: w.points[0]
+						})));
 				app.circuit.modified = true;
 				app.updateCircuitLabel();
 				addClass(app.svgBoard, self.data.className);
@@ -418,7 +457,7 @@ function registerEcNodeState() {
 			MOVE: function (newCtx: IMouseState) {
 				let
 					node = app.sm.data.it.overNode(newCtx.offset, 0),
-					p = Point.translateBy(newCtx.offset, app.tooltipOfs);
+					p = Point.translateBy(newCtx.offset, app.tooltipOfs, app.tooltipOfs);
 				if (node == -1) {
 					app.tooltip.setVisible(false);
 					app.sm.transition(State.BOARD, Action.RESUME);
@@ -611,7 +650,7 @@ function registerWireLineState() {
 					app.highlight.show(pos.x, pos.y, wire.id, node);
 				} else {
 					let
-						p = Point.translateBy(newCtx.offset, app.tooltipOfs);
+						p = Point.translateBy(newCtx.offset, app.tooltipOfs, app.tooltipOfs);
 					!app.tooltip.move(p.x, p.y).visible
 						&& app.tooltip.setVisible(true);
 				}
@@ -627,6 +666,7 @@ function registerWireLineState() {
 						showWireConnections(wire);
 				} else
 					app.sm.data.mouseDown = true;
+				(<any>window).wire = app.sm.data.it;
 			},
 			UP: function (newCtx: IMouseState) {
 				if (app.sm.data.wiringFromNode) {

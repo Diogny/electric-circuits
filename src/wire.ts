@@ -82,15 +82,15 @@ export default class Wire extends ItemBoard {
 
 		//bond wire ends if any
 		//if (options.start) {
-			//...
+		//...
 		//}
 
 		//if (options.end) {
-			//...
+		//...
 		//}
 
 		//place it
-		this.move(this.settings.points[0].x, this.settings.points[0].y);
+		moveToStart.call(this);
 		//signal component creation
 		this.onProp && this.onProp({
 			id: `#${this.id}`,
@@ -139,6 +139,21 @@ export default class Wire extends ItemBoard {
 		return this;
 	}
 
+	public translate(dx: number, dy: number): Wire {
+		super.translate(dx, dy);
+		//don't translate bonded end points because it should have been|will be moved by bonded EC or Wire
+		let
+			savedEditMode = this.editMode;
+		this.editMode = false;
+		for (let i = 0, p = this.settings.points[i], end = this.last; i <= end; p = this.settings.points[++i]) {
+			if ((i > 0 && i < end) || ((i == 0 || i == end) && !this.nodeBonds(i))) {
+				this.setNode(i, Point.translateBy(p, dx, dy));
+			}
+		}
+		this.editMode = savedEditMode;
+		return this;
+	}
+
 	/**
 	 * @description returns true if a point is valid
 	 * @comment later see how to change this to validNode, conflict in !ic.valid(node)
@@ -159,8 +174,13 @@ export default class Wire extends ItemBoard {
 	public getNode(node: number): IItemNode {
 		let
 			p: Point = this.settings.points[node];
-		p && (p = p.clone());
-		return <IItemNode><unknown>p;
+		return <IItemNode>(p && { x: p.x, y: p.y })
+	}
+
+	public getNodeRealXY(node: number): Point {
+		let
+			p = this.getNode(node);
+		return p && Point.create(p)
 	}
 
 	public appendNode(p: Point): boolean {
@@ -171,6 +191,7 @@ export default class Wire extends ItemBoard {
 		//because no transformation, p is the same, just save it
 		this.settings.points[node].x = p.x | 0;	// remove decimals "trunc"
 		this.settings.points[node].y = p.y | 0;
+		moveToStart.call(this);
 		//this.updateTransformPoint(node, p, false);
 		return this.nodeRefresh(node);
 	}
@@ -188,6 +209,7 @@ export default class Wire extends ItemBoard {
 		//can only be called when editMode == false
 		if (!this.editMode) {
 			this.settings.points = points.map(p => new Point(p.x | 0, p.y | 0));
+			moveToStart.call(this);
 			//clean lines and set polyline new points
 			this.settings.lines = [];
 			this.refresh();
@@ -247,6 +269,7 @@ export default class Wire extends ItemBoard {
 		this.editMode = false;
 		deleteWireNode.call(this, line);
 		deleteWireNode.call(this, line - 1);
+		moveToStart.call(this);
 		this.editMode = savedEditMode;
 		return true;
 	}
@@ -257,6 +280,7 @@ export default class Wire extends ItemBoard {
 			p;
 		this.editMode = false;
 		p = deleteWireNode.call(this, node);
+		moveToStart.call(this);
 		this.editMode = savedEditMode;
 		return p;
 	}
@@ -306,6 +330,10 @@ export default class Wire extends ItemBoard {
 		})
 	}
 
+}
+
+function moveToStart() {
+	(this as Wire).move(this.settings.points[0].x, this.settings.points[0].y)
 }
 
 function deleteWireNode(node: number): Point | undefined {

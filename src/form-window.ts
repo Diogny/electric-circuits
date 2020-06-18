@@ -1,6 +1,7 @@
 import BaseWindow from "./base-window";
 import { IBaseWindowOptions } from "./interfaces";
-import { extend, rEL, addClass, aEL, removeClass } from "./dab";
+import { extend, rEL, addClass, aEL, removeClass, empty } from "./dab";
+import { CircuitProperty } from "./circuit";
 
 export default class FormWindow extends BaseWindow {
 
@@ -15,8 +16,7 @@ export default class FormWindow extends BaseWindow {
 		this.contentHTML = <HTMLDivElement>this.win.querySelector("div>div>div");
 	}
 
-	public showDialog(title: string,
-		formItems: { label: string, value: string | number, placeHolder?: string, required?: boolean }[]
+	public showDialog(title: string, formItems: CircuitProperty[]
 	): Promise<number> {
 		let
 			self = this as FormWindow;
@@ -31,17 +31,26 @@ export default class FormWindow extends BaseWindow {
 				},
 				clickHandler = (e: MouseEvent) => {
 					let
-						choice = parseInt(<any>(e.target as HTMLElement).getAttribute("dialog-option"));
+						choice = parseInt(<any>(e.target as HTMLElement).getAttribute("dialog-option")),
+						isRequired = (s: string, ndx: number) => (empty(s) && formItems[ndx].required);
 					if (isNaN(choice))
 						return;
 					if (choice == 0) {
 						if ((Array.from(self.formHTML.querySelectorAll("div>input"))
-							.filter((item: HTMLInputElement, index) => {
-								if (!(formItems[index].value = item.value) && formItems[index].required) {
-									removeClass(<any>item.nextElementSibling, "hide");
+							.filter((elem: HTMLInputElement) => {
+								let
+									index = parseInt(<any>elem.getAttribute("index")),
+									item = formItems[index];
+								if (item
+									&& !item.readonly
+									&& isRequired(item.value = elem.value, index)
+								) {
+									(<any>elem.nextElementSibling).innerText = "required";
+									removeClass(<any>elem.nextElementSibling, "hide");
 									return true;
-								} else
-									addClass(<any>item.nextElementSibling, "hide");
+								}
+								(<any>elem.nextElementSibling).innerText = "*";
+								addClass(<any>elem.nextElementSibling, "hide");
 							})).length
 						) {
 							return;
@@ -62,9 +71,14 @@ export default class FormWindow extends BaseWindow {
 				let
 					label = `<label for="dialog-form-${index}">${item.label}</label>`,
 					placeHolder = item.placeHolder ? ` placeholder="${item.placeHolder}"` : "",
-					input = `<input type="text" id="dialog-form-${index}"${placeHolder} />`,
-					required = `<span class="hide"> *</span>`;
-				return '<div class="pure-control-group">' + label + input + required + '</div>'
+					input = !item.readonly ? `<input type="text" id="dialog-form-${index}" value="${item.value}" index="${index}"${placeHolder} />` : "",
+					span = item.readonly ? `<span id="dialog-form-${index}">${item.value}</span>` : "",
+					required = `<span class="hide">*</span>`;
+				return `<div class="pure-control-group${item.visible ? "" : " hide"}">`
+					+ label
+					+ (input || span)
+					+ required
+					+ '</div>'
 			})
 				.join('')
 			self.contentHTML.innerHTML =

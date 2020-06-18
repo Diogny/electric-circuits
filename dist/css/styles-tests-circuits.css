@@ -367,6 +367,12 @@ g[svg-comp] text.big {
   font-size: 50px;
 }
 
+g.label > text {
+  font-family: monospace;
+  stroke-width: 0.5px;
+  font-size: 14px;
+}
+
 g[svg-comp] > circle[svg-type="node"],
 g[svg-comp] > circle[svg-type="node-x"],
 g[svg-comp] > circle.node {
@@ -516,6 +522,9 @@ body.dark .expandable > span > i {
   padding-left: 5px;
   display: inline-flex;
   height: 25px;
+}
+[circuit="name"]:hover {
+  cursor: pointer;
 }
 [circuit="name"] > span:nth-of-type(1) {
   color: red;
@@ -809,8 +818,18 @@ body.dark .expandable > span > i {
   background-color: #717272e0;
   color: white;
 }
-.win.dialog > div.content > form > fieldset > div > span {
+.win.dialog > div.content > form > fieldset > div > span[id] {
+  max-width: 300px;
+  display: inline-block;
+  overflow: hidden;
+  height: 19px;
+  line-height: 19px;
+  margin: 0 1em 0 0;
+  vertical-align: middle;
+}
+.win.dialog > div.content > form > fieldset > div > span:not([id]) {
   color: red;
-  font-size: 1.5em;
+  font-size: 1em;
   font-weight: bolder;
+  margin-left: 5px;
 }

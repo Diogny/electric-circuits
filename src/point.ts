@@ -82,7 +82,7 @@ export default class Point implements IPoint {
 
 	static scale(v: IPoint, k: number): Point { return new Point(k * v.x, k * v.y) }
 
-	static translateBy(v: IPoint, k: number): Point { return new Point(v.x + k, v.y + k) }
+	static translateBy(v: IPoint, dx: number, dy: number): Point { return new Point(v.x + dx, v.y + dy) }
 
 	//static translate(v: Point, k: number): IPoint { return new Point(v.x + k, v.y + k) }
 	static times(v: IPoint, scaleX: number, scaleY: number): Point { return new Point(v.x * scaleX, v.y * scaleY) }

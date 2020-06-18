@@ -17,7 +17,6 @@ var Circuit = /** @class */ (function () {
         this.wireMap = new Map();
         this.selectedComponents = [];
         this.uniqueCounters = {};
-        //empty Circuit
         this.version = options.version || "1.1.5";
         this.__zoom = Circuit.validZoom(options.zoom) ? options.zoom : Circuit.defaultZoom;
         this.name = options.name;
@@ -74,7 +73,6 @@ var Circuit = /** @class */ (function () {
         configurable: true
     });
     Object.defineProperty(Circuit.prototype, "components", {
-        //returns all components: ECs, Wires
         get: function () { return this.ecList.concat(this.wireList); },
         enumerable: false,
         configurable: true
@@ -83,7 +81,6 @@ var Circuit = /** @class */ (function () {
         return this.ecMap.get(id) || this.wireMap.get(id);
     };
     Object.defineProperty(Circuit.prototype, "ec", {
-        //has value if only one comp selected, none or multiple has undefined
         get: function () {
             return !this.selectedComponents.length ? void 0 : this.selectedComponents[0];
         },
@@ -101,28 +98,31 @@ var Circuit = /** @class */ (function () {
     };
     Circuit.prototype.toggleSelect = function (comp) {
         comp.select(!comp.selected);
-        this.selectedComponents = this.ecList.filter(function (c) { return c.selected; });
+        this.selectedComponents =
+            this.ecList.filter(function (c) { return c.selected; });
     };
     Circuit.prototype.selectThis = function (comp) {
         selectAll.call(this, false);
         this.selectedComponents = [comp.select(true)];
     };
     Circuit.prototype.selectRect = function (rect) {
-        (this.selectedComponents = this.ecList.filter(function (item) {
-            return rect.intersect(item.rect());
-        }))
+        (this.selectedComponents =
+            this.ecList.filter(function (item) {
+                return rect.intersect(item.rect());
+            }))
             .forEach(function (item) { return item.select(true); });
     };
     Circuit.prototype.deleteSelected = function () {
         var _this = this;
         var deletedCount = 0;
-        this.selectedComponents = this.selectedComponents.filter(function (c) {
-            if (_this.delete(c)) {
-                deletedCount++;
-                return false;
-            }
-            return true;
-        });
+        this.selectedComponents =
+            this.selectedComponents.filter(function (c) {
+                if (_this.delete(c)) {
+                    deletedCount++;
+                    return false;
+                }
+                return true;
+            });
         return deletedCount;
     };
     Circuit.prototype.delete = function (comp) {
@@ -138,7 +138,8 @@ var Circuit = /** @class */ (function () {
     };
     Circuit.prototype.add = function (options) {
         var comp;
-        ((name == "wire") && (options.points = options.points, true))
+        ((name == "wire")
+            && (options.points = options.points, true))
             || (options.x = options.x, options.y = options.y);
         comp = createBoardItem.call(this, options);
         this.modified = true;
@@ -171,7 +172,8 @@ var Circuit = /** @class */ (function () {
                 if (answer.canceled)
                     choice = 1; // Cancel: 1
                 else if (answer.error) {
-                    console.log(answer); //later popup with error
+                    //later popup with error
+                    console.log(answer);
                     choice = 5; // Error: 5
                 }
                 else { //OK
@@ -179,8 +181,17 @@ var Circuit = /** @class */ (function () {
                     self.modified = false;
                 }
             }
-            resolve(choice); // Save: 0, Cancel: 1, Error: 5
+            // Save: 0, Cancel: 1, Error: 5
+            resolve(choice);
         });
+    };
+    Circuit.circuitProperties = function (circuit) {
+        return [
+            { label: "name", value: (circuit === null || circuit === void 0 ? void 0 : circuit.name) || "", required: true, placeHolder: "Name", visible: true },
+            { label: "version", value: (circuit === null || circuit === void 0 ? void 0 : circuit.version) || "1.1.5", readonly: true, visible: true },
+            { label: "description", value: (circuit === null || circuit === void 0 ? void 0 : circuit.description) || "", placeHolder: "Description", visible: true },
+            { label: "path", value: (circuit === null || circuit === void 0 ? void 0 : circuit.filePath) || "", readonly: true, visible: true },
+        ];
     };
     Circuit.prototype.destroy = function () {
         var _this = this;
@@ -229,8 +240,10 @@ function createBoardItem(options) {
                     && (!isUniqueCounter()
                         || (result = rootRef[prop] = base.comp.meta.countStart | 0, false))))
                 throw "invalid label template";
-            //increment counter only for static properties
-            isUniqueCounter() && dab_1.isNum(result) && (rootRef[prop] = result + 1);
+            //increment counter only for unique properties
+            isUniqueCounter()
+                && dab_1.isNum(result)
+                && (rootRef[prop] = result + 1);
             return result;
         });
         base.count++;
@@ -257,7 +270,10 @@ function createBoardItem(options) {
 function parseCircuitXML(data) {
     var self = this;
     //answer.filePath
-    xml2js.parseString(data, { trim: true, explicitArray: false }, function (err, json) {
+    xml2js.parseString(data, {
+        trim: true,
+        explicitArray: false
+    }, function (err, json) {
         if (err)
             console.log(err);
         else {

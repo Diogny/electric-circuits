@@ -525,10 +525,9 @@ export class MyApp extends Application implements IMyApp {
 	public newCircuit(): Promise<number> {
 		let
 			self = this as MyApp,
-			options = [
-				{ label: "name", value: "", required: true, placeHolder: "Name" },
-				{ label: "description", value: "", placeHolder: "Description" },
-			];
+			options = Circuit.circuitProperties(),
+			path = options.find(value => value.label == "path");
+		path && (path.visible = false);
 		this.circuitLoadingOrSaving = true;
 		return this.saveDialogIfModified()
 			.then((choice) => {

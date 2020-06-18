@@ -12,6 +12,15 @@ import Point from "./point";
 import Comp from "./components";
 import { Bond } from "./bonds";
 
+export interface CircuitProperty {
+	label: string;
+	value: string;
+	required?: boolean,
+	placeHolder?: string;
+	readonly?: boolean;
+	visible?: boolean;
+}
+
 export class Circuit {
 
 	version: string;
@@ -28,7 +37,7 @@ export class Circuit {
 		return this.compMap.get(name)
 	}
 
-	public static defaultZoom: number = 0.5;	// 2X
+	public static defaultZoom: number = 0.5;// 2X
 
 	__zoom: number;
 	get zoom(): number { return this.__zoom }
@@ -64,7 +73,6 @@ export class Circuit {
 
 	get empty(): boolean { return !(this.wireMap.size || this.ecMap.size) }
 
-	//returns all components: ECs, Wires
 	get components(): ItemBoard[] { return (this.ecList as ItemBoard[]).concat(this.wireList) }
 
 	selectedComponents: EC[];
@@ -77,7 +85,6 @@ export class Circuit {
 		return this.ecMap.get(id) || this.wireMap.get(id)
 	}
 
-	//has value if only one comp selected, none or multiple has undefined
 	get ec(): EC | undefined {
 		return !this.selectedComponents.length ? void 0 : this.selectedComponents[0]
 	}
@@ -88,7 +95,6 @@ export class Circuit {
 		this.wireMap = new Map();
 		this.selectedComponents = [];
 		this.uniqueCounters = {};
-		//empty Circuit
 		this.version = options.version || "1.1.5";
 		this.__zoom = Circuit.validZoom(options.zoom) ? options.zoom : Circuit.defaultZoom;
 		this.name = options.name;
@@ -112,7 +118,8 @@ export class Circuit {
 
 	public toggleSelect(comp: EC) {
 		comp.select(!comp.selected);
-		this.selectedComponents = this.ecList.filter(c => c.selected);
+		this.selectedComponents =
+			this.ecList.filter(c => c.selected);
 	}
 
 	public selectThis(comp: EC) {
@@ -121,22 +128,24 @@ export class Circuit {
 	}
 
 	public selectRect(rect: Rect) {
-		(this.selectedComponents = this.ecList.filter((item) => {
-			return rect.intersect(item.rect())
-		}))
+		(this.selectedComponents =
+			this.ecList.filter((item) => {
+				return rect.intersect(item.rect())
+			}))
 			.forEach(item => item.select(true));
 	}
 
 	public deleteSelected(): number {
 		let
 			deletedCount = 0;
-		this.selectedComponents = this.selectedComponents.filter((c) => {
-			if (this.delete(c)) {
-				deletedCount++;
-				return false;
-			}
-			return true;
-		});
+		this.selectedComponents =
+			this.selectedComponents.filter((c) => {
+				if (this.delete(c)) {
+					deletedCount++;
+					return false;
+				}
+				return true;
+			});
 		return deletedCount
 	}
 
@@ -156,7 +165,8 @@ export class Circuit {
 	public add(options: { name: string, x: number, y: number, points: IPoint[] }): EC | Wire {
 		let
 			comp: EC | Wire;
-		((name == "wire") && (options.points = options.points, true))
+		((name == "wire")
+			&& (options.points = options.points, true))
 			|| (options.x = options.x, options.y = options.y);
 		comp = createBoardItem.call(this, options);
 		this.modified = true;
@@ -193,7 +203,8 @@ export class Circuit {
 				if (answer.canceled)
 					choice = 1;		// Cancel: 1
 				else if (answer.error) {
-					console.log(answer);				//later popup with error
+					//later popup with error
+					console.log(answer);
 					choice = 5;		// Error: 5
 				}
 				else {						//OK
@@ -201,8 +212,18 @@ export class Circuit {
 					self.modified = false;
 				}
 			}
-			resolve(choice); // Save: 0, Cancel: 1, Error: 5
+			// Save: 0, Cancel: 1, Error: 5
+			resolve(choice);
 		})
+	}
+
+	public static circuitProperties(circuit?: Circuit): CircuitProperty[] {
+		return [
+			{ label: "name", value: circuit?.name || "", required: true, placeHolder: "Name", visible: true },
+			{ label: "version", value: circuit?.version || "1.1.5", readonly: true, visible: true },
+			{ label: "description", value: circuit?.description || "", placeHolder: "Description", visible: true },
+			{ label: "path", value: circuit?.filePath || "", readonly: true, visible: true },
+		]
 	}
 
 	public destroy() {
@@ -265,8 +286,10 @@ function createBoardItem(options: any): EC | Wire {
 							|| (result = rootRef[prop] = base.comp.meta.countStart | 0, false)))
 				)
 					throw `invalid label template`;
-				//increment counter only for static properties
-				isUniqueCounter() && isNum(result) && (rootRef[<any>prop] = result + 1)
+				//increment counter only for unique properties
+				isUniqueCounter()
+					&& isNum(result)
+					&& (rootRef[<any>prop] = result + 1)
 				return result;
 			});
 		base.count++;
@@ -295,7 +318,10 @@ function parseCircuitXML(data: string) {
 	let
 		self = (this as Circuit);
 	//answer.filePath
-	xml2js.parseString(data, { trim: true, explicitArray: false }, (err, json) => {
+	xml2js.parseString(data, {
+		trim: true,
+		explicitArray: false
+	}, (err, json) => {
 		if (err)
 			console.log(err);
 		else {

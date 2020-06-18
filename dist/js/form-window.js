@@ -21,18 +21,22 @@ var FormWindow = /** @class */ (function (_super) {
                 self.setVisible(false);
                 dab_1.addClass(self.win, "hide");
             }, clickHandler = function (e) {
-                var choice = parseInt(e.target.getAttribute("dialog-option"));
+                var choice = parseInt(e.target.getAttribute("dialog-option")), isRequired = function (s, ndx) { return (dab_1.empty(s) && formItems[ndx].required); };
                 if (isNaN(choice))
                     return;
                 if (choice == 0) {
                     if ((Array.from(self.formHTML.querySelectorAll("div>input"))
-                        .filter(function (item, index) {
-                        if (!(formItems[index].value = item.value) && formItems[index].required) {
-                            dab_1.removeClass(item.nextElementSibling, "hide");
+                        .filter(function (elem) {
+                        var index = parseInt(elem.getAttribute("index")), item = formItems[index];
+                        if (item
+                            && !item.readonly
+                            && isRequired(item.value = elem.value, index)) {
+                            elem.nextElementSibling.innerText = "required";
+                            dab_1.removeClass(elem.nextElementSibling, "hide");
                             return true;
                         }
-                        else
-                            dab_1.addClass(item.nextElementSibling, "hide");
+                        elem.nextElementSibling.innerText = "*";
+                        dab_1.addClass(elem.nextElementSibling, "hide");
                     })).length) {
                         return;
                     }
@@ -48,8 +52,12 @@ var FormWindow = /** @class */ (function (_super) {
             self.titleHTML.innerText = title;
             //form
             self.formHTML.innerHTML = formItems.map(function (item, index) {
-                var label = "<label for=\"dialog-form-" + index + "\">" + item.label + "</label>", placeHolder = item.placeHolder ? " placeholder=\"" + item.placeHolder + "\"" : "", input = "<input type=\"text\" id=\"dialog-form-" + index + "\"" + placeHolder + " />", required = "<span class=\"hide\"> *</span>";
-                return '<div class="pure-control-group">' + label + input + required + '</div>';
+                var label = "<label for=\"dialog-form-" + index + "\">" + item.label + "</label>", placeHolder = item.placeHolder ? " placeholder=\"" + item.placeHolder + "\"" : "", input = !item.readonly ? "<input type=\"text\" id=\"dialog-form-" + index + "\" value=\"" + item.value + "\" index=\"" + index + "\"" + placeHolder + " />" : "", span = item.readonly ? "<span id=\"dialog-form-" + index + "\">" + item.value + "</span>" : "", required = "<span class=\"hide\">*</span>";
+                return "<div class=\"pure-control-group" + (item.visible ? "" : " hide") + "\">"
+                    + label
+                    + (input || span)
+                    + required
+                    + '</div>';
             })
                 .join('');
             self.contentHTML.innerHTML =

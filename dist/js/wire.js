@@ -27,7 +27,7 @@ var Wire = /** @class */ (function (_super) {
         //...
         //}
         //place it
-        _this.move(_this.settings.points[0].x, _this.settings.points[0].y);
+        moveToStart.call(_this);
         //signal component creation
         _this.onProp && _this.onProp({
             id: "#" + _this.id,
@@ -148,6 +148,19 @@ var Wire = /** @class */ (function (_super) {
         }
         return this;
     };
+    Wire.prototype.translate = function (dx, dy) {
+        _super.prototype.translate.call(this, dx, dy);
+        //don't translate bonded end points because it should have been|will be moved by bonded EC or Wire
+        var savedEditMode = this.editMode;
+        this.editMode = false;
+        for (var i = 0, p = this.settings.points[i], end = this.last; i <= end; p = this.settings.points[++i]) {
+            if ((i > 0 && i < end) || ((i == 0 || i == end) && !this.nodeBonds(i))) {
+                this.setNode(i, point_1.default.translateBy(p, dx, dy));
+            }
+        }
+        this.editMode = savedEditMode;
+        return this;
+    };
     /**
      * @description returns true if a point is valid
      * @comment later see how to change this to validNode, conflict in !ic.valid(node)
@@ -166,8 +179,11 @@ var Wire = /** @class */ (function (_super) {
     };
     Wire.prototype.getNode = function (node) {
         var p = this.settings.points[node];
-        p && (p = p.clone());
-        return p;
+        return (p && { x: p.x, y: p.y });
+    };
+    Wire.prototype.getNodeRealXY = function (node) {
+        var p = this.getNode(node);
+        return p && point_1.default.create(p);
     };
     Wire.prototype.appendNode = function (p) {
         return !this.editMode && (this.settings.points.push(p), this.refresh(), true);
@@ -176,6 +192,7 @@ var Wire = /** @class */ (function (_super) {
         //because no transformation, p is the same, just save it
         this.settings.points[node].x = p.x | 0; // remove decimals "trunc"
         this.settings.points[node].y = p.y | 0;
+        moveToStart.call(this);
         //this.updateTransformPoint(node, p, false);
         return this.nodeRefresh(node);
     };
@@ -191,6 +208,7 @@ var Wire = /** @class */ (function (_super) {
         //can only be called when editMode == false
         if (!this.editMode) {
             this.settings.points = points.map(function (p) { return new point_1.default(p.x | 0, p.y | 0); });
+            moveToStart.call(this);
             //clean lines and set polyline new points
             this.settings.lines = [];
             this.refresh();
@@ -239,6 +257,7 @@ var Wire = /** @class */ (function (_super) {
         this.editMode = false;
         deleteWireNode.call(this, line);
         deleteWireNode.call(this, line - 1);
+        moveToStart.call(this);
         this.editMode = savedEditMode;
         return true;
     };
@@ -246,6 +265,7 @@ var Wire = /** @class */ (function (_super) {
         var savedEditMode = this.editMode, p;
         this.editMode = false;
         p = deleteWireNode.call(this, node);
+        moveToStart.call(this);
         this.editMode = savedEditMode;
         return p;
     };
@@ -291,6 +311,9 @@ var Wire = /** @class */ (function (_super) {
     return Wire;
 }(itemsBoard_1.ItemBoard));
 exports.default = Wire;
+function moveToStart() {
+    this.move(this.settings.points[0].x, this.settings.points[0].y);
+}
 function deleteWireNode(node) {
     var last = this.last;
     //first or last node cannot be deleted, only middle nodes

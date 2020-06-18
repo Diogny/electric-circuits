@@ -9,7 +9,7 @@ Used in my testing website [Electric Circuits](http://diogny.com/tests/circuits.
 ### Functionality and Wiring
 
 	Right-click shows context menu for individual board items
-	Board panning: Alt + Left-Click drag
+	Board panning: Shift + Left-Click drag
 	Board ViewBox reset/center using tool button click
 	Board Zoom click on zoom buttoms, later scroll will do it
 
@@ -21,6 +21,7 @@ Used in my testing website [Electric Circuits](http://diogny.com/tests/circuits.
 	
 	Ctrl + Left-Click on Board and drag shows selection rectangle for ECs
 	Left-Click on EC body hold and drag, multiple selected are dragged too
+		if Shift is pressed at the begining then all connected ECs and wires are dragged too
 	Ctrl + Left-Click on EC select/unselect
 	Left-Click on EC body shows it's properties
 	
@@ -97,6 +98,6 @@ Used in my testing website [Electric Circuits](http://diogny.com/tests/circuits.
 	git add -u					stage the modified and deleted files
 	git add -A
 	git commit -m "update message"
-	git tag v1.1.11
+	git tag v1.1.12
 	git push origin master --tags
 

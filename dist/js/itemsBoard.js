@@ -8,6 +8,7 @@ var itemsBase_1 = require("./itemsBase");
 var components_1 = require("./components");
 var utils_1 = require("./utils");
 var point_1 = require("./point");
+var types_1 = require("./types");
 //ItemBoard->Wire
 var ItemBoard = /** @class */ (function (_super) {
     tslib_1.__extends(ItemBoard, _super);
@@ -103,16 +104,11 @@ var ItemBoard = /** @class */ (function (_super) {
         }
         return this.settings.props[propName];
     };
-    //poly.bond(0, ec, 1)
-    //poly.bond(poly.last, ec, 1)
-    //ec.bond(1, poly, 0)
-    //ec.bond(1, poly, poly.last)
     ItemBoard.prototype.bond = function (thisNode, ic, icNode) {
         var entry = this.nodeBonds(thisNode);
         // ic: wire,  node: wire node number, thisNode: node of IC connected
         if (!ic
             || (entry && entry.has(ic.id)) //there's a bond with a connection to this ic.id
-            //!(ic.valid(node) || node == -1)) 	//(!ic.valid(node) && node != -1)
             || !ic.valid(icNode))
             return false;
         //make bond if first, or append new one
@@ -123,7 +119,6 @@ var ItemBoard = /** @class */ (function (_super) {
             console.log('Oooopsie!');
         }
         this.settings.bondsCount++;
-        //refresh this node
         this.nodeRefresh(thisNode);
         //make bond the other way, to this component, if not already done
         entry = ic.nodeBonds(icNode);
@@ -134,16 +129,13 @@ var ItemBoard = /** @class */ (function (_super) {
         return this.bonds[nodeName];
     };
     ItemBoard.prototype.unbond = function (node, id) {
-        //find nodeName bonds
         var bond = this.nodeBonds(node), b = (bond == null) ? null : bond.remove(id);
         if (b != null) {
-            //
             if (bond.count == 0) {
                 //ensures there's no bond object if no destination
                 delete this.settings.bonds[node];
                 (--this.settings.bondsCount == 0) && (this.settings.bonds = []);
             }
-            //refresh this item node
             this.nodeRefresh(node);
             var ic = this.circuit.get(id);
             ic && ic.unbond(b.ndx, this.id);
@@ -165,6 +157,39 @@ var ItemBoard = /** @class */ (function (_super) {
     ItemBoard.prototype.disconnect = function () {
         for (var node = 0; node < this.count; node++)
             this.unbondNode(node);
+    };
+    ItemBoard.connectedWiresTo = function (ecList) {
+        var _a;
+        var wireList = [], ecIdList = ecList.map(function (ec) { return ec.id; }), circuit = (_a = ecList[0]) === null || _a === void 0 ? void 0 : _a.circuit, secondTest = [], oppositeEdge = function (node, last) { return node == 0 ? last : (node == last ? 0 : node); };
+        if (circuit) {
+            ecList.forEach(function (ec) {
+                ec.bonds.forEach(function (bond) {
+                    bond.to
+                        .filter(function (b) { return !wireList.find(function (w) { return w.id == b.id; }); })
+                        .forEach(function (b) {
+                        var wire = circuit.get(b.id), toWireBond = wire.nodeBonds(oppositeEdge(b.ndx, wire.last));
+                        if (toWireBond.to[0].type == types_1.Type.EC) {
+                            ecIdList.includes(toWireBond.to[0].id)
+                                && wireList.push(wire);
+                        }
+                        else {
+                            if (wireList.find(function (w) { return w.id == toWireBond.to[0].id; })) {
+                                wireList.push(wire);
+                            }
+                            else {
+                                secondTest.push({
+                                    wire: wire,
+                                    toId: toWireBond.to[0].id
+                                });
+                            }
+                        }
+                    });
+                });
+            });
+            secondTest
+                .forEach(function (b) { return wireList.find(function (w) { return w.id == b.toId; }) && wireList.push(b.wire); });
+        }
+        return wireList;
     };
     ItemBoard.prototype.propertyDefaults = function () {
         return dab_1.extend(_super.prototype.propertyDefaults.call(this), {

@@ -67,7 +67,7 @@ var Point = /** @class */ (function () {
         return p1.distance(p2);
     };
     Point.scale = function (v, k) { return new Point(k * v.x, k * v.y); };
-    Point.translateBy = function (v, k) { return new Point(v.x + k, v.y + k); };
+    Point.translateBy = function (v, dx, dy) { return new Point(v.x + dx, v.y + dy); };
     //static translate(v: Point, k: number): IPoint { return new Point(v.x + k, v.y + k) }
     Point.times = function (v, scaleX, scaleY) { return new Point(v.x * scaleX, v.y * scaleY); };
     Point.minus = function (v1, v2) { return new Point(v1.x - v2.x, v1.y - v2.y); };

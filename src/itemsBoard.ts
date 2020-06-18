@@ -9,6 +9,9 @@ import {
 import { map } from './utils';
 import Point from './point';
 import { Circuit } from './circuit';
+import EC from './ec';
+import Wire from './wire';
+import { Type } from './types';
 
 //ItemBoard->Wire
 export abstract class ItemBoard extends ItemBase {
@@ -22,6 +25,19 @@ export abstract class ItemBoard extends ItemBase {
 	get label(): string { return this.settings.label }
 
 	abstract get count(): number;	// EC is node count, Wire is point count
+	abstract valid(node: number): boolean;
+	abstract get last(): number;
+	abstract refresh(): ItemBoard;	//full refresh
+	abstract nodeRefresh(node: number): ItemBoard;
+	abstract getNode(node: number): IItemNode;
+	abstract getNodeRealXY(node: number): Point;
+	abstract setNode(node: number, p: IPoint): ItemBoard;
+	abstract overNode(p: IPoint, ln: number): number;
+	//finds a matching point, faster
+	abstract findNode(p: Point): number;
+
+	//this returns true for an EC, and any Wire node and that it is not a start|end bonded node
+	abstract nodeHighlightable(node: number): boolean;
 
 	constructor(public circuit: Circuit, options: IItemBaseOptions) {
 		super(options);
@@ -97,18 +113,12 @@ export abstract class ItemBoard extends ItemBase {
 		return this.settings.props[propName]
 	}
 
-	//poly.bond(0, ec, 1)
-	//poly.bond(poly.last, ec, 1)
-	//ec.bond(1, poly, 0)
-	//ec.bond(1, poly, poly.last)
 	public bond(thisNode: number, ic: ItemBoard, icNode: number): boolean {
 		let
 			entry = this.nodeBonds(thisNode);
-
 		// ic: wire,  node: wire node number, thisNode: node of IC connected
 		if (!ic
 			|| (entry && entry.has(ic.id)) 	//there's a bond with a connection to this ic.id
-			//!(ic.valid(node) || node == -1)) 	//(!ic.valid(node) && node != -1)
 			|| !ic.valid(icNode))
 			return false;
 		//make bond if first, or append new one
@@ -118,9 +128,7 @@ export abstract class ItemBoard extends ItemBase {
 			console.log('Oooopsie!')
 		}
 		this.settings.bondsCount++;
-		//refresh this node
 		this.nodeRefresh(thisNode);
-
 		//make bond the other way, to this component, if not already done
 		entry = ic.nodeBonds(icNode);
 		//returning true when already a bond is to ensure the first bond call returns "true"
@@ -132,19 +140,15 @@ export abstract class ItemBoard extends ItemBase {
 	}
 
 	public unbond(node: number, id: string): void {
-		//find nodeName bonds
 		let
 			bond = this.nodeBonds(node),
 			b = (bond == null) ? null : bond.remove(id);
-
 		if (b != null) {
-			//
 			if (bond.count == 0) {
 				//ensures there's no bond object if no destination
 				delete (<any>this.settings.bonds)[node];
 				(--this.settings.bondsCount == 0) && (this.settings.bonds = []);
 			}
-			//refresh this item node
 			this.nodeRefresh(node);
 			let
 				ic = this.circuit.get(id);
@@ -172,18 +176,43 @@ export abstract class ItemBoard extends ItemBase {
 			this.unbondNode(node);
 	}
 
-	abstract valid(node: number): boolean;
-	abstract get last(): number;
-	abstract refresh(): ItemBoard;	//full refresh
-	abstract nodeRefresh(node: number): ItemBoard;
-	abstract getNode(node: number): IItemNode;
-	abstract setNode(node: number, p: IPoint): ItemBoard;
-	abstract overNode(p: IPoint, ln: number): number;
-	//finds a matching point, faster
-	abstract findNode(p: Point): number;
-
-	//this returns true for an EC, and any Wire node and that it is not a start|end bonded node
-	abstract nodeHighlightable(node: number): boolean;
+	public static connectedWiresTo(ecList: EC[]): Wire[] {
+		let
+			wireList: Wire[] = [],
+			ecIdList = ecList.map(ec => ec.id),
+			circuit = ecList[0]?.circuit,
+			secondTest: { wire: Wire, toId: string }[] = [],
+			oppositeEdge = (node: number, last: number) => node == 0 ? last : (node == last ? 0 : node);
+		if (circuit) {
+			ecList.forEach(ec => {
+				ec.bonds.forEach(bond => {
+					bond.to
+						.filter(b => !wireList.find(w => w.id == b.id))
+						.forEach(b => {
+							let
+								wire = circuit.get(b.id) as Wire,
+								toWireBond = wire.nodeBonds(oppositeEdge(b.ndx, wire.last));
+							if (toWireBond.to[0].type == Type.EC) {
+								ecIdList.includes(toWireBond.to[0].id)
+									&& wireList.push(wire)
+							} else {
+								if (wireList.find(w => w.id == toWireBond.to[0].id)) {
+									wireList.push(wire);
+								} else {
+									secondTest.push({
+										wire: wire,
+										toId: toWireBond.to[0].id
+									})
+								}
+							}
+						})
+				})
+			});
+			secondTest
+				.forEach(b => wireList.find(w => w.id == b.toId) && wireList.push(b.wire))
+		}
+		return wireList;
+	}
 
 	public propertyDefaults(): IItemBoardProperties {
 		return extend(super.propertyDefaults(), {

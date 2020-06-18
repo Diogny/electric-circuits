@@ -6,7 +6,6 @@
 		"description": "Logical NOT gate"
 	},
 	"meta" : {
-		"class": "next",
 		"nodes": {
 			"list" : [
 				{ "x": 0, "y": 30, "label": "Input A" },
@@ -30,7 +29,6 @@
 		"description": "Logical Buffer gate"
 	},
 	"meta" : {
-		"class": "next",
 		"nodes": {
 			"list" : [
 				{ "x": 0, "y": 30, "label": "Input A" },
@@ -47,7 +45,6 @@
 		"description" : "Logical AND gate 2-inputs"
 	},
 	"meta" : {
-		"class": "next",
 		"nodes": {
 			"list" : [
 				{ "x": 0, "y": 15, "label": "Input A" },
@@ -74,7 +71,6 @@
 		"description" : "Logicl NAND gate 2-inputs"
 	},
 	"meta" : {
-		"class": "next",
 		"nodes": {
 			"list" : [
 				{ "x": 0, "y": 15, "label": "Input A" },
@@ -102,7 +98,6 @@
 		"description" : "Logicl OR gate 2-inputs"
 	},
 	"meta" : {
-		"class": "next",
 		"nodes": {
 			"list" : [
 				{ "x": 6, "y": 15, "label": "Input A" },
@@ -129,7 +124,6 @@
 		"description" : "Logicl NOR gate 2-inputs"
 	},
 	"meta" : {
-		"class": "next",
 		"nodes": {
 			"list" : [
 				{ "x": 6, "y": 15, "label": "Input A" },
@@ -157,7 +151,6 @@
 		"description" : "Logicl XOR gate 2-inputs"
 	},
 	"meta" : {
-		"class": "next",
 		"nodes": {
 			"list" : [
 				{ "x": 6, "y": 15, "label": "Input A" },
@@ -185,7 +178,6 @@
 		"description" : "Logicl XNOR gate 2-inputs"
 	},
 	"meta" : {
-		"class": "next",
 		"nodes": {
 			"list" : [
 				{ "x": 6, "y": 15, "label": "Input A" },
@@ -214,7 +206,6 @@
 		"description" : "Ground terminal"
 	},
 	"meta" : {
-		"class": "next",
 		"nodes": {
 			"list" : [
 				{ "x": 40, "y": 0, "label": "GND" }
@@ -227,45 +218,68 @@
 },
 {
 	"type" : "power",
-	"name" : "battery",
+	"name" : "battery-cell",
 	"properties" : {
-		"description" : "Generic battery"
+		"description" : "Generic cell battery AA",
+		"notes": "AAA, AA, C and D batteries are around 1.5 volts",
+		"voltage" : {
+			"value" : "1.5V",
+			"valueType": "unit",
+			"type": "input",
+			"readonly": true
+		},
+		"amperage" : {
+			"value" : "1500mA",
+			"valueType": "unit",
+			"type": "input",
+			"readonly": true
+		}
 	},
 	"meta" : {
-		"class": "next",
 		"nodes": {
 			"list" : [
-				{ "x": 0, "y": 40, "label": "GND" },
-				{ "x": 20, "y": 40, "label": "VCC" }
+				{ "x": 15, "y": 40, "label": "VCC" },
+				{ "x": 35, "y": 40, "label": "GND" }
 			]
 		}
 	},
-	"data" : "<rect svg-type='body' x='0' y='20' width='7' height='40'/>
-<line class='thick' x1='20' y1='0' x2='20' y2='80'/>
-<path class='vcc no-fill' d='M 25,20 L 35,20 L 30,20 V 15 V 25'/>"
+	"data" : "<rect svg-type='body' x='27' y='20' width='8' height='40'/>
+<line class='thick' x1='15' y1='0' x2='15' y2='80'/>
+<path class='vcc no-fill' d='M 0,20 L 10,20 L 5,20 V 15 V 25'/>"
 },
 {
 	"type" : "power",
-	"name" : "battery-multi",
+	"name" : "battery-cell-2",
 	"properties" : {
-		"description" : "Generic multi-battery"
+		"description" : "Generic 2 cell battery AA",
+		"notes": "AAA, AA, C and D batteries are around 1.5 volts",
+		"notes2": "this's to test scroll in the property window...",
+		"voltage" : {
+			"value" : "3V",
+			"valueType": "unit",
+			"type": "input",
+			"readonly": true
+		},
+		"amperage" : {
+			"value" : "3000mA",
+			"valueType": "unit",
+			"type": "input",
+			"readonly": true
+		}
 	},
 	"meta" : {
-		"class": "next",
 		"nodes": {
 			"list" : [
-				{ "x": 0, "y": 40, "label": "GND" },
-				{ "x": 63, "y": 40, "label": "VCC" }
+				{ "x": 15, "y": 40, "label": "VCC" },
+				{ "x": 65, "y": 40, "label": "VCC" }
 			]
 		}
 	},
-	"data" : "<rect svg-type='body' x='0' y='20' width='7' height='40'/>
+	"data" : "<rect svg-type='body' x='27' y='20' width='8' height='40'/>
 <line class='thick' x1='15' y1='0' x2='15' y2='80'/>
-<rect svg-type='body' x='24' y='20' width='7' height='40'/>
-<line class='thick' x1='39.5' y1='0' x2='39.5' y2='80'/>
-<rect svg-type='body' x='48' y='20' width='7' height='40'/>
-<line class='thick' x1='63' y1='0' x2='63' y2='80'/>
-<path class='vcc no-fill' d='M 68,20 L 78,20 L 73,20 V 15 V 25'/>"
+<rect svg-type='body' x='57' y='20' width='8' height='40'/>
+<line class='thick' x1='45' y1='0' x2='45' y2='80'/>
+<path class='vcc no-fill' d='M 0,20 L 10,20 L 5,20 V 15 V 25'/>"
 },
 {
 	"type" : "power",
@@ -274,7 +288,6 @@
 		"description": "Generic Power"
 	},
 	"meta" : {
-		"class": "next",
 		"nodes": {
 			"list" : [
 				{ "x": 0, "y": 40, "label": "GND" },
@@ -292,7 +305,7 @@
 	"properties" : {
 		"description": "3.3V Generic Power",
 		"voltage" : "3.3V",
-		"current": "1500mA"
+		"amperage": "1500mA"
 	},
 	"tmpl" : {
 		"name" : "gen_power",
@@ -309,9 +322,9 @@
 	"type" : "power",
 	"name" : "5v",
 	"properties" : {
-		"description": "5V Generic battery",
+		"description": "5V Generic Power",
 		"voltage" : "5V",
-		"current": "2500mA"
+		"amperage": "2500mA"
 	},
 	"tmpl" : {
 		"name" : "gen_power",
@@ -336,26 +349,25 @@
 		}
 	},
 	"meta" : {
-		"class": "next",
 		"countStart": 1,
 		"nameTmpl": "F{Circuit.fuseCount}",
 		"labelId": {
 			"x": 10,
-			"y": -3
+			"y": -10
 		},
 		"nodes": {
 			"list" : [
-				{ "x": 0, "y": 20, "label": "node 0" },
-				{ "x": 40, "y": 20, "label": "node 1" }
+				{ "x": 0, "y": 10, "label": "node 0" },
+				{ "x": 40, "y": 10, "label": "node 1" }
 			]
 		}
 	},
-	"data" : "<rect svg-type='body' x='0' y='10' width='40' height='20'/>
-<line x1='0' y1='20' x2='5' y2='20'></line>
-<circle cx='7' cy='20' r='2'></circle>
-<line x1='35' y1='20' x2='40' y2='20'></line>
-<circle cx='33' cy='20' r='2'></circle>
-<path class='no-fill' d='M 8,18 Q 14.5,8 20,20 Q 24.5,32 32,22'></path>"
+	"data" : "<rect svg-type='body' x='0' y='0' width='40' height='20'/>
+<line x1='0' y1='10' x2='5' y2='10'></line>
+<circle cx='7' cy='10' r='2'></circle>
+<line x1='35' y1='10' x2='40' y2='10'></line>
+<circle cx='33' cy='10' r='2'></circle>
+<path class='no-fill' d='M 8,8 Q 14.5,0 20,10 Q 24.5,20 32,12'></path>"
 },
 {
 	"type" : "diode",
@@ -364,16 +376,15 @@
 		"description" : "Generic diode"
 	},
 	"meta" : {
-		"class": "next",
 		"nodes": {
 			"list" : [
 				{ "x": 0, "y": 30, "label": "Anode (+)" },
-				{ "x": 61, "y": 30, "label": "Catode (-)" }
+				{ "x": 63, "y": 30, "label": "Catode (-)" }
 			]
 		}
 	},
 	"data" : "<path svg-type='body' d='M 0,0 L 60,30 L 0,60 Z'/>
-<line class='thick' x1='61' y1='0' x2='61' y2='60'/>"
+<line class='thick' x1='63' y1='0' x2='63' y2='60'/>"
 },
 {
 	"type" : "diode",
@@ -395,18 +406,17 @@
 		}
 	},
 	"meta" : {
-		"class": "next",
 		"nodes": {
 			"list" : [
-				{ "x": 0, "y": 40, "label": "Anode (+)" },
-				{ "x": 61, "y": 40, "label": "Catode (-)" }
+				{ "x": 0, "y": 30, "label": "Anode (+)" },
+				{ "x": 63, "y": 30, "label": "Catode (-)" }
 			]
 		}
 	},
-	"data" : "<path svg-type='body' d='M 0,10 L 60,40 L 0,70 Z'/>
-<line class='thick' x1='61' y1='10' x2='61' y2='65'/>
-<path svg-type='body' class='color' d='M 30,15 L 36.8,4.6 L 33,2 L 40,0 L 40,7.2 L 36.8,4.6'/>
-<path svg-type='body' class='color' d='M 43,23 L 49,13 L 45,10.2 L 52,8  L 52.9,15.5 L 49,13'/>"
+	"data" : "<path svg-type='body' d='M 0,0 L 60,30 L 0,60 Z'/>
+<line class='thick' x1='63' y1='0' x2='63' y2='60'/>
+<path class='thick' class='color' d='M 32,12 L 36.8,4.6 L 33,2 L 40,0 L 40,7.2 L 36.8,4.6'/>
+<path class='thick' class='color' d='M 45,19 L 49,13 L 45,10.2 L 52,8  L 52.9,15.5 L 49,13'/>"
 },
 {
 	"type" : "diode",
@@ -415,18 +425,17 @@
 		"description" : "Generic photodiode"
 	},
 	"meta" : {
-		"class": "next",
 		"nodes": {
 			"list" : [
-				{ "x": 0, "y": 40, "label": "Anode (+)" },
-				{ "x": 61, "y": 40, "label": "Catode (-)" }
+				{ "x": 0, "y": 30, "label": "Anode (+)" },
+				{ "x": 63, "y": 30, "label": "Catode (-)" }
 			]
 		}
 	},
-	"data" : "<path svg-type='body' d='M 0,10 L 60,40 L 0,70 Z'/>
-<line class='thick' x1='61' y1='10' x2='61' y2='65'/>
-<path svg-type='body' d='M 40,0 L 33.3,10.1 L 29.4,7.6 L 30,15 L 37.4,12.8 L 33.3,10.1'/>
-<path svg-type='body' d='M 52,8 L 45.4,18.1 L 41.6,15.6 L 42,23 L 49.5,20.9 L 45.4,18.1'/>"
+	"data" : "<path svg-type='body' d='M 0,0 L 60,30 L 0,60 Z'/>
+<line class='thick' x1='63' y1='0' x2='63' y2='60'/>
+<path class='thick' d='M 40,0 L 36.3,7.1 L 32.4,4.6 L 33,12 L 40.4,9.8 L 36.3,7.1'/>
+<path class='thick' d='M 53,7 L 49.4,14.1 L 44.6,11.6 L 46,19 L 53.5,16.9 L 49.4,14.1'/>"
 },
 {
 	"type" : "diode",
@@ -435,16 +444,15 @@
 		"description" : "Generic schottky diode"
 	},
 	"meta" : {
-		"class": "next",
 		"nodes": {
 			"list" : [
 				{ "x": 0, "y": 30, "label": "Anode (+)" },
-				{ "x": 61, "y": 30, "label": "Catode (-)" }
+				{ "x": 63, "y": 30, "label": "Catode (-)" }
 			]
 		}
 	},
 	"data" : "<path svg-type='body' d='M 0,0 L 60,30 L 0,60 Z'/>
-<path class='thick no-fill' d='M 46,47 L 46,60 L 61,60 L 61,0 L 76,0 L 76,13'/>"
+<path class='thick no-fill' d='M 46,47 L 46,60 L 63,60 L 63,0 L 76,0 L 76,13'/>"
 },
 {
 	"type" : "diode",
@@ -453,16 +461,15 @@
 		"description" : "Generic tunnel diode"
 	},
 	"meta" : {
-		"class": "next",
 		"nodes": {
 			"list" : [
 				{ "x": 0, "y": 30, "label": "Anode (+)" },
-				{ "x": 61, "y": 30, "label": "Catode (-)" }
+				{ "x": 63, "y": 30, "label": "Catode (-)" }
 			]
 		}
 	},
 	"data" : "<path svg-type='body' d='M 0,0 L 60,30 L 0,60 Z'/>
-<path class='thick no-fill' d='M 51,60 L 61,60 L 61,0 L 51,0'/>"
+<path class='thick no-fill' d='M 51,60 L 63,60 L 63,0 L 51,0'/>"
 },
 {
 	"type" : "diode",
@@ -471,7 +478,6 @@
 		"description" : "Generic varicap diode"
 	},
 	"meta" : {
-		"class": "next",
 		"nodes": {
 			"list" : [
 				{ "x": 0, "y": 30, "label": "Anode (+)" },
@@ -480,7 +486,7 @@
 		}
 	},
 	"data" : "<path svg-type='body' d='M 0,0 L 60,30 L 0,60 Z'/>
-<line class='thick' x1='61' y1='0' x2='61' y2='60'/>
+<line class='thick' x1='63' y1='0' x2='63' y2='60'/>
 <line class='thick' x1='70' y1='0' x2='70' y2='60'/>"
 },
 {
@@ -490,16 +496,15 @@
 		"description" : "Generic Zener diode"
 	},
 	"meta" : {
-		"class": "next",
 		"nodes": {
 			"list" : [
 				{ "x": 0, "y": 30, "label": "Anode (+)" },
-				{ "x": 61, "y": 30, "label": "Catode (-)" }
+				{ "x": 63, "y": 30, "label": "Catode (-)" }
 			]
 		}
 	},
 	"data" : "<path svg-type='body' d='M 0,0 L 60,30 L 0,60 Z'/>
-<path class='thick no-fill' d='M 51,60 L 61,60 L 61,0 L 71,0'/>"
+<path class='thick no-fill' d='M 51,60 L 63,60 L 63,0 L 71,0'/>"
 },
 {
 	"type" : "transistor",
@@ -508,7 +513,6 @@
 		"description" : "BJT Bipolar NPN Transistor"
 	},
 	"meta" : {
-		"class": "next",
 		"nodes": {
 			"list" : [
 				{ "x": 0, "y": 30, "label": "Base" },
@@ -527,7 +531,6 @@
 		"description" : "BJT Bipolar PNP Transistor"
 	},
 	"meta" : {
-		"class": "next",
 		"nodes": {
 			"list" : [
 				{ "x": 0, "y": 30, "label": "Base" },
@@ -546,7 +549,6 @@
 		"description" : "Generic DIP 4 pins"
 	},
 	"meta" : {
-		"class": "next",
 		"nodes": {
 			"createLabels" : true,
 			"list" : [
@@ -567,7 +569,6 @@
 		"description" : "Generic DIP 6 pins"
 	},
 	"meta" : {
-		"class": "next",
 		"nodes": {
 			"createLabels" : true,
 			"list" : [
@@ -590,7 +591,6 @@
 		"description" : "Generic DIP 8 pins"
 	},
 	"meta" : {
-		"class": "next",
 		"nodes": {
 			"createLabels" : true,
 			"list" : [
@@ -635,7 +635,6 @@
 		"description" : "Generic DIP 10 pins"
 	},
 	"meta": {
-		"class": "next",
 		"nodes": {
 			"createLabels" : true,
 			"list" : [
@@ -662,7 +661,6 @@
 		"description" : "Generic DIP 12 pins"
 	},
 	"meta" : {
-		"class": "next",
 		"nodes": {
 			"createLabels" : true,
 			"list" : [
@@ -691,7 +689,6 @@
 		"description" : "Generic DIP 14 pins"
 	},
 	"meta" : {
-		"class": "next",
 		"nodes": {
 			"createLabels" : true,
 			"list" : [
@@ -745,7 +742,6 @@
 		"description" : "Generic DIP 16 pins"
 	},
 	"meta" : {
-		"class": "next",
 		"nodes": {
 			"createLabels" : true,
 			"list" : [
@@ -778,7 +774,6 @@
 		"description" : "Generic DIP 28 pins"
 	},
 	"meta": {
-		"class": "next",
 		"label" : {
 			"x" : 15,
 			"y" : 35,
@@ -836,7 +831,6 @@
 		"description": "Generic capacitor"
 	},
 	"meta" : {
-		"class": "next",
 		"countStart": 1,
 		"nameTmpl": "C{Circuit.capacitorCount}",
 		"labelId": {
@@ -860,7 +854,6 @@
 		"description" : "Generic polarized capacitor"
 	},
 	"meta" : {
-		"class": "next",
 		"countStart": 1,
 		"nameTmpl": "C{Circuit.capacitorCount}",
 		"labelId": {
@@ -885,7 +878,6 @@
 		"description" : "Generic variable capacitor"
 	},
 	"meta" : {
-		"class": "next",
 		"countStart": 1,
 		"nameTmpl": "C{Circuit.capacitorCount}",
 		"labelId": {
@@ -910,7 +902,6 @@
 		"description" : "Generic DC Motor"
 	},
 	"meta" : {
-		"class": "next",
 		"nodes": {
 			"list" : [
 				{ "x": 30, "y": 0, "label": "node (-)" },
@@ -928,7 +919,6 @@
 		"description" : "AC Lamp"
 	},
 	"meta" : {
-		"class": "next",
 		"nodes": {
 			"list" : [
 				{ "x": 0, "y": 30, "label": "node 0" },
@@ -953,12 +943,11 @@
 		"tolerance": "2%"
 	},
 	"meta" : {
-		"class": "next",
 		"countStart": 1,
 		"nameTmpl": "R{Circuit.resistorCount}",
 		"labelId": {
 			"x": 10,
-			"y": -5
+			"y": -10
 		},
 		"nodes": {
 			"list" : [
@@ -982,7 +971,6 @@
 		"tolerance": "2%"
 	},
 	"meta" : {
-		"class": "next",
 		"countStart": 1,
 		"nameTmpl": "VR{Circuit.variableResistorCount}",
 		"labelId": {
@@ -1013,7 +1001,6 @@
 		"tolerance": "2%"
 	},
 	"meta" : {
-		"class": "next",
 		"nodes": {
 			"list" : [
 				{ "x": 10, "y": 0, "label": "node 0" },
@@ -1032,7 +1019,6 @@
 		"description" : "Generic Push Button"
 	},
 	"meta" : {
-		"class": "next",
 		"nodes": {
 			"list" : [
 				{ "x": 6, "y": 40, "label": "node 0" },
@@ -1051,7 +1037,6 @@
 		"description" : "Generic Switch"
 	},
 	"meta" : {
-		"class": "next",
 		"nodes": {
 			"list" : [
 				{ "x": 6, "y": 25, "label": "node 0" },
@@ -1070,7 +1055,6 @@
 		"description": "Generic SDPT Switch"
 	},
 	"meta" : {
-		"class": "next",
 		"nodes": {
 			"list" : [
 				{ "x": 7, "y": 25, "label": "node 0" },
@@ -1101,11 +1085,10 @@
 		}
 	},
 	"meta" : {
-		"class": "next",
 		"countStart": 1,
 		"nameTmpl": "BZ{Circuit.piezoBuzzerCount}",
 		"labelId": {
-			"x": -40,
+			"x": -35,
 			"y": 30
 		},
 		"nodes": {
@@ -1126,7 +1109,6 @@
 		"description" : "Generic inductor"
 	},
 	"meta" : {
-		"class": "next",
 		"nodes": {
 			"list" : [
 				{ "x": 2, "y": 35, "label": "node 0" },
@@ -1143,7 +1125,6 @@
 		"description" : "9V relay"
 	},
 	"meta" : {
-		"class": "next",
 		"nodes": {
 			"list" : [
 				{ "x": 0, "y": 10, "label": "Coil 0" },
@@ -1171,7 +1152,6 @@
 		"description" : "transformer"
 	},
 	"meta" : {
-		"class": "next",
 		"nodes": {
 			"list" : [
 				{ "x": 0, "y": 10, "label": "input 0" },
