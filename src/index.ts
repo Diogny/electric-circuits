@@ -1,7 +1,6 @@
 import { ipcRenderer } from "electron";
 import { templatesDOM, qSA, qS, tag } from "./utils"
 import * as fs from 'fs';
-import * as xml2js from 'xml2js';
 import {
 	IComponentOptions, StateType as State, ActionType as Action,
 	IMachineState, IMouseState, IPoint, IMyAppOptions
@@ -66,9 +65,19 @@ let
 				app.newCircuit();
 				break;
 			case 'CtrlKeyP':
-				ipcRenderer.sendSync('print-circuit');
+				let
+					svg = <SVGElement>app.svgBoard.cloneNode(true),
+					rect = app.svgBoard.getBoundingClientRect();
+				console.log(ipcRenderer.sendSync('print-circuit', [
+					{
+						width: rect.width,
+						height: rect.height + 20
+					},
+					svg.outerHTML
+				]));
 				break;
 			case 'CtrlKeyH':
+			case 'F1':
 				ipcRenderer.sendSync('help-circuit');
 				break;
 			case 'Delete':

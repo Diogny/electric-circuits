@@ -77,22 +77,20 @@ function createMainWindow(opt: any) {
 
 	mainWindow.removeMenu();
 
-	createPrintWindow();
-	createHelpWindow();
+	//createPrintWindow();
+	//createHelpWindow();
 }
 
-function createPrintWindow() {
+function createPrintWindow(rect: { width: number, height: number }) {
 	//printing window
 	printWindow = new BrowserWindow({
 		parent: mainWindow,
 		modal: true,
 		title: "Circuit Printing",
 		center: true,
-		width: 800,
-		height: 500,
-		minWidth: 800,
-		minHeight: 500,
-		//useContentSize: true,
+		width: rect.width,
+		height: rect.height,
+		useContentSize: true,
 		webPreferences: {
 			nodeIntegration: true,
 			enableRemoteModule: false,
@@ -104,7 +102,7 @@ function createPrintWindow() {
 		maximizable: false,
 		fullscreenable: false,
 		//thickFrame: false,
-		resizable: true,
+		resizable: false,
 	});
 	let
 		url = path.join(app.getAppPath(), "html/print.html");
@@ -113,6 +111,7 @@ function createPrintWindow() {
 	//printWindow.loadURL('https://github.com')
 	printWindow.once('ready-to-show', () => {
 		//printWindow.show();
+		//printWindow.webContents.openDevTools()
 	});
 	printWindow.on("closed", (e: any) => {
 		printWindow = <any>null;
@@ -324,18 +323,52 @@ ipcMain.on('saveFile', (event, arg) => {
 })
 
 ipcMain.on('print-circuit', (event, arg) => {
-	console.log(arg);
-	if (!printWindow)
-		createPrintWindow();
-	printWindow.show();
-	event.returnValue = "printing...";
+	//console.log(arg);
+	fs.writeFile(path.join(app.getAppPath(), "data/saved-svg.svg"), arg[1], function (err) {
+		if (err) {
+			event.returnValue = {
+				error: true,
+				message: err.message
+			}
+		} else {
+			if (!printWindow)
+				createPrintWindow(arg[0]);
+			printWindow.show();
+			event.returnValue = true;
+		}
+	})
+})
+
+ipcMain.on('print-svg', (event, arg) => {
+	event.returnValue = printWindow
+		? (printWindow.webContents.print(), true)
+		: false;
+})
+
+ipcMain.on('close-print-win', (event, arg) => {
+	printWindow && (printWindow.close());
+})
+
+ipcMain.on('get-svg', (event, args) => {
+	fs.readFile(path.join(app.getAppPath(), "data/saved-svg.svg"), {}, function (err, data: Buffer) {
+		if (err) {
+			event.returnValue = {
+				error: true,
+				message: err.message
+			}
+		} else {
+			event.returnValue = {
+				svg: data.toString()
+			}
+		}
+	})
 })
 
 ipcMain.on('help-circuit', (event, arg) => {
 	console.log(arg);
 	if (!helpWindow)
 		createHelpWindow();
-		helpWindow.show();
+	helpWindow.show();
 	event.returnValue = "help is working...";
 })
 

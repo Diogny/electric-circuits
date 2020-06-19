@@ -281,50 +281,12 @@ body.dark .bar-item[file="save"] > .icon {
   /* position: relative;*/
 }
 
-/* makes SVG Text non selectable*/
-#board text {
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-  pointer-events: none;
-}
+/*selected*/
 
-circle,
-ellipse,
-rect,
-line,
-polyline,
-polygon,
-path {
-  shape-rendering: auto;
+.ec.selected > [svg-type="body"] {
+  stroke-width: 4px;
+  fill: #b5b3b3;
 }
-
-/*********** EC ***********/
-
-.ec {
-  fill: #f3f0f0;
-  stroke: black;
-  stroke-opacity: 1;
-  stroke-width: 2px;
-  stroke-linecap: butt;
-  fill-rule: evenodd;
-}
-
-body.dark .ec [svg-type="body"] {
-  stroke: #ffffff;
-}
-body.dark .ec {
-  fill: black;
-  stroke: white;
-}
-
-g[svg-comp] > path[svg-type="node"] {
-  stroke-width: 1px;
-  fill: darkgray;
-}
-
 body.light .ec [svg-type]:hover {
   stroke: red;
 }
@@ -332,103 +294,13 @@ body.dark .ec [svg-type]:hover {
   stroke: red;
 }
 
-g[svg-comp] > .thick {
-  stroke-width: 2px;
-}
-
-g[svg-comp] > .thick3 {
-  stroke-width: 3px;
-}
-
-.ec > .no-fill,
-.ec.selected > .no-fill {
-  fill: none;
-}
-
-.ec text {
-  fill: black;
-  stroke: black;
-  stroke-width: 0.5px;
-  font-family: monospace;
-  font-size: 10px;
-}
-body.dark g text {
-  fill: white;
-  stroke: white;
-}
-g[svg-comp] text.title {
-  font-size: 18px;
-}
-
-g[svg-comp] text.middle {
-  font-size: 27px;
-}
-g[svg-comp] text.big {
-  font-size: 50px;
-}
-
-g.label > text {
-  font-family: monospace;
-  stroke-width: 0.5px;
-  font-size: 14px;
-}
-
-g[svg-comp] > circle[svg-type="node"],
-g[svg-comp] > circle[svg-type="node-x"],
-g[svg-comp] > circle.node {
-  fill: #bcdcfb;
-  stroke-width: 2px;
-  stroke: red;
-}
-
-/*selected*/
-
-.ec.selected > [svg-type="body"] {
-  stroke-width: 4px;
-  fill: #b5b3b3;
-}
-
 /*********** WIRE ***********/
-
-.wire > line,
-.wire > polyline {
-  stroke-width: 2px;
-  fill: none;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
 .wire.selected > line,
 .wire.selected > polyline {
   stroke-width: 5px;
 }
 
-body.light .wire > line,
-body.light .wire > polyline {
-  stroke: rgb(82, 80, 80);
-}
-body.dark .wire > line,
-body.dark .wire > polyline {
-  stroke: whitesmoke;
-}
-
 /*********** GENERAL ***********/
-
-.dash {
-  stroke-width: 1px;
-}
-rect.dash {
-  fill: none;
-}
-
-.light line.dash,
-.light rect.dash {
-  stroke: rgb(150, 150, 150);
-}
-.dark line.dash,
-.dark rect.dash {
-  stroke: rgb(150, 150, 150);
-}
 
 .dragging {
   cursor: move;
@@ -436,27 +308,6 @@ rect.dash {
 
 .drag-node {
   cursor: crosshair;
-}
-
-/*tooltip*/
-.tooltip > rect {
-  stroke-width: 1;
-  fill-opacity: 0.9;
-  stroke-opacity: 0.9;
-}
-.light g.tooltip > rect {
-  fill: white;
-  stroke: black;
-}
-.dark g.tooltip > rect {
-  fill: black;
-  stroke: white;
-}
-.light g.tooltip > text {
-  fill: #656262;
-}
-.dark g.tooltip > text {
-  fill: white;
 }
 
 /************************ BODY FOOTER ************************/

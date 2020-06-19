@@ -284,8 +284,9 @@ export class MyApp extends Application implements IMyApp {
 				case 'ArrowUp':
 				case 'ArrowRight':
 				case 'ArrowDown':
-					//case 'ControlLeft':
-					//case 'ControlRight':
+				//case 'ControlLeft':
+				//case 'ControlRight':
+				case 'F1':
 					break;
 				case 'KeyA':	// CtrlKeyA		select all ECs
 				case 'KeyC':	// CtrlKeyC		copy selected ECs
