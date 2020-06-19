@@ -317,14 +317,14 @@ var MyApp = /** @class */ (function (_super) {
                 }
                 break;
             case interfaces_1.ActionType.SELECT_ALL:
-                this.circuit.selectAll();
+                this.circuit.selectAll(true);
                 this.refreshRotation();
                 this.winProps.clear();
                 //temporary, for testings...
                 window.ec = void 0;
                 break;
             case interfaces_1.ActionType.UNSELECT_ALL:
-                this.circuit.deselectAll();
+                this.circuit.selectAll(false);
                 this.refreshRotation();
                 this.winProps.clear();
                 //temporary, for testings...

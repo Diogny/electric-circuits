@@ -412,14 +412,14 @@ export class MyApp extends Application implements IMyApp {
 				}
 				break;
 			case ActionType.SELECT_ALL:
-				this.circuit.selectAll();
+				this.circuit.selectAll(true);
 				this.refreshRotation();
 				this.winProps.clear();
 				//temporary, for testings...
 				(<any>window).ec = void 0;
 				break;
 			case ActionType.UNSELECT_ALL:
-				this.circuit.deselectAll();
+				this.circuit.selectAll(false);
 				this.refreshRotation();
 				this.winProps.clear();
 				//temporary, for testings...

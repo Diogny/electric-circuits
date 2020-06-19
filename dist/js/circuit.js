@@ -89,12 +89,9 @@ var Circuit = /** @class */ (function () {
     });
     //selection
     Circuit.prototype.hasComponent = function (id) { return this.ecMap.has(id); };
-    Circuit.prototype.selectAll = function () {
-        this.selectedComponents = selectAll.call(this, true);
-    };
-    Circuit.prototype.deselectAll = function () {
-        selectAll.call(this, false);
-        this.selectedComponents = [];
+    Circuit.prototype.selectAll = function (value) {
+        return (this.selectedComponents = Array.from(this.ecMap.values())
+            .filter(function (comp) { return (comp.select(value), value); }));
     };
     Circuit.prototype.toggleSelect = function (comp) {
         comp.select(!comp.selected);
@@ -102,8 +99,8 @@ var Circuit = /** @class */ (function () {
             this.ecList.filter(function (c) { return c.selected; });
     };
     Circuit.prototype.selectThis = function (comp) {
-        selectAll.call(this, false);
-        this.selectedComponents = [comp.select(true)];
+        return comp
+            && (this.selectAll(false).push(comp.select(true)), true);
     };
     Circuit.prototype.selectRect = function (rect) {
         (this.selectedComponents =
@@ -211,7 +208,6 @@ var Circuit = /** @class */ (function () {
 exports.Circuit = Circuit;
 function createBoardItem(options) {
     var self = this, regex = /(?:{([^}]+?)})+/g, name = (options === null || options === void 0 ? void 0 : options.name) || "", base = self.rootComponent(name), newComp = !base, item = void 0;
-    //register new component in the circuit
     !base && (base = {
         comp: components_1.default.find(name),
         count: 0
@@ -222,32 +218,34 @@ function createBoardItem(options) {
         && (base.count = base.comp.meta.countStart | 0, self.compMap.set(name, base));
     options.base = base.comp;
     if (!options.id) {
-        //if not ID
         options.id = name + "-" + base.count;
-        //use template to create label according to defined strategy
-        options.label = base.comp.meta.nameTmpl.replace(regex, function (match, group) {
-            var arr = group.split('.'), getRoot = function (name) {
-                //valid entry points
-                switch (name) {
-                    case "base": return base;
-                    case "Circuit": return self.uniqueCounters;
-                }
-            }, rootName = arr.shift() || "", rootRef = getRoot(rootName), prop = arr.pop(), isUniqueCounter = function () { return rootName == "Circuit"; }, result;
-            while (rootRef && arr.length)
-                rootRef = rootRef[arr.shift()];
-            if (rootRef == undefined
-                || ((result = rootRef[prop]) == undefined
-                    && (!isUniqueCounter()
-                        || (result = rootRef[prop] = base.comp.meta.countStart | 0, false))))
-                throw "invalid label template";
-            //increment counter only for unique properties
-            isUniqueCounter()
-                && dab_1.isNum(result)
-                && (rootRef[prop] = result + 1);
-            return result;
-        });
-        base.count++;
     }
+    //use template to create label according to defined strategy
+    var label = base.comp.meta.nameTmpl.replace(regex, function (match, group) {
+        var arr = group.split('.'), getRoot = function (name) {
+            //valid entry points
+            switch (name) {
+                case "base": return base;
+                case "Circuit": return self.uniqueCounters;
+            }
+        }, rootName = arr.shift() || "", rootRef = getRoot(rootName), prop = arr.pop(), isUniqueCounter = function () { return rootName == "Circuit"; }, result;
+        while (rootRef && arr.length)
+            rootRef = rootRef[arr.shift()];
+        if (rootRef == undefined
+            || ((result = rootRef[prop]) == undefined
+                && (!isUniqueCounter()
+                    || (result = rootRef[prop] = base.comp.meta.countStart | 0, false))))
+            throw "invalid label template";
+        isUniqueCounter()
+            && dab_1.isNum(result)
+            && (rootRef[prop] = result + 1);
+        return result;
+    });
+    if (options.label && label != options.label)
+        throw "invalid label";
+    else
+        options.label = label;
+    base.count++;
     switch (name) {
         case "wire":
             item = new wire_1.default(self, options);
@@ -269,7 +267,6 @@ function createBoardItem(options) {
 }
 function parseCircuitXML(data) {
     var self = this;
-    //answer.filePath
     xml2js.parseString(data, {
         trim: true,
         explicitArray: false
@@ -365,10 +362,5 @@ function getCircuitXML() {
         + wires
         + '\t<bonds>\n' + bonds + '\t</bonds>\n'
         + '</circuit>\n';
-}
-function selectAll(value) {
-    var arr = Array.from(this.ecMap.values());
-    arr.forEach(function (comp) { return comp.select(value); });
-    return arr;
 }
 //# sourceMappingURL=circuit.js.map

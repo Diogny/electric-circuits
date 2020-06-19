@@ -43,7 +43,7 @@
 		"chai": "^4.2.0",
 		"electron": "^9.0.4",
 		"electron-reload": "^1.5.0",
-		"eslint": "^7.2.0",
+		"eslint": "^7.3.0",
 		"html-webpack-plugin": "^4.3.0",
 		"mocha": "^8.0.1",
 		"ts-loader": "^7.0.5",

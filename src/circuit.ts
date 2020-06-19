@@ -107,13 +107,9 @@ export class Circuit {
 	//selection
 	public hasComponent(id: string): boolean { return this.ecMap.has(id); }
 
-	public selectAll() {
-		this.selectedComponents = selectAll.call(this, true);
-	}
-
-	public deselectAll() {
-		selectAll.call(this, false);
-		this.selectedComponents = [];
+	public selectAll(value: boolean): EC[] {
+		return (this.selectedComponents = Array.from((this as Circuit).ecMap.values())
+			.filter(comp => (comp.select(value), value)))
 	}
 
 	public toggleSelect(comp: EC) {
@@ -122,9 +118,9 @@ export class Circuit {
 			this.ecList.filter(c => c.selected);
 	}
 
-	public selectThis(comp: EC) {
-		selectAll.call(this, false);
-		this.selectedComponents = [comp.select(true) as EC];
+	public selectThis(comp: EC): boolean {
+		return comp
+			&& (this.selectAll(false).push(comp.select(true) as EC), true)
 	}
 
 	public selectRect(rect: Rect) {
@@ -247,7 +243,6 @@ function createBoardItem(options: any): EC | Wire {
 		base = <IBaseComponent>self.rootComponent(name),
 		newComp = !base,
 		item: ItemBoard = <any>void 0;
-	//register new component in the circuit
 	!base && (base = {
 		comp: <Comp>Comp.find(name),
 		count: 0
@@ -258,11 +253,11 @@ function createBoardItem(options: any): EC | Wire {
 		&& (base.count = base.comp.meta.countStart | 0, self.compMap.set(name, base));
 	options.base = base.comp;
 	if (!options.id) {
-		//if not ID
 		options.id = `${name}-${base.count}`;
-
-		//use template to create label according to defined strategy
-		options.label = base.comp.meta.nameTmpl.replace(regex,
+	}
+	//use template to create label according to defined strategy
+	let
+		label = base.comp.meta.nameTmpl.replace(regex,
 			function (match: string, group: string): string { //, offset: number, str: string
 				let
 					arr = group.split('.'),
@@ -286,14 +281,16 @@ function createBoardItem(options: any): EC | Wire {
 							|| (result = rootRef[prop] = base.comp.meta.countStart | 0, false)))
 				)
 					throw `invalid label template`;
-				//increment counter only for unique properties
 				isUniqueCounter()
 					&& isNum(result)
 					&& (rootRef[<any>prop] = result + 1)
 				return result;
 			});
-		base.count++;
-	}
+	if (options.label && label != options.label)
+		throw `invalid label`;
+	else
+		options.label = label;
+	base.count++;
 	switch (name) {
 		case "wire":
 			item = new Wire(self, options);
@@ -317,7 +314,6 @@ function createBoardItem(options: any): EC | Wire {
 function parseCircuitXML(data: string) {
 	let
 		self = (this as Circuit);
-	//answer.filePath
 	xml2js.parseString(data, {
 		trim: true,
 		explicitArray: false
@@ -444,11 +440,4 @@ function getCircuitXML(): string {
 		+ wires
 		+ '\t<bonds>\n' + bonds + '\t</bonds>\n'
 		+ '</circuit>\n'
-}
-
-function selectAll(value: boolean): EC[] {
-	let
-		arr = Array.from((this as Circuit).ecMap.values());
-	arr.forEach(comp => comp.select(value));
-	return arr;
 }
