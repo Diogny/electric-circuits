@@ -19,8 +19,7 @@ var linealign_1 = require("./linealign");
 var highlightNode_1 = require("./highlightNode");
 var selection_rect_1 = require("./selection-rect");
 var circuit_1 = require("./circuit");
-var dialog_window_1 = require("./dialog-window");
-var form_window_1 = require("./form-window");
+var dialog_windows_1 = require("./dialog-windows");
 var MyApp = /** @class */ (function (_super) {
     tslib_1.__extends(MyApp, _super);
     function MyApp(options) {
@@ -101,11 +100,11 @@ var MyApp = /** @class */ (function (_super) {
         _this.dash = new linealign_1.default(_this);
         _this.highlight = new highlightNode_1.default({});
         _this.selection = new selection_rect_1.SelectionRect(_this);
-        _this.dialog = new dialog_window_1.default({
+        _this.dialog = new dialog_windows_1.DialogWindow({
             app: _this,
             id: "win-dialog",
         });
-        _this.form = new form_window_1.default({
+        _this.form = new dialog_windows_1.FormWindow({
             app: _this,
             id: "win-form",
         });

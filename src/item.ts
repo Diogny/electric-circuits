@@ -26,12 +26,9 @@ export default abstract class Item extends TypedClass {
 		// options is for custom options only
 		let
 			optionsClass = options.class || "";
-		//delete class from options so it doesn't override default settings
 		delete options.class;
 		this.settings = obj(copy(this.propertyDefaults(), options));
-		//update this.settings.class with unique values
 		this.settings.class = unique((this.class + " " + optionsClass).split(' ')).join(' ');
-		//fix (x,y) coordinates if wrongly initially provided
 		this.settings.x = this.settings.x || 0;
 		this.settings.y = this.settings.y || 0;
 	}

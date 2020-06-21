@@ -27,7 +27,7 @@ export default class ContextWindow extends BoardWindow {
 		this.settings.current = "board";
 		this.settings.offset = Point.origin;
 		let
-			that = this;
+			that = this as BoardWindow;
 		//register global click event
 		aEL(this.win, "click", (e: MouseEvent) => {
 			let
@@ -38,7 +38,7 @@ export default class ContextWindow extends BoardWindow {
 				trigger = attr(self.parentElement, "data-trigger");
 			self
 				&& !disabled
-				&& (that.setVisible(false), data && (trigger += `::${data}`), (this.app as MyApp).execute(action, trigger))
+				&& (that.setVisible(false), data && (trigger += `::${data}`), (that.app as MyApp).execute(action, trigger))
 		}, false)
 	}
 

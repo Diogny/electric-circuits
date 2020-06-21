@@ -3,8 +3,7 @@ import { Bond } from './bonds';
 import ItemBase from './itemsBase';
 import Comp from './components';
 import {
-	IPoint, IItemNode, IBondItem, IItemBoardProperties,
-	ComponentPropertyType, IComponentProperty, IItemBaseOptions
+	IPoint, IItemNode, IBondItem, IItemBoardProperties, ComponentPropertyType, IComponentProperty, IItemBaseOptions
 } from './interfaces';
 import { map } from './utils';
 import Point from './point';
@@ -24,10 +23,10 @@ export abstract class ItemBoard extends ItemBase {
 	get bonds(): Bond[] { return this.settings.bonds }
 	get label(): string { return this.settings.label }
 
-	abstract get count(): number;	// EC is node count, Wire is point count
+	abstract get count(): number;
 	abstract valid(node: number): boolean;
 	abstract get last(): number;
-	abstract refresh(): ItemBoard;	//full refresh
+	abstract refresh(): ItemBoard;
 	abstract nodeRefresh(node: number): ItemBoard;
 	abstract getNode(node: number): IItemNode;
 	abstract getNodeRealXY(node: number): Point;
@@ -84,7 +83,7 @@ export abstract class ItemBoard extends ItemBase {
 			method: 'move',
 			where: 1				//signals it was a change inside the object
 		})
-		return this;	//for object chaining
+		return this;
 	}
 
 	public setOnProp(value: Function): ItemBoard {
@@ -92,7 +91,6 @@ export abstract class ItemBoard extends ItemBase {
 		return this;
 	}
 
-	//properties available to show up in property window
 	public windowProperties(): string[] { return ["id", "p", "bonds"] }
 
 	public properties(): string[] {
@@ -101,7 +99,6 @@ export abstract class ItemBoard extends ItemBase {
 	}
 
 	public prop(propName: string): ComponentPropertyType {
-		//inject available properties if called
 		switch (propName) {
 			case "id":
 				return new IdInjector(this)
@@ -116,12 +113,10 @@ export abstract class ItemBoard extends ItemBase {
 	public bond(thisNode: number, ic: ItemBoard, icNode: number): boolean {
 		let
 			entry = this.nodeBonds(thisNode);
-		// ic: wire,  node: wire node number, thisNode: node of IC connected
 		if (!ic
-			|| (entry && entry.has(ic.id)) 	//there's a bond with a connection to this ic.id
+			|| (entry && entry.has(ic.id))
 			|| !ic.valid(icNode))
 			return false;
-		//make bond if first, or append new one
 		if (!entry) {
 			(<any>this.settings.bonds)[thisNode] = entry = new Bond(this, ic, icNode, thisNode);
 		} else if (!entry.add(ic, icNode)) {
@@ -129,9 +124,7 @@ export abstract class ItemBoard extends ItemBase {
 		}
 		this.settings.bondsCount++;
 		this.nodeRefresh(thisNode);
-		//make bond the other way, to this component, if not already done
 		entry = ic.nodeBonds(icNode);
-		//returning true when already a bond is to ensure the first bond call returns "true"
 		return (entry && entry.has(this.id)) ? true : ic.bond(icNode, this, thisNode);
 	}
 
@@ -145,7 +138,6 @@ export abstract class ItemBoard extends ItemBase {
 			b = (bond == null) ? null : bond.remove(id);
 		if (b != null) {
 			if (bond.count == 0) {
-				//ensures there's no bond object if no destination
 				delete (<any>this.settings.bonds)[node];
 				(--this.settings.bondsCount == 0) && (this.settings.bonds = []);
 			}
@@ -174,6 +166,15 @@ export abstract class ItemBoard extends ItemBase {
 	public disconnect() {
 		for (let node = 0; node < this.count; node++)
 			this.unbondNode(node);
+	}
+
+	public propertyDefaults(): IItemBoardProperties {
+		return extend(super.propertyDefaults(), {
+			selected: false,
+			onProp: void 0,
+			bonds: [],
+			bondsCount: 0
+		})
 	}
 
 	public static connectedWiresTo(ecList: EC[]): Wire[] {
@@ -214,14 +215,49 @@ export abstract class ItemBoard extends ItemBase {
 		return wireList;
 	}
 
-	public propertyDefaults(): IItemBoardProperties {
-		return extend(super.propertyDefaults(), {
-			selected: false,
-			onProp: void 0,
-			bonds: [],
-			bondsCount: 0
-		})
+	public static wireConnections(wire: Wire): { it: EC | Wire, p: Point, n: number }[] {
+		let
+			wireCollection: Wire[] = [wire],
+			wiresFound: string[] = [],
+			points: { it: EC | Wire, p: Point, n: number }[] = [],
+			circuit = wire.circuit,
+			findComponents = (bond: Bond) => {
+				bond.to.forEach(b => {
+					let
+						w = circuit.get(b.id);
+					if (!w)
+						throw `Invalid bond connections`;			//shouldn't happen, but to catch wrong code
+					switch (b.type) {
+						case Type.WIRE:
+							if (!wiresFound.some(id => id == b.id)) {
+								wiresFound.push(w.id);
+								wireCollection.push(w as Wire);
+								points.push({
+									it: w,
+									p: Point.create(w.getNode(b.ndx)),
+									n: b.ndx
+								});
+							}
+							break;
+						case Type.EC:
+							points.push({
+								it: w,
+								p: (w as EC).getNodeRealXY(b.ndx),
+								n: b.ndx
+							});
+							break;
+					}
+				})
+			};
+		while (wireCollection.length) {
+			let
+				w = <Wire>wireCollection.shift();
+			wiresFound.push(w.id);
+			w.bonds.forEach(findComponents);
+		}
+		return points
 	}
+
 }
 
 export abstract class PropertyInjector implements IComponentProperty {

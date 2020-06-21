@@ -236,6 +236,20 @@
 			</div>
 		</div>
 	</script>
+	<script type="text/html" id="formFieldWinSpan">
+		<div class="pure-control-group {class}">
+			<label for="dialog-form-{index}">{label}</label>
+			<span id="dialog-form-{index}">{value}</span>
+			<span class="hide">*</span>
+		</div>
+	</script>
+	<script type="text/html" id="formFieldWinInput">
+		<div class="pure-control-group {class}">
+			<label for="dialog-form-{index}">{label}</label>
+			<input type="text" id="dialog-form-{index}" value="{value}" index="{index}" placeholder="{placeHolder}" />
+			<span class="hide">*</span>
+		</div>
+	</script>
 	<!-- You can also require other files to run in this process -->
 	<script>var exports = {};</script>
 	<script src="../index.js"></script>

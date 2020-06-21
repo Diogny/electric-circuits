@@ -16,25 +16,17 @@ var defaultComponent = function (name) { return ({
 var Comp = /** @class */ (function () {
     function Comp(options) {
         var that = this, template = options.tmpl;
-        //delete
         delete options.tmpl;
-        //copy making a dupplicate
         this.settings = dab_1.obj(options);
-        //check to see if this component derivates from a template
         if (template) {
             var base = Comp.find(template.name);
-            //copy SVG data
             this.settings.data = base.data;
-            //deep copy meta, it has simple object and values
             this.settings.meta = JSON.parse(JSON.stringify(base.meta));
-            //copy label if any
             template.label && (this.settings.meta.label = dab_1.obj(template.label));
-            //update node labels
             template.nodeLabels.forEach(function (lbl, ndx) {
                 that.settings.meta.nodes.list[ndx].label = lbl;
             });
         }
-        //set default id template if not defined
         !this.settings.meta.nameTmpl && (this.settings.meta.nameTmpl = defaultIdTemplate);
         if (!Comp.store(this.settings.name, this))
             throw "duplicated: " + this.settings.name;

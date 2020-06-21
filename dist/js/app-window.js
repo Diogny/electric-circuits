@@ -12,18 +12,14 @@ var AppWindow = /** @class */ (function (_super) {
     function AppWindow(options) {
         var _this = _super.call(this, options) || this;
         var header = _this.win.querySelector("header"), footer = _this.win.querySelector("footer");
-        //
         _this.titleHTML = header.children[0];
         _this.titleButtons = header.children[1];
         _this.settings.main = _this.win.querySelector("main");
-        //
         _this.barTitle = footer.children[0];
         _this.barButtons = footer.children[1];
-        //set title, content, and bottom bar
         _this.setTitle(_this.settings.title);
         _this.setText(_this.settings.content);
         _this.setBar(_this.settings.bar);
-        //register this to this.win
         _this.win.__win = _this;
         var that = _this;
         //header buttons
@@ -91,7 +87,6 @@ var AppWindow = /** @class */ (function (_super) {
     AppWindow.prototype.setVisible = function (value) {
         _super.prototype.setVisible.call(this, value);
         if (this.visible) {
-            //correct (x,y) in case of mainwindow resize moves it outside
             var _a = checkPosition(this, this.x, this.y), x = _a.x, y = _a.y;
             this.move(x, y);
         }
@@ -142,7 +137,6 @@ var AppWindow = /** @class */ (function (_super) {
     AppWindow.prototype.refresh = function () {
         if (!this.compId)
             return;
-        //refresh editable properties
         this.settings.properties.forEach(function (p) { return p.refresh(); });
     };
     AppWindow.prototype.appendPropChild = function (el) {

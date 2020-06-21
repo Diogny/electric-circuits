@@ -107,7 +107,3 @@ export default class Tooltip extends Label {
 	}
 
 }
-//tooltip.move(200,50).setText("One line").visible = true;
-//tooltip.move(200,50).setText("One line\r\nTwo lines and").visible = true;
-//tooltip.move(200,50).setText([{ text : "One line" }, { text: "Two line and more..." } ]).visible = true;
-//tooltip.move(200,50).setText([{ text : "One line" }, { text: "Two line and more...", fill: "blue"  } ]).visible = true;

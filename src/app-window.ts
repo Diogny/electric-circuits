@@ -45,18 +45,14 @@ export default class AppWindow extends BoardWindow {
 		let
 			header = <HTMLElement>this.win.querySelector("header"),
 			footer = <HTMLElement>this.win.querySelector("footer");
-		//
 		this.titleHTML = <HTMLDivElement>header.children[0];
 		this.titleButtons = <HTMLDivElement>header.children[1];
 		this.settings.main = <HTMLElement>this.win.querySelector("main");
-		//
 		this.barTitle = <HTMLSpanElement>footer.children[0];
 		this.barButtons = <HTMLDivElement>footer.children[1];
-		//set title, content, and bottom bar
 		this.setTitle(this.settings.title);
 		this.setText(this.settings.content);
 		this.setBar(this.settings.bar);
-		//register this to this.win
 		(<any>this.win).__win = this;
 		let
 			that = this as AppWindow;
@@ -94,12 +90,10 @@ export default class AppWindow extends BoardWindow {
 	public setVisible(value: boolean): AppWindow {
 		super.setVisible(value);
 		if (this.visible) {
-			//correct (x,y) in case of mainwindow resize moves it outside
 			let
 				{ x, y } = checkPosition(this, this.x, this.y);
 			this.move(x, y);
 		}
-
 		return this
 	}
 
@@ -153,7 +147,6 @@ export default class AppWindow extends BoardWindow {
 	public refresh() {
 		if (!this.compId)
 			return;
-		//refresh editable properties
 		this.settings.properties.forEach(p => p.refresh())
 	}
 

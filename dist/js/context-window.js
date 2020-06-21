@@ -27,7 +27,7 @@ var ContextWindow = /** @class */ (function (_super) {
             var self = dab_1.getParentAttr(e.target, "data-action"), action = dab_1.attr(self, "data-action") | 0, data = dab_1.attr(self, "data-data"), disabled = self.hasAttribute("disabled"), trigger = dab_1.attr(self.parentElement, "data-trigger");
             self
                 && !disabled
-                && (that.setVisible(false), data && (trigger += "::" + data), _this.app.execute(action, trigger));
+                && (that.setVisible(false), data && (trigger += "::" + data), that.app.execute(action, trigger));
         }, false);
         return _this;
     }

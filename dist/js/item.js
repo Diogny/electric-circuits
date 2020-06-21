@@ -12,12 +12,9 @@ var Item = /** @class */ (function (_super) {
         //all default properties must be refrenced from this or this.settings
         // options is for custom options only
         var optionsClass = options.class || "";
-        //delete class from options so it doesn't override default settings
         delete options.class;
         _this.settings = dab_1.obj(dab_1.copy(_this.propertyDefaults(), options));
-        //update this.settings.class with unique values
         _this.settings.class = dab_1.unique((_this.class + " " + optionsClass).split(' ')).join(' ');
-        //fix (x,y) coordinates if wrongly initially provided
         _this.settings.x = _this.settings.x || 0;
         _this.settings.y = _this.settings.y || 0;
         return _this;

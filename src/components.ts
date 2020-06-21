@@ -31,27 +31,18 @@ export default class Comp {
 		let
 			that = this,
 			template = options.tmpl;
-		//delete
 		delete options.tmpl;
-		//copy making a dupplicate
 		this.settings = obj(options);
-
-		//check to see if this component derivates from a template
 		if (template) {
 			let
 				base = <Comp>Comp.find(template.name);
-			//copy SVG data
 			this.settings.data = base.data;
-			//deep copy meta, it has simple object and values
 			this.settings.meta = JSON.parse(JSON.stringify(base.meta));
-			//copy label if any
 			template.label && (this.settings.meta.label = obj(template.label));
-			//update node labels
 			template.nodeLabels.forEach((lbl, ndx) => {
 				that.settings.meta.nodes.list[ndx].label = lbl;
 			})
 		}
-		//set default id template if not defined
 		!this.settings.meta.nameTmpl && (this.settings.meta.nameTmpl = defaultIdTemplate);
 		if (!Comp.store(this.settings.name, this))
 			throw `duplicated: ${this.settings.name}`;

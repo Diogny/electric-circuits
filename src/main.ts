@@ -76,9 +76,6 @@ function createMainWindow(opt: any) {
 	})
 
 	mainWindow.removeMenu();
-
-	//createPrintWindow();
-	//createHelpWindow();
 }
 
 function createPrintWindow(rect: { width: number, height: number }) {
@@ -108,7 +105,6 @@ function createPrintWindow(rect: { width: number, height: number }) {
 		url = path.join(app.getAppPath(), "html/print.html");
 
 	printWindow.loadFile(url);
-	//printWindow.loadURL('https://github.com')
 	printWindow.once('ready-to-show', () => {
 		//printWindow.show();
 		//printWindow.webContents.openDevTools()
@@ -116,6 +112,7 @@ function createPrintWindow(rect: { width: number, height: number }) {
 	printWindow.on("closed", (e: any) => {
 		printWindow = <any>null;
 	});
+	printWindow.removeMenu();
 }
 
 function createHelpWindow() {
@@ -147,13 +144,14 @@ function createHelpWindow() {
 		url = path.join(app.getAppPath(), "html/help.html");
 
 	helpWindow.loadFile(url);
-	//helpWindow.loadURL('https://github.com')
 	helpWindow.once('ready-to-show', () => {
 		//helpWindow.show();
+		//helpWindow.webContents.openDevTools();
 	});
 	helpWindow.on("closed", (e: any) => {
 		helpWindow = <any>null;
 	});
+	helpWindow.removeMenu();
 }
 
 app.on("ready", () => {
@@ -162,13 +160,11 @@ app.on("ready", () => {
 		{ x, y } = store.get('location');
 
 	createMainWindow({ x, y, width, height });
-	//sendMainWindowSize(width, height);
 
 	mainWindow.on('resize', () => {
-		let { width, height } = mainWindow.getContentBounds();
-		// save them
+		let
+			{ width, height } = mainWindow.getContentBounds();
 		store.set('windowBounds', { width, height });
-		//send
 		sendMainWindowSize(width, height);
 	});
 
@@ -243,13 +239,11 @@ function sendMainWindowSize(width: number, height: number) {
 ipcMain.on('get-win-size', (event, arg) => {
 	let
 		data = mainWindow.getContentBounds() as any;
-	//extra
 	data.minSize = mainWindow.getMinimumSize();
 	data.maxSize = mainWindow.getMaximumSize();
 	data.contentSize = mainWindow.getContentSize();
 	data.contentBounds = mainWindow.getContentBounds();
-	//
-	event.returnValue = data //.getBounds();
+	event.returnValue = data
 })
 
 ipcMain.on('openFile', (event, path) => {
@@ -375,15 +369,4 @@ ipcMain.on('help-circuit', (event, arg) => {
 ipcMain.on('app-quit', (event, arg) => {
 	forceQuit = true;
 	mainWindow.close()
-})
-
-//this will contain the communication section...
-ipcMain.on('asynchronous-message', (event, arg) => {
-	console.log(arg) // prints "ping"
-	event.reply('asynchronous-reply', 'pong')
-})
-
-ipcMain.on('synchronous-message', (event, arg) => {
-	console.log(arg) // prints "ping"
-	event.returnValue = 'pong'
 })

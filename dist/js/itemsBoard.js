@@ -81,19 +81,17 @@ var ItemBoard = /** @class */ (function (_super) {
             method: 'move',
             where: 1 //signals it was a change inside the object
         });
-        return this; //for object chaining
+        return this;
     };
     ItemBoard.prototype.setOnProp = function (value) {
         dab_1.isFn(value) && (this.settings.onProp = value);
         return this;
     };
-    //properties available to show up in property window
     ItemBoard.prototype.windowProperties = function () { return ["id", "p", "bonds"]; };
     ItemBoard.prototype.properties = function () {
         return this.windowProperties().concat(utils_1.map(this.settings.props, function (value, key) { return key; }));
     };
     ItemBoard.prototype.prop = function (propName) {
-        //inject available properties if called
         switch (propName) {
             case "id":
                 return new IdInjector(this);
@@ -106,12 +104,10 @@ var ItemBoard = /** @class */ (function (_super) {
     };
     ItemBoard.prototype.bond = function (thisNode, ic, icNode) {
         var entry = this.nodeBonds(thisNode);
-        // ic: wire,  node: wire node number, thisNode: node of IC connected
         if (!ic
-            || (entry && entry.has(ic.id)) //there's a bond with a connection to this ic.id
+            || (entry && entry.has(ic.id))
             || !ic.valid(icNode))
             return false;
-        //make bond if first, or append new one
         if (!entry) {
             this.settings.bonds[thisNode] = entry = new bonds_1.Bond(this, ic, icNode, thisNode);
         }
@@ -120,9 +116,7 @@ var ItemBoard = /** @class */ (function (_super) {
         }
         this.settings.bondsCount++;
         this.nodeRefresh(thisNode);
-        //make bond the other way, to this component, if not already done
         entry = ic.nodeBonds(icNode);
-        //returning true when already a bond is to ensure the first bond call returns "true"
         return (entry && entry.has(this.id)) ? true : ic.bond(icNode, this, thisNode);
     };
     ItemBoard.prototype.nodeBonds = function (nodeName) {
@@ -132,7 +126,6 @@ var ItemBoard = /** @class */ (function (_super) {
         var bond = this.nodeBonds(node), b = (bond == null) ? null : bond.remove(id);
         if (b != null) {
             if (bond.count == 0) {
-                //ensures there's no bond object if no destination
                 delete this.settings.bonds[node];
                 (--this.settings.bondsCount == 0) && (this.settings.bonds = []);
             }
@@ -157,6 +150,14 @@ var ItemBoard = /** @class */ (function (_super) {
     ItemBoard.prototype.disconnect = function () {
         for (var node = 0; node < this.count; node++)
             this.unbondNode(node);
+    };
+    ItemBoard.prototype.propertyDefaults = function () {
+        return dab_1.extend(_super.prototype.propertyDefaults.call(this), {
+            selected: false,
+            onProp: void 0,
+            bonds: [],
+            bondsCount: 0
+        });
     };
     ItemBoard.connectedWiresTo = function (ecList) {
         var _a;
@@ -191,13 +192,40 @@ var ItemBoard = /** @class */ (function (_super) {
         }
         return wireList;
     };
-    ItemBoard.prototype.propertyDefaults = function () {
-        return dab_1.extend(_super.prototype.propertyDefaults.call(this), {
-            selected: false,
-            onProp: void 0,
-            bonds: [],
-            bondsCount: 0
-        });
+    ItemBoard.wireConnections = function (wire) {
+        var wireCollection = [wire], wiresFound = [], points = [], circuit = wire.circuit, findComponents = function (bond) {
+            bond.to.forEach(function (b) {
+                var w = circuit.get(b.id);
+                if (!w)
+                    throw "Invalid bond connections"; //shouldn't happen, but to catch wrong code
+                switch (b.type) {
+                    case types_1.Type.WIRE:
+                        if (!wiresFound.some(function (id) { return id == b.id; })) {
+                            wiresFound.push(w.id);
+                            wireCollection.push(w);
+                            points.push({
+                                it: w,
+                                p: point_1.default.create(w.getNode(b.ndx)),
+                                n: b.ndx
+                            });
+                        }
+                        break;
+                    case types_1.Type.EC:
+                        points.push({
+                            it: w,
+                            p: w.getNodeRealXY(b.ndx),
+                            n: b.ndx
+                        });
+                        break;
+                }
+            });
+        };
+        while (wireCollection.length) {
+            var w = wireCollection.shift();
+            wiresFound.push(w.id);
+            w.bonds.forEach(findComponents);
+        }
+        return points;
     };
     return ItemBoard;
 }(itemsBase_1.default));

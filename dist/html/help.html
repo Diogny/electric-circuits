@@ -9,13 +9,42 @@
 	<meta name="base" content="path">
 	<link rel="shortcut icon" href="favicon.ico">
 	<link rel="stylesheet" href="../css/purecss.min.css">
-	<!--<link rel="stylesheet" href="css/styles.css">-->
 	<link rel="stylesheet" href="../css/help.css">
 </head>
 
 <body class="light">
-	<!-- You can also require other files to run in this process -->
-	<script>var exports = {};</script>
+	<div style="margin: 10px 30px;">
+		<div>
+			<h4>Board</h4>
+			<ul>
+				<li>Right-click shows context menu for individual board items</li>
+				<li>Board panning: Shift + Left-Click drag</li>
+				<li>Board ViewBox reset/center using tool button click</li>
+				<li>Board Zoom click on zoom buttoms, later scroll will do it</li>
+			</ul>
+		</div>
+		<div>
+			<h4>EC (Electronic Components)</h4>
+			<ul>
+				<li> Ctrl + Left-Click on Board and drag shows selection rectangle for ECs</li>
+				<li>Left-Click on EC body hold and drag, multiple selected are dragged too</li>
+				<li>... if Shift is pressed at the begining then all connected ECs and wires are dragged too</li>
+				<li>Ctrl + Left-Click on EC select/unselect</li>
+				<li>Left-Click on EC body shows it's properties</li>
+			</ul>
+		</div>
+		<div>
+			<h4>Wires</h4>
+			<ul>
+				<li>Start new Wire: Ctrl + Left-Click over EC node</li>
+				<li>Highlighted wire nodes and Wire lines can be dragged and aligned</li>
+				<li>Escape stops wiring</li>
+				<li>Bond lose wire end: Ctrl + Left-Click on highlighted wire node, drag and drop over EC node or Wire
+					node</li>
+				<li>EC and Wire tooltip label should be deleted in the future, only EC node labels should stay</li>
+			</ul>
+		</div>
+	</div>
 	<script src="../help.js"></script>
 </body>
 

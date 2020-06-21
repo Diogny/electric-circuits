@@ -7,12 +7,12 @@ import Point from './point';
 
 export default abstract class ItemBase extends Item {
 
-	protected settings: IItemBaseProperties;	//this extends the base class Item property
+	protected settings: IItemBaseProperties;
 
 	get g(): SVGElement { return this.settings.g }
 
 	get ClientRect(): ISize {
-		let b = this.g.getBoundingClientRect();//gives the DOM screen info
+		let b = this.g.getBoundingClientRect();
 		return obj({
 			width: b.width | 0,
 			height: b.height | 0
@@ -41,9 +41,7 @@ export default abstract class ItemBase extends Item {
 		super(options);
 		let
 			classArr = isStr(this.class) ? this.class.split(' ') : [];
-		//prepare class names
 		!this.settings.visible && (classArr.push("hide"));
-		//create main container
 		this.settings.g = tag("g", this.settings.id, {
 			class: (this.settings.class = classArr.join(' '))
 		});

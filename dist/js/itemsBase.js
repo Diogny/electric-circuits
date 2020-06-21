@@ -11,9 +11,7 @@ var ItemBase = /** @class */ (function (_super) {
     function ItemBase(options) {
         var _this = _super.call(this, options) || this;
         var classArr = dab_1.isStr(_this.class) ? _this.class.split(' ') : [];
-        //prepare class names
         !_this.settings.visible && (classArr.push("hide"));
-        //create main container
         _this.settings.g = utils_1.tag("g", _this.settings.id, {
             class: (_this.settings.class = classArr.join(' '))
         });
@@ -26,7 +24,7 @@ var ItemBase = /** @class */ (function (_super) {
     });
     Object.defineProperty(ItemBase.prototype, "ClientRect", {
         get: function () {
-            var b = this.g.getBoundingClientRect(); //gives the DOM screen info
+            var b = this.g.getBoundingClientRect();
             return dab_1.obj({
                 width: b.width | 0,
                 height: b.height | 0

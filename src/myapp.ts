@@ -1,8 +1,7 @@
 import { ipcRenderer } from "electron";
 import { Application } from "./app";
 import {
-	IMyApp, ITooltipText, IAppWindowOptions, IStateMachineOptions,
-	StateType, ActionType, IMouseState, IContextMenuOptions, IMyAppOptions
+	IMyApp, ITooltipText, IAppWindowOptions, IStateMachineOptions, StateType, ActionType, IMouseState, IContextMenuOptions, IMyAppOptions
 } from "./interfaces";
 import { basePath, qS, pad, qSA } from "./utils";
 import Rect from "./rect";
@@ -21,8 +20,7 @@ import HighlightNode from "./highlightNode";
 import Wire from "./wire";
 import { SelectionRect } from "./selection-rect";
 import { Circuit } from "./circuit";
-import DialogWindow from "./dialog-window";
-import FormWindow from "./form-window";
+import { FormWindow, DialogWindow } from "./dialog-windows";
 
 export class MyApp extends Application implements IMyApp {
 

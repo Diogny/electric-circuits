@@ -1,13 +1,12 @@
 import { ipcRenderer } from "electron";
-import { templatesDOM, qSA, qS, tag } from "./utils"
+import { templatesDOM, qSA, qS } from "./utils"
 import * as fs from 'fs';
 import {
-	IComponentOptions, StateType as State, ActionType as Action,
-	IMachineState, IMouseState, IPoint, IMyAppOptions
+	IComponentOptions, StateType as State, ActionType as Action, IMachineState, IMouseState, IPoint, IMyAppOptions
 } from "./interfaces";
 import Comp from "./components";
 import { MyApp } from "./myapp";
-import { attr, aEL, removeClass, addClass, getParentAttr, range } from "./dab";
+import { attr, aEL, removeClass, addClass, getParentAttr } from "./dab";
 import Point from "./point";
 import Wire from "./wire";
 import StateMachine from "./stateMachine";
@@ -35,7 +34,10 @@ let
 	},
 	showWireConnections = (wire: Wire) => {
 		app.sm.data.showWireConnections = true;
-		app.highlight.showConnections(getWireConnections(wire));
+		app.highlight.showConnections(
+			ItemBoard.wireConnections(wire)
+				.map(item => item.p)
+		)
 	},
 	hideWireConnections = () => {
 		app.sm.data.showWireConnections = false;
@@ -99,14 +101,6 @@ let
 		return;
 	};
 
-//experimental
-let
-	ecCircles = {
-		g: tag("g", "ec-circles", {
-			class: "hide"
-		})
-	};
-
 function hookEvents() {
 	//ZOOM controls
 	qSA('.bar-item[data-scale]').forEach((item: any) => {
@@ -147,7 +141,6 @@ function hookEvents() {
 		app.form.showDialog("Circuit Properties", options)
 			.then(choice => {
 				if (choice == 0) {
-					//assign values
 					if (options.filter((opt: CircuitProperty) => {
 						if (opt.readonly)
 							return;
@@ -161,42 +154,6 @@ function hookEvents() {
 				}
 			})
 	}, false);
-}
-
-//later move to ItemBoard static function, and leave specific point transform here
-//	should return { ec: EC | Wire, node: number }
-function getWireConnections(wire: Wire): Point[] {
-	let
-		wireCollection: Wire[] = [wire],
-		wiresFound: string[] = [],
-		points: Point[] = [],
-		findComponents = (bond: Bond) => {
-			bond.to.forEach(b => {
-				let
-					w = app.circuit.get(b.id);
-				if (!w)
-					throw `Invalid bond connections`;			//shouldn't happen, but to catch wrong code
-				switch (b.type) {
-					case Type.WIRE:
-						if (!wiresFound.some(id => id == b.id)) {
-							wiresFound.push(w.id);
-							wireCollection.push(w as Wire);
-							points.push(Point.create(w.getNode(b.ndx)));
-						}
-						break;
-					case Type.EC:
-						points.push((w as EC).getNodeRealXY(b.ndx));
-						break;
-				}
-			})
-		};
-	while (wireCollection.length) {
-		let
-			w = <Wire>wireCollection.shift();
-		wiresFound.push(w.id);
-		w.bonds.forEach(findComponents);
-	}
-	return points
 }
 
 function registerBoardState() {
@@ -852,9 +809,7 @@ function readJson(path: string): any {
 }
 
 window.addEventListener("DOMContentLoaded", () => {
-
-	//load DOM script HTML templates
-	templatesDOM("viewBox01|size01|point01|baseWin01|ctxWin01|ctxItem01|propWin01|dialogWin01|formWin01")
+	templatesDOM("viewBox01|size01|point01|baseWin01|ctxWin01|ctxItem01|propWin01|dialogWin01|formWin01|formFieldWinSpan|formFieldWinInput")
 		.then(async (templates: Object) => {
 			let
 				json = readJson('./dist/data/library-circuits.v2.json');
@@ -903,10 +858,6 @@ window.addEventListener("DOMContentLoaded", () => {
 			app.svgBoard.append(app.highlight.g);
 			qS('body>footer').insertAdjacentElement("afterend", app.dialog.win);
 			qS('body>footer').insertAdjacentElement("afterend", app.form.win);
-
-			//experimental
-			//app.svgBoard.append(ecCircles.g);
-
 
 			hookEvents();
 			//register states
@@ -976,28 +927,3 @@ ipcRenderer.on("check-before-exit", (event, arg) => {
 				ipcRenderer.send('app-quit', '')
 		})
 });
-
-//this's a proof of concept of how to communicate with main process, the recommended NEW way...
-console.log(ipcRenderer.sendSync('synchronous-message', 'ping')) // prints "pong"
-ipcRenderer.on('asynchronous-reply', (event, arg) => {
-	console.log(arg) // prints "pong"
-})
-ipcRenderer.send('asynchronous-message', 'ping')
-//remote.getGlobal('sharedObj')	will be deprecated soon
-//https://www.electronjs.org/docs/tutorial/security
-
-/*
-let
-				a = await ipcRenderer.invoke('shared', 'app');
-			console.log("global.app =", a);
-
-			console.log("global.app.circuit.modified =",
-				await ipcRenderer.invoke('shared-data', ['app.circuit.modified']));
-
-			console.log("global.app.circuit.modified = true; =>",
-				await ipcRenderer.invoke('shared-data', ['app.circuit.modified', true]));
-
-			console.log("global.app.circuit.modified =",
-				await ipcRenderer.invoke('shared-data', ['app.circuit.modified']));
-
-				*/
