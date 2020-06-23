@@ -1,19 +1,92 @@
 import { ipcRenderer } from "electron"
-import { qS } from "./utils"
-
-document.addEventListener("keydown", (ev: KeyboardEvent) => {
-	if (ev.ctrlKey && ev.code == "KeyP") {
-		ipcRenderer.sendSync("print-svg")
-	}
-	else if (ev.code == 'Escape') {
-		ipcRenderer.sendSync("close-print-win")
-	}
-}, false);
+import { qS, templatesDOM } from "./ts/utils"
+import Rect from "./ts/rect";
+import { aEL, attr } from "./ts/dab";
+import { DialogWindow } from "./ts/dialog-windows";
+import { ITemplate } from "./ts/interfaces";
 
 let
 	div = <HTMLDivElement>qS('#board'),
-	answer = ipcRenderer.sendSync("get-svg");
+	controls = <HTMLDivElement>qS('#board-controls'),
+	svg: SVGElement = <any>void 0,
+	rects: { zoom: string, rect: Rect }[] = <any>void 0,
+	isPrinting = false,
+	app = <ITemplate>{
+		templates: {}
+	},
+	printSVG = () => {
+		controls.classList.add("hide");
+		isPrinting = true;
+		ipcRenderer.sendSync("print-svg");
+	},
+	msgBox: DialogWindow,
+	clickHandler = (e: MouseEvent) => {
+		let
+			target = e.target as HTMLInputElement,
+			index = parseInt(<string>target.getAttribute("data-index"));
+		(<any>document.activeElement).blur();
+		if (target.value == "Print") {
+			printSVG();
+		} else {
+			setViewBox(index);
+		}
+	},
+	setViewBox = (index: number) => {
+		if (!rects || !svg)
+			return;
+		let
+			item = rects[index],
+			input = <HTMLInputElement>controls.children[index],
+			selected = <HTMLInputElement>Array.from(controls.children)
+				.find((item: HTMLInputElement) => item.classList.contains("selected"))
+		selected && selected.classList.remove("selected");
+		input.classList.add("selected");
+		attr(svg, { "viewBox": `${item.rect.x} ${item.rect.y} ${item.rect.width} ${item.rect.height}` });
+	};
 
-if (answer.svg) {
-	div.innerHTML = answer.svg;
-}
+ipcRenderer.on("after-print", (event, arg) => {
+	controls.classList.remove("hide");
+	isPrinting = false;
+	if (arg.failureReason)
+		msgBox.showMessage("Print Information", arg.failureReason);
+});
+
+templatesDOM("dialogWin01")
+	.then(templates => {
+		app.templates = templates;
+
+		msgBox = new DialogWindow(<any>{
+			app: app,
+			id: "win-dialog",
+		});
+		qS('body').append(msgBox.win);
+		(<any>window).dialog = msgBox;
+
+		let
+			answer = ipcRenderer.sendSync("get-svg");
+		if (answer.svg) {
+			document.addEventListener("keydown", (ev: KeyboardEvent) => {
+				if (ev.ctrlKey && ev.code == "KeyP") {
+					printSVG();
+				}
+				else if (ev.code == 'Escape') {
+					ipcRenderer.sendSync("close-print-win")
+				}
+			}, false);
+
+			rects = answer.rects;
+
+			controls.innerHTML = rects.map((o, ndx) => {
+				return `<input type="button" value="${o.zoom}" data-index="${ndx}">`
+			})
+				.concat(['<input type="button" value="Print">'])
+				.join('');
+			Array.from(controls.children)
+				.forEach((item: HTMLElement) => aEL(item, "click", clickHandler, false));
+			div.innerHTML = answer.svg;
+			svg = <SVGElement>div.querySelector("svg");
+			setViewBox(rects.length - 1);
+		} else {
+			msgBox.showMessage("Print Information", answer.message);
+		}
+	})

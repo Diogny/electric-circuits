@@ -1,6 +1,12 @@
-const webpack = require('webpack');
+//const webpack = require('webpack');
 const path = require('path');
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
+
+const mode = process.env.NODE_ENV || "development";
+
 //var Comp = require('./lib/components').default;
 //console.log(Comp);
 
@@ -21,7 +27,23 @@ const commonConfig = {
 				test: /\.ts(x)?$/,
 				use: 'ts-loader',
 				exclude: /node_modules/
-			}
+			},
+			{
+				test: /\.css$/,
+				exclude: /node_modules/,
+				use: [
+					{ loader: MiniCssExtractPlugin.loader },
+					"css-loader"
+				]
+			},
+			{
+				test: /\.(png|svg|jpe?g|gif)$/i,
+				loader: 'file-loader',
+				options: {
+					name: 'img/[name].[ext]',
+					publicPath: '../',
+				},
+			},
 		]
 	},
 	resolve: {
@@ -43,19 +65,69 @@ module.exports = module.exports = [
 	Object.assign(
 		{
 			target: 'electron-renderer',
-			entry: { index: './src/index.ts' }
+			entry: {
+				index: ['./src/index.ts', './src/css/circuits.css', './src/css/windows.css', './src/css/svg.css']
+			},
+			plugins: [
+				new MiniCssExtractPlugin({
+					filename: "css/[name].bundle.css"
+				}),
+				new HtmlWebpackPlugin({
+					//hash: true,
+					title: 'Electronic Circuits',
+					myPageHeader: 'Hello World',
+					template: './src/html/index.html',
+					filename: 'html/index.html'
+				}),
+				new CopyPlugin({
+					patterns: [
+						{ from: './src/css/purecss.min.css', to: 'css/purecss.min.css' },
+						{ from: './src/html/favicon.ico', to: 'html/favicon.ico' },
+						{ from: './src/data/context-menu.json', to: 'data/context-menu.json' },
+						{ from: './src/data/library-circuits.v2.json', to: 'data/library-circuits.v2.json' },
+						{ from: './src/img/rot-left-16x16-p2.png', to: 'img/rot-left-16x16-p2.png' },
+						{ from: './src/img/rot-right-16x16-p2.png', to: 'img/rot-right-16x16-p2.png' },
+					]
+				}),
+			],
 		},
 		commonConfig),
 	Object.assign(
 		{
 			target: 'electron-renderer',
-			entry: { print: './src/index.print.ts' }
+			entry: {
+				print: ['./src/index.print.ts', './src/css/svg.css', './src/css/windows.css', './src/css/print.css']
+			},
+			plugins: [
+				new MiniCssExtractPlugin({
+					filename: "css/[name].bundle.css"
+				}),
+				new HtmlWebpackPlugin({
+					//hash: true,
+					title: 'Print Circuit',
+					template: './src/html/print.html',
+					filename: 'html/print.html'
+				}),
+			],
 		},
 		commonConfig),
 	Object.assign(
 		{
 			target: 'electron-renderer',
-			entry: { help: './src/index.help.ts' }
+			entry: {
+				help: ['./src/index.help.ts', './src/css/help.css']
+			},
+			plugins: [
+				new MiniCssExtractPlugin({
+					filename: "css/[name].bundle.css"
+				}),
+				new HtmlWebpackPlugin({
+					//hash: true,
+					title: 'Circuit Help',
+					template: './src/html/help.html',
+					filename: 'html/help.html'
+				}),
+			],
 		},
 		commonConfig),
 ];

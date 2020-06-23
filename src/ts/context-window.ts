@@ -2,7 +2,7 @@ import {
 	IContextMenuOptions, IContextMenuItem, IContextMenuSettings, ActionType, StateType, IBoardWindowOptions
 } from "./interfaces";
 import { each } from "./utils";
-import { nano, aEL, getParentAttr, attr, extend } from "./dab";
+import { nano, aEL, getParentAttr, attr, extend, clone } from "./dab";
 import { MyApp } from "./myapp";
 import Point from "./point";
 import BoardWindow from "./board-window";
@@ -99,7 +99,7 @@ export default class ContextWindow extends BoardWindow {
 			let
 				html = entry.map(value => {
 					let
-						o = Object.create(value);
+						o = clone<IContextMenuItem>(value);
 					(value.enabled && !value.enabled.some(i => i == state)) && (o.disabled = "disabled");
 					return nano(this.app.templates.ctxItem01, o)
 				}

@@ -1,0 +1,278 @@
+/********************  BASE WINDOW ********************/
+
+.win {
+  /*min-width: 100px;
+	min-height: 100px;*/
+  position: absolute;
+  border: 1px solid #d6d6d6; /*1px solid rgba(255, 255, 255, 0.2);*/
+  border-radius: 1px;
+  display: flex;
+  flex-direction: column;
+  background-color: #dedcdc;
+  color: black;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1), 0 1px 8px rgba(0, 0, 0, 0.2);
+}
+
+.win.hide {
+  display: none;
+}
+
+/********************  APP WINDOW ********************/
+
+.win.props {
+  border: 1px solid #c5c2c2;
+}
+
+.win.props.collapsed {
+  height: 20px !important;
+}
+
+/* HEADER */
+.win.props > header {
+  background: rgba(0, 0, 0, 0.12);
+  /*color: black;*/
+  position: relative;
+  line-height: 18px;
+}
+.win.props > header > .title {
+  padding: 2px 6px;
+}
+
+.win.props.collapsed > main,
+.win.props.collapsed > footer {
+  display: none;
+}
+
+.win.props > header.dragging {
+  cursor: move;
+}
+
+/* HEADER Title */
+.win.props > header > div:nth-of-type(1) {
+  font-size: 14px;
+}
+
+/* HEADER buttons */
+.win.props > header > div:nth-of-type(2) {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+}
+
+.win.props > header > div > img,
+.win.props > footer > div > img {
+  /* float: right;*/
+  cursor: pointer;
+}
+
+.win.props > header > div:nth-of-type(2) > img:nth-of-type(1) {
+  /*content: url(../img/arrow-up-16x16.png); not fully supported yet Firefox*/
+  background-image: url(../img/arrow-up-16x16.png);
+}
+
+.win.props.collapsed > header > div:nth-of-type(2) > img:nth-of-type(1) {
+  /*content: url(../img/arrow-down-16x16.png); not fully supported yet Firefox*/
+  background-image: url(../img/arrow-down-16x16.png);
+}
+
+.win.props > header > div:nth-of-type(2) > img:nth-of-type(2) {
+  /*content: url(../img/close-p3-16x16.png); not fully supported yet Firefox*/
+  background-image: url(../img/close-p3-16x16.png);
+}
+
+.win.props > header > div:nth-of-type(2) > img:hover {
+  background-color: red;
+}
+
+/* MAIN */
+.win.props > main {
+  height: 100%;
+  /*width: 100%;*/
+  background: rgba(10, 10, 10, 0.1);
+  flex: 1;
+  margin: 0;
+  padding: 4px;
+}
+
+.win.props > main.hide {
+  display: none;
+}
+
+.win.props > main input.prop {
+  width: 80px;
+  height: 16px;
+  background-color: #d0d0d0;
+  border-color: #cacaca;
+}
+
+.ec-container {
+  margin: 6px 2px;
+}
+
+.ec-container > span.label {
+  padding: 2px;
+  margin-right: 10px;
+}
+
+.ec-container > span.prop {
+  color: #777474;
+}
+
+.ec-container > .rot {
+  display: inline-block;
+  background-color: #b8bbbd; /*#3988ce;*/
+  padding: 1px 2px;
+  border: 1px solid #aba6a6;
+}
+
+.rot > .prop {
+  /* border: 1px solid gray; */
+  padding: 1px 6px;
+  color: white;
+}
+
+.rot > img {
+  cursor: pointer;
+}
+
+/* FOOTER */
+.win.props > footer {
+  margin: 0;
+  font-size: 12px;
+  padding: 2px 6px;
+  border-top: 1px solid #d6d3d3;
+  position: relative;
+}
+
+.win.props > footer.hide {
+  display: none;
+}
+
+/* HEADER Title */
+.win.props > footer > span {
+  font-size: 14px;
+}
+
+/* HEADER buttons */
+.win.props > footer > div {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+}
+
+.win.props > footer > div > img:nth-of-type(1) {
+  /*content: url(../img/arrow-up-16x16.png); not fully supported yet Firefox*/
+  background-image: url(../img/garbage-blk-p3.png);
+}
+
+.win.props > footer > div > img:hover {
+  background-color: #d0cfcf;
+}
+
+/* Right Context window */
+
+.light .win.ctx {
+  background: rgba(0, 0, 0, 0.4);
+  -webkit-backdrop-filter: blur(7px);
+  backdrop-filter: blur(7px);
+}
+.dark .win.ctx {
+  background: rgba(255, 255, 255, 0.4);
+  -webkit-backdrop-filter: blur(7px);
+  backdrop-filter: blur(7px);
+}
+
+.win.ctx > div {
+  padding: 6px 8px;
+  font-size: 14px;
+}
+
+.win.ctx > div:hover {
+  background-color: #bdbdbf;
+  color: white;
+  cursor: pointer;
+}
+
+.light .win.ctx > div > span {
+  color: white;
+}
+.dark .win.ctx > div > span {
+  color: #fdfdfd;
+}
+
+.win.ctx > div > span.right {
+  float: right;
+}
+
+.light .win.ctx > div[disabled] {
+  background: rgba(0, 0, 0, 0.1);
+}
+.dark .win.ctx > div[disabled] {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.win.ctx > div[disabled] > span {
+  color: #aba8a8;
+}
+
+/*.win.ctx > div[disabled]:hover {
+	cursor: not-allowed;
+  }*/
+
+/********************  DIALOG WINDOW ********************/
+
+.win.dialog {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backdrop-filter: blur(5px);
+  z-index: 1000;
+  top: 0;
+  left: 0;
+  margin: 0;
+  overflow: hidden;
+}
+.light .win.dialog {
+  background: #35353452;
+}
+.dark .win.dialog {
+  background: #b9b9b952;
+}
+
+.win.dialog > div.content {
+  display: inline-block;
+  margin: auto;
+  background: #77948be0;
+  padding: 10px 19px;
+}
+.win.dialog > div.content > h4,
+.win.dialog > div.content > h5 {
+  color: #4d4e4e;
+}
+.win.dialog > div.content > div {
+  text-align: center;
+}
+.win.dialog > div.content > div > button {
+  margin: 0px 4px;
+  background-color: #d4d4cd;
+  border-style: none;
+}
+.win.dialog > div.content > div > button:hover {
+  background-color: #717272e0;
+  color: white;
+}
+.win.dialog > div.content > form > fieldset > div > span[id] {
+  max-width: 300px;
+  display: inline-block;
+  overflow: hidden;
+  height: 19px;
+  line-height: 19px;
+  margin: 0 1em 0 0;
+  vertical-align: middle;
+}
+.win.dialog > div.content > form > fieldset > div > span:not([id]) {
+  color: red;
+  font-size: 1em;
+  font-weight: bolder;
+  margin-left: 5px;
+}

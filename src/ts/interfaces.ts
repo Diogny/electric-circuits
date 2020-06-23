@@ -317,8 +317,12 @@ export interface IBondItem {
 
 //***************************************** BaseWindow ************************************//
 
+export interface ITemplate {
+	templates: any
+}
+
 export interface IBaseWindowOptions extends IItemBaseOptions {
-	app: Application;
+	app: ITemplate;
 	title: string;
 	templateName: string;
 }
@@ -368,6 +372,7 @@ export interface IContextMenuItem {
 	data: string;
 	shortcut: string;
 	enabled: StateType[];
+	disabled?: string;
 }
 
 export interface IContextMenuOptions extends IBoardWindowOptions {

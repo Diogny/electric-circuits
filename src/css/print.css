@@ -1,0 +1,26 @@
+.hide {
+  display: none;
+}
+body {
+  overflow: hidden;
+  position: relative;
+}
+#board-controls {
+  margin: 12px 7px;
+}
+#board-controls > input {
+  border-top: 1px solid gray;
+  border-bottom: 1px solid gray;
+  border-left: 1px solid gray;
+  border-right: none;
+  padding: 4px 10px;
+}
+#board-controls > input.selected {
+  color: white;
+  background-color: #a0abab;
+}
+#board-controls > input:last-child {
+  color: white;
+  background-color: #32d6a1;
+  border-right: 1px solid gray;
+}

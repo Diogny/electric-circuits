@@ -1,5 +1,5 @@
 import { IBaseWindowOptions } from "./interfaces";
-import { extend, addClass, removeClass, empty, nano } from "./dab";
+import { extend, addClass, removeClass, empty, nano, clone } from "./dab";
 import { CircuitProperty } from "./circuit";
 import DialogBase from "./dialog-base";
 
@@ -50,7 +50,7 @@ export class FormWindow extends DialogBase {
 		return this.promise(title, function () {
 			(this as DialogWindow).contentHTML.innerHTML = formItems.map((item, index) => {
 				let
-					o: CircuitProperty = Object.create(item);
+					o = clone<CircuitProperty>(item);
 				!o.placeHolder && (o.placeHolder = o.label);
 				(<any>o).index = index;
 				(<any>o).class = item.visible ? "" : "hide";

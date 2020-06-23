@@ -1,8 +1,8 @@
 import { app, BrowserWindow, ipcMain, dialog } from "electron";
 import * as path from "path";
 import * as fs from 'fs';
-import Store from "./store";
-import { prop } from "./utils";
+import Store from "./ts/store";
+import { prop } from "./ts/utils";
 //import { format as formatUrl } from 'url';
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
@@ -107,8 +107,8 @@ function createPrintWindow(rect: { width: number, height: number }) {
 	printWindow.loadFile(url);
 	printWindow.once('ready-to-show', () => {
 		//printWindow.show();
-		//printWindow.webContents.openDevTools()
 	});
+	printWindow.webContents.openDevTools();
 	printWindow.on("closed", (e: any) => {
 		printWindow = <any>null;
 	});
@@ -316,6 +316,9 @@ ipcMain.on('saveFile', (event, arg) => {
 		})
 })
 
+let
+	printData: any = {};
+
 ipcMain.on('print-circuit', (event, arg) => {
 	//console.log(arg);
 	fs.writeFile(path.join(app.getAppPath(), "data/saved-svg.svg"), arg[1], function (err) {
@@ -325,6 +328,7 @@ ipcMain.on('print-circuit', (event, arg) => {
 				message: err.message
 			}
 		} else {
+			printData = arg[2];
 			if (!printWindow)
 				createPrintWindow(arg[0]);
 			printWindow.show();
@@ -335,7 +339,12 @@ ipcMain.on('print-circuit', (event, arg) => {
 
 ipcMain.on('print-svg', (event, arg) => {
 	event.returnValue = printWindow
-		? (printWindow.webContents.print(), true)
+		? (printWindow.webContents.print({}, (sucess, failureReason) => {
+			printWindow.webContents.send("after-print", {
+				success: sucess,
+				failureReason: failureReason
+			})
+		}), true)
 		: false;
 })
 
@@ -352,7 +361,8 @@ ipcMain.on('get-svg', (event, args) => {
 			}
 		} else {
 			event.returnValue = {
-				svg: data.toString()
+				svg: data.toString(),
+				rects: printData
 			}
 		}
 	})

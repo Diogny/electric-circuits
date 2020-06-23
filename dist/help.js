@@ -81,10 +81,21 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = "./src/index.help.ts");
+/******/ 	return __webpack_require__(__webpack_require__.s = 0);
 /******/ })
 /************************************************************************/
 /******/ ({
+
+/***/ "./src/css/help.css":
+/*!**************************!*\
+  !*** ./src/css/help.css ***!
+  \**************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+eval("// extracted by mini-css-extract-plugin\n\n//# sourceURL=webpack:///./src/css/help.css?");
+
+/***/ }),
 
 /***/ "./src/index.help.ts":
 /*!***************************!*\
@@ -94,6 +105,17 @@
 /***/ (function(module, exports) {
 
 eval("console.log(' help is comming...');\r\n\n\n//# sourceURL=webpack:///./src/index.help.ts?");
+
+/***/ }),
+
+/***/ 0:
+/*!****************************************************!*\
+  !*** multi ./src/index.help.ts ./src/css/help.css ***!
+  \****************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+eval("__webpack_require__(/*! ./src/index.help.ts */\"./src/index.help.ts\");\nmodule.exports = __webpack_require__(/*! ./src/css/help.css */\"./src/css/help.css\");\n\n\n//# sourceURL=webpack:///multi_./src/index.help.ts_./src/css/help.css?");
 
 /***/ })
 

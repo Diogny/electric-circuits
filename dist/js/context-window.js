@@ -88,7 +88,7 @@ var ContextWindow = /** @class */ (function (_super) {
             this.settings.current = key;
             this.clear();
             var html = entry.map(function (value) {
-                var o = Object.create(value);
+                var o = dab_1.clone(value);
                 (value.enabled && !value.enabled.some(function (i) { return i == state; })) && (o.disabled = "disabled");
                 return dab_1.nano(_this.app.templates.ctxItem01, o);
             }).join('');

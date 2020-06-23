@@ -1,7 +1,7 @@
 import { ipcRenderer } from "electron";
 import { Application } from "./app";
 import {
-	IMyApp, ITooltipText, IAppWindowOptions, IStateMachineOptions, StateType, ActionType, IMouseState, IContextMenuOptions, IMyAppOptions
+	IMyApp, ITooltipText, IAppWindowOptions, IStateMachineOptions, StateType, ActionType, IMouseState, IContextMenuOptions, IMyAppOptions, ITemplate
 } from "./interfaces";
 import { basePath, qS, pad, qSA } from "./utils";
 import Rect from "./rect";
@@ -153,7 +153,7 @@ export class MyApp extends Application implements IMyApp {
 
 		//this'll hold the properties of the current selected component
 		this.winProps = new AppWindow(<IAppWindowOptions>{
-			app: this as Application,
+			app: <ITemplate>this,
 			id: "win-props",
 			x: 800,
 			y: 0,
@@ -342,6 +342,17 @@ export class MyApp extends Application implements IMyApp {
 		this.viewBox.width = this.baseViewBox.width * zoom | 0;
 		this.viewBox.height = this.baseViewBox.height * zoom | 0;
 		calculateAndUpdateViewBoxData.call(this, x, y);
+	}
+
+	public getViewBoxRects(r: Rect): { zoom: string, rect: Rect }[] {
+		let
+			getRect = (z: number, index: number): { zoom: string, rect: Rect } => ({
+				zoom: Circuit.zoomFactors[index],
+				rect: new Rect(r.x, r.y, this.baseViewBox.width * z, this.baseViewBox.height * z)
+			}),
+			sizes = Circuit.zoomMultipliers.map(getRect)
+				.filter(o => o.rect.contains(r));
+		return sizes.length ? sizes : [getRect(Circuit.zoomMultipliers[0], 0)]
 	}
 
 	public refreshViewBoxData() {

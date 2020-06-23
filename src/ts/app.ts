@@ -1,9 +1,9 @@
 
-import { IApplication, IApplicationOptions, IApplicationSettings, IUIProperty, IUIPropertyOptions } from "./interfaces";
+import { IApplication, IApplicationOptions, IApplicationSettings, IUIProperty, IUIPropertyOptions, ITemplate } from "./interfaces";
 import UIProp from "./props";
 import { dP, extend } from "./dab";
 
-export class Application implements IApplication {
+export class Application implements IApplication, ITemplate {
 
 	protected settings: IApplicationSettings;
 

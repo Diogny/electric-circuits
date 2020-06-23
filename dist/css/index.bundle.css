@@ -1,0 +1,838 @@
+body {
+  overflow: hidden;
+  position: relative;
+}
+
+.light {
+  background-color: white;
+}
+.dark {
+  background-color: black;
+}
+
+.hide {
+  display: none;
+}
+
+.shadow {
+  border-radius: 1px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1), 0 1px 8px rgba(0, 0, 0, 0.2);
+}
+
+.no-select {
+  -moz-user-select: -moz-none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
+
+.select-css {
+  /*padding: 0px 10px;*/
+  font-size: 16px;
+  font-family: sans-serif;
+  border: none !important;
+  line-height: normal;
+  vertical-align: middle;
+  /*appearance: none;
+		  -webkit-appearance: none;  hides arrow*/
+  /* display: block; */
+}
+
+.light .select-css {
+  color: #6f6c6c;
+  background-color: #eaeaea; /*#3988ce;*/
+}
+.dark .select-css {
+  color: #fff;
+  background-color: #969494; /*#3988ce;*/
+}
+
+.light .select-css > option::select {
+  background-color: #bfc5c5 !important; /*#96dcdc !important;*/
+}
+.dark .select-css > option::select {
+  background-color: #bfc5c5 !important; /*#96dcdc !important;*/
+}
+
+.light .select-css:hover {
+  background-color: #e4e4e4; /*#2275bf;*/
+}
+.dark .select-css:hover {
+  background-color: #8e8d8d; /*#2275bf;*/
+  /*   filter: invert(100%);
+			color:#bdc6c0;
+			*/
+}
+
+.light .select-css option:checked {
+  background-color: #e0dfdf;
+  color: black;
+}
+.dark .select-css option:checked {
+  background-color: white;
+  color: black;
+}
+
+.select-css:focus {
+  outline: none;
+}
+.select-css:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/************************ BODY HEADER ************************/
+
+body.light .bar {
+  /*background: linear-gradient(180deg,rgba(244, 242, 242, 1) 28%, rgba(193, 195, 198, 1) 100%);*/
+  background: linear-gradient(
+    180deg,
+    rgba(215, 218, 223, 1) 0%,
+    rgba(231, 231, 231, 1) 10%,
+    rgba(237, 237, 237, 1) 90%,
+    rgba(220, 223, 227, 1) 100%
+  );
+}
+body.dark .bar {
+  /*background: linear-gradient(180deg,rgba(150, 150, 150, 1) 28%,rgba(92, 93, 94, 1) 100%); /*#3988ce;*/
+  background: linear-gradient(
+    180deg,
+    rgba(107, 107, 107, 1) 0%,
+    rgba(156, 154, 154, 1) 10%,
+    rgba(144, 141, 141, 1) 90%,
+    rgba(101, 99, 99, 1) 100%
+  );
+}
+
+.bar-group {
+  height: 100%;
+}
+
+.bar-item {
+  margin: 0;
+  padding: 7px 8px 7px 8px;
+  line-height: 26px;
+  height: 100%;
+}
+body.light .bar-item {
+  border-right: 1px solid #cccccc61; /*1px solid  #5d98d4;*/
+  color: #7f7c7c;
+}
+body.dark .bar-item {
+  border-right: 1px solid #a9a5a5; /*1px solid  #5d98d4;*/
+  color: white;
+}
+
+.bar-item * {
+  vertical-align: middle; /* parent must have height: 100%  px em   https://stackoverflow.com/questions/7273338/how-to-vertically-align-an-image-inside-a-div*/
+}
+
+.bar-item.link {
+  cursor: pointer;
+}
+
+body.light .bar-item.selected {
+  background: #c7c9ce; /*#2464a7;*/
+}
+body.dark .bar-item.selected {
+  background: #76787b; /*#2464a7;*/
+}
+
+body.light .bar-item.link:hover {
+  /*opacity: 0.6;*/
+  background: #c3c2c2; /*#73b2eb;*/
+}
+body.dark .bar-item.link:hover {
+  /*opacity: 0.6;*/
+  background: #616060; /*#73b2eb;*/
+}
+
+body.light .bar-item > input {
+  background-color: #e2e0e0; /*#3988ce;*/
+  color: white;
+  border: 1px solid #e2e0e0; /*#5d98d4;*/
+  padding: 0px 7px;
+  width: 70px;
+}
+body.dark .bar-item > input {
+  background-color: #717171; /*#3988ce;*/
+  color: white;
+  border: 1px solid #717171; /*#5d98d4;*/
+  padding: 0px 7px;
+  width: 70px;
+}
+
+#rot-lbl {
+  width: 35px;
+  display: inline-block;
+  text-align: center;
+}
+.light #rot-lbl {
+  border: 1px solid #e4e4e4;
+}
+.dark #rot-lbl {
+  border: 1px solid #949494;
+}
+
+.bar-item > .icon {
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+}
+body.light .bar-item[action="comp-create"] > .icon {
+  background: url(../img/create-comp16x16-dark.png) no-repeat;
+}
+body.dark .bar-item[action="comp-create"] > .icon {
+  background: url(../img/create-comp16x16.png) no-repeat;
+}
+
+body.light .bar-item[rot-dir="left"] > .icon {
+  background: url(../img/rot-left16x16-dark.png) no-repeat;
+}
+body.dark .bar-item[rot-dir="left"] > .icon {
+  background: url(../img/rot-left16x16.png) no-repeat;
+}
+
+body.light .bar-item[rot-dir="right"] > .icon {
+  background: url(../img/rot-right16x16-dark.png) no-repeat;
+}
+body.dark .bar-item[rot-dir="right"] > .icon {
+  background: url(../img/rot-right16x16.png) no-repeat;
+}
+
+body.light .bar-item[tool="vb-focus"] > .icon {
+  background: url(../img/focus16x16-dark.png) no-repeat;
+}
+body.dark .bar-item[tool="vb-focus"] > .icon {
+  background: url(../img/focus16x16.png) no-repeat;
+}
+
+body.light .bar-item[file="open"] > .icon {
+  background: url(../img/file-open16x16-dark.png) no-repeat;
+}
+body.dark .bar-item[file="open"] > .icon {
+  background: url(../img/file-open16x16.png) no-repeat;
+}
+
+body.light .bar-item[file="save"] > .icon {
+  background: url(../img/file-save16x16-dark.png) no-repeat;
+}
+body.dark .bar-item[file="save"] > .icon {
+  background: url(../img/file-save16x16.png) no-repeat;
+}
+
+/************************ BODY MAIN ************************/
+
+/*********** BOARD ***********/
+
+#board {
+  position: relative;
+  overflow: hidden;
+}
+
+/* board grid size*/
+.light .grid30x30 {
+  background-size: 10px 10px;
+  background-image: linear-gradient(
+      to right,
+      rgba(128, 128, 128, 0.1) 1px,
+      transparent 1px
+    ),
+    linear-gradient(to bottom, rgba(128, 128, 128, 0.1) 1px, transparent 1px);
+}
+
+.light .grid45x45 {
+  background-size: 15px 15px;
+  background-image: linear-gradient(
+      to right,
+      rgba(128, 128, 128, 0.1) 1px,
+      transparent 1px
+    ),
+    linear-gradient(to bottom, rgba(128, 128, 128, 0.1) 1px, transparent 1px);
+}
+
+.light .grid60x60 {
+  background-size: 20px 20px;
+  background-image: linear-gradient(
+      to right,
+      rgba(128, 128, 128, 0.1) 1px,
+      transparent 1px
+    ),
+    linear-gradient(to bottom, rgba(128, 128, 128, 0.1) 1px, transparent 1px);
+}
+.dark .grid60x60 {
+  background-size: 20px 20px;
+  background-image: linear-gradient(
+      to right,
+      rgba(255, 255, 255, 0.15) 1px,
+      transparent 1px
+    ),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.15) 1px, transparent 1px);
+}
+
+.light .grid-dots-60x60 {
+  background: linear-gradient(90deg, #fff 19px, transparent 1%) center,
+    linear-gradient(#fff 19px, transparent 1%) center, #a5a2a2;
+  background-size: 20px 20px;
+  background-position: 1px 1px;
+  /* height: 100%; */
+  /* width: 100%; */
+  /* position: relative;*/
+}
+
+/*selected*/
+
+.ec.selected > [svg-type="body"] {
+  stroke-width: 4px;
+  fill: #b5b3b3;
+}
+body.light .ec [svg-type]:hover {
+  stroke: red;
+}
+body.dark .ec [svg-type]:hover {
+  stroke: red;
+}
+
+/*********** WIRE ***********/
+.wire.selected > line,
+.wire.selected > polyline {
+  stroke-width: 5px;
+}
+
+/*********** GENERAL ***********/
+
+.dragging {
+  cursor: move;
+}
+
+.drag-node {
+  cursor: crosshair;
+}
+
+/************************ BODY FOOTER ************************/
+
+body.light > footer {
+  padding: 0 6px;
+  background-color: #eaeaea;
+  color: #696767;
+}
+body.dark > footer {
+  padding: 0 6px;
+  color: #e6e1e1;
+  background-color: #969494;
+}
+
+body > footer div[bar="bottom-left"],
+body > footer div[bar="bottom-center"] {
+  /*margin: 2px 0px 2px;*/
+  font-size: 14px;
+  font-weight: initial;
+}
+
+body.light > footer > div:not(:last-child) > div {
+  border-right: 1px solid #e2d9d9;
+  margin-left: 5px;
+}
+body.dark > footer > div:not(:last-child) > div {
+  border-right: 1px solid #847d7d;
+  margin-left: 5px;
+}
+
+body > footer > div.bar-group {
+  height: 26px;
+  line-height: 25px;
+}
+
+body.dark footer select.select-css {
+  color: #e6e1e1;
+}
+
+/*   */
+.expandable {
+  display: inline-block;
+}
+
+.expandable > span > i {
+  display: none;
+}
+
+body.light .expandable > span > i {
+  color: #a8a8ab;
+}
+body.dark .expandable > span > i {
+  color: #c6c6c7;
+}
+
+.expandable:hover * {
+  display: inline;
+}
+
+[circuit="name"] {
+  border-left: 1px solid #e2d9d9;
+  padding-left: 5px;
+  display: inline-flex;
+  height: 25px;
+}
+[circuit="name"]:hover {
+  cursor: pointer;
+}
+[circuit="name"] > span:nth-of-type(1) {
+  color: red;
+  line-height: 35px;
+  padding: 0 2px;
+}
+/************************ beautiful scroll bar  ************************/
+
+.scroll-rgt {
+  overflow-y: scroll;
+}
+
+.scroll-rgt::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  border-radius: 5px;
+  background-color: #f5f5f5;
+}
+
+.scroll-rgt::-webkit-scrollbar {
+  width: 5px;
+  background-color: #f5f5f5;
+}
+
+.scroll-rgt::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  background-color: #555;
+}
+
+
+/********************  BASE WINDOW ********************/
+
+.win {
+  /*min-width: 100px;
+	min-height: 100px;*/
+  position: absolute;
+  border: 1px solid #d6d6d6; /*1px solid rgba(255, 255, 255, 0.2);*/
+  border-radius: 1px;
+  display: flex;
+  flex-direction: column;
+  background-color: #dedcdc;
+  color: black;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1), 0 1px 8px rgba(0, 0, 0, 0.2);
+}
+
+.win.hide {
+  display: none;
+}
+
+/********************  APP WINDOW ********************/
+
+.win.props {
+  border: 1px solid #c5c2c2;
+}
+
+.win.props.collapsed {
+  height: 20px !important;
+}
+
+/* HEADER */
+.win.props > header {
+  background: rgba(0, 0, 0, 0.12);
+  /*color: black;*/
+  position: relative;
+  line-height: 18px;
+}
+.win.props > header > .title {
+  padding: 2px 6px;
+}
+
+.win.props.collapsed > main,
+.win.props.collapsed > footer {
+  display: none;
+}
+
+.win.props > header.dragging {
+  cursor: move;
+}
+
+/* HEADER Title */
+.win.props > header > div:nth-of-type(1) {
+  font-size: 14px;
+}
+
+/* HEADER buttons */
+.win.props > header > div:nth-of-type(2) {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+}
+
+.win.props > header > div > img,
+.win.props > footer > div > img {
+  /* float: right;*/
+  cursor: pointer;
+}
+
+.win.props > header > div:nth-of-type(2) > img:nth-of-type(1) {
+  /*content: url(../img/arrow-up-16x16.png); not fully supported yet Firefox*/
+  background-image: url(../img/arrow-up-16x16.png);
+}
+
+.win.props.collapsed > header > div:nth-of-type(2) > img:nth-of-type(1) {
+  /*content: url(../img/arrow-down-16x16.png); not fully supported yet Firefox*/
+  background-image: url(../img/arrow-down-16x16.png);
+}
+
+.win.props > header > div:nth-of-type(2) > img:nth-of-type(2) {
+  /*content: url(../img/close-p3-16x16.png); not fully supported yet Firefox*/
+  background-image: url(../img/close-p3-16x16.png);
+}
+
+.win.props > header > div:nth-of-type(2) > img:hover {
+  background-color: red;
+}
+
+/* MAIN */
+.win.props > main {
+  height: 100%;
+  /*width: 100%;*/
+  background: rgba(10, 10, 10, 0.1);
+  flex: 1;
+  margin: 0;
+  padding: 4px;
+}
+
+.win.props > main.hide {
+  display: none;
+}
+
+.win.props > main input.prop {
+  width: 80px;
+  height: 16px;
+  background-color: #d0d0d0;
+  border-color: #cacaca;
+}
+
+.ec-container {
+  margin: 6px 2px;
+}
+
+.ec-container > span.label {
+  padding: 2px;
+  margin-right: 10px;
+}
+
+.ec-container > span.prop {
+  color: #777474;
+}
+
+.ec-container > .rot {
+  display: inline-block;
+  background-color: #b8bbbd; /*#3988ce;*/
+  padding: 1px 2px;
+  border: 1px solid #aba6a6;
+}
+
+.rot > .prop {
+  /* border: 1px solid gray; */
+  padding: 1px 6px;
+  color: white;
+}
+
+.rot > img {
+  cursor: pointer;
+}
+
+/* FOOTER */
+.win.props > footer {
+  margin: 0;
+  font-size: 12px;
+  padding: 2px 6px;
+  border-top: 1px solid #d6d3d3;
+  position: relative;
+}
+
+.win.props > footer.hide {
+  display: none;
+}
+
+/* HEADER Title */
+.win.props > footer > span {
+  font-size: 14px;
+}
+
+/* HEADER buttons */
+.win.props > footer > div {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+}
+
+.win.props > footer > div > img:nth-of-type(1) {
+  /*content: url(../img/arrow-up-16x16.png); not fully supported yet Firefox*/
+  background-image: url(../img/garbage-blk-p3.png);
+}
+
+.win.props > footer > div > img:hover {
+  background-color: #d0cfcf;
+}
+
+/* Right Context window */
+
+.light .win.ctx {
+  background: rgba(0, 0, 0, 0.4);
+  -webkit-backdrop-filter: blur(7px);
+  backdrop-filter: blur(7px);
+}
+.dark .win.ctx {
+  background: rgba(255, 255, 255, 0.4);
+  -webkit-backdrop-filter: blur(7px);
+  backdrop-filter: blur(7px);
+}
+
+.win.ctx > div {
+  padding: 6px 8px;
+  font-size: 14px;
+}
+
+.win.ctx > div:hover {
+  background-color: #bdbdbf;
+  color: white;
+  cursor: pointer;
+}
+
+.light .win.ctx > div > span {
+  color: white;
+}
+.dark .win.ctx > div > span {
+  color: #fdfdfd;
+}
+
+.win.ctx > div > span.right {
+  float: right;
+}
+
+.light .win.ctx > div[disabled] {
+  background: rgba(0, 0, 0, 0.1);
+}
+.dark .win.ctx > div[disabled] {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.win.ctx > div[disabled] > span {
+  color: #aba8a8;
+}
+
+/*.win.ctx > div[disabled]:hover {
+	cursor: not-allowed;
+  }*/
+
+/********************  DIALOG WINDOW ********************/
+
+.win.dialog {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backdrop-filter: blur(5px);
+  z-index: 1000;
+  top: 0;
+  left: 0;
+  margin: 0;
+  overflow: hidden;
+}
+.light .win.dialog {
+  background: #35353452;
+}
+.dark .win.dialog {
+  background: #b9b9b952;
+}
+
+.win.dialog > div.content {
+  display: inline-block;
+  margin: auto;
+  background: #77948be0;
+  padding: 10px 19px;
+}
+.win.dialog > div.content > h4,
+.win.dialog > div.content > h5 {
+  color: #4d4e4e;
+}
+.win.dialog > div.content > div {
+  text-align: center;
+}
+.win.dialog > div.content > div > button {
+  margin: 0px 4px;
+  background-color: #d4d4cd;
+  border-style: none;
+}
+.win.dialog > div.content > div > button:hover {
+  background-color: #717272e0;
+  color: white;
+}
+.win.dialog > div.content > form > fieldset > div > span[id] {
+  max-width: 300px;
+  display: inline-block;
+  overflow: hidden;
+  height: 19px;
+  line-height: 19px;
+  margin: 0 1em 0 0;
+  vertical-align: middle;
+}
+.win.dialog > div.content > form > fieldset > div > span:not([id]) {
+  color: red;
+  font-size: 1em;
+  font-weight: bolder;
+  margin-left: 5px;
+}
+
+/* makes SVG Text non selectable*/
+#board text {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  pointer-events: none;
+}
+
+circle,
+ellipse,
+rect,
+line,
+polyline,
+polygon,
+path {
+  shape-rendering: auto;
+}
+
+/*********** EC ***********/
+
+.ec {
+  fill: #f3f0f0;
+  stroke: black;
+  stroke-opacity: 1;
+  stroke-width: 2px;
+  stroke-linecap: butt;
+  fill-rule: evenodd;
+}
+
+body.dark .ec [svg-type="body"] {
+  stroke: #ffffff;
+}
+body.dark .ec {
+  fill: black;
+  stroke: white;
+}
+
+g[svg-comp] > path[svg-type="node"] {
+  stroke-width: 1px;
+  fill: darkgray;
+}
+
+g[svg-comp] > .thick {
+  stroke-width: 2px;
+}
+
+g[svg-comp] > .thick3 {
+  stroke-width: 3px;
+}
+
+.ec > .no-fill,
+.ec.selected > .no-fill {
+  fill: none;
+}
+
+.ec text {
+  fill: black;
+  stroke: black;
+  stroke-width: 0.5px;
+  font-family: monospace;
+  font-size: 10px;
+}
+body.dark g text {
+  fill: white;
+  stroke: white;
+}
+g[svg-comp] text.title {
+  font-size: 18px;
+}
+
+g[svg-comp] text.middle {
+  font-size: 27px;
+}
+g[svg-comp] text.big {
+  font-size: 50px;
+}
+
+g.label > text {
+  font-family: monospace;
+  stroke-width: 0.5px;
+  font-size: 14px;
+}
+
+g[svg-comp] > circle[svg-type="node"],
+g[svg-comp] > circle[svg-type="node-x"],
+g[svg-comp] > circle.node {
+  fill: #bcdcfb;
+  stroke-width: 2px;
+  stroke: red;
+}
+
+/*********** WIRE ***********/
+.wire > line,
+.wire > polyline {
+  stroke-width: 2px;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+body.light .wire > line,
+body.light .wire > polyline {
+  stroke: rgb(82, 80, 80);
+}
+body.dark .wire > line,
+body.dark .wire > polyline {
+  stroke: whitesmoke;
+}
+
+/********************** Dash **************************/
+.dash {
+  stroke-width: 1px;
+}
+rect.dash {
+  fill: none;
+}
+
+.light line.dash,
+.light rect.dash {
+  stroke: rgb(150, 150, 150);
+}
+.dark line.dash,
+.dark rect.dash {
+  stroke: rgb(150, 150, 150);
+}
+
+/*tooltip*/
+.tooltip > rect {
+  stroke-width: 1;
+  fill-opacity: 0.9;
+  stroke-opacity: 0.9;
+}
+.light g.tooltip > rect {
+  fill: white;
+  stroke: black;
+}
+.dark g.tooltip > rect {
+  fill: black;
+  stroke: white;
+}
+.light g.tooltip > text {
+  fill: #656262;
+}
+.dark g.tooltip > text {
+  fill: white;
+}
+

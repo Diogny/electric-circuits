@@ -1,7 +1,7 @@
 import Item from "./item";
 import { Type } from "./types";
 import { Application } from "./app";
-import { IBaseWindowSettings, ISize, IBaseWindowOptions } from "./interfaces";
+import { IBaseWindowSettings, ISize, IBaseWindowOptions, ITemplate } from "./interfaces";
 import { obj, extend, nano } from "./dab";
 import { html } from "./utils";
 
@@ -11,7 +11,7 @@ export default class BaseWindow extends Item {
 
 	get type(): Type { return Type.WIN }
 
-	get app(): Application { return this.settings.app }
+	get app(): ITemplate { return this.settings.app }
 
 	get win(): HTMLElement { return this.settings.win }
 

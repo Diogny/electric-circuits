@@ -4,6 +4,7 @@ exports.Circuit = void 0;
 var ec_1 = require("./ec");
 var wire_1 = require("./wire");
 var types_1 = require("./types");
+var rect_1 = require("./rect");
 var dab_1 = require("./dab");
 var electron_1 = require("electron");
 var xml2js = require("xml2js");
@@ -38,9 +39,24 @@ var Circuit = /** @class */ (function () {
         enumerable: false,
         configurable: true
     });
+    Object.defineProperty(Circuit, "zoomMultipliers", {
+        get: function () {
+            return Array.from([8, 4, 2, 1, 0.75, 0.5, 0.33, 0.25, 0.166, 0.125]);
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(Circuit, "zoomFactors", {
+        get: function () {
+            return Array.from(["1/8X", "1/4X", "1/2X", "1X", "1 1/2X", "2X", "3X", "4X", "6X", "8X"]);
+        },
+        enumerable: false,
+        configurable: true
+    });
     Circuit.validZoom = function (zoom) {
         return !(isNaN(zoom)
-            || !["0.125", "0.166", "0.25", "0.33", "0.5", "0.75", "1", "2", "4", "8"].some(function (s) { return parseFloat(s) == zoom; }));
+            || !Circuit.zoomMultipliers.some(function (z) { return z == zoom; }) //["0.125", "0.166", "0.25", "0.33", "0.5", "0.75", "1", "2", "4", "8"]
+        );
     };
     Object.defineProperty(Circuit.prototype, "modified", {
         get: function () { return this.__modified; },
@@ -201,6 +217,12 @@ var Circuit = /** @class */ (function () {
         this.selectedComponents = void 0;
         this.__modified = false;
         this.filePath = void 0;
+    };
+    Circuit.prototype.boundariesRect = function () {
+        var components = this.components, first = components.shift(), r = first ? first.rect() : rect_1.default.empty();
+        components.forEach(function (ec) { return r.add(ec.rect()); });
+        r.grow(20, 20);
+        return r;
     };
     Circuit.defaultZoom = 0.5; // 2X
     return Circuit;

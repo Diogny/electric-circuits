@@ -47,10 +47,16 @@ export class Circuit {
 			&& (this.__zoom = value)
 	}
 
+	public static get zoomMultipliers(): number[] {
+		return Array.from([8, 4, 2, 1, 0.75, 0.5, 0.33, 0.25, 0.166, 0.125]);
+	}
+	public static get zoomFactors(): string[] {
+		return Array.from(["1/8X", "1/4X", "1/2X", "1X", "1 1/2X", "2X", "3X", "4X", "6X", "8X"]);
+	}
 	public static validZoom(zoom: number): boolean {
 		return !(
 			isNaN(zoom)
-			|| !["0.125", "0.166", "0.25", "0.33", "0.5", "0.75", "1", "2", "4", "8"].some(s => parseFloat(s) == zoom)
+			|| !Circuit.zoomMultipliers.some(z => z == zoom) //["0.125", "0.166", "0.25", "0.33", "0.5", "0.75", "1", "2", "4", "8"]
 		)
 	}
 
@@ -232,6 +238,16 @@ export class Circuit {
 		this.selectedComponents = <any>void 0;
 		this.__modified = false;
 		this.filePath = <any>void 0;
+	}
+
+	public boundariesRect(): Rect {
+		let
+			components = this.components,
+			first = components.shift(),
+			r = first ? first.rect() : Rect.empty();
+		components.forEach(ec => r.add(ec.rect()));
+		r.grow(20, 20);
+		return r;
 	}
 }
 

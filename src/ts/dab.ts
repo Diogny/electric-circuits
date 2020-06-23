@@ -143,6 +143,8 @@ const obj = (o: any) => {			//deep copy
 }
 export { obj }
 
+export const clone = <T>(o: T): T => <T>JSON.parse(JSON.stringify(o));
+
 export const defEnum = (e: any) => {
 	for (let key in e) {			//let item = e[key];
 		e[e[key]] = key;

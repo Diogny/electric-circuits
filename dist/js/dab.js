@@ -1,7 +1,7 @@
 "use strict";
 //still in progress...
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createClass = exports.addClassX = exports.union = exports.unique = exports.range = exports.getParentAttr = exports.condClass = exports.toggleClass = exports.removeClass = exports.addClass = exports.hasClass = exports.aCld = exports.dP = exports.rEL = exports.aEL = exports.propDescriptor = exports.attr = exports.css = exports.defEnum = exports.obj = exports.pojo = exports.isElement = exports.inherit = exports.copy = exports.extend = exports.nano = exports.splat = exports.round = exports.clamp = exports.pInt = exports.isInt = exports.isNumeric = exports.isNum = exports.isArr = exports.isObj = exports.isStr = exports.dfnd = exports.isFn = exports.typeOf = exports.empty = exports.ts = exports.consts = void 0;
+exports.createClass = exports.addClassX = exports.union = exports.unique = exports.range = exports.getParentAttr = exports.condClass = exports.toggleClass = exports.removeClass = exports.addClass = exports.hasClass = exports.aCld = exports.dP = exports.rEL = exports.aEL = exports.propDescriptor = exports.attr = exports.css = exports.defEnum = exports.clone = exports.obj = exports.pojo = exports.isElement = exports.inherit = exports.copy = exports.extend = exports.nano = exports.splat = exports.round = exports.clamp = exports.pInt = exports.isInt = exports.isNumeric = exports.isNum = exports.isArr = exports.isObj = exports.isStr = exports.dfnd = exports.isFn = exports.typeOf = exports.empty = exports.ts = exports.consts = void 0;
 var c = {
     s: "string",
     o: "object",
@@ -119,6 +119,7 @@ var obj = function (o) {
     return result;
 };
 exports.obj = obj;
+exports.clone = function (o) { return JSON.parse(JSON.stringify(o)); };
 exports.defEnum = function (e) {
     for (var key in e) { //let item = e[key];
         e[e[key]] = key;

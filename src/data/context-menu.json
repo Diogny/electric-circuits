@@ -1,0 +1,163 @@
+{
+	"board": [
+		{
+			"text": "Delete Selected",
+			"name": "DELETE_SELECTED",
+			"enabled": [
+				"BOARD"
+			]
+		},
+		{
+			"text": "Select All",
+			"name": "SELECT_ALL",
+			"shortcut": "Ctrl+A",
+			"enabled": [
+				"BOARD"
+			]
+		},
+		{
+			"text": "Deselect All",
+			"name": "UNSELECT_ALL",
+			"shortcut": "Ctrl+B",
+			"enabled": [
+				"BOARD"
+			]
+		}
+	],
+	"ec-body": [
+		{
+			"text": "Delete",
+			"name": "DELETE",
+			"shortcut": "Del"
+		},
+		{
+			"text": "Properties",
+			"name": "SHOW_PROPERTIES",
+			"shortcut": "Ctrl+P",
+			"enabled": [
+				"EC_BODY"
+			]
+		},
+		{
+			"text": "Rotate 45 clockwise",
+			"name": "ROTATE_45_CLOCKWISE",
+			"data": 45
+		},
+		{
+			"text": "Rotate 45 counter clockwise",
+			"name": "ROTATE_45_COUNTER_CLOCKWISE",
+			"data": -45
+		},
+		{
+			"text": "Rotate 90 clockwise",
+			"name": "ROTATE_90_CLOCKWISE",
+			"data": 90
+		},
+		{
+			"text": "Rotate 90 counter clockwise",
+			"name": "ROTATE_90_COUNTER_CLOCKWISE",
+			"data": -90
+		},
+		{
+			"text": "Select",
+			"name": "SELECT",
+			"enabled": [
+				"EC_BODY"
+			]
+		},
+		{
+			"text": "Bring to Front",
+			"name": "BRING_TO_FRONT",
+			"enabled": [
+				"EC_BODY"
+			]
+		}
+	],
+	"ec-node": [
+		{
+			"text": "Unbond",
+			"name": "UNBOND",
+			"shortcut": "Ctrl-U",
+			"enabled": [
+				"EC_NODE"
+			]
+		},
+		{
+			"text": "Properties",
+			"name": "SHOW_PROPERTIES",
+			"shortcut": "Ctrl+P",
+			"enabled": [
+				"EC_NODE"
+			]
+		},
+		{
+			"text": "Select",
+			"name": "SELECT"
+		}
+	],
+	"wire-line": [
+		{
+			"text": "Properties",
+			"name": "SHOW_PROPERTIES",
+			"shortcut": "Ctrl+P",
+			"enabled": [
+				"WIRE_LINE"
+			]
+		},
+		{
+			"text": "Split Segment",
+			"name": "SPLIT_THIS_LINE"
+		},
+		{
+			"text": "Delete",
+			"name": "DELETE",
+			"shortcut": "Del"
+		},
+		{
+			"text": "Delete Segment",
+			"name": "DELETE_THIS_LINE"
+		},
+		{
+			"text": "Select",
+			"name": "SELECT",
+			"enabled": [
+				"WIRE_LINE"
+			]
+		},
+		{
+			"text": "Resume Edit",
+			"name": "RESUME_EDIT",
+			"shortcut": "Ctrl+P"
+		}
+	],
+	"wire-node": [
+		{
+			"text": "Unbond",
+			"name": "UNBOND",
+			"shortcut": "Ctrl-U",
+			"enabled": [
+				"WIRE_LINE"
+			]
+		},
+		{
+			"text": "Delete Node",
+			"name": "DELETE_WIRE_NODE",
+			"shortcut": "Del",
+			"enabled": [
+				"WIRE_LINE"
+			]
+		},
+		{
+			"text": "Properties",
+			"name": "SHOW_PROPERTIES",
+			"shortcut": "Ctrl+P",
+			"enabled": [
+				"WIRE_LINE"
+			]
+		},
+		{
+			"text": "Select",
+			"name": "SELECT"
+		}
+	]
+}

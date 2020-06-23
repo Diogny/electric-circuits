@@ -28,7 +28,7 @@ Used in my testing website [Electric Circuits](http://diogny.com/tests/circuits.
 
 
 ### Last compilation:
-	We are using Node.js 12.14.1, Chromium 83.0.4103.104, and Electron 9.0.4.
+	We are using Node.js 12.14.1, Chromium 83.0.4103.119, and Electron 9.0.5.
 
 ![components](img/img01.png)
 
@@ -62,6 +62,7 @@ Used in my testing website [Electric Circuits](http://diogny.com/tests/circuits.
 	pnpm install xml2js --save-dev
 	pnpm install @types/xml2js  --save-dev
 	pnpm install tslib --save-dev
+	pnpm install --save-dev css-loader style-loader file-loader mini-css-extract-plugin copy-webpack-plugin
 
 ### testings
 	pnpm i mocha -D
@@ -98,6 +99,6 @@ Used in my testing website [Electric Circuits](http://diogny.com/tests/circuits.
 	git add -u					stage the modified and deleted files
 	git add -A
 	git commit -m "update message"
-	git tag v1.1.14
+	git tag v1.1.15
 	git push origin master --tags
 

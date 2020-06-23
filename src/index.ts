@@ -1,22 +1,22 @@
 import { ipcRenderer } from "electron";
-import { templatesDOM, qSA, qS } from "./utils"
+import { templatesDOM, qSA, qS } from "./ts/utils"
 import * as fs from 'fs';
 import {
 	IComponentOptions, StateType as State, ActionType as Action, IMachineState, IMouseState, IPoint, IMyAppOptions
-} from "./interfaces";
-import Comp from "./components";
-import { MyApp } from "./myapp";
-import { attr, aEL, removeClass, addClass, getParentAttr } from "./dab";
-import Point from "./point";
-import Wire from "./wire";
-import StateMachine from "./stateMachine";
-import { Type } from "./types";
-import { ItemBoard } from "./itemsBoard";
-import Size from "./size";
-import EC from "./ec";
-import Rect from "./rect";
-import { Bond } from "./bonds";
-import { Circuit, CircuitProperty } from "./circuit";
+} from "./ts/interfaces";
+import Comp from "./ts/components";
+import { MyApp } from "./ts/myapp";
+import { attr, aEL, removeClass, addClass, getParentAttr } from "./ts/dab";
+import Point from "./ts/point";
+import Wire from "./ts/wire";
+import StateMachine from "./ts/stateMachine";
+import { Type } from "./ts/types";
+import { ItemBoard } from "./ts/itemsBoard";
+import Size from "./ts/size";
+import EC from "./ts/ec";
+import Rect from "./ts/rect";
+import { Bond } from "./ts/bonds";
+import { Circuit, CircuitProperty } from "./ts/circuit";
 
 let
 	app: MyApp,
@@ -69,13 +69,15 @@ let
 			case 'CtrlKeyP':
 				let
 					svg = <SVGElement>app.svgBoard.cloneNode(true),
-					rect = app.svgBoard.getBoundingClientRect();
+					boardRect = app.svgBoard.getBoundingClientRect(),
+					circuitRect = app.circuit.boundariesRect();
 				console.log(ipcRenderer.sendSync('print-circuit', [
 					{
-						width: rect.width,
-						height: rect.height + 20
+						width: boardRect.width,
+						height: boardRect.height + 20
 					},
-					svg.outerHTML
+					svg.outerHTML,
+					app.getViewBoxRects(circuitRect)
 				]));
 				break;
 			case 'CtrlKeyH':

@@ -267,6 +267,15 @@ var MyApp = /** @class */ (function (_super) {
         this.viewBox.height = this.baseViewBox.height * zoom | 0;
         calculateAndUpdateViewBoxData.call(this, x, y);
     };
+    MyApp.prototype.getViewBoxRects = function (r) {
+        var _this = this;
+        var getRect = function (z, index) { return ({
+            zoom: circuit_1.Circuit.zoomFactors[index],
+            rect: new rect_1.default(r.x, r.y, _this.baseViewBox.width * z, _this.baseViewBox.height * z)
+        }); }, sizes = circuit_1.Circuit.zoomMultipliers.map(getRect)
+            .filter(function (o) { return o.rect.contains(r); });
+        return sizes.length ? sizes : [getRect(circuit_1.Circuit.zoomMultipliers[0], 0)];
+    };
     MyApp.prototype.refreshViewBoxData = function () {
         this.bottomBarCenter.innerHTML = dab_1.nano(this.templates.viewBox01, this.viewBox) + "&nbsp; ";
         //+ nano(this.templates.size01, this.size);

@@ -45,7 +45,7 @@ var FormWindow = /** @class */ (function (_super) {
         return this.promise(title, function () {
             var _this = this;
             this.contentHTML.innerHTML = formItems.map(function (item, index) {
-                var o = Object.create(item);
+                var o = dab_1.clone(item);
                 !o.placeHolder && (o.placeHolder = o.label);
                 o.index = index;
                 o.class = item.visible ? "" : "hide";

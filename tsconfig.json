@@ -14,7 +14,7 @@
 		"baseUrl": ".",
 		"paths": {
 			"src/*": [
-				"src/*"
+				"src/ts/*"
 			],
 			"*": [
 				"node_modules/*"
@@ -22,12 +22,6 @@
 		}
 	},
 	"include": [
-		"src/**/*"
-	],
-	"exclude": [
-		"src/main.ts",
-		"src/index.ts",
-		"src/index.print.ts",
-		"src/index.help.ts"
+		"src/ts/**/*"
 	]
 }
