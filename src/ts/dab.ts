@@ -69,13 +69,6 @@ export const round = (v: number, decimals: number) => {
 
 export const splat = (o: any) => isArr(o) ? o : (dfnd(o) ? [o] : []);
 
-export const nano = (n: string, e: any) => {
-	return n.replace(/\{([\w\.]*)\}/g, (n, t) => {
-		for (var r = t.split("."), f = e[r.shift()], u = 0, i = r.length; i > u; u++) f = f[r[u]];
-		return c.u != typeof f && null !== f ? f : "";
-	});
-}
-
 //copy all properties in src to obj, and returns obj
 export const extend = (obj: any, src: any) => { //no support for IE 8 https://plainjs.com/javascript/utilities/merge-two-javascript-objects-19/
 	//!obj && (obj = {});

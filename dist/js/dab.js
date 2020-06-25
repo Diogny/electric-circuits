@@ -1,7 +1,7 @@
 "use strict";
 //still in progress...
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createClass = exports.addClassX = exports.union = exports.unique = exports.range = exports.getParentAttr = exports.condClass = exports.toggleClass = exports.removeClass = exports.addClass = exports.hasClass = exports.aCld = exports.dP = exports.rEL = exports.aEL = exports.propDescriptor = exports.attr = exports.css = exports.defEnum = exports.clone = exports.obj = exports.pojo = exports.isElement = exports.inherit = exports.copy = exports.extend = exports.nano = exports.splat = exports.round = exports.clamp = exports.pInt = exports.isInt = exports.isNumeric = exports.isNum = exports.isArr = exports.isObj = exports.isStr = exports.dfnd = exports.isFn = exports.typeOf = exports.empty = exports.ts = exports.consts = void 0;
+exports.createClass = exports.addClassX = exports.union = exports.unique = exports.range = exports.getParentAttr = exports.condClass = exports.toggleClass = exports.removeClass = exports.addClass = exports.hasClass = exports.aCld = exports.dP = exports.rEL = exports.aEL = exports.propDescriptor = exports.attr = exports.css = exports.defEnum = exports.clone = exports.obj = exports.pojo = exports.isElement = exports.inherit = exports.copy = exports.extend = exports.splat = exports.round = exports.clamp = exports.pInt = exports.isInt = exports.isNumeric = exports.isNum = exports.isArr = exports.isObj = exports.isStr = exports.dfnd = exports.isFn = exports.typeOf = exports.empty = exports.ts = exports.consts = void 0;
 var c = {
     s: "string",
     o: "object",
@@ -54,13 +54,6 @@ exports.round = function (v, decimals) {
     return (decimals = decimals | 0, Number(Math.round(Number(v + "e" + decimals)) + "e-" + decimals));
 }; //force toArray
 exports.splat = function (o) { return isArr(o) ? o : (dfnd(o) ? [o] : []); };
-exports.nano = function (n, e) {
-    return n.replace(/\{([\w\.]*)\}/g, function (n, t) {
-        for (var r = t.split("."), f = e[r.shift()], u = 0, i = r.length; i > u; u++)
-            f = f[r[u]];
-        return c.u != typeof f && null !== f ? f : "";
-    });
-};
 //copy all properties in src to obj, and returns obj
 exports.extend = function (obj, src) {
     //!obj && (obj = {});

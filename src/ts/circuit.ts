@@ -3,14 +3,16 @@ import Wire from "./wire";
 import { ItemBoard } from "./itemsBoard";
 import { Type } from "./types";
 import Rect from "./rect";
-import { nano, isNum } from "./dab";
+import { isNum } from "./dab";
 import { ipcRenderer } from "electron";
 import * as xml2js from 'xml2js';
 import * as fs from 'fs';
+import * as path from "path";
 import { IPoint, IBaseComponent } from "./interfaces";
 import Point from "./point";
 import Comp from "./components";
 import { Bond } from "./bonds";
+import { Templates } from "./templates";
 
 export interface CircuitProperty {
 	label: string;
@@ -224,6 +226,7 @@ export class Circuit {
 			{ label: "name", value: circuit?.name || "", required: true, placeHolder: "Name", visible: true },
 			{ label: "version", value: circuit?.version || "1.1.5", readonly: true, visible: true },
 			{ label: "description", value: circuit?.description || "", placeHolder: "Description", visible: true },
+			{ label: "filename", value: path.basename(circuit?.filePath || ""), readonly: true, visible: true },
 			{ label: "path", value: circuit?.filePath || "", readonly: true, visible: true },
 		]
 	}
@@ -338,7 +341,8 @@ function parseCircuitXML(data: string) {
 			console.log(err);
 		else {
 			let
-				atttrs = json.circuit.$,
+				circuit = json.circuit || json.CIRCUIT,
+				atttrs = circuit.$,
 				getData = (value: any): any[] => {
 					if (!value || (typeof value == "string"))
 						return [];
@@ -347,9 +351,20 @@ function parseCircuitXML(data: string) {
 					else
 						return value;
 				},
-				ecs = getData(json.circuit.ecs.ec),
-				wires = getData(json.circuit.wires.wire),
-				bonds = getData(json.circuit.bonds.bond),
+				getDataCompatibility = (group: string) => {
+					switch (group) {
+						case "ecs":
+							return getData(circuit.ecs ? circuit.ecs.ec : circuit.ECS.EC);
+						case "wires":
+							return getData(circuit.wires ? circuit.wires.wire : circuit.WIRES.WIRE);
+						case "bonds":
+							return getData(circuit.bonds ? circuit.bonds.bond : circuit.BONDS.BOND);
+					}
+					return [];
+				},
+				ECS = getDataCompatibility("ecs"),
+				WIRES = getDataCompatibility("wires"),
+				BONDS = getDataCompatibility("bonds"),
 				view = (atttrs.view || "").split(',');
 			//attributes
 			self.version = atttrs.version;
@@ -359,7 +374,7 @@ function parseCircuitXML(data: string) {
 			self.description = atttrs.description;
 			self.view = new Point(parseInt(view[0]) | 0, parseInt(view[1]) | 0);
 			//create ECs
-			ecs.forEach((xml: { $: { id: string, name: string, x: string, y: string, rot: string, label: string } }) => {
+			ECS.forEach((xml: { $: { id: string, name: string, x: string, y: string, rot: string, label: string } }) => {
 				<EC>createBoardItem.call(self, {
 					id: xml.$.id,
 					name: xml.$.name,
@@ -369,7 +384,7 @@ function parseCircuitXML(data: string) {
 					label: xml.$.label,
 				}, false);
 			})
-			wires.forEach((xml: { $: { id: string, points: string, label: string } }) => {
+			WIRES.forEach((xml: { $: { id: string, points: string, label: string } }) => {
 				let
 					options = {
 						id: xml.$.id,
@@ -381,7 +396,7 @@ function parseCircuitXML(data: string) {
 					throw `invalid wire points`;
 				<Wire>createBoardItem.call(self, options, false);
 			})
-			bonds.forEach((s: string) => {
+			BONDS.forEach((s: string) => {
 				let
 					arr = s.split(','),
 					fromIt = <ItemBoard>self.get(<string>arr.shift()),
@@ -422,38 +437,22 @@ function getAllCircuitBonds(): string[] {
 
 function getCircuitXML(): string {
 	let
-		self = this as Circuit,
-		circuitMetadata = () => {
-			let
-				description = self.description
-					? ` description="${self.description}"` : "";
-			return `<circuit version="1.1.5" zoom="${self.zoom}" name="${self.name}"${description} view="${self.view.x},${self.view.y}">\n`
-		},
-		ecTmpl = '\t\t<ec id="{id}" name="{name}" x="{x}" y="{y}" rot="{rotation}" label="{label}" />\n',
-		ecs = '\t<ecs>\n'
-			+ self.ecList
-				.map(comp => nano(ecTmpl, comp))
-				.join('')
-			+ '\t</ecs>\n',
-		wireTnpl = '\t\t<wire id="{id}" points="{points}" label="{label}" />\n',
-		wires =
-			'\t<wires>\n'
-			+ self.wireList
-				.map(wire => nano(wireTnpl, {
-					id: wire.id,
-					points: wire.points.map(p => nano('{x},{y}', p))
-						.join('|'),
-					label: wire.label
-				}))
-				.join('')
-			+ '\t</wires>\n',
-		bonds = getAllCircuitBonds.call(self)
-			.map((b: string) => `\t\t<bond>${b}</bond>\n`)
-			.join('');
+		self = this as Circuit;
 	return '<?xml version="1.0" encoding="utf-8"?>\n'
-		+ circuitMetadata()
-		+ ecs
-		+ wires
-		+ '\t<bonds>\n' + bonds + '\t</bonds>\n'
-		+ '</circuit>\n'
+		+ Templates.parse('circuitXml', {
+			version: self.version,
+			name: self.name,
+			zoom: self.zoom,
+			description: self.description,
+			view: self.view,
+			ecList: self.ecList,
+			wireList: self.wireList.map(w => ({
+				id: w.id,
+				label: w.label,
+				points: w.points.map(p => Templates.nano('simplePoint', p))
+					.join('|')
+			})),
+			bonds: getAllCircuitBonds.call(self)
+		},
+			true)
 }

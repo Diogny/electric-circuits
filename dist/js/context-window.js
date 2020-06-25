@@ -6,6 +6,7 @@ var utils_1 = require("./utils");
 var dab_1 = require("./dab");
 var point_1 = require("./point");
 var board_window_1 = require("./board-window");
+var templates_1 = require("./templates");
 var ContextWindow = /** @class */ (function (_super) {
     tslib_1.__extends(ContextWindow, _super);
     function ContextWindow(options) {
@@ -82,7 +83,6 @@ var ContextWindow = /** @class */ (function (_super) {
         return this.win.setAttribute("data-trigger", "" + [id, name, type, nodeOrLine].join('::')), ctx;
     };
     ContextWindow.prototype.build = function (key, state, offset) {
-        var _this = this;
         var entry = this.settings.list.get(key);
         if (entry) {
             this.settings.current = key;
@@ -90,7 +90,7 @@ var ContextWindow = /** @class */ (function (_super) {
             var html = entry.map(function (value) {
                 var o = dab_1.clone(value);
                 (value.enabled && !value.enabled.some(function (i) { return i == state; })) && (o.disabled = "disabled");
-                return dab_1.nano(_this.app.templates.ctxItem01, o);
+                return templates_1.Templates.nano('ctxItem01', o);
             }).join('');
             this.win.innerHTML = html;
             this.settings.offset = offset;

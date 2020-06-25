@@ -4,6 +4,7 @@ exports.FormWindow = exports.DialogWindow = void 0;
 var tslib_1 = require("tslib");
 var dab_1 = require("./dab");
 var dialog_base_1 = require("./dialog-base");
+var templates_1 = require("./templates");
 var DialogWindow = /** @class */ (function (_super) {
     tslib_1.__extends(DialogWindow, _super);
     function DialogWindow(options) {
@@ -43,13 +44,12 @@ var FormWindow = /** @class */ (function (_super) {
     }
     FormWindow.prototype.showDialog = function (title, formItems) {
         return this.promise(title, function () {
-            var _this = this;
             this.contentHTML.innerHTML = formItems.map(function (item, index) {
                 var o = dab_1.clone(item);
                 !o.placeHolder && (o.placeHolder = o.label);
                 o.index = index;
                 o.class = item.visible ? "" : "hide";
-                return dab_1.nano(_this.app.templates[item.readonly ? "formFieldWinSpan" : "formFieldWinInput"], o);
+                return templates_1.Templates.nano(item.readonly ? "formFieldWinSpan" : "formFieldWinInput", o);
             })
                 .join('');
         }, ["Save", "Cancel"], function (choice) {

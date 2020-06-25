@@ -15,8 +15,8 @@ import { ItemBoard } from "./ts/itemsBoard";
 import Size from "./ts/size";
 import EC from "./ts/ec";
 import Rect from "./ts/rect";
-import { Bond } from "./ts/bonds";
 import { Circuit, CircuitProperty } from "./ts/circuit";
+import { Templates } from "./ts/templates";
 
 let
 	app: MyApp,
@@ -49,6 +49,27 @@ let
 		ArrowRight: { x: 1, y: 0 },
 		ArrowDown: { x: 0, y: 1 }
 	},
+	loadCircuit = () => {
+		app.sm.transition(State.WINDOW, Action.START);
+		app.loadCircuit()
+			.finally(() => {
+				app.sm.transition(State.BOARD, Action.RESUME);
+			})
+	},
+	saveCircuit = () => {
+		app.sm.transition(State.WINDOW, Action.START);
+		app.saveCircuit(false)
+			.finally(() => {
+				app.sm.transition(State.BOARD, Action.RESUME);
+			})
+	},
+	newCircuit = () => {
+		app.sm.transition(State.WINDOW, Action.START);
+		app.newCircuit()
+			.finally(() => {
+				app.sm.transition(State.BOARD, Action.RESUME);
+			})
+	},
 	cursorBoardHandler = (code: string): boolean | undefined => {
 		app.tooltip.setVisible(false);
 		app.highlight.setVisible(false);
@@ -58,13 +79,13 @@ let
 				app.execute(Action.SELECT_ALL, "");
 				break;
 			case 'CtrlKeyS':
-				app.saveCircuit(false);
+				saveCircuit();
 				break;
 			case 'CtrlKeyL':
-				app.loadCircuit();
+				loadCircuit();
 				break;
 			case 'CtrlKeyN':
-				app.newCircuit();
+				newCircuit();
 				break;
 			case 'CtrlKeyP':
 				let
@@ -133,9 +154,9 @@ function hookEvents() {
 	//ViewBox Reset
 	aEL(qS('.bar-item[tool="vb-focus"]'), "click", () => app.updateViewBox(app.circuit.zoom, 0, 0), false);
 	//File Open
-	aEL(qS('.bar-item[file="open"]'), "click", () => app.loadCircuit(), false);
+	aEL(qS('.bar-item[file="open"]'), "click", () => loadCircuit(), false);
 	//Save File
-	aEL(qS('.bar-item[file="save"]'), "click", () => app.saveCircuit(false), false);
+	aEL(qS('.bar-item[file="save"]'), "click", () => saveCircuit(), false);
 	//Circuit Property edit
 	aEL(app.circuitName, "click", () => {
 		let
@@ -158,6 +179,22 @@ function hookEvents() {
 	}, false);
 }
 
+function registerWindowState() {
+	app.sm.register(<IMachineState>{
+		key: State.WINDOW,
+		overType: "deny",
+		actions: {
+			//KEY: cursorBoardHandler, was sending delete commands
+			DEFAULT: function (newCtx: IMouseState) {
+				console.log(newCtx);
+			},
+			//transitions
+			START: function (newCtx: IMouseState) {
+
+			}
+		}
+	});
+}
 function registerBoardState() {
 	app.sm.register(<IMachineState>{
 		key: State.BOARD,
@@ -811,16 +848,21 @@ function readJson(path: string): any {
 }
 
 window.addEventListener("DOMContentLoaded", () => {
-	templatesDOM("viewBox01|size01|point01|baseWin01|ctxWin01|ctxItem01|propWin01|dialogWin01|formWin01|formFieldWinSpan|formFieldWinInput")
-		.then(async (templates: Object) => {
+	templatesDOM("viewBox01|size01|point01|baseWin01|ctxWin01|ctxItem01|propWin01|dialogWin01|formWin01|formFieldWinSpan|formFieldWinInput|circuitXml")
+		.then(async (tmpls) => {
 			let
 				json = readJson('./dist/data/library-circuits.v2.json');
 			json.forEach((element: IComponentOptions) => {
 				Comp.register(element);
 			});
 			json = readJson('./dist/data/context-menu.json');
+
+			Templates.register(tmpls);
+			Templates.set('circuitName', '<span class="{{ class }}">*</span><span>{{ name }}</span>');
+			Templates.set('simplePoint', '{{ x }},{{ y }}');
+
 			app = new MyApp(<IMyAppOptions>{
-				templates: templates,
+				templates: tmpls,
 				includePropsInThis: true,
 				props: {
 					rot_lbl: {
@@ -863,6 +905,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
 			hookEvents();
 			//register states
+			registerWindowState();
 			registerBoardState();
 			registerEcBodyState();
 			registerEcDragState();

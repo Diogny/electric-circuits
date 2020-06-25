@@ -9,8 +9,10 @@ var dab_1 = require("./dab");
 var electron_1 = require("electron");
 var xml2js = require("xml2js");
 var fs = require("fs");
+var path = require("path");
 var point_1 = require("./point");
 var components_1 = require("./components");
+var templates_1 = require("./templates");
 var Circuit = /** @class */ (function () {
     function Circuit(options) {
         this.compMap = new Map();
@@ -203,6 +205,7 @@ var Circuit = /** @class */ (function () {
             { label: "name", value: (circuit === null || circuit === void 0 ? void 0 : circuit.name) || "", required: true, placeHolder: "Name", visible: true },
             { label: "version", value: (circuit === null || circuit === void 0 ? void 0 : circuit.version) || "1.1.5", readonly: true, visible: true },
             { label: "description", value: (circuit === null || circuit === void 0 ? void 0 : circuit.description) || "", placeHolder: "Description", visible: true },
+            { label: "filename", value: path.basename((circuit === null || circuit === void 0 ? void 0 : circuit.filePath) || ""), readonly: true, visible: true },
             { label: "path", value: (circuit === null || circuit === void 0 ? void 0 : circuit.filePath) || "", readonly: true, visible: true },
         ];
     };
@@ -296,14 +299,24 @@ function parseCircuitXML(data) {
         if (err)
             console.log(err);
         else {
-            var atttrs = json.circuit.$, getData = function (value) {
+            var circuit_1 = json.circuit || json.CIRCUIT, atttrs = circuit_1.$, getData_1 = function (value) {
                 if (!value || (typeof value == "string"))
                     return [];
                 if (value.$)
                     return [value];
                 else
                     return value;
-            }, ecs = getData(json.circuit.ecs.ec), wires = getData(json.circuit.wires.wire), bonds = getData(json.circuit.bonds.bond), view = (atttrs.view || "").split(',');
+            }, getDataCompatibility = function (group) {
+                switch (group) {
+                    case "ecs":
+                        return getData_1(circuit_1.ecs ? circuit_1.ecs.ec : circuit_1.ECS.EC);
+                    case "wires":
+                        return getData_1(circuit_1.wires ? circuit_1.wires.wire : circuit_1.WIRES.WIRE);
+                    case "bonds":
+                        return getData_1(circuit_1.bonds ? circuit_1.bonds.bond : circuit_1.BONDS.BOND);
+                }
+                return [];
+            }, ECS = getDataCompatibility("ecs"), WIRES = getDataCompatibility("wires"), BONDS = getDataCompatibility("bonds"), view = (atttrs.view || "").split(',');
             //attributes
             self.version = atttrs.version;
             !Circuit.validZoom(self.zoom = parseFloat(atttrs.zoom))
@@ -312,7 +325,7 @@ function parseCircuitXML(data) {
             self.description = atttrs.description;
             self.view = new point_1.default(parseInt(view[0]) | 0, parseInt(view[1]) | 0);
             //create ECs
-            ecs.forEach(function (xml) {
+            ECS.forEach(function (xml) {
                 createBoardItem.call(self, {
                     id: xml.$.id,
                     name: xml.$.name,
@@ -322,7 +335,7 @@ function parseCircuitXML(data) {
                     label: xml.$.label,
                 }, false);
             });
-            wires.forEach(function (xml) {
+            WIRES.forEach(function (xml) {
                 var options = {
                     id: xml.$.id,
                     name: "wire",
@@ -333,7 +346,7 @@ function parseCircuitXML(data) {
                     throw "invalid wire points";
                 createBoardItem.call(self, options, false);
             });
-            bonds.forEach(function (s) {
+            BONDS.forEach(function (s) {
                 var arr = s.split(','), fromIt = self.get(arr.shift()), fromNdx = parseInt(arr.shift()), toIt = self.get(arr.shift()), toNdx = parseInt(arr.shift());
                 if (arr.length || !fromIt || !toIt || !fromIt.getNode(fromNdx) || !toIt.getNode(toNdx))
                     throw "invalid bond";
@@ -358,31 +371,22 @@ function getAllCircuitBonds() {
     return bonds;
 }
 function getCircuitXML() {
-    var self = this, circuitMetadata = function () {
-        var description = self.description
-            ? " description=\"" + self.description + "\"" : "";
-        return "<circuit version=\"1.1.5\" zoom=\"" + self.zoom + "\" name=\"" + self.name + "\"" + description + " view=\"" + self.view.x + "," + self.view.y + "\">\n";
-    }, ecTmpl = '\t\t<ec id="{id}" name="{name}" x="{x}" y="{y}" rot="{rotation}" label="{label}" />\n', ecs = '\t<ecs>\n'
-        + self.ecList
-            .map(function (comp) { return dab_1.nano(ecTmpl, comp); })
-            .join('')
-        + '\t</ecs>\n', wireTnpl = '\t\t<wire id="{id}" points="{points}" label="{label}" />\n', wires = '\t<wires>\n'
-        + self.wireList
-            .map(function (wire) { return dab_1.nano(wireTnpl, {
-            id: wire.id,
-            points: wire.points.map(function (p) { return dab_1.nano('{x},{y}', p); })
-                .join('|'),
-            label: wire.label
-        }); })
-            .join('')
-        + '\t</wires>\n', bonds = getAllCircuitBonds.call(self)
-        .map(function (b) { return "\t\t<bond>" + b + "</bond>\n"; })
-        .join('');
+    var self = this;
     return '<?xml version="1.0" encoding="utf-8"?>\n'
-        + circuitMetadata()
-        + ecs
-        + wires
-        + '\t<bonds>\n' + bonds + '\t</bonds>\n'
-        + '</circuit>\n';
+        + templates_1.Templates.parse('circuitXml', {
+            version: self.version,
+            name: self.name,
+            zoom: self.zoom,
+            description: self.description,
+            view: self.view,
+            ecList: self.ecList,
+            wireList: self.wireList.map(function (w) { return ({
+                id: w.id,
+                label: w.label,
+                points: w.points.map(function (p) { return templates_1.Templates.nano('simplePoint', p); })
+                    .join('|')
+            }); }),
+            bonds: getAllCircuitBonds.call(self)
+        }, true);
 }
 //# sourceMappingURL=circuit.js.map

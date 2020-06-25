@@ -5,11 +5,12 @@ var item_1 = require("./item");
 var types_1 = require("./types");
 var dab_1 = require("./dab");
 var utils_1 = require("./utils");
+var templates_1 = require("./templates");
 var BaseWindow = /** @class */ (function (_super) {
     tslib_1.__extends(BaseWindow, _super);
     function BaseWindow(options) {
         var _this = _super.call(this, options) || this;
-        _this.settings.win = utils_1.html(dab_1.nano(_this.app.templates[_this.settings.templateName], {
+        _this.settings.win = utils_1.html(templates_1.Templates.nano(_this.settings.templateName, {
             id: _this.id,
             class: _this.class
         }));

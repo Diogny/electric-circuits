@@ -116,7 +116,7 @@
 					<div class="icon" title="File Save"></div>
 				</div>
 				<div class="bar-item pure-u link">
-					<input id="cons-log" type="checkbox" style="width: 16px; " title="Console log">
+					<input id="cons-log" type="checkbox" title="Console log">
 				</div>
 			</div>
 		</div>
@@ -150,44 +150,44 @@
 	<script type="text/html" id="viewBox01">
 		<div class="expandable hide">
 			<span>(</span>
-			<span class="var"><i>x: </i>{x}</span><span>,</span>
-			<span class="var"><i>y: </i>{y}</span><span>,</span>
-			<span class="var"><i>w: </i>{width}</span><span>,</span>
-			<span class="var"><i>h: </i>{height}</span>
+			<span class="var"><i>x: </i>{{ x }}</span><span>,</span>
+			<span class="var"><i>y: </i>{{ y }}</span><span>,</span>
+			<span class="var"><i>w: </i>{{ width }}</span><span>,</span>
+			<span class="var"><i>h: </i>{{ height }}</span>
 			<span>)</span>
 		</div>
 	</script>
 	<script type="text/html" id="size01">
 		<div class="expandable hide">
 			<span>(</span>
-			<span class="var"><i>w: </i>{width}</span><span>,</span>
-			<span class="var"><i>h: </i>{height}</span>
+			<span class="var"><i>w: </i>{{ width }}</span><span>,</span>
+			<span class="var"><i>h: </i>{{ height }}</span>
 			<span>)</span>
 		</div>
 	</script>
 	<script type="text/html" id="point01">
 		<div class="expandable hide">
 			<span>(</span>
-			<span class="var"><i>x: </i>{x}</span><span>,</span>
-			<span class="var"><i>y: </i>{y}</span><span>,</span>
+			<span class="var"><i>x: </i>{{ x }}</span><span>,</span>
+			<span class="var"><i>y: </i>{{ y }}</span><span>,</span>
 			<span>)</span>
 		</div>
 	</script>
 	<script type="text/html" id="baseWin01">
-		<div svg-type="win" id="{id}" class="{class}">
+		<div svg-type="win" id="{{ id }}" class="{{ class }}">
 		</div>
 	</script>
 	<script type="text/html" id="ctxWin01">
-		<div svg-type="win" id="{id}" class="{class}" data-trigger="">
+		<div svg-type="win" id="{{ id }}" class="{{ class }}" data-trigger="">
 		</div>
 	</script>
 	<script type="text/html" id="ctxItem01">
-		<div class="{class}" data-action="{action}" data-data="{data}" {disabled}>
-			<span>{text}</span><span class="right">{shortcut}</span>
+		<div class="{{ class }}" data-action="{{ action }}" data-data="{{ data }}" {{ disabled }}>
+			<span>{{ text }}</span><span class="right">{{ shortcut }}</span>
 		</div>
 	</script>
 	<script type="text/html" id="propWin01">
-		<div svg-type="win" id="{id}" class="{class}">
+		<div svg-type="win" id="{{ id }}" class="{{ class }}">
 			<header class="no-select">
 				<div class="title">Properties</div>
 				<div>
@@ -205,7 +205,7 @@
 		</div>
 	</script>
 	<script type="text/html" id="dialogWin01">
-		<div id="{id}" class="{class}">
+		<div id="{{ id }}" class="{{ class }}">
 			<div class="content">
 				<h4>title</h4>
 				<h5>message</h5> 
@@ -218,7 +218,7 @@
 		</div>
 	</script>
 	<script type="text/html" id="formWin01">
-		<div id="{id}" class="{class}">
+		<div id="{{ id }}" class="{{ class }}">
 			<div class="content">
 				<h4>title</h4>
 				<form class="pure-form pure-form-aligned">
@@ -233,18 +233,31 @@
 		</div>
 	</script>
 	<script type="text/html" id="formFieldWinSpan">
-		<div class="pure-control-group {class}">
-			<label for="dialog-form-{index}">{label}</label>
-			<span id="dialog-form-{index}">{value}</span>
+		<div class="pure-control-group {{ class }}">
+			<label for="dialog-form-{{ index }}">{{ label }}</label>
+			<span id="dialog-form-{{ index }}">{{ value }}</span>
 			<span class="hide">*</span>
 		</div>
 	</script>
 	<script type="text/html" id="formFieldWinInput">
-		<div class="pure-control-group {class}">
-			<label for="dialog-form-{index}">{label}</label>
-			<input type="text" id="dialog-form-{index}" value="{value}" index="{index}" placeholder="{placeHolder}" />
+		<div class="pure-control-group {{ class }}">
+			<label for="dialog-form-{{ index }}">{{ label }}</label>
+			<input type="text" id="dialog-form-{{ index }}" value="{{ value }}" index="{{ index }}" placeholder="{{ placeHolder }}" />
 			<span class="hide">*</span>
 		</div>
+	</script>
+	<script type="text/html" id="circuitXml">
+		<circuit version="{{ version }}" zoom="{{ zoom }}" name="{{ name }}" description?="{{ description }}" view="{{ view.x }},{{ view.y }}">
+			<ecs>
+				<ec d-for="item in ecList" id="{{ item.id }}" name="{{ item.name }}" x="{{ item.x }}" y="{{ item.y }}" rot="{{ item.rotation }}" label="{{ item.label }}" ></ec>
+			</ecs>
+			<wires>
+				<wire d-for="item in wireList" id="{{ item.id }}" points="{{ item.points }}" label="{{ item.label }}" ></wire>
+			</wires>
+			<bonds>
+				<bond d-for="item in bonds">{{ item }}</bond>
+			</bonds>
+		</circuit>
 	</script>
 <script src="../index.js"></script></body>
 

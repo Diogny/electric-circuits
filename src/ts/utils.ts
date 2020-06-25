@@ -32,19 +32,19 @@ export const templatesUrl = (url: string, obj?: object) => ajaxp.get(url, obj ||
 		return templates;
 	});
 
-export const templatesDOM = (query: string | string[]): Promise<Object> => {
+export const templatesDOM = (query: string | string[]): Promise<{ [key: string]: string }> => {
 	return new Promise(function (resolve, reject) {
 		//query:string   id0|id1|id[n]
 		let
 			templates = {
-				count: 0
 			},
+			count = 0,
 			idList = Array.isArray(query) ? query : query.split('|');
 		idList.forEach((id: string) => {
 			let
 				tmpl = qS(`#${id}`),
 				src = tmpl ? tmpl.innerHTML.replace(/\r|\n/g, "").trim() : undefined;
-			tmpl && (templates.count++, templates[id] = src);
+			tmpl && (count++, templates[id] = src);
 		});
 		resolve(templates)
 	})

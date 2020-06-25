@@ -229,8 +229,6 @@ export interface IItemBaseOptions {
 }
 
 export interface IItemWireOptions extends IItemBaseOptions {
-	//start: IWireBond;
-	//end: IWireBond;
 	points: IPoint[];
 }
 
@@ -245,11 +243,6 @@ export interface ILabelText extends IItemBaseOptions {
 
 export interface ITooltipText extends ILabelText {
 	borderRadius: number;
-}
-
-export interface IWireBond {
-	id: string;
-	node: number;
 }
 
 //the object item base has all properties, but restricted in the constructor
@@ -437,9 +430,9 @@ export interface IStateMachine extends IStateMachineBaseOptions {
 }
 
 export enum StateType {
-	IDLE = 1,						// idle
+	WINDOW = 1,
 	DEFAULT = 2,
-	BOARD = 3,						// board
+	BOARD = 3,
 	EC_NODE = 4,
 	EC_DRAG = 5,
 	EC_BODY = 6,

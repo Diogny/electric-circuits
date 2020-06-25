@@ -2,10 +2,11 @@ import {
 	IContextMenuOptions, IContextMenuItem, IContextMenuSettings, ActionType, StateType, IBoardWindowOptions
 } from "./interfaces";
 import { each } from "./utils";
-import { nano, aEL, getParentAttr, attr, extend, clone } from "./dab";
+import { aEL, getParentAttr, attr, extend, clone } from "./dab";
 import { MyApp } from "./myapp";
 import Point from "./point";
 import BoardWindow from "./board-window";
+import { Templates } from "./templates";
 
 export default class ContextWindow extends BoardWindow {
 
@@ -101,7 +102,7 @@ export default class ContextWindow extends BoardWindow {
 					let
 						o = clone<IContextMenuItem>(value);
 					(value.enabled && !value.enabled.some(i => i == state)) && (o.disabled = "disabled");
-					return nano(this.app.templates.ctxItem01, o)
+					return Templates.nano('ctxItem01', o)
 				}
 				).join('');
 			this.win.innerHTML = html;

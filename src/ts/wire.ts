@@ -25,13 +25,11 @@ export default class Wire extends ItemBoard {
 
 	get points(): Point[] { return Array.from(this.settings.points) }
 
-	//edit-mode
 	get editMode(): boolean { return this.settings.edit }
 
 	set editMode(value: boolean) {
-		if (this.editMode == value)		//avoid duplicated
+		if (this.editMode == value)
 			return;
-		//if editMode == true
 		if (this.editMode) {
 			//	will change to false
 			//		.destroy lines
@@ -44,7 +42,6 @@ export default class Wire extends ItemBoard {
 			//		.show polyline
 			removeClass(this.settings.polyline, "hide")
 		} else {
-			//if editMode == false
 			//	will change to true
 			//		.hide polyline
 			addClass(this.settings.polyline, "hide");
@@ -76,22 +73,8 @@ export default class Wire extends ItemBoard {
 			points: "",
 		});
 		this.g.append(this.settings.polyline);
-
-		//set new points in polyline
 		this.setPoints(options.points);
-
-		//bond wire ends if any
-		//if (options.start) {
-		//...
-		//}
-
-		//if (options.end) {
-		//...
-		//}
-
-		//place it
 		moveToStart.call(this);
-		//signal component creation
 		this.onProp && this.onProp({
 			id: `#${this.id}`,
 			args: {
@@ -108,7 +91,6 @@ export default class Wire extends ItemBoard {
 	}
 
 	public refresh(): Wire {
-		//set new points
 		attr(this.settings.polyline, {
 			points: this.settings.points.map(p => `${p.x}, ${p.y}`).join(' ')
 		});
@@ -117,15 +99,12 @@ export default class Wire extends ItemBoard {
 
 	public nodeRefresh(node: number): Wire {
 		if (this.editMode) {
-			//update lines  only if in edit mode
 			let
 				ln: SVGElement,
 				p = this.settings.points[node];
-
-			(ln = this.settings.lines[node - 1]) && attr(ln, { x2: p.x, y2: p.y }); //line where i(p) is second point
-			(ln = this.settings.lines[node]) && attr(ln, { x1: p.x, y1: p.y }); //line where i(p) is first point
+			(ln = this.settings.lines[node - 1]) && attr(ln, { x2: p.x, y2: p.y });
+			(ln = this.settings.lines[node]) && attr(ln, { x1: p.x, y1: p.y });
 		} else {
-			//full refresh because polyline
 			this.refresh();
 		}
 		if (!(node == 0 || node == this.last)) {
@@ -188,11 +167,9 @@ export default class Wire extends ItemBoard {
 	}
 
 	public setNode(node: number, p: IPoint): Wire {
-		//because no transformation, p is the same, just save it
-		this.settings.points[node].x = p.x | 0;	// remove decimals "trunc"
+		this.settings.points[node].x = p.x | 0;
 		this.settings.points[node].y = p.y | 0;
 		moveToStart.call(this);
-		//this.updateTransformPoint(node, p, false);
 		return this.nodeRefresh(node);
 	}
 
@@ -206,11 +183,9 @@ export default class Wire extends ItemBoard {
 		if (!isArr(points)
 			|| points.length < 2)
 			throw 'Poliwire min 2 points';
-		//can only be called when editMode == false
 		if (!this.editMode) {
 			this.settings.points = points.map(p => new Point(p.x | 0, p.y | 0));
 			moveToStart.call(this);
-			//clean lines and set polyline new points
 			this.settings.lines = [];
 			this.refresh();
 		}
@@ -227,10 +202,8 @@ export default class Wire extends ItemBoard {
 				(x <= p.x + this.settings.pad) &&
 				(y >= p.y - this.settings.pad) &&
 				(y <= p.y + this.settings.pad);
-
 		//if not in editMode, then ln will be 0, so reset to 1, and last point is the last
 		!this.editMode && (ln = 1, endPoint = this.last, lineCount = 1);
-
 		if (isLine(ln)) {
 			return isAround(this.settings.points[ln - 1], p.x, p.y) ?
 				ln - 1 :
@@ -261,7 +234,7 @@ export default class Wire extends ItemBoard {
 	}
 
 	public deleteLine(line: number): boolean {
-		//cannot delete fir or last line
+		//cannot delete first or last line
 		if (line <= 1 || line >= this.last)
 			return false;
 		let
@@ -325,8 +298,8 @@ export default class Wire extends ItemBoard {
 		return extend(super.propertyDefaults(), {
 			name: "wire",
 			class: "wire",
-			pad: 5,					// radius of the highlight circle
-			edit: false					// initial is false
+			pad: 5,
+			edit: false
 		})
 	}
 

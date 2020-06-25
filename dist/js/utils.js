@@ -31,12 +31,10 @@ exports.templatesUrl = function (url, obj) { return ajaxp_1.default.get(url, obj
 exports.templatesDOM = function (query) {
     return new Promise(function (resolve, reject) {
         //query:string   id0|id1|id[n]
-        var templates = {
-            count: 0
-        }, idList = Array.isArray(query) ? query : query.split('|');
+        var templates = {}, count = 0, idList = Array.isArray(query) ? query : query.split('|');
         idList.forEach(function (id) {
             var tmpl = qS("#" + id), src = tmpl ? tmpl.innerHTML.replace(/\r|\n/g, "").trim() : undefined;
-            tmpl && (templates.count++, templates[id] = src);
+            tmpl && (count++, templates[id] = src);
         });
         resolve(templates);
     });

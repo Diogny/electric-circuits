@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.DialogType = exports.ActionType = exports.StateType = void 0;
 var StateType;
 (function (StateType) {
-    StateType[StateType["IDLE"] = 1] = "IDLE";
+    StateType[StateType["WINDOW"] = 1] = "WINDOW";
     StateType[StateType["DEFAULT"] = 2] = "DEFAULT";
     StateType[StateType["BOARD"] = 3] = "BOARD";
     StateType[StateType["EC_NODE"] = 4] = "EC_NODE";

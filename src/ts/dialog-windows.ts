@@ -1,7 +1,8 @@
 import { IBaseWindowOptions } from "./interfaces";
-import { extend, addClass, removeClass, empty, nano, clone } from "./dab";
+import { extend, addClass, removeClass, empty, clone } from "./dab";
 import { CircuitProperty } from "./circuit";
 import DialogBase from "./dialog-base";
+import { Templates } from "./templates";
 
 export class DialogWindow extends DialogBase {
 
@@ -54,7 +55,7 @@ export class FormWindow extends DialogBase {
 				!o.placeHolder && (o.placeHolder = o.label);
 				(<any>o).index = index;
 				(<any>o).class = item.visible ? "" : "hide";
-				return nano((this as DialogWindow).app.templates[item.readonly ? "formFieldWinSpan" : "formFieldWinInput"], o)
+				return Templates.nano(item.readonly ? "formFieldWinSpan" : "formFieldWinInput", o)
 			})
 				.join('')
 		}, ["Save", "Cancel"], function (choice: number) {

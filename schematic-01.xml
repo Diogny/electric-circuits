@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<circuit version="1.1.5" zoom="0.33" name="my circuit" view="0,0">
-	<ecs>
-		<ec id="resistor-1" name="resistor" x="150" y="50" rot="0" label="R1" />
-		<ec id="variable-resistor-1" name="variable-resistor" x="150" y="150" rot="0" label="VR1" />
-		<ec id="3v3-0" name="3v3" x="30" y="75" rot="0" label="3v3-0" />
-		<ec id="led-0" name="led" x="277" y="75" rot="0" label="led-0" />
-	</ecs>
-	<wires>
-		<wire id="wire-0" points="90,115|118,115|118,60|150,60" label="wire-0" />
-		<wire id="wire-1" points="118,115|118,170|150,170" label="wire-1" />
-		<wire id="wire-2" points="190,60|230,60|230,115|277,115" label="wire-2" />
-		<wire id="wire-3" points="230,115|230,170|190,170" label="wire-3" />
-		<wire id="wire-4" points="30,115|16,115|16,202|361,202|361,115|338,115" label="wire-4" />
-	</wires>
-	<bonds>
-		<bond>resistor-1,0,wire-0,3</bond>
-		<bond>resistor-1,1,wire-2,0</bond>
-		<bond>variable-resistor-1,0,wire-1,2</bond>
-		<bond>variable-resistor-1,1,wire-3,2</bond>
-		<bond>3v3-0,0,wire-4,0</bond>
-		<bond>3v3-0,1,wire-0,0</bond>
-		<bond>led-0,0,wire-2,3</bond>
-		<bond>led-0,1,wire-4,5</bond>
-		<bond>wire-0,1,wire-1,0</bond>
-		<bond>wire-2,2,wire-3,0</bond>
-	</bonds>
-</circuit>
+<CIRCUIT version="1.1.5" zoom="0.33" name="my circuit" view="0,0">
+	<ECS>
+		<EC id="resistor-1" name="resistor" x="150" y="50" rot="0" label="R1" />
+		<EC id="variable-resistor-1" name="variable-resistor" x="150" y="150" rot="0" label="VR1" />
+		<EC id="3v3-0" name="3v3" x="30" y="75" rot="0" label="3v3-0" />
+		<EC id="led-0" name="led" x="277" y="85" rot="0" label="led-0" />
+	</ECS>
+	<WIRES>
+		<WIRE id="wire-0" points="90,115|118,115|118,60|150,60" label="wire-0" />
+		<WIRE id="wire-1" points="118,115|118,170|150,170" label="wire-1" />
+		<WIRE id="wire-2" points="190,60|230,60|230,115|277,115" label="wire-2" />
+		<WIRE id="wire-3" points="230,115|230,170|190,170" label="wire-3" />
+		<WIRE id="wire-4" points="30,115|16,115|16,202|361,202|361,115|340,115" label="wire-4" />
+	</WIRES>
+	<BONDS>
+		<BOND>resistor-1,0,wire-0,3</BOND>
+		<BOND>resistor-1,1,wire-2,0</BOND>
+		<BOND>variable-resistor-1,0,wire-1,2</BOND>
+		<BOND>variable-resistor-1,1,wire-3,2</BOND>
+		<BOND>3v3-0,0,wire-4,0</BOND>
+		<BOND>3v3-0,1,wire-0,0</BOND>
+		<BOND>led-0,0,wire-2,3</BOND>
+		<BOND>led-0,1,wire-4,5</BOND>
+		<BOND>wire-0,1,wire-1,0</BOND>
+		<BOND>wire-2,2,wire-3,0</BOND>
+	</BONDS>
+</CIRCUIT>

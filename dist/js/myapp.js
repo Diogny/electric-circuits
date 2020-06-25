@@ -20,6 +20,7 @@ var highlightNode_1 = require("./highlightNode");
 var selection_rect_1 = require("./selection-rect");
 var circuit_1 = require("./circuit");
 var dialog_windows_1 = require("./dialog-windows");
+var templates_1 = require("./templates");
 var MyApp = /** @class */ (function (_super) {
     tslib_1.__extends(MyApp, _super);
     function MyApp(options) {
@@ -255,7 +256,7 @@ var MyApp = /** @class */ (function (_super) {
         this.updateViewBox(zoom);
     };
     MyApp.prototype.updateCircuitLabel = function () {
-        this.circuitName.innerHTML = dab_1.nano('<span class="{class}">*</span><span>{name}</span>', {
+        this.circuitName.innerHTML = templates_1.Templates.nano('circuitName', {
             name: this.circuit.name,
             class: this.circuit.modified ? "" : "hide"
         });
@@ -277,8 +278,8 @@ var MyApp = /** @class */ (function (_super) {
         return sizes.length ? sizes : [getRect(circuit_1.Circuit.zoomMultipliers[0], 0)];
     };
     MyApp.prototype.refreshViewBoxData = function () {
-        this.bottomBarCenter.innerHTML = dab_1.nano(this.templates.viewBox01, this.viewBox) + "&nbsp; ";
-        //+ nano(this.templates.size01, this.size);
+        this.bottomBarCenter.innerHTML = templates_1.Templates.nano('viewBox01', this.viewBox) + "&nbsp; ";
+        //+ n ano(this.templates.size01, this.size);
     };
     MyApp.prototype.getAspectRatio = function (width, height) {
         var ratio = width / height;
@@ -434,8 +435,9 @@ var MyApp = /** @class */ (function (_super) {
             : Promise.resolve(3); // Not Modified: 3
     };
     MyApp.prototype.newCircuit = function () {
-        var self = this, options = circuit_1.Circuit.circuitProperties(), path = options.find(function (value) { return value.label == "path"; });
+        var self = this, options = circuit_1.Circuit.circuitProperties(), path = options.find(function (value) { return value.label == "path"; }), filename = options.find(function (value) { return value.label == "filename"; });
         path && (path.visible = false);
+        filename && (filename.visible = false);
         this.circuitLoadingOrSaving = true;
         return this.saveDialogIfModified()
             .then(function (choice) {
@@ -468,9 +470,12 @@ var MyApp = /** @class */ (function (_super) {
             }
         })
             .catch(function (reason) {
+            //console.log('error: ', reason);
             self.circuitLoadingOrSaving = false;
-            console.log('error: ', reason);
-            return Promise.resolve(5); // Error: 5
+            return self.dialog.showMessage(reason.name, reason.message)
+                .then(function () {
+                return Promise.resolve(5); // Error: 5
+            });
         });
     };
     MyApp.prototype.saveCircuit = function (showDialog) {
@@ -523,9 +528,12 @@ var MyApp = /** @class */ (function (_super) {
             return Promise.resolve(choice);
         })
             .catch(function (reason) {
+            //console.log('error: ', reason);
             self.circuitLoadingOrSaving = false;
-            console.log('error: ', reason);
-            return Promise.resolve(5); // Error: 5
+            return self.dialog.showMessage(reason.name, reason.message)
+                .then(function () {
+                return Promise.resolve(5); // Error: 5
+            });
         });
     };
     return MyApp;

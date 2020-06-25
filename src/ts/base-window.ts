@@ -1,9 +1,9 @@
 import Item from "./item";
 import { Type } from "./types";
-import { Application } from "./app";
 import { IBaseWindowSettings, ISize, IBaseWindowOptions, ITemplate } from "./interfaces";
-import { obj, extend, nano } from "./dab";
+import { obj, extend } from "./dab";
 import { html } from "./utils";
+import { Templates } from "./templates";
 
 export default class BaseWindow extends Item {
 
@@ -34,7 +34,7 @@ export default class BaseWindow extends Item {
 
 	constructor(options: IBaseWindowOptions) {
 		super(options);
-		this.settings.win = <HTMLElement>html(nano(this.app.templates[this.settings.templateName], {
+		this.settings.win = <HTMLElement>html(Templates.nano(this.settings.templateName, {
 			id: this.id,
 			class: this.class
 		}));

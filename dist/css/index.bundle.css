@@ -174,7 +174,10 @@ body.dark .bar-item > input {
 .dark #rot-lbl {
   border: 1px solid #949494;
 }
-
+#cons-log {
+  width: 18px;
+  height: 18px;
+}
 .bar-item > .icon {
   width: 16px;
   height: 16px;
@@ -406,7 +409,6 @@ body.dark .expandable > span > i {
   box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
   background-color: #555;
 }
-
 
 /********************  BASE WINDOW ********************/
 

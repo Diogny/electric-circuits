@@ -17,18 +17,8 @@ var Wire = /** @class */ (function (_super) {
             points: "",
         });
         _this.g.append(_this.settings.polyline);
-        //set new points in polyline
         _this.setPoints(options.points);
-        //bond wire ends if any
-        //if (options.start) {
-        //...
-        //}
-        //if (options.end) {
-        //...
-        //}
-        //place it
         moveToStart.call(_this);
-        //signal component creation
         _this.onProp && _this.onProp({
             id: "#" + _this.id,
             args: {
@@ -76,13 +66,11 @@ var Wire = /** @class */ (function (_super) {
         configurable: true
     });
     Object.defineProperty(Wire.prototype, "editMode", {
-        //edit-mode
         get: function () { return this.settings.edit; },
         set: function (value) {
             var _this = this;
-            if (this.editMode == value) //avoid duplicated
+            if (this.editMode == value)
                 return;
-            //if editMode == true
             if (this.editMode) {
                 //	will change to false
                 //		.destroy lines
@@ -96,7 +84,6 @@ var Wire = /** @class */ (function (_super) {
                 dab_1.removeClass(this.settings.polyline, "hide");
             }
             else {
-                //if editMode == false
                 //	will change to true
                 //		.hide polyline
                 dab_1.addClass(this.settings.polyline, "hide");
@@ -121,7 +108,6 @@ var Wire = /** @class */ (function (_super) {
         configurable: true
     });
     Wire.prototype.refresh = function () {
-        //set new points
         dab_1.attr(this.settings.polyline, {
             points: this.settings.points.map(function (p) { return p.x + ", " + p.y; }).join(' ')
         });
@@ -130,13 +116,11 @@ var Wire = /** @class */ (function (_super) {
     Wire.prototype.nodeRefresh = function (node) {
         var _this = this;
         if (this.editMode) {
-            //update lines  only if in edit mode
             var ln = void 0, p = this.settings.points[node];
-            (ln = this.settings.lines[node - 1]) && dab_1.attr(ln, { x2: p.x, y2: p.y }); //line where i(p) is second point
-            (ln = this.settings.lines[node]) && dab_1.attr(ln, { x1: p.x, y1: p.y }); //line where i(p) is first point
+            (ln = this.settings.lines[node - 1]) && dab_1.attr(ln, { x2: p.x, y2: p.y });
+            (ln = this.settings.lines[node]) && dab_1.attr(ln, { x1: p.x, y1: p.y });
         }
         else {
-            //full refresh because polyline
             this.refresh();
         }
         if (!(node == 0 || node == this.last)) {
@@ -189,11 +173,9 @@ var Wire = /** @class */ (function (_super) {
         return !this.editMode && (this.settings.points.push(p), this.refresh(), true);
     };
     Wire.prototype.setNode = function (node, p) {
-        //because no transformation, p is the same, just save it
-        this.settings.points[node].x = p.x | 0; // remove decimals "trunc"
+        this.settings.points[node].x = p.x | 0;
         this.settings.points[node].y = p.y | 0;
         moveToStart.call(this);
-        //this.updateTransformPoint(node, p, false);
         return this.nodeRefresh(node);
     };
     Wire.prototype.nodeHighlightable = function (node) {
@@ -205,11 +187,9 @@ var Wire = /** @class */ (function (_super) {
         if (!dab_1.isArr(points)
             || points.length < 2)
             throw 'Poliwire min 2 points';
-        //can only be called when editMode == false
         if (!this.editMode) {
             this.settings.points = points.map(function (p) { return new point_1.default(p.x | 0, p.y | 0); });
             moveToStart.call(this);
-            //clean lines and set polyline new points
             this.settings.lines = [];
             this.refresh();
         }
@@ -250,7 +230,7 @@ var Wire = /** @class */ (function (_super) {
         return -1;
     };
     Wire.prototype.deleteLine = function (line) {
-        //cannot delete fir or last line
+        //cannot delete first or last line
         if (line <= 1 || line >= this.last)
             return false;
         var savedEditMode = this.editMode;
@@ -305,7 +285,7 @@ var Wire = /** @class */ (function (_super) {
             name: "wire",
             class: "wire",
             pad: 5,
-            edit: false // initial is false
+            edit: false
         });
     };
     return Wire;

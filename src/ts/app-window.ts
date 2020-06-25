@@ -76,14 +76,15 @@ export default class AppWindow extends BoardWindow {
 	}
 
 	public onMouseEnter(e: MouseEvent) {
+		(this.app as MyApp).sm.transition(StateType.WINDOW, ActionType.START);
 		(this.app as MyApp).bottomBarLeft.innerHTML = "&nbsp;";
 		this.settings.offset && (this.settings.offset = new Point(e.offsetX, e.offsetY));
 		//console.log('IN app window', e.eventPhase, (e.target as HTMLElement).id);
 	}
 
 	public onMouseLeave(e: MouseEvent) {
-		this.renderBar("");
 		(this.app as MyApp).sm.transition(StateType.BOARD, ActionType.RESUME);
+		this.renderBar("");
 		//console.log('OUT of app window', e.eventPhase, (e.target as HTMLElement).id);
 	}
 

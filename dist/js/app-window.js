@@ -75,13 +75,14 @@ var AppWindow = /** @class */ (function (_super) {
         return this.barTitle.innerText = (this.settings.bar = value), this;
     };
     AppWindow.prototype.onMouseEnter = function (e) {
+        this.app.sm.transition(interfaces_1.StateType.WINDOW, interfaces_1.ActionType.START);
         this.app.bottomBarLeft.innerHTML = "&nbsp;";
         this.settings.offset && (this.settings.offset = new point_1.default(e.offsetX, e.offsetY));
         //console.log('IN app window', e.eventPhase, (e.target as HTMLElement).id);
     };
     AppWindow.prototype.onMouseLeave = function (e) {
-        this.renderBar("");
         this.app.sm.transition(interfaces_1.StateType.BOARD, interfaces_1.ActionType.RESUME);
+        this.renderBar("");
         //console.log('OUT of app window', e.eventPhase, (e.target as HTMLElement).id);
     };
     AppWindow.prototype.setVisible = function (value) {

@@ -8,7 +8,7 @@ import Rect from "./rect";
 import Size from "./size";
 import Point from './point';
 import Tooltip from "./tooltip";
-import { attr, aEL, nano, removeClass, addClass } from "./dab";
+import { attr, aEL, removeClass, addClass } from "./dab";
 import AppWindow from "./app-window";
 import StateMachine from "./stateMachine";
 import ContextWindow from "./context-window";
@@ -21,6 +21,7 @@ import Wire from "./wire";
 import { SelectionRect } from "./selection-rect";
 import { Circuit } from "./circuit";
 import { FormWindow, DialogWindow } from "./dialog-windows";
+import { Templates } from "./templates";
 
 export class MyApp extends Application implements IMyApp {
 
@@ -330,7 +331,7 @@ export class MyApp extends Application implements IMyApp {
 	}
 
 	public updateCircuitLabel() {
-		this.circuitName.innerHTML = nano('<span class="{class}">*</span><span>{name}</span>', {
+		this.circuitName.innerHTML = Templates.nano('circuitName', {
 			name: this.circuit.name,
 			class: this.circuit.modified ? "" : "hide"
 		});
@@ -356,8 +357,8 @@ export class MyApp extends Application implements IMyApp {
 	}
 
 	public refreshViewBoxData() {
-		this.bottomBarCenter.innerHTML = nano(this.templates.viewBox01, this.viewBox) + "&nbsp; "
-		//+ nano(this.templates.size01, this.size);
+		this.bottomBarCenter.innerHTML = Templates.nano('viewBox01', this.viewBox) + "&nbsp; "
+		//+ na no(this.templates.size01, this.size);
 	}
 
 	public getAspectRatio(width: number, height: number) {
@@ -536,8 +537,10 @@ export class MyApp extends Application implements IMyApp {
 		let
 			self = this as MyApp,
 			options = Circuit.circuitProperties(),
-			path = options.find(value => value.label == "path");
+			path = options.find(value => value.label == "path"),
+			filename = options.find(value => value.label == "filename");
 		path && (path.visible = false);
+		filename && (filename.visible = false);
 		this.circuitLoadingOrSaving = true;
 		return this.saveDialogIfModified()
 			.then((choice) => {
@@ -571,9 +574,12 @@ export class MyApp extends Application implements IMyApp {
 				}
 			})
 			.catch((reason) => {
+				//console.log('error: ', reason);
 				self.circuitLoadingOrSaving = false;
-				console.log('error: ', reason);
-				return Promise.resolve(5)	// Error: 5
+				return self.dialog.showMessage(reason.name, reason.message)
+					.then(() => {
+						return Promise.resolve(5)	// Error: 5
+					})
 			})
 	}
 
@@ -633,9 +639,12 @@ export class MyApp extends Application implements IMyApp {
 				return Promise.resolve(choice)
 			})
 			.catch((reason) => {
+				//console.log('error: ', reason);
 				self.circuitLoadingOrSaving = false;
-				console.log('error: ', reason);
-				return Promise.resolve(5)	// Error: 5
+				return self.dialog.showMessage(reason.name, reason.message)
+					.then(() => {
+						return Promise.resolve(5)	// Error: 5
+					})
 			})
 	}
 }
