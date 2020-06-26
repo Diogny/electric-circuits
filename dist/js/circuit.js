@@ -57,8 +57,7 @@ var Circuit = /** @class */ (function () {
     });
     Circuit.validZoom = function (zoom) {
         return !(isNaN(zoom)
-            || !Circuit.zoomMultipliers.some(function (z) { return z == zoom; }) //["0.125", "0.166", "0.25", "0.33", "0.5", "0.75", "1", "2", "4", "8"]
-        );
+            || !Circuit.zoomMultipliers.some(function (z) { return z == zoom; }));
     };
     Object.defineProperty(Circuit.prototype, "modified", {
         get: function () { return this.__modified; },
@@ -105,7 +104,6 @@ var Circuit = /** @class */ (function () {
         enumerable: false,
         configurable: true
     });
-    //selection
     Circuit.prototype.hasComponent = function (id) { return this.ecMap.has(id); };
     Circuit.prototype.selectAll = function (value) {
         return (this.selectedComponents = Array.from(this.ecMap.values())
@@ -183,11 +181,9 @@ var Circuit = /** @class */ (function () {
                 var answer = electron_1.ipcRenderer.sendSync('saveFile', {
                     data: getCircuitXML.call(self)
                 });
-                //error treatment
                 if (answer.canceled)
                     choice = 1; // Cancel: 1
                 else if (answer.error) {
-                    //later popup with error
                     console.log(answer);
                     choice = 5; // Error: 5
                 }
@@ -245,7 +241,6 @@ function createBoardItem(options) {
     if (!options.id) {
         options.id = name + "-" + base.count;
     }
-    //use template to create label according to defined strategy
     var label = base.comp.meta.nameTmpl.replace(regex, function (match, group) {
         var arr = group.split('.'), getRoot = function (name) {
             //valid entry points

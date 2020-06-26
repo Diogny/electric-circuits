@@ -48,40 +48,43 @@ export class FormWindow extends DialogBase {
 	}
 
 	public showDialog(title: string, formItems: CircuitProperty[]): Promise<number> {
-		return this.promise(title, function () {
-			(this as DialogWindow).contentHTML.innerHTML = formItems.map((item, index) => {
+		return this.promise(title,
+			function () {
+				(this as DialogWindow).contentHTML.innerHTML = formItems.map((item, index) => {
+					let
+						o = clone<CircuitProperty>(item);
+					!o.placeHolder && (o.placeHolder = o.label);
+					(<any>o).index = index;
+					(<any>o).class = item.visible ? "" : "hide";
+					return Templates.nano(item.readonly ? "formFieldWinSpan" : "formFieldWinInput", o)
+				})
+					.join('')
+			},
+			["Save", "Cancel"],
+			function (choice: number) {
 				let
-					o = clone<CircuitProperty>(item);
-				!o.placeHolder && (o.placeHolder = o.label);
-				(<any>o).index = index;
-				(<any>o).class = item.visible ? "" : "hide";
-				return Templates.nano(item.readonly ? "formFieldWinSpan" : "formFieldWinInput", o)
+					isRequired = (s: string, ndx: number) => (empty(s) && formItems[ndx].required);
+				if (choice == 0
+					&& (Array.from((this as DialogWindow).contentHTML.querySelectorAll("div>input"))
+						.filter((elem: HTMLInputElement) => {
+							let
+								index = parseInt(<any>elem.getAttribute("index")),
+								item = formItems[index];
+							if (item
+								&& !item.readonly
+								&& isRequired(item.value = elem.value, index)
+							) {
+								(<any>elem.nextElementSibling).innerText = "required";
+								removeClass(<any>elem.nextElementSibling, "hide");
+								return true;
+							}
+							(<any>elem.nextElementSibling).innerText = "*";
+							addClass(<any>elem.nextElementSibling, "hide");
+						})).length
+				)
+					return false;
+				return true
 			})
-				.join('')
-		}, ["Save", "Cancel"], function (choice: number) {
-			let
-				isRequired = (s: string, ndx: number) => (empty(s) && formItems[ndx].required);
-			if (choice == 0
-				&& (Array.from((this as DialogWindow).contentHTML.querySelectorAll("div>input"))
-					.filter((elem: HTMLInputElement) => {
-						let
-							index = parseInt(<any>elem.getAttribute("index")),
-							item = formItems[index];
-						if (item
-							&& !item.readonly
-							&& isRequired(item.value = elem.value, index)
-						) {
-							(<any>elem.nextElementSibling).innerText = "required";
-							removeClass(<any>elem.nextElementSibling, "hide");
-							return true;
-						}
-						(<any>elem.nextElementSibling).innerText = "*";
-						addClass(<any>elem.nextElementSibling, "hide");
-					})).length
-			)
-				return false;
-			return true
-		})
 	}
 
 	public propertyDefaults(): IBaseWindowOptions {

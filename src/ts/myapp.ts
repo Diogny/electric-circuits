@@ -22,6 +22,7 @@ import { SelectionRect } from "./selection-rect";
 import { Circuit } from "./circuit";
 import { FormWindow, DialogWindow } from "./dialog-windows";
 import { Templates } from "./templates";
+import ActionManager from "./action-manager";
 
 export class MyApp extends Application implements IMyApp {
 
@@ -51,6 +52,9 @@ export class MyApp extends Application implements IMyApp {
 	//all window height
 	contentHeight: number;
 	size: Size;
+
+	get boardOffsetLeft(): number { return this.board.offsetLeft }
+	get boardOffsetTop(): number { return this.board.offsetTop }
 
 	get tooltipOfs(): number { return 15 }
 
@@ -154,7 +158,6 @@ export class MyApp extends Application implements IMyApp {
 
 		//this'll hold the properties of the current selected component
 		this.winProps = new AppWindow(<IAppWindowOptions>{
-			app: <ITemplate>this,
 			id: "win-props",
 			x: 800,
 			y: 0,
@@ -185,7 +188,7 @@ export class MyApp extends Application implements IMyApp {
 				KEY: function (code: any) {
 					//console.log(`KEY: ${code}`);
 					//this's the default
-					(code == "Delete") && that.execute(ActionType.DELETE, "");
+					(code == "Delete") && ActionManager.$.execute(ActionType.DELETE, "");
 				},
 				HIDE_NODE: hideNodeTooltip,
 				FORWARD_OVER: function (newCtx: IMouseState) {
@@ -288,6 +291,7 @@ export class MyApp extends Application implements IMyApp {
 				case 'F1':
 					break;
 				case 'KeyA':	// CtrlKeyA		select all ECs
+				case 'KeyU':	// CtrlKeyU		unselect all ECs
 				case 'KeyC':	// CtrlKeyC		copy selected ECs
 				case 'KeyV':	// CtrlKeyV		paste cloned selected ECs
 				//case 'KeyX':	// CtrlKeyX		cut selected ECs - see if it makes sense
@@ -389,121 +393,6 @@ export class MyApp extends Application implements IMyApp {
 			rotation = isEC ? (ec as EC).rotation : 0;
 		this.prop("rot_lbl").value = ` ${rotation}°`;
 		isEC && (this.winProps.compId == ec?.id) && this.winProps.property("rotation")?.refresh();
-	}
-
-	//public execute({ action, trigger, data }: { action: ActionType; trigger: string; data?: any; }) {
-	public execute(action: ActionType, trigger: string) {
-		let
-			arr = trigger.split('::'),
-			comp = this.circuit.get(<string>arr.shift()),
-			name = arr.shift(),
-			type = arr.shift(),
-			nodeOrLine = parseInt(<any>arr.shift()),
-			data = arr.shift(),
-			compNull = false;
-		//this's a temporary fix to make it work
-		//	final code will have a centralized action dispatcher
-		switch (action) {
-			case ActionType.TOGGLE_SELECT:
-				if (!(compNull = !comp) && comp.type == Type.EC) {
-					this.circuit.toggleSelect(comp as EC);
-					this.refreshRotation(this.circuit.ec);
-					(this.circuit.ec && (this.winProps.load(this.circuit.ec), 1)) || this.winProps.clear();
-					//temporary, for testings...
-					this.circuit.ec && ((<any>window).ec = this.circuit.ec);
-				}
-				break;
-			case ActionType.SELECT:
-				if (!(compNull = !comp) && comp.type == Type.EC) {
-					this.circuit.selectThis(comp as EC);
-					this.refreshRotation(comp);
-					((action == ActionType.SELECT) && (this.winProps.load(comp), 1)) || this.winProps.clear();
-					//temporary, for testings...
-					(<any>window).ec = this.circuit.ec;
-				}
-				break;
-			case ActionType.SELECT_ALL:
-				this.circuit.selectAll(true);
-				this.refreshRotation();
-				this.winProps.clear();
-				//temporary, for testings...
-				(<any>window).ec = void 0;
-				break;
-			case ActionType.UNSELECT_ALL:
-				this.circuit.selectAll(false);
-				this.refreshRotation();
-				this.winProps.clear();
-				//temporary, for testings...
-				(<any>window).ec = void 0;
-				break;
-			case ActionType.DELETE_SELECTED:
-				let
-					selectedCount = this.circuit.selectedComponents.length,
-					deletedCount = this.circuit.deleteSelected();
-				this.refreshRotation();
-				this.winProps.clear().setVisible(false);
-				this.tooltip.setVisible(false);
-				this.updateCircuitLabel();
-				if (selectedCount != deletedCount) {
-					console.log(`[${deletedCount}] components of [${selectedCount}]`)
-				}
-				//temporary, for testings...
-				(<any>window).ec = void 0;
-				break;
-			case ActionType.DELETE:
-				//only comp if sent
-				if (!(compNull = !comp)) {
-					if (this.circuit.delete(comp)) {
-						this.refreshRotation();
-						this.winProps.clear().setVisible(false);
-						this.tooltip.setVisible(false);
-						this.updateCircuitLabel();
-						this.sm.send(ActionType.AFTER_DELETE, comp.id);
-					}
-				}
-				//temporary, for testings...
-				(<any>window).ec = void 0;
-				break;
-			case ActionType.DELETE_THIS_LINE:
-				//console.log(`delete line segment: `, trigger);
-				if (!(compNull = !comp)) {
-					(comp as Wire).deleteLine(nodeOrLine);
-					this.winProps.refresh();
-					this.updateCircuitLabel();
-				}
-				break;
-			case ActionType.DELETE_WIRE_NODE:
-				//console.log(`delete wire node: `, trigger);
-				if (!(compNull = !comp)) {
-					(comp as Wire).deleteNode(nodeOrLine);
-					this.winProps.refresh();
-					this.updateCircuitLabel();
-				}
-				break;
-			case ActionType.SPLIT_THIS_LINE:
-				//console.log(`split line segment: `, trigger, this.rightClick.offset);
-				if (!(compNull = !comp)) {
-					(comp as Wire).insertNode(nodeOrLine, this.rightClick.offset);
-					this.winProps.refresh();
-					this.updateCircuitLabel();
-				}
-				break;
-			case ActionType.SHOW_PROPERTIES:
-				!(compNull = !comp) && this.winProps.load(comp);
-				break;
-			case ActionType.ROTATE_45_CLOCKWISE:
-			case ActionType.ROTATE_45_COUNTER_CLOCKWISE:
-			case ActionType.ROTATE_90_CLOCKWISE:
-			case ActionType.ROTATE_90_COUNTER_CLOCKWISE:
-				!(compNull = !comp) && data && this.rotateComponentBy(<any>data | 0, comp);
-				break;
-		}
-		//logs
-		if (compNull) {
-			console.log(`invalid trigger: ${trigger}`);
-		} else {
-			//console.log(`action: ${action}, id: ${comp?.id}, name: ${name}, type: ${type}, trigger: ${trigger}`);
-		}
 	}
 
 	public addToDOM(comp: EC | Wire): boolean {

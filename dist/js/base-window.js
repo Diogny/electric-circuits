@@ -23,11 +23,6 @@ var BaseWindow = /** @class */ (function (_super) {
         enumerable: false,
         configurable: true
     });
-    Object.defineProperty(BaseWindow.prototype, "app", {
-        get: function () { return this.settings.app; },
-        enumerable: false,
-        configurable: true
-    });
     Object.defineProperty(BaseWindow.prototype, "win", {
         get: function () { return this.settings.win; },
         enumerable: false,
@@ -43,7 +38,7 @@ var BaseWindow = /** @class */ (function (_super) {
     };
     Object.defineProperty(BaseWindow.prototype, "ClientRect", {
         get: function () {
-            var b = this.win.getBoundingClientRect(); //gives the DOM screen info
+            var b = this.win.getBoundingClientRect();
             return dab_1.obj({
                 width: b.width | 0,
                 height: b.height | 0
@@ -64,7 +59,6 @@ var BaseWindow = /** @class */ (function (_super) {
     };
     BaseWindow.prototype.propertyDefaults = function () {
         return dab_1.extend(_super.prototype.propertyDefaults.call(this), {
-            app: void 0,
             visible: false,
             ignoreHeight: false,
             title: "",

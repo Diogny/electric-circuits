@@ -7,6 +7,7 @@ var dab_1 = require("./dab");
 var point_1 = require("./point");
 var board_window_1 = require("./board-window");
 var templates_1 = require("./templates");
+var action_manager_1 = require("./action-manager");
 var ContextWindow = /** @class */ (function (_super) {
     tslib_1.__extends(ContextWindow, _super);
     function ContextWindow(options) {
@@ -28,7 +29,9 @@ var ContextWindow = /** @class */ (function (_super) {
             var self = dab_1.getParentAttr(e.target, "data-action"), action = dab_1.attr(self, "data-action") | 0, data = dab_1.attr(self, "data-data"), disabled = self.hasAttribute("disabled"), trigger = dab_1.attr(self.parentElement, "data-trigger");
             self
                 && !disabled
-                && (that.setVisible(false), data && (trigger += "::" + data), that.app.execute(action, trigger));
+                && (that.setVisible(false),
+                    data && (trigger += "::" + data),
+                    action_manager_1.default.$.execute(action, trigger));
         }, false);
         return _this;
     }
@@ -43,7 +46,7 @@ var ContextWindow = /** @class */ (function (_super) {
         //return false;
     };
     ContextWindow.prototype.onMouseLeave = function (e) {
-        this.app.sm.transition(interfaces_1.StateType.BOARD, interfaces_1.ActionType.RESUME);
+        action_manager_1.default.$.transition(interfaces_1.StateType.BOARD, interfaces_1.ActionType.RESUME);
     };
     ContextWindow.prototype.setVisible = function (value) {
         return (!_super.prototype.setVisible.call(this, value).visible && this.win.setAttribute("data-trigger", "")), this;
@@ -87,12 +90,11 @@ var ContextWindow = /** @class */ (function (_super) {
         if (entry) {
             this.settings.current = key;
             this.clear();
-            var html = entry.map(function (value) {
+            this.win.innerHTML = entry.map(function (value) {
                 var o = dab_1.clone(value);
                 (value.enabled && !value.enabled.some(function (i) { return i == state; })) && (o.disabled = "disabled");
                 return templates_1.Templates.nano('ctxItem01', o);
             }).join('');
-            this.win.innerHTML = html;
             this.settings.offset = offset;
         }
         else

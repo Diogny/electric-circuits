@@ -52,13 +52,15 @@ export class Circuit {
 	public static get zoomMultipliers(): number[] {
 		return Array.from([8, 4, 2, 1, 0.75, 0.5, 0.33, 0.25, 0.166, 0.125]);
 	}
+
 	public static get zoomFactors(): string[] {
 		return Array.from(["1/8X", "1/4X", "1/2X", "1X", "1 1/2X", "2X", "3X", "4X", "6X", "8X"]);
 	}
+
 	public static validZoom(zoom: number): boolean {
 		return !(
 			isNaN(zoom)
-			|| !Circuit.zoomMultipliers.some(z => z == zoom) //["0.125", "0.166", "0.25", "0.33", "0.5", "0.75", "1", "2", "4", "8"]
+			|| !Circuit.zoomMultipliers.some(z => z == zoom)
 		)
 	}
 
@@ -76,17 +78,12 @@ export class Circuit {
 	}
 
 	get ecList(): EC[] { return Array.from(this.ecMap.values()) }
-
 	get wireList(): Wire[] { return Array.from(this.wireMap.values()) }
-
 	get empty(): boolean { return !(this.wireMap.size || this.ecMap.size) }
-
 	get components(): ItemBoard[] { return (this.ecList as ItemBoard[]).concat(this.wireList) }
 
 	selectedComponents: EC[];
-
 	filePath: string;
-
 	view: Point;
 
 	public get(id: string): EC | Wire | undefined {
@@ -112,7 +109,6 @@ export class Circuit {
 		this.view = new Point(0, 0);
 	}
 
-	//selection
 	public hasComponent(id: string): boolean { return this.ecMap.has(id); }
 
 	public selectAll(value: boolean): EC[] {
@@ -203,11 +199,9 @@ export class Circuit {
 				let answer = ipcRenderer.sendSync('saveFile', {
 					data: getCircuitXML.call(self)
 				});
-				//error treatment
 				if (answer.canceled)
 					choice = 1;		// Cancel: 1
 				else if (answer.error) {
-					//later popup with error
 					console.log(answer);
 					choice = 5;		// Error: 5
 				}
@@ -274,7 +268,6 @@ function createBoardItem(options: any): EC | Wire {
 	if (!options.id) {
 		options.id = `${name}-${base.count}`;
 	}
-	//use template to create label according to defined strategy
 	let
 		label = base.comp.meta.nameTmpl.replace(regex,
 			function (match: string, group: string): string { //, offset: number, str: string

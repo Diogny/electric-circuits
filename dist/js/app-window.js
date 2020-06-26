@@ -7,6 +7,7 @@ var utils_1 = require("./utils");
 var point_1 = require("./point");
 var ecprop_1 = require("./ecprop");
 var board_window_1 = require("./board-window");
+var action_manager_1 = require("./action-manager");
 var AppWindow = /** @class */ (function (_super) {
     tslib_1.__extends(AppWindow, _super);
     function AppWindow(options) {
@@ -75,19 +76,17 @@ var AppWindow = /** @class */ (function (_super) {
         return this.barTitle.innerText = (this.settings.bar = value), this;
     };
     AppWindow.prototype.onMouseEnter = function (e) {
-        this.app.sm.transition(interfaces_1.StateType.WINDOW, interfaces_1.ActionType.START);
-        this.app.bottomBarLeft.innerHTML = "&nbsp;";
+        action_manager_1.default.$.transition(interfaces_1.StateType.WINDOW, interfaces_1.ActionType.START);
         this.settings.offset && (this.settings.offset = new point_1.default(e.offsetX, e.offsetY));
         //console.log('IN app window', e.eventPhase, (e.target as HTMLElement).id);
     };
     AppWindow.prototype.onMouseLeave = function (e) {
-        this.app.sm.transition(interfaces_1.StateType.BOARD, interfaces_1.ActionType.RESUME);
+        action_manager_1.default.$.transition(interfaces_1.StateType.BOARD, interfaces_1.ActionType.RESUME);
         this.renderBar("");
         //console.log('OUT of app window', e.eventPhase, (e.target as HTMLElement).id);
     };
     AppWindow.prototype.setVisible = function (value) {
-        _super.prototype.setVisible.call(this, value);
-        if (this.visible) {
+        if (_super.prototype.setVisible.call(this, value).visible) {
             var _a = checkPosition(this, this.x, this.y), x = _a.x, y = _a.y;
             this.move(x, y);
         }
@@ -129,7 +128,8 @@ var AppWindow = /** @class */ (function (_super) {
         this.settings.compId = comp.id;
         comp.properties().forEach(function (name) {
             _this.appendPropChild(new ecprop_1.default(comp, name, function onEcPropChange(value) {
-                //console.log(this, value)
+                action_manager_1.default.$.app.circuit.modified = true;
+                action_manager_1.default.$.app.updateCircuitLabel();
             }, true));
         });
         this.setVisible(true);
@@ -163,31 +163,31 @@ var AppWindow = /** @class */ (function (_super) {
 exports.default = AppWindow;
 function checkPosition(win, x, y) {
     return {
-        x: dab_1.clamp(x, 0, win.app.size.width - win.win.offsetWidth),
-        y: dab_1.clamp(y, 0, win.app.contentHeight - win.win.offsetHeight)
+        x: dab_1.clamp(x, 0, action_manager_1.default.$.app.size.width - win.win.offsetWidth),
+        y: dab_1.clamp(y, 0, action_manager_1.default.$.app.contentHeight - win.win.offsetHeight)
     };
 }
 function dragWindow(win) {
     var ofsx = 0, ofsy = 0;
-    win.titleHTML.onmousedown = dragMouseDown;
+    win.titleHTML.addEventListener("mousedown", dragMouseDown, false);
     function dragMouseDown(e) {
         e = e || window.event;
         e.preventDefault();
         ofsx = e.offsetX;
         ofsy = e.offsetY;
-        document.onmouseup = closeDragElement;
-        document.onmousemove = elementDrag;
+        document.addEventListener("mouseup", closeDragElement, false);
+        document.addEventListener("mousemove", elementDrag, false);
         dab_1.addClass(win.titleHTML, "dragging");
     }
     function elementDrag(e) {
         e = e || window.event;
         e.preventDefault();
-        var _a = checkPosition(win, e.clientX - ofsx - win.app.board.offsetLeft, e.clientY - ofsy - win.app.board.offsetTop), x = _a.x, y = _a.y;
+        var _a = checkPosition(win, e.clientX - ofsx - action_manager_1.default.$.app.boardOffsetLeft, e.clientY - ofsy - action_manager_1.default.$.app.boardOffsetTop), x = _a.x, y = _a.y;
         win.move(x, y);
     }
     function closeDragElement() {
-        document.onmouseup = null;
-        document.onmousemove = null;
+        document.removeEventListener("mouseup", closeDragElement, false);
+        document.removeEventListener("mousemove", elementDrag, false);
         dab_1.removeClass(win.titleHTML, "dragging");
     }
 }

@@ -3,9 +3,9 @@ import { IAppWindowProperties, IAppWindowOptions, StateType, ActionType } from "
 import { html } from "./utils";
 import Point from "./point";
 import EcProp from "./ecprop";
-import { MyApp } from "./myapp";
 import { ItemBoard } from "./itemsBoard";
 import BoardWindow from "./board-window";
+import ActionManager from "./action-manager";
 
 export default class AppWindow extends BoardWindow {
 
@@ -76,21 +76,19 @@ export default class AppWindow extends BoardWindow {
 	}
 
 	public onMouseEnter(e: MouseEvent) {
-		(this.app as MyApp).sm.transition(StateType.WINDOW, ActionType.START);
-		(this.app as MyApp).bottomBarLeft.innerHTML = "&nbsp;";
+		ActionManager.$.transition(StateType.WINDOW, ActionType.START);
 		this.settings.offset && (this.settings.offset = new Point(e.offsetX, e.offsetY));
 		//console.log('IN app window', e.eventPhase, (e.target as HTMLElement).id);
 	}
 
 	public onMouseLeave(e: MouseEvent) {
-		(this.app as MyApp).sm.transition(StateType.BOARD, ActionType.RESUME);
+		ActionManager.$.transition(StateType.BOARD, ActionType.RESUME);
 		this.renderBar("");
 		//console.log('OUT of app window', e.eventPhase, (e.target as HTMLElement).id);
 	}
 
 	public setVisible(value: boolean): AppWindow {
-		super.setVisible(value);
-		if (this.visible) {
+		if (super.setVisible(value).visible) {
 			let
 				{ x, y } = checkPosition(this, this.x, this.y);
 			this.move(x, y);
@@ -138,7 +136,8 @@ export default class AppWindow extends BoardWindow {
 		comp.properties().forEach((name: string) => {
 			this.appendPropChild(new EcProp(<ItemBoard>comp, name,
 				function onEcPropChange(value: any) {
-					//console.log(this, value)
+					ActionManager.$.app.circuit.modified = true;
+					ActionManager.$.app.updateCircuitLabel();
 				}, true));
 		});
 		this.setVisible(true);
@@ -176,8 +175,8 @@ export default class AppWindow extends BoardWindow {
 
 function checkPosition(win: AppWindow, x: number, y: number): { x: number, y: number } {
 	return {
-		x: clamp(x, 0, (win.app as MyApp).size.width - win.win.offsetWidth),
-		y: clamp(y, 0, (win.app as MyApp).contentHeight - win.win.offsetHeight)
+		x: clamp(x, 0, ActionManager.$.app.size.width - win.win.offsetWidth),
+		y: clamp(y, 0, ActionManager.$.app.contentHeight - win.win.offsetHeight)
 	}
 }
 
@@ -186,15 +185,15 @@ function dragWindow(win: AppWindow) {
 		ofsx = 0,
 		ofsy = 0;
 
-	win.titleHTML.onmousedown = dragMouseDown;
+	win.titleHTML.addEventListener("mousedown", dragMouseDown, false);
 
 	function dragMouseDown(e: MouseEvent) {
 		e = e || window.event;
 		e.preventDefault();
 		ofsx = e.offsetX;
 		ofsy = e.offsetY;
-		document.onmouseup = closeDragElement;
-		document.onmousemove = elementDrag;
+		document.addEventListener("mouseup", closeDragElement, false);
+		document.addEventListener("mousemove", elementDrag, false);
 		addClass(win.titleHTML, "dragging")
 	}
 
@@ -203,14 +202,14 @@ function dragWindow(win: AppWindow) {
 		e.preventDefault();
 		let
 			{ x, y } = checkPosition(win,
-				e.clientX - ofsx - (win.app as MyApp).board.offsetLeft,
-				e.clientY - ofsy - (win.app as MyApp).board.offsetTop);
+				e.clientX - ofsx - ActionManager.$.app.boardOffsetLeft,
+				e.clientY - ofsy - ActionManager.$.app.boardOffsetTop);
 		win.move(x, y);
 	}
 
 	function closeDragElement() {
-		document.onmouseup = null;
-		document.onmousemove = null;
+		document.removeEventListener("mouseup", closeDragElement, false);
+		document.removeEventListener("mousemove", elementDrag, false);
 		removeClass(win.titleHTML, "dragging")
 	}
 }

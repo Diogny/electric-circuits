@@ -23,11 +23,9 @@ export class Label extends ItemBase {
 	get fontSize(): number { return this.settings.fontSize }
 
 	constructor(options: ILabelText) {
-		//set defaults
 		options.visible = false;
 		super(options);
 		this.text = '';
-		//create label
 		this.t = <SVGTextElement>tag("text", "", {});
 		aCld(this.g, this.t);
 	}
@@ -35,7 +33,7 @@ export class Label extends ItemBase {
 	public move(x: number, y: number): Label {
 		super.move(x, y);
 		attr(this.g, { transform: "translate(" + this.x + " " + this.y + ")" });
-		return this;	//chaining
+		return this;
 	}
 
 	public setFontSize(value: number): Label {

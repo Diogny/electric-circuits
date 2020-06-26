@@ -26,13 +26,10 @@ export class Bond implements TypedClass {
 		if (!from || !to)
 			throw 'empty bond';
 		this.from = this.create(from, pin);
-		//by default a destination bond has at least one item
 		this.to = [];
-		//adds the first to bond
 		this.add(to, node);
 	}
 
-	//returns true if this bond is connected to an specific EC
 	public has(id: string): boolean { return this.to.some((b) => id == b.id) }
 
 	public get(id: string): IBondItem | undefined {
@@ -68,22 +65,17 @@ export class Bond implements TypedClass {
 		let
 			ndx = this.to.findIndex((b) => b.id == id),
 			b: IBondItem | null = (ndx == -1) ? null : this.to[ndx];
-		//remove from array
 		(b != null) && this.to.splice(ndx, 1);
-		//return the removed bond or null
 		return b;
 	}
 
-	//for Debugging purposes
 	public toString = (): string => {
 		let
 			fn = (o: IBondItem) => `#${o.id} [${o.ndx}]`,
 			toStr = this.to.map((b) => fn(b)).join(', ');
-
 		return `from ${fn(this.from)} to ${toStr}`
 	}
 
-	//for Debugging purposes
 	public static display = (arr: Bond[]): string[] => { return arr.map((o) => o.toString()) }
 
 }

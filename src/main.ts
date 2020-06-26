@@ -65,7 +65,7 @@ function createMainWindow(opt: any) {
 
 	if (isDevelopment) {
 		//uncomment for not dev
-		mainWindow.webContents.openDevTools()
+		//mainWindow.webContents.openDevTools()
 	}
 
 	mainWindow.webContents.on('devtools-opened', () => {
@@ -74,7 +74,6 @@ function createMainWindow(opt: any) {
 			mainWindow.focus()
 		})
 	})
-
 	mainWindow.removeMenu();
 }
 
@@ -108,7 +107,7 @@ function createPrintWindow(rect: { width: number, height: number }) {
 	printWindow.once('ready-to-show', () => {
 		//printWindow.show();
 	});
-	printWindow.webContents.openDevTools();
+	//printWindow.webContents.openDevTools();
 	printWindow.on("closed", (e: any) => {
 		printWindow = <any>null;
 	});
@@ -146,8 +145,8 @@ function createHelpWindow() {
 	helpWindow.loadFile(url);
 	helpWindow.once('ready-to-show', () => {
 		//helpWindow.show();
-		//helpWindow.webContents.openDevTools();
 	});
+	//helpWindow.webContents.openDevTools();
 	helpWindow.on("closed", (e: any) => {
 		helpWindow = <any>null;
 	});

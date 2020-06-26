@@ -13,7 +13,6 @@ var Bond = /** @class */ (function () {
      */
     function Bond(from, to, node, pin) {
         var _this = this;
-        //for Debugging purposes
         this.toString = function () {
             var fn = function (o) { return "#" + o.id + " [" + o.ndx + "]"; }, toStr = _this.to.map(function (b) { return fn(b); }).join(', ');
             return "from " + fn(_this.from) + " to " + toStr;
@@ -21,9 +20,7 @@ var Bond = /** @class */ (function () {
         if (!from || !to)
             throw 'empty bond';
         this.from = this.create(from, pin);
-        //by default a destination bond has at least one item
         this.to = [];
-        //adds the first to bond
         this.add(to, node);
     }
     Object.defineProperty(Bond.prototype, "type", {
@@ -42,7 +39,6 @@ var Bond = /** @class */ (function () {
         enumerable: false,
         configurable: true
     });
-    //returns true if this bond is connected to an specific EC
     Bond.prototype.has = function (id) { return this.to.some(function (b) { return id == b.id; }); };
     Bond.prototype.get = function (id) {
         return this.to.find(function (b) { return id == b.id; });
@@ -71,12 +67,9 @@ var Bond = /** @class */ (function () {
      */
     Bond.prototype.remove = function (id) {
         var ndx = this.to.findIndex(function (b) { return b.id == id; }), b = (ndx == -1) ? null : this.to[ndx];
-        //remove from array
         (b != null) && this.to.splice(ndx, 1);
-        //return the removed bond or null
         return b;
     };
-    //for Debugging purposes
     Bond.display = function (arr) { return arr.map(function (o) { return o.toString(); }); };
     return Bond;
 }());

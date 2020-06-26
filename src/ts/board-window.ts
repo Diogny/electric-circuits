@@ -12,9 +12,6 @@ export default class BoardWindow extends BaseWindow {
 	get size(): ISize { return this.settings.size }
 
 	set size(value: ISize) {
-		if (!pojo(value)) {
-			return;
-		}
 		this.settings.size = {
 			width: Math.max(BoardWindow.minWidth, value.width | 0),
 			height: Math.max(BoardWindow.minHeight, value.height | 0)

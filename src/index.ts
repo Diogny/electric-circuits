@@ -17,6 +17,7 @@ import EC from "./ts/ec";
 import Rect from "./ts/rect";
 import { Circuit, CircuitProperty } from "./ts/circuit";
 import { Templates } from "./ts/templates";
+import ActionManager from "./ts/action-manager";
 
 let
 	app: MyApp,
@@ -76,7 +77,10 @@ let
 		//console.log(`BOARD key code: ${code}`)
 		switch (code) {
 			case 'CtrlKeyA':
-				app.execute(Action.SELECT_ALL, "");
+				ActionManager.$.execute(Action.SELECT_ALL, "");
+				break;
+			case 'CtrlKeyU':
+				ActionManager.$.execute(Action.UNSELECT_ALL, "");
 				break;
 			case 'CtrlKeyS':
 				saveCircuit();
@@ -106,7 +110,7 @@ let
 				ipcRenderer.sendSync('help-circuit');
 				break;
 			case 'Delete':
-				app.execute(Action.DELETE_SELECTED, "");
+				ActionManager.$.execute(Action.DELETE_SELECTED, "");
 				break;
 			case 'ArrowLeft':
 			case 'ArrowUp':
@@ -307,7 +311,7 @@ function registerBoardState() {
 			UP: function (newCtx: IMouseState) {
 				app.sm.data.mouseDown = false;
 				if (newCtx.button == 0)
-					app.execute(Action.UNSELECT_ALL, "");
+					ActionManager.$.execute(Action.UNSELECT_ALL, "");
 				app.rightClick.setVisible(false);
 				app.sm.data.panningVector && (
 					app.sm.data.panningVector = void 0,
@@ -375,7 +379,7 @@ function registerEcBodyState() {
 			UP: function (newCtx: IMouseState) {
 				app.sm.data.mouseDown = false;
 				app.rightClick.setVisible(false);
-				(newCtx.button == 0) && app.execute(
+				(newCtx.button == 0) && ActionManager.$.execute(
 					newCtx.ctrlKey ?
 						Action.TOGGLE_SELECT :  // Ctrl+click	=> toggle select
 						Action.SELECT,  		// click		=> select one
@@ -429,7 +433,7 @@ function registerEcDragState() {
 				if (!newCtxIt)
 					throw `EC_DRAG on undefined EC`;
 				!app.circuit.selectedComponents.some(comp => comp.id == newCtxIt.id) &&
-					(app.execute(Action.SELECT, `${newCtxIt.id}::${newCtxIt.name}::body`));
+					(ActionManager.$.execute(Action.SELECT, `${newCtxIt.id}::${newCtxIt.name}::body`));
 				self.data = {
 					it: it,
 					className: "dragging",
@@ -591,7 +595,7 @@ function registerNewWireFromEcState() {
 				app.addToDOM(app.sm.data.wire);
 				app.updateCircuitLabel();
 				app.sm.data.wire.bond(0, ec, node);
-				app.execute(Action.UNSELECT_ALL, "");
+				ActionManager.$.execute(Action.UNSELECT_ALL, "");
 				app.sm.data.selectedItem = undefined;
 			},
 		}
@@ -688,7 +692,7 @@ function registerWireLineState() {
 				(newCtx.button == 0
 					&& app.sm.data.mouseDown)
 					&& (app.sm.data.mouseDown = false,
-						app.execute(
+						ActionManager.$.execute(
 							newCtx.ctrlKey ?
 								Action.TOGGLE_SELECT :  // Ctrl+click	=> toggle select
 								Action.SELECT,  		// click		=> select one
@@ -893,6 +897,7 @@ window.addEventListener("DOMContentLoaded", () => {
 				},
 				list: json
 			});
+			ActionManager.create(app);
 			updateViewBox(ipcRenderer.sendSync('get-win-size', ''));
 			app.board.appendChild(app.winProps.win);
 			app.board.appendChild(app.rightClick.win);

@@ -21,6 +21,7 @@ var selection_rect_1 = require("./selection-rect");
 var circuit_1 = require("./circuit");
 var dialog_windows_1 = require("./dialog-windows");
 var templates_1 = require("./templates");
+var action_manager_1 = require("./action-manager");
 var MyApp = /** @class */ (function (_super) {
     tslib_1.__extends(MyApp, _super);
     function MyApp(options) {
@@ -113,7 +114,6 @@ var MyApp = /** @class */ (function (_super) {
         _this.updateCircuitLabel();
         //this'll hold the properties of the current selected component
         _this.winProps = new app_window_1.default({
-            app: _this,
             id: "win-props",
             x: 800,
             y: 0,
@@ -144,7 +144,7 @@ var MyApp = /** @class */ (function (_super) {
                 KEY: function (code) {
                     //console.log(`KEY: ${code}`);
                     //this's the default
-                    (code == "Delete") && that.execute(interfaces_1.ActionType.DELETE, "");
+                    (code == "Delete") && action_manager_1.default.$.execute(interfaces_1.ActionType.DELETE, "");
                 },
                 HIDE_NODE: hideNodeTooltip,
                 FORWARD_OVER: function (newCtx) {
@@ -214,6 +214,7 @@ var MyApp = /** @class */ (function (_super) {
                 case 'F1':
                     break;
                 case 'KeyA': // CtrlKeyA		select all ECs
+                case 'KeyU': // CtrlKeyU		unselect all ECs
                 case 'KeyC': // CtrlKeyC		copy selected ECs
                 case 'KeyV': // CtrlKeyV		paste cloned selected ECs
                 //case 'KeyX':	// CtrlKeyX		cut selected ECs - see if it makes sense
@@ -234,6 +235,16 @@ var MyApp = /** @class */ (function (_super) {
         }, false);
         return _this;
     }
+    Object.defineProperty(MyApp.prototype, "boardOffsetLeft", {
+        get: function () { return this.board.offsetLeft; },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(MyApp.prototype, "boardOffsetTop", {
+        get: function () { return this.board.offsetTop; },
+        enumerable: false,
+        configurable: true
+    });
     Object.defineProperty(MyApp.prototype, "tooltipOfs", {
         get: function () { return 15; },
         enumerable: false,
@@ -279,7 +290,7 @@ var MyApp = /** @class */ (function (_super) {
     };
     MyApp.prototype.refreshViewBoxData = function () {
         this.bottomBarCenter.innerHTML = templates_1.Templates.nano('viewBox01', this.viewBox) + "&nbsp; ";
-        //+ n ano(this.templates.size01, this.size);
+        //+ na no(this.templates.size01, this.size);
     };
     MyApp.prototype.getAspectRatio = function (width, height) {
         var ratio = width / height;
@@ -301,112 +312,6 @@ var MyApp = /** @class */ (function (_super) {
         var isEC = ec && (ec.type == types_1.Type.EC), rotation = isEC ? ec.rotation : 0;
         this.prop("rot_lbl").value = " " + rotation + "\u00B0";
         isEC && (this.winProps.compId == (ec === null || ec === void 0 ? void 0 : ec.id)) && ((_a = this.winProps.property("rotation")) === null || _a === void 0 ? void 0 : _a.refresh());
-    };
-    //public execute({ action, trigger, data }: { action: ActionType; trigger: string; data?: any; }) {
-    MyApp.prototype.execute = function (action, trigger) {
-        var arr = trigger.split('::'), comp = this.circuit.get(arr.shift()), name = arr.shift(), type = arr.shift(), nodeOrLine = parseInt(arr.shift()), data = arr.shift(), compNull = false;
-        //this's a temporary fix to make it work
-        //	final code will have a centralized action dispatcher
-        switch (action) {
-            case interfaces_1.ActionType.TOGGLE_SELECT:
-                if (!(compNull = !comp) && comp.type == types_1.Type.EC) {
-                    this.circuit.toggleSelect(comp);
-                    this.refreshRotation(this.circuit.ec);
-                    (this.circuit.ec && (this.winProps.load(this.circuit.ec), 1)) || this.winProps.clear();
-                    //temporary, for testings...
-                    this.circuit.ec && (window.ec = this.circuit.ec);
-                }
-                break;
-            case interfaces_1.ActionType.SELECT:
-                if (!(compNull = !comp) && comp.type == types_1.Type.EC) {
-                    this.circuit.selectThis(comp);
-                    this.refreshRotation(comp);
-                    ((action == interfaces_1.ActionType.SELECT) && (this.winProps.load(comp), 1)) || this.winProps.clear();
-                    //temporary, for testings...
-                    window.ec = this.circuit.ec;
-                }
-                break;
-            case interfaces_1.ActionType.SELECT_ALL:
-                this.circuit.selectAll(true);
-                this.refreshRotation();
-                this.winProps.clear();
-                //temporary, for testings...
-                window.ec = void 0;
-                break;
-            case interfaces_1.ActionType.UNSELECT_ALL:
-                this.circuit.selectAll(false);
-                this.refreshRotation();
-                this.winProps.clear();
-                //temporary, for testings...
-                window.ec = void 0;
-                break;
-            case interfaces_1.ActionType.DELETE_SELECTED:
-                var selectedCount = this.circuit.selectedComponents.length, deletedCount = this.circuit.deleteSelected();
-                this.refreshRotation();
-                this.winProps.clear().setVisible(false);
-                this.tooltip.setVisible(false);
-                this.updateCircuitLabel();
-                if (selectedCount != deletedCount) {
-                    console.log("[" + deletedCount + "] components of [" + selectedCount + "]");
-                }
-                //temporary, for testings...
-                window.ec = void 0;
-                break;
-            case interfaces_1.ActionType.DELETE:
-                //only comp if sent
-                if (!(compNull = !comp)) {
-                    if (this.circuit.delete(comp)) {
-                        this.refreshRotation();
-                        this.winProps.clear().setVisible(false);
-                        this.tooltip.setVisible(false);
-                        this.updateCircuitLabel();
-                        this.sm.send(interfaces_1.ActionType.AFTER_DELETE, comp.id);
-                    }
-                }
-                //temporary, for testings...
-                window.ec = void 0;
-                break;
-            case interfaces_1.ActionType.DELETE_THIS_LINE:
-                //console.log(`delete line segment: `, trigger);
-                if (!(compNull = !comp)) {
-                    comp.deleteLine(nodeOrLine);
-                    this.winProps.refresh();
-                    this.updateCircuitLabel();
-                }
-                break;
-            case interfaces_1.ActionType.DELETE_WIRE_NODE:
-                //console.log(`delete wire node: `, trigger);
-                if (!(compNull = !comp)) {
-                    comp.deleteNode(nodeOrLine);
-                    this.winProps.refresh();
-                    this.updateCircuitLabel();
-                }
-                break;
-            case interfaces_1.ActionType.SPLIT_THIS_LINE:
-                //console.log(`split line segment: `, trigger, this.rightClick.offset);
-                if (!(compNull = !comp)) {
-                    comp.insertNode(nodeOrLine, this.rightClick.offset);
-                    this.winProps.refresh();
-                    this.updateCircuitLabel();
-                }
-                break;
-            case interfaces_1.ActionType.SHOW_PROPERTIES:
-                !(compNull = !comp) && this.winProps.load(comp);
-                break;
-            case interfaces_1.ActionType.ROTATE_45_CLOCKWISE:
-            case interfaces_1.ActionType.ROTATE_45_COUNTER_CLOCKWISE:
-            case interfaces_1.ActionType.ROTATE_90_CLOCKWISE:
-            case interfaces_1.ActionType.ROTATE_90_COUNTER_CLOCKWISE:
-                !(compNull = !comp) && data && this.rotateComponentBy(data | 0, comp);
-                break;
-        }
-        //logs
-        if (compNull) {
-            console.log("invalid trigger: " + trigger);
-        }
-        else {
-            //console.log(`action: ${action}, id: ${comp?.id}, name: ${name}, type: ${type}, trigger: ${trigger}`);
-        }
     };
     MyApp.prototype.addToDOM = function (comp) {
         switch (comp.type) {

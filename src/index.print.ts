@@ -3,7 +3,7 @@ import { qS, templatesDOM } from "./ts/utils"
 import Rect from "./ts/rect";
 import { aEL, attr } from "./ts/dab";
 import { DialogWindow } from "./ts/dialog-windows";
-import { ITemplate } from "./ts/interfaces";
+import { Templates } from "./ts/templates";
 
 let
 	div = <HTMLDivElement>qS('#board'),
@@ -11,9 +11,6 @@ let
 	svg: SVGElement = <any>void 0,
 	rects: { zoom: string, rect: Rect }[] = <any>void 0,
 	isPrinting = false,
-	app = <ITemplate>{
-		templates: {}
-	},
 	printSVG = () => {
 		controls.classList.add("hide");
 		isPrinting = true;
@@ -52,16 +49,13 @@ ipcRenderer.on("after-print", (event, arg) => {
 });
 
 templatesDOM("dialogWin01")
-	.then(templates => {
-		app.templates = templates;
-
+	.then(tmpls => {
+		Templates.register(tmpls);
 		msgBox = new DialogWindow(<any>{
-			app: app,
 			id: "win-dialog",
 		});
 		qS('body').append(msgBox.win);
 		(<any>window).dialog = msgBox;
-
 		let
 			answer = ipcRenderer.sendSync("get-svg");
 		if (answer.svg) {
@@ -73,9 +67,7 @@ templatesDOM("dialogWin01")
 					ipcRenderer.sendSync("close-print-win")
 				}
 			}, false);
-
 			rects = answer.rects;
-
 			controls.innerHTML = rects.map((o, ndx) => {
 				return `<input type="button" value="${o.zoom}" data-index="${ndx}">`
 			})

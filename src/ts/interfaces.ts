@@ -6,13 +6,14 @@ import Prop from "./props";
 import Rect from "./rect";
 import Size from "./size";
 import Tooltip from "./tooltip";
-import HtmlWindow from "./app-window";
 import StateMachine from "./stateMachine";
 import { ItemBoard } from "./itemsBoard";
-import { Application } from "./app";
 import EcProp from "./ecprop";
 import EC from "./ec";
 import Wire from "./wire";
+import { Circuit } from "./circuit";
+import AppWindow from "./app-window";
+import ContextWindow from "./context-window";
 
 export interface IExec {
 	result: any;
@@ -95,21 +96,25 @@ export interface IMyAppOptions extends IApplicationOptions {
 
 export interface IMyApp extends IApplication {
 	rootDir: string;
-	board: HTMLElement;
-	svgBoard: SVGElement;
-
+	size: Size;
 	ratio: number;
 	viewBox: Rect;
 	baseViewBox: Size;
+	contentHeight: number;
+	boardOffsetLeft: number;
+	boardOffsetTop: number
 	//zoom: number;
 	ratioX: number;
 	ratioY: number;
 	center: Point;
+	circuit: Circuit;
+	winProps: AppWindow;
+	rightClick: ContextWindow;
 	tooltip: Tooltip;
-	bottomBarLeft: HTMLElement;
-	winProps: HtmlWindow;
-
 	sm: StateMachine;
+	refreshRotation(ec?: ItemBoard): void;
+	updateCircuitLabel(): void;
+	rotateComponentBy(angle: number, comp?: ItemBoard): void;
 }
 
 export interface IMouseState {
@@ -315,7 +320,6 @@ export interface ITemplate {
 }
 
 export interface IBaseWindowOptions extends IItemBaseOptions {
-	app: ITemplate;
 	title: string;
 	templateName: string;
 }
@@ -487,13 +491,13 @@ export enum ActionType {
 
 //***************************************** Dialog Windows ************************************//
 
-export enum DialogType {
-	OK = 0,
-	Canceled = 1,		// ESC openFile, saveFile, == Don't Save
-	Error = 2,
+export enum DialogType {	// Save: 0, Cancel: 1, Error: 5
+	Save = 0,
+	Cancel = 1,		// ESC openFile, saveFile, == Don't Save
+	
 	Loaded = 3,
 	Saved = 4,
-
+	Error = 5,
 }
 
 /*

@@ -57,11 +57,11 @@ var ActionType;
 //***************************************** Dialog Windows ************************************//
 var DialogType;
 (function (DialogType) {
-    DialogType[DialogType["OK"] = 0] = "OK";
-    DialogType[DialogType["Canceled"] = 1] = "Canceled";
-    DialogType[DialogType["Error"] = 2] = "Error";
+    DialogType[DialogType["Save"] = 0] = "Save";
+    DialogType[DialogType["Cancel"] = 1] = "Cancel";
     DialogType[DialogType["Loaded"] = 3] = "Loaded";
     DialogType[DialogType["Saved"] = 4] = "Saved";
+    DialogType[DialogType["Error"] = 5] = "Error";
 })(DialogType = exports.DialogType || (exports.DialogType = {}));
 /*
 

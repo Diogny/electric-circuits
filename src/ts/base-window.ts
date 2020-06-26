@@ -1,6 +1,6 @@
 import Item from "./item";
 import { Type } from "./types";
-import { IBaseWindowSettings, ISize, IBaseWindowOptions, ITemplate } from "./interfaces";
+import { IBaseWindowSettings, ISize, IBaseWindowOptions } from "./interfaces";
 import { obj, extend } from "./dab";
 import { html } from "./utils";
 import { Templates } from "./templates";
@@ -11,8 +11,6 @@ export default class BaseWindow extends Item {
 
 	get type(): Type { return Type.WIN }
 
-	get app(): ITemplate { return this.settings.app }
-
 	get win(): HTMLElement { return this.settings.win }
 
 	get title(): string { return this.settings.title }
@@ -21,7 +19,7 @@ export default class BaseWindow extends Item {
 	}
 
 	get ClientRect(): ISize {
-		let b = this.win.getBoundingClientRect();//gives the DOM screen info
+		let b = this.win.getBoundingClientRect();
 		return obj({
 			width: b.width | 0,
 			height: b.height | 0
@@ -48,7 +46,6 @@ export default class BaseWindow extends Item {
 
 	public propertyDefaults(): IBaseWindowOptions {
 		return extend(super.propertyDefaults(), {
-			app: void 0,
 			visible: false,
 			ignoreHeight: false,
 			title: "",

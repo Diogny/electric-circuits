@@ -3,10 +3,10 @@ import {
 } from "./interfaces";
 import { each } from "./utils";
 import { aEL, getParentAttr, attr, extend, clone } from "./dab";
-import { MyApp } from "./myapp";
 import Point from "./point";
 import BoardWindow from "./board-window";
 import { Templates } from "./templates";
+import ActionManager from "./action-manager";
 
 export default class ContextWindow extends BoardWindow {
 
@@ -39,7 +39,10 @@ export default class ContextWindow extends BoardWindow {
 				trigger = attr(self.parentElement, "data-trigger");
 			self
 				&& !disabled
-				&& (that.setVisible(false), data && (trigger += `::${data}`), (that.app as MyApp).execute(action, trigger))
+				&& (that.setVisible(false),
+					data && (trigger += `::${data}`),
+					ActionManager.$.execute(action, trigger)
+				)
 		}, false)
 	}
 
@@ -49,7 +52,7 @@ export default class ContextWindow extends BoardWindow {
 	}
 
 	public onMouseLeave(e: MouseEvent) {
-		(this.app as MyApp).sm.transition(StateType.BOARD, ActionType.RESUME);
+		ActionManager.$.transition(StateType.BOARD, ActionType.RESUME);
 	}
 
 	public setVisible(value: boolean): ContextWindow {
@@ -97,15 +100,13 @@ export default class ContextWindow extends BoardWindow {
 		if (entry) {
 			this.settings.current = key;
 			this.clear();
-			let
-				html = entry.map(value => {
-					let
-						o = clone<IContextMenuItem>(value);
-					(value.enabled && !value.enabled.some(i => i == state)) && (o.disabled = "disabled");
-					return Templates.nano('ctxItem01', o)
-				}
-				).join('');
-			this.win.innerHTML = html;
+			this.win.innerHTML = entry.map(value => {
+				let
+					o = clone<IContextMenuItem>(value);
+				(value.enabled && !value.enabled.some(i => i == state)) && (o.disabled = "disabled");
+				return Templates.nano('ctxItem01', o)
+			}
+			).join('');
 			this.settings.offset = offset;
 		} else
 			this.settings.offset = Point.origin;

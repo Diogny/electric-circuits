@@ -10,11 +10,9 @@ var Label = /** @class */ (function (_super) {
     tslib_1.__extends(Label, _super);
     function Label(options) {
         var _this = this;
-        //set defaults
         options.visible = false;
         _this = _super.call(this, options) || this;
         _this.text = '';
-        //create label
         _this.t = utils_1.tag("text", "", {});
         dab_1.aCld(_this.g, _this.t);
         return _this;
@@ -43,7 +41,7 @@ var Label = /** @class */ (function (_super) {
     Label.prototype.move = function (x, y) {
         _super.prototype.move.call(this, x, y);
         dab_1.attr(this.g, { transform: "translate(" + this.x + " " + this.y + ")" });
-        return this; //chaining
+        return this;
     };
     Label.prototype.setFontSize = function (value) {
         this.settings.fontSize = value;

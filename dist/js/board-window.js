@@ -16,9 +16,6 @@ var BoardWindow = /** @class */ (function (_super) {
     Object.defineProperty(BoardWindow.prototype, "size", {
         get: function () { return this.settings.size; },
         set: function (value) {
-            if (!dab_1.pojo(value)) {
-                return;
-            }
             this.settings.size = {
                 width: Math.max(BoardWindow.minWidth, value.width | 0),
                 height: Math.max(BoardWindow.minHeight, value.height | 0)
