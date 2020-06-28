@@ -73,7 +73,6 @@ export type ComponentPropertyType = string | IComponentProperty;
 //***************************************** Application ************************************//
 
 export interface IApplicationOptions {
-	templates: any;
 	includePropsInThis: boolean;
 	props: { [x: string]: IUIPropertyOptions };
 	list: Map<string, IContextMenuItem[]>
@@ -81,7 +80,6 @@ export interface IApplicationOptions {
 
 export interface IApplicationSettings {
 	props: Map<string, IUIProperty>;
-	templates: any;
 }
 
 export interface IApplication {

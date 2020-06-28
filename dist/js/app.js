@@ -8,7 +8,6 @@ var Application = /** @class */ (function () {
         var _this = this;
         this.settings = dab_1.extend({}, options);
         this.settings.props = new Map();
-        !this.settings.templates && (this.settings.templates = {});
         Object.keys(options.props).forEach(function (key) {
             if (_this.add(options.props[key], key)) {
                 options.includePropsInThis
@@ -16,14 +15,6 @@ var Application = /** @class */ (function () {
             }
         });
     }
-    Object.defineProperty(Application.prototype, "templates", {
-        get: function () { return this.settings.templates; },
-        set: function (value) {
-            this.settings.templates = value;
-        },
-        enumerable: false,
-        configurable: true
-    });
     Application.prototype.has = function (key) { return this.settings.props.has(key); };
     Application.prototype.add = function (propOptions, key) {
         var p = new props_1.default(propOptions);

@@ -866,7 +866,6 @@ window.addEventListener("DOMContentLoaded", () => {
 			Templates.set('simplePoint', '{{ x }},{{ y }}');
 
 			app = new MyApp(<IMyAppOptions>{
-				templates: tmpls,
 				includePropsInThis: true,
 				props: {
 					rot_lbl: {

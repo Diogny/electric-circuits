@@ -1,5 +1,5 @@
 class Templates {
-	private static map: Map<string, string | number> = new Map();
+	private static map: Map<string, string> = new Map();
 
 	public static get(key: string): string { return <any>Templates.map.get(key) }
 
@@ -34,10 +34,7 @@ class Templates {
 	 */
 	public static parse(key: string, obj: any, beautify?: boolean) {
 		let
-			str = Templates.get(key),
-			parser = new DOMParser(),
-			//serializer = new XMLSerializer(),
-			xml = parser.parseFromString(str, "text/html"),  // XML.parse(str), // 
+			xml = XML.parse(Templates.get(key), "text/html"),
 			nsMap = new Map(),
 			getValue = (ns: string, o: any) => {
 				for (var arr = ns.split("."), f = o[<any>arr.shift()], i = 0, len = arr.length; f && len > i; i++)
@@ -52,7 +49,6 @@ class Templates {
 			},
 			processNode = (node: HTMLElement, rootName: string, arr: any[], ndx: number) => {
 				let
-					i = 0,
 					isMatch = false,
 					attributes = Array.from(node.attributes),
 					parseContent = (str: string) => {

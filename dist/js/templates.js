@@ -35,10 +35,7 @@ var Templates = /** @class */ (function () {
      * @param obj object to get values from
      */
     Templates.parse = function (key, obj, beautify) {
-        var str = Templates.get(key), parser = new DOMParser(), 
-        //serializer = new XMLSerializer(),
-        xml = parser.parseFromString(str, "text/html"), // XML.parse(str), // 
-        nsMap = new Map(), getValue = function (ns, o) {
+        var xml = XML.parse(Templates.get(key), "text/html"), nsMap = new Map(), getValue = function (ns, o) {
             for (var arr = ns.split("."), f = o[arr.shift()], i = 0, len = arr.length; f && len > i; i++)
                 f = f[arr[i]];
             return f;
@@ -47,7 +44,7 @@ var Templates = /** @class */ (function () {
             !value && nsMap.set(ns, value = getValue(ns, obj));
             return value;
         }, processNode = function (node, rootName, arr, ndx) {
-            var i = 0, isMatch = false, attributes = Array.from(node.attributes), parseContent = function (str) {
+            var isMatch = false, attributes = Array.from(node.attributes), parseContent = function (str) {
                 var regex = /\{\{\s*([\w\.]*)\s*\}\}/g, match, parsed = "", index = 0;
                 while (match = regex.exec(str)) {
                     parsed += str.substr(index, match.index - index);
@@ -65,8 +62,8 @@ var Templates = /** @class */ (function () {
                 parsed += str.substr(index, str.length - index);
                 return parsed;
             };
-            for (var i_1 = 0; i_1 < attributes.length; i_1++) {
-                var attr = attributes[i_1], attrName = attr.name, isIndex = attrName == 'd-for-ndx', removeUndefined = attrName.endsWith('?'), value = void 0;
+            for (var i = 0; i < attributes.length; i++) {
+                var attr = attributes[i], attrName = attr.name, isIndex = attrName == 'd-for-ndx', removeUndefined = attrName.endsWith('?'), value = void 0;
                 isMatch = false;
                 isIndex
                     ? (attrName = attr.value, value = ndx)
