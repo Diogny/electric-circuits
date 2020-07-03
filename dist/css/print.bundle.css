@@ -452,4 +452,9 @@ body {
   background-color: #32d6a1;
   border-right: 1px solid gray;
 }
+@media print {
+  #board-controls {
+    display: none;
+  }
+}
 

@@ -8,6 +8,8 @@ Used in my testing website [Electric Circuits](http://diogny.com/tests/circuits.
 
 ### Functionality and Wiring
 
+	Press F1 or Ctrl+H for Help
+	
 	Right-click shows context menu for individual board items
 	Board panning: Shift + Left-Click drag
 	Board ViewBox reset/center using tool button click
@@ -55,50 +57,4 @@ Used in my testing website [Electric Circuits](http://diogny.com/tests/circuits.
 ![last UI look](img/img12.png)
 
 ![modal dialog window](img/img13.png)
-
-### install development packajes
-	pnpm install --save-dev tsconfig-paths-webpack-plugin
-	pnpm install electron-reload --save-dev
-	pnpm install xml2js --save-dev
-	pnpm install @types/xml2js  --save-dev
-	pnpm install tslib --save-dev
-	pnpm install --save-dev css-loader style-loader file-loader mini-css-extract-plugin copy-webpack-plugin
-
-### testings
-	pnpm i mocha -D
-	pnpm i chai -D
-	
-### build/run
-	pnpm run build-dev		builds all
-	pnpm run start			builds all & starts electron app
-	pnpm run app			starts electron app
-
-### git
-	git init
-		Initialized empty Git repository in C:/Users/diogn/OneDrive/Projects/npm/electric-circuits/.git/
-
-### git add files
-	git add .
-	git add package.json
-	git add tsconfig.json
-	git add dist/
-	git add test/
-	git add readme.md
-	git add .gitignore
-	
-
-### git first commit
-	git commit -m "first commit"
-	git remote add origin https://github.com/Diogny/electric-circuits.git
-	git push -u origin master
-
-### git update
-	git status
-	git rm --cached dist/src/boardCircle.js
-	git add <file> ...	git add .
-	git add -u					stage the modified and deleted files
-	git add -A
-	git commit -m "update message"
-	git tag v1.1.17
-	git push origin master --tags
 

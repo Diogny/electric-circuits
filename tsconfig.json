@@ -10,7 +10,7 @@
 		"sourceMap": true,
 		"removeComments": false,
 		"noEmitOnError": true,
-		"outDir": "./dist/js",
+		"outDir": "./src/js",
 		"baseUrl": ".",
 		"paths": {
 			"src/*": [

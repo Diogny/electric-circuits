@@ -1,6 +1,7 @@
 import { ipcRenderer } from "electron";
 import { templatesDOM, qSA, qS } from "./ts/utils"
 import * as fs from 'fs';
+import * as path from "path";
 import {
 	IComponentOptions, StateType as State, ActionType as Action, IMachineState, IMouseState, IPoint, IMyAppOptions
 } from "./ts/interfaces";
@@ -21,6 +22,7 @@ import ActionManager from "./ts/action-manager";
 
 let
 	app: MyApp,
+	basePath = "",
 	showBodyAndTooltip = (offset: Point, label: string) => {
 		let
 			p = Point.translateBy(offset, app.tooltipOfs, app.tooltipOfs);
@@ -852,89 +854,94 @@ function readJson(path: string): any {
 }
 
 window.addEventListener("DOMContentLoaded", () => {
-	templatesDOM("viewBox01|size01|point01|baseWin01|ctxWin01|ctxItem01|propWin01|dialogWin01|formWin01|formFieldWinSpan|formFieldWinInput|circuitXml")
-		.then(async (tmpls) => {
-			let
-				json = readJson('./dist/data/library-circuits.v2.json');
-			json.forEach((element: IComponentOptions) => {
-				Comp.register(element);
-			});
-			json = readJson('./dist/data/context-menu.json');
+	ipcRenderer.invoke('shared-data', ['app.basePath'])
+		.then((v: string) => {
+			basePath = v;
 
-			Templates.register(tmpls);
-			Templates.set('circuitName', '<span class="{{ class }}">*</span><span>{{ name }}</span>');
-			Templates.set('simplePoint', '{{ x }},{{ y }}');
+			templatesDOM("viewBox01|size01|point01|baseWin01|ctxWin01|ctxItem01|propWin01|dialogWin01|formWin01|formFieldWinSpan|formFieldWinInput|circuitXml")
+				.then(async (tmpls) => {
+					let
+						json = readJson(path.join(basePath, 'data/library-circuits.v2.json'));
+					json.forEach((element: IComponentOptions) => {
+						Comp.register(element);
+					});
+					json = readJson(path.join(basePath, 'data/context-menu.json'));
 
-			app = new MyApp(<IMyAppOptions>{
-				includePropsInThis: true,
-				props: {
-					rot_lbl: {
-						tag: "#rot-lbl"
-					},
-					comp_option: {
-						tag: "#comp-option",
-						onChange: function (value: string, where: number) {
-							if (where != 1)		// 1 == "ui"
-								return;
-							//"value" has the string name of the selected component
-						}
-					},
-					cons_log: {
-						tag: "#cons-log",
-						onChange: function (value: boolean, where: number) {
-							app.sm.log = value;
-						}
-					},
-					theme_select: {
-						tag: 'select[tool="theme-select"]',
-						onChange: function (value: string, where: number) {
-							(where == 1)	// 1 == "ui"
-								&& (document.body.className != value)
-								&& (document.body.className = value);
-						}
-					}
-				},
-				list: json
-			});
-			ActionManager.create(app);
-			updateViewBox(ipcRenderer.sendSync('get-win-size', ''));
-			app.board.appendChild(app.winProps.win);
-			app.board.appendChild(app.rightClick.win);
-			app.svgBoard.append(app.dash.g);
-			app.svgBoard.append(app.selection.g);
-			app.svgBoard.append(app.tooltip.g);
-			app.svgBoard.append(app.highlight.g);
-			qS('body>footer').insertAdjacentElement("afterend", app.dialog.win);
-			qS('body>footer').insertAdjacentElement("afterend", app.form.win);
+					Templates.register(tmpls);
+					Templates.set('circuitName', '<span class="{{ class }}">*</span><span>{{ name }}</span>');
+					Templates.set('simplePoint', '{{ x }},{{ y }}');
 
-			hookEvents();
-			//register states
-			registerWindowState();
-			registerBoardState();
-			registerEcBodyState();
-			registerEcDragState();
-			registerEcNodeState();
-			registerNewWireFromEcState();
-			registerWireLineState();
-			registerWireNodeDragState();
-			registerWireLineDragState();
-			app.sm.enabled = true;
+					app = new MyApp(<IMyAppOptions>{
+						includePropsInThis: true,
+						props: {
+							rot_lbl: {
+								tag: "#rot-lbl"
+							},
+							comp_option: {
+								tag: "#comp-option",
+								onChange: function (value: string, where: number) {
+									if (where != 1)		// 1 == "ui"
+										return;
+									//"value" has the string name of the selected component
+								}
+							},
+							cons_log: {
+								tag: "#cons-log",
+								onChange: function (value: boolean, where: number) {
+									app.sm.log = value;
+								}
+							},
+							theme_select: {
+								tag: 'select[tool="theme-select"]',
+								onChange: function (value: string, where: number) {
+									(where == 1)	// 1 == "ui"
+										&& (document.body.className != value)
+										&& (document.body.className = value);
+								}
+							}
+						},
+						list: json
+					});
+					ActionManager.create(app);
+					updateViewBox(ipcRenderer.sendSync('get-win-size', ''));
+					app.board.appendChild(app.winProps.win);
+					app.board.appendChild(app.rightClick.win);
+					app.svgBoard.append(app.dash.g);
+					app.svgBoard.append(app.selection.g);
+					app.svgBoard.append(app.tooltip.g);
+					app.svgBoard.append(app.highlight.g);
+					qS('body>footer').insertAdjacentElement("afterend", app.dialog.win);
+					qS('body>footer').insertAdjacentElement("afterend", app.form.win);
 
-			//////////////////// TESTINGS /////////////////
-			//(<any>window).win = app.winProps;
-			//(<any>window).combo = app.prop("comp_option");
-			(<any>window).tooltip = app.tooltip;
-			(<any>window).rc = app.rightClick;
-			(<any>window).Rect = Rect;
-			(<any>window).MyApp = app;
-			(<any>window).dialog = app.dialog;
+					hookEvents();
+					//register states
+					registerWindowState();
+					registerBoardState();
+					registerEcBodyState();
+					registerEcDragState();
+					registerEcNodeState();
+					registerNewWireFromEcState();
+					registerWireLineState();
+					registerWireNodeDragState();
+					registerWireLineDragState();
+					app.sm.enabled = true;
 
-			console.log(`We are using Node.js ${process.versions.node}, Chromium ${process.versions.chrome}, and Electron ${process.versions.electron}`)
-			//////////////////// TESTINGS /////////////////
+					//////////////////// TESTINGS /////////////////
+					//(<any>window).win = app.winProps;
+					//(<any>window).combo = app.prop("comp_option");
+					(<any>window).tooltip = app.tooltip;
+					(<any>window).rc = app.rightClick;
+					(<any>window).Rect = Rect;
+					(<any>window).MyApp = app;
+					(<any>window).dialog = app.dialog;
+
+					console.log(`We are using Node.js ${process.versions.node}, Chromium ${process.versions.chrome}, and Electron ${process.versions.electron}`)
+					//////////////////// TESTINGS /////////////////
+				})
+				.catch((ex: any) => {
+					console.log(ex)
+				});
 		})
-		.catch((ex: any) => {
-			console.log(ex)
-		});
 });
 
 function updateViewBox(arg: any) {
@@ -953,6 +960,10 @@ ipcRenderer.on("win-resize", (event, arg) => {
 });
 
 ipcRenderer.on("check-before-exit", (event, arg) => {
+	if (!app) {
+		ipcRenderer.send('app-quit', '');
+		return;
+	}
 	if (app.dialog.visible
 		|| app.form.visible
 		|| app.circuitLoadingOrSaving)

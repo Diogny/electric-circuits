@@ -12,7 +12,7 @@ let
 	rects: { zoom: string, rect: Rect }[] = <any>void 0,
 	isPrinting = false,
 	printSVG = () => {
-		controls.classList.add("hide");
+		//controls.classList.add("hide");
 		isPrinting = true;
 		ipcRenderer.sendSync("print-svg");
 	},
@@ -42,7 +42,7 @@ let
 	};
 
 ipcRenderer.on("after-print", (event, arg) => {
-	controls.classList.remove("hide");
+	//controls.classList.remove("hide");
 	isPrinting = false;
 	if (arg.failureReason)
 		msgBox.showMessage("Print Information", arg.failureReason);

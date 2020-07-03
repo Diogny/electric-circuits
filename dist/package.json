@@ -1,0 +1,26 @@
+{
+	"name": "ecircuits",
+	"author": "Diogny A. B. <diognyab@outlook.com>",
+	"version": "1.1.17",
+	"description": "Creates electric circuits",
+	"license": "MIT",
+	"productName": "ECircuits App",
+	"homepage": "https://github.com/Diogny/electric-circuits",
+	"bugs": {
+		"url": "https://github.com/Diogny/electric-circuits/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/Diogny/electric-circuits.git"
+	},
+	"keywords": [
+		"Electron",
+		"electric",
+		"circuits",
+		"units",
+		"svg",
+		"package",
+		"dabberio"
+	],
+	"main": "./main.js"
+}
